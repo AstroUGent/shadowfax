@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<box>
+  <height>4.</height>
+  <width>4.</width>
+  <depth>4.</depth>
+  <origin>
+    <x>0.</x><y>0.</y><z>0.</z>
+  </origin>
+  <regions>
+    <region>
+      <height>4.</height>
+      <width>4.</width>
+      <depth>4.</depth>
+      <exponent>10.0</exponent>
+      <origin>
+        <x>0.</x><y>0.</y><z>0.</z>
+      </origin>
+      <hydro>
+        <rho>0.</rho><vx>0.</vx><vy>0.</vy><vz>0.</vz><p>0.</p>
+      </hydro>
+    </region>
+    <region>
+      <height>2.</height>
+      <width>2.</width>
+      <depth>2.</depth>
+      <exponent>2.0</exponent>
+      <origin>
+        <x>0.</x><y>0.</y><z>0.</z>
+      </origin>
+      <hydro>
+        <rho>0.5/pi/(r+0.001)</rho><vx>0.</vx><vy>0.</vy><vz>0.</vz><p>0.05/pi/3.0/(r+0.001)</p>
+      </hydro>
+    </region>
+  </regions>
+</box>

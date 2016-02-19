@@ -721,12 +721,12 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver){
                            {0., 0., Wtemp[1], 0., 0.},
                            {0., 0., 0., Wtemp[1], 0.},
                            {0., solver.get_gamma()*Wtemp[4], 0., 0., Wtemp[1]}};
-        double By[5][5] = {{Wtemp[2], Wtemp[0], 0., 0., 0.},
+        double By[5][5] = {{Wtemp[2], 0., Wtemp[0], 0., 0.},
                            {0., Wtemp[2], 0., 0., 0.},
                            {0., 0., Wtemp[2], 0., 1./Wtemp[0]},
                            {0., 0., 0., Wtemp[2], 0.},
                            {0., 0., solver.get_gamma()*Wtemp[4], 0., Wtemp[2]}};
-        double Bz[5][5] = {{Wtemp[3], Wtemp[0], 0., 0., 0.},
+        double Bz[5][5] = {{Wtemp[3], 0., 0., Wtemp[0], 0.},
                            {0., Wtemp[3], 0., 0., 0.},
                            {0., 0., Wtemp[3], 0., 0.},
                            {0., 0., 0., Wtemp[3], 1./Wtemp[0]},
@@ -736,7 +736,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver){
                            {0., Wtemp[1], 0., 1./Wtemp[0]},
                            {0., 0., Wtemp[1], 0.},
                            {0., solver.get_gamma()*Wtemp[3], 0., Wtemp[1]}};
-        double By[4][4] = {{Wtemp[2], Wtemp[0], 0., 0.},
+        double By[4][4] = {{Wtemp[2], 0., Wtemp[0], 0.},
                            {0., Wtemp[2], 0., 0.},
                            {0., 0., Wtemp[2], 1./Wtemp[0]},
                            {0., 0., solver.get_gamma()*Wtemp[3], Wtemp[2]}};
@@ -800,12 +800,12 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver){
                        {0., 0., Wtemp[1], 0., 0.},
                        {0., 0., 0., Wtemp[1], 0.},
                        {0., solver.get_gamma()*Wtemp[4], 0., 0., Wtemp[1]}};
-    double Ay[5][5] = {{Wtemp[2], Wtemp[0], 0., 0., 0.},
+    double Ay[5][5] = {{Wtemp[2], 0., Wtemp[0], 0., 0.},
                        {0., Wtemp[2], 0., 0., 0.},
                        {0., 0., Wtemp[2], 0., 1./Wtemp[0]},
                        {0., 0., 0., Wtemp[2], 0.},
                        {0., 0., solver.get_gamma()*Wtemp[4], 0., Wtemp[2]}};
-    double Az[5][5] = {{Wtemp[3], Wtemp[0], 0., 0., 0.},
+    double Az[5][5] = {{Wtemp[3], 0., 0., Wtemp[0], 0.},
                        {0., Wtemp[3], 0., 0., 0.},
                        {0., 0., Wtemp[3], 0., 0.},
                        {0., 0., 0., Wtemp[3], 1./Wtemp[0]},
@@ -815,7 +815,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver){
                        {0., Wtemp[1], 0., 1./Wtemp[0]},
                        {0., 0., Wtemp[1], 0.},
                        {0., solver.get_gamma()*Wtemp[3], 0., Wtemp[1]}};
-    double Ay[4][4] = {{Wtemp[2], Wtemp[0], 0., 0.},
+    double Ay[4][4] = {{Wtemp[2], 0., Wtemp[0], 0.},
                        {0., Wtemp[2], 0., 0.},
                        {0., 0., Wtemp[2], 1./Wtemp[0]},
                        {0., 0., solver.get_gamma()*Wtemp[3], Wtemp[2]}};

@@ -99,6 +99,10 @@ private:
      *  related to the hydrodynamics */
     Timer* _hydrotimer;
 
+    /*! \brief Timer used to quantify the time spent in gravity related
+     *  operations */
+    Timer* _gravitytimer;
+
     /*! \brief Timer used to determine when it is time to do restart dumps */
     Timer _restarttimer;
 

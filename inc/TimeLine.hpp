@@ -28,6 +28,8 @@
 
 #include "ShadowfaxSnapshotWriter.hpp"
 #include "GadgetSnapshotWriter.hpp"
+#include "utilities/Timer.hpp"
+#include <iostream>
 #include <string>
 
 class ParticleVector;
@@ -83,6 +85,9 @@ private:
      *  the expensive treewalk criterion */
     bool _treetime;
 
+    /*! \brief Timer to quantify time spent in writing snapshot files */
+    Timer* _iotimer;
+
 public:
     TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
              ParticleVector& particlevector, std::string snaptype,
@@ -97,6 +102,9 @@ public:
      * Clean up the snapshot writer.
      */
     ~TimeLine(){
+        std::cout << "Spent " << _iotimer->value() << "s writing snapshots"
+                  << std::endl;
+        delete _iotimer;
         delete _snapshotwriter;
     }
 

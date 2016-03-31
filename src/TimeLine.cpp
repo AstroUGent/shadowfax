@@ -106,6 +106,8 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
         _min_timestep = 1;
     }
 
+    _iotimer = new Timer();
+
     LOGS("TimeLine created");
 }
 
@@ -138,7 +140,9 @@ unsigned long TimeLine::get_integertime(){
 bool TimeLine::step_forward(){
     _current_time += _timestep;
     if(get_time() >= _snaptime*_snapshotwriter->get_lastsnap()){
+        _iotimer->start();
         _snapshotwriter->write_snapshot(get_time(), _particles);
+        _iotimer->stop();
     }
     LOGS("TimeLine step_forward");
 

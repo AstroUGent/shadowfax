@@ -2315,12 +2315,46 @@ void DelTess::add_mirrors(Tree& parttree){
 #endif
     // activate all particles, they will get surrounded by complete cells
     unsigned int redo = 0;
+    bool initial_radius = false;
     for(unsigned int i = startpoint; i < pointssize; i++){
         if(_points[i]){
             _points[i]->set_id(2);
+            initial_radius |= !_points[i]->get_particle()->get_max_radius();
             redo++;
         }
     }
+
+    if(initial_radius){
+        // first step, need to initialize the search radius
+        for(unsigned int i = 1; i < _simplices.size(); i++) {
+            if(_simplices[i] != NULL) {
+                VorGen* sp = _simplices[i]->get_special_point(_points);
+                unsigned int* vorgens = _simplices[i]->get_vorgens();
+#if ndim_ == 3
+                VorGen* points[4] = {_points[vorgens[0]], _points[vorgens[1]],
+                                     _points[vorgens[2]], _points[vorgens[3]]};
+#else
+                VorGen* points[3] = {_points[vorgens[0]], _points[vorgens[1]],
+                                     _points[vorgens[2]]};
+#endif
+                double r =
+                        (sp->get_position() - points[0]->get_position()).norm();
+                for(unsigned int j = ndim_ + 1; j--;) {
+                    if(points[j]->get_particle() != NULL &&
+                       points[j]->get_id() != 1) {
+                        if(points[j]->get_particle()->get_max_radius()) {
+                            points[j]->get_particle()->set_max_radius(min(
+                                    points[j]->get_particle()->get_max_radius(),
+                                    2. * r));
+                        } else {
+                            points[j]->get_particle()->set_max_radius(2. * r);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     vector<unsigned int> other_indices(worldsize, 0);
     unsigned int lastindex = 1;
     if(worldsize > 1){

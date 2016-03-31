@@ -198,10 +198,12 @@ Simulation::~Simulation(){
     cout << "Timestep calculation: " << _timesteptimer->value() << "s" << endl;
     cout << "MPI communication: " << _mpitimer->value() << "s" << endl;
     cout << "Additional hydro: " << _hydrotimer->value() << "s" << endl;
+    cout << "Gravity: " << _gravitytimer->value() << "s" << endl;
     delete _starttimer;
     delete _timesteptimer;
     delete _mpitimer;
     delete _hydrotimer;
+    delete _gravitytimer;
     cout << "Total program time: " << _totaltimer.stop() << " seconds" << endl;
 }
 
@@ -280,10 +282,12 @@ double Simulation::load(ParticleVector& cells, string ictype, string filename,
 void Simulation::main_loop(){
     _mpitimer = new Timer();
     _hydrotimer = new Timer();
+    _gravitytimer = new Timer();
 
     // we have to calculate the potential before we calculate the time steps,
     // since active particles are defined by the endtime being equal to 0,
     // which is no longer true after the time steps are calculated
+    _gravitytimer->start();
     if(_parameterfile->has_gravity()){
         LOGS("Start calculating gravitational potential");
         _particles->get_tree().walk_tree<PotentialWalker>(*_particles, true,
@@ -305,6 +309,7 @@ void Simulation::main_loop(){
         }
         LOGS("Finished calculating gravitational potential");
     }
+    _gravitytimer->stop();
 
     // we now have all information needed to calculate the timesteps
     _timesteptimer = new Timer();
@@ -424,6 +429,7 @@ void Simulation::main_loop(){
         if(_particles->gassize()){
             _voronoi->update_positions(_periodic);
         }
+        _gravitytimer->start();
         if(_parameterfile->has_gravity()){
             // half a kick and drift for the N-body particles
             for(unsigned int i = _particles->dmsize(); i--;){
@@ -441,6 +447,7 @@ void Simulation::main_loop(){
                 _particles->dm(i)->move(_timeline->get_realtime(dt));
             }
         }
+        _gravitytimer->stop();
         LOGS("Did second kick");
         currentTime += dt;
         _timeline->set_timestep(dt);
@@ -458,6 +465,7 @@ void Simulation::main_loop(){
         }
 
 #ifdef VARIABLE_SOFTENING
+        _gravitytimer->start();
         if(_parameterfile->has_gravity()){
             // we set the softening lenghts of the gas before we update the tree
             // values
@@ -469,6 +477,7 @@ void Simulation::main_loop(){
                 }
             }
         }
+        _gravitytimer->stop();
 #endif
 
         _particles->get_tree().set_velocities();
@@ -476,6 +485,7 @@ void Simulation::main_loop(){
             _particles->get_tree().exchange_pseudonodes();
         }
 
+        _gravitytimer->start();
         if(_parameterfile->has_gravity()){
             LOGS("Start calculating gravitational potential");
             _particles->get_tree().walk_tree<PotentialWalker>(*_particles, true,
@@ -587,6 +597,7 @@ void Simulation::main_loop(){
             }
             LOGS("Did gravitational kick");
         }
+        _gravitytimer->stop();
 
         // The volume of the cells has changed, hence we have to recalculate the
         // Ws

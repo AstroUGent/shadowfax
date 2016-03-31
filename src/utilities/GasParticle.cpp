@@ -46,7 +46,7 @@ GasParticle::GasParticle() : Particle() {
     for(int i = 0; i < MPIGlobal::size; i++){
         _exports[i] = false;
     }
-    _max_radius = 0.02;
+    _max_radius = 0.;
     _is_pseudo = false;
     _max_mach = 0.;
     _local_id = 0;
@@ -69,7 +69,7 @@ GasParticle::GasParticle(Vec pos) : Particle(pos) {
     for(int i = 0; i < MPIGlobal::size; i++){
         _exports[i] = false;
     }
-    _max_radius = 0.02;
+    _max_radius = 0.;
     _is_pseudo = false;
     _max_mach = 0.;
     _local_id = 0;

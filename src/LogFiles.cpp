@@ -215,7 +215,7 @@ void LogFiles::copy_file_single(ifstream &ifile, ofstream &ofile, long pos){
     char *contents = new char[pos];
     ifile.read(contents, pos);
     ofile.write(contents, pos);
-    delete contents;
+    delete [] contents;
 }
 
 /**
@@ -240,7 +240,7 @@ void LogFiles::copy_file_buffer(ifstream &ifile, ofstream &ofile, long pos){
         ofile.write(contents, blocksize);
         numread++;
     }
-    delete contents;
+    delete [] contents;
 }
 
 /**

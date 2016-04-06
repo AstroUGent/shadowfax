@@ -287,24 +287,44 @@ void GasParticle::apply_gravity(double dt){
     if(!_Q[0]){
         return;
     }
+#if ndim_==3
     _Q[4] -= 0.5*(_Q[1]*_Q[1] + _Q[2]*_Q[2] + _Q[3]*_Q[3])/_Q[0];
+#else
+    _Q[3] -= 0.5*(_Q[1]*_Q[1] + _Q[2]*_Q[2])/_Q[0];
+#endif
     _Q += dt*_Q[0]*_a_grav_new;
+#if ndim_==3
     _Q[4] += 0.5*(_Q[1]*_Q[1] + _Q[2]*_Q[2] + _Q[3]*_Q[3])/_Q[0];
+#else
+    _Q[3] += 0.5*(_Q[1]*_Q[1] + _Q[2]*_Q[2])/_Q[0];
+#endif
+
 #endif
 
 #ifdef SCHEME2
+
+#if ndim_==3
     _Q[4] += 0.5*dt*(_Q[1]*_a_grav_new[0] + _Q[2]*_a_grav_new[1] +
                      _Q[3]*_a_grav_new[2]);
+#else
+    _Q[3] += 0.5*dt*(_Q[1]*_a_grav_new[0] + _Q[2]*_a_grav_new[1]);
+#endif
     _Q += dt*_Q[0]*_a_grav_new;
+#if ndim_==3
     _Q[4] += 0.5*dt*(_Q[1]*_a_grav_new[0] + _Q[2]*_a_grav_new[1] +
                      _Q[3]*_a_grav_new[2]);
+#else
+    _Q[3] += 0.5*dt*(_Q[1]*_a_grav_new[0] + _Q[2]*_a_grav_new[1]);
+#endif
+
 #endif
 
 #ifdef SCHEME3
-    _Q[4] += dt*_Q[0]*Vec::dot(_v, _a_grav_new);
+    _Q[ndim_+1] += dt*_Q[0]*Vec::dot(_v, _a_grav_new);
+
     _Q += dt*_Q[0]*_a_grav_new;
 
-    _Q[4] -= 0.5*Vec::dot(_delta_E_grav, _a_grav_new);
+    _Q[ndim_+1] -= 0.5*Vec::dot(_delta_E_grav, _a_grav_new);
 #if ndim_==3
     _delta_E_grav.set(0.,0.,0.);
 #else

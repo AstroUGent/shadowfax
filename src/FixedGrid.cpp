@@ -24,13 +24,13 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "FixedGrid.hpp"
-#include "utilities/ParticleVector.hpp"
+#include "Error.hpp"
 #include "RiemannSolverFactory.hpp"
 #include "TimeLine.hpp"
-#include "VorGen.hpp"
-#include "VorFace.hpp"
 #include "VorCell.hpp"
-#include "Error.hpp"
+#include "VorFace.hpp"
+#include "VorGen.hpp"
+#include "utilities/ParticleVector.hpp"
 using namespace std;
 
 /**
@@ -50,69 +50,70 @@ using namespace std;
  * @param particles ParticleVector containing GasParticles with valid positions
  * @param periodic Flag to indicate if the simulation box is periodic or not
  */
-FixedGrid::FixedGrid(ParticleVector &particles, bool periodic){
-    // let's assume a square/cubic grid
-#if ndim_==3
+FixedGrid::FixedGrid(ParticleVector& particles, bool periodic) {
+// let's assume a square/cubic grid
+#if ndim_ == 3
     _size[0] = int(cbrt(particles.gassize()));
     _size[1] = _size[0];
     _size[2] = _size[0];
-    vector<unsigned int> igrid(_size[0]*_size[1]*_size[2],
-                               _size[0]*_size[1]*_size[2]);
-    _idx.resize(_size[0]*_size[1]*_size[2]);
+    vector<unsigned int> igrid(_size[0] * _size[1] * _size[2],
+                               _size[0] * _size[1] * _size[2]);
+    _idx.resize(_size[0] * _size[1] * _size[2]);
 #else
     _size[0] = int(sqrt(particles.gassize()));
     _size[1] = _size[0];
-    vector<unsigned int> igrid(_size[0]*_size[1], _size[0]*_size[1]);
-    _idx.resize(_size[0]*_size[1]);
+    vector<unsigned int> igrid(_size[0] * _size[1], _size[0] * _size[1]);
+    _idx.resize(_size[0] * _size[1]);
 #endif
 
     // now we need to store the pointers in the correct grid cell
     // find the cell size in every direction
-    double box[ndim_+ndim_];
+    double box[ndim_ + ndim_];
     particles.get_container().get_bounding_box(box);
     double cellsize[ndim_];
-    for(int i = 0; i < ndim_; i++){
-        cellsize[i] = box[i+ndim_]/_size[i];
+    for(int i = 0; i < ndim_; i++) {
+        cellsize[i] = box[i + ndim_] / _size[i];
     }
 
-    // calculate grid quantities
-#if ndim_==3
-    _cellvolume = cellsize[0]*cellsize[1]*cellsize[2];
-    _cellh = cbrt(_cellvolume*3./4./M_PI);
+// calculate grid quantities
+#if ndim_ == 3
+    _cellvolume = cellsize[0] * cellsize[1] * cellsize[2];
+    _cellh = cbrt(_cellvolume * 3. / 4. / M_PI);
 #else
-    _cellvolume = cellsize[0]*cellsize[1];
-    _cellh = sqrt(_cellvolume/M_PI);
+    _cellvolume = cellsize[0] * cellsize[1];
+    _cellh = sqrt(_cellvolume / M_PI);
 #endif
 
     _vorgens.resize(particles.gassize());
     _cells.resize(particles.gassize());
     // loop over the particles and find the correct cell
-    for(unsigned int i = 0; i < particles.gassize(); i++){
+    for(unsigned int i = 0; i < particles.gassize(); i++) {
         // make a vorgen
         Vec x = particles.gas(i)->get_position();
 
         // store the particle in the grid
         unsigned int ijk[ndim_];
-        for(int k = 0; k < ndim_; k++){
+        for(int k = 0; k < ndim_; k++) {
             ijk[k] = 0;
-            while(ijk[k] < _size[k] && x[k] > box[k]+ijk[k]*cellsize[k]){
+            while(ijk[k] < _size[k] && x[k] > box[k] + ijk[k] * cellsize[k]) {
                 ijk[k]++;
             }
-            if(ijk[k] == _size[k] && x[k] > box[k]+ijk[k]*cellsize[k]){
+            if(ijk[k] == _size[k] && x[k] > box[k] + ijk[k] * cellsize[k]) {
                 cerr << "Particle outside grid!" << endl;
                 my_exit();
             }
             // we check the upper bound of the cell, but store the lower bound
             ijk[k]--;
         }
-#if ndim_==3
-        unsigned int idx = ijk[0]*_size[1]*_size[2]+ijk[1]*_size[2]+ijk[2];
+#if ndim_ == 3
+        unsigned int idx =
+                ijk[0] * _size[1] * _size[2] + ijk[1] * _size[2] + ijk[2];
 #else
-        unsigned int idx = ijk[0]*_size[1]+ijk[1];
+        unsigned int idx = ijk[0] * _size[1] + ijk[1];
 #endif
         _idx[i] = idx;
         igrid[idx] = i;
-#if ndim_==3
+#if ndim_ == 3
         _vorgens[idx] = new VorGen(x.x(), x.y(), x.z());
 #else
         _vorgens[idx] = new VorGen(x.x(), x.y());
@@ -124,433 +125,474 @@ FixedGrid::FixedGrid(ParticleVector &particles, bool periodic){
         _vorgens[idx]->set_particle(particles.gas(igrid[idx]));
         _vorgens[idx]->set_id(2);
     }
-#if ndim_==3
-    for(unsigned int i = 0; i < _size[0]*_size[1]*_size[2]; i++){
-        if(igrid[i] == _size[0]*_size[1]*_size[2]){
+#if ndim_ == 3
+    for(unsigned int i = 0; i < _size[0] * _size[1] * _size[2]; i++) {
+        if(igrid[i] == _size[0] * _size[1] * _size[2]) {
             cerr << "Empty cell!" << endl;
             cerr << i << endl;
             my_exit();
         }
     }
 #else
-    for(unsigned int i = 0; i < _size[0]*_size[1]; i++){
-        if(igrid[i] == _size[0]*_size[1]){
+    for(unsigned int i = 0; i < _size[0] * _size[1]; i++) {
+        if(igrid[i] == _size[0] * _size[1]) {
             cerr << "Empty cell!" << endl;
         }
     }
 #endif
 
-    // set connectivity
+// set connectivity
 
-#if ndim_==3
-    _ghosts.resize(2*_size[1]*_size[2] + 2*_size[0]*_size[2] +
-                   2*_size[0]*_size[1]);
+#if ndim_ == 3
+    _ghosts.resize(2 * _size[1] * _size[2] + 2 * _size[0] * _size[2] +
+                   2 * _size[0] * _size[1]);
 
     // x direction
-    for(unsigned int i = 0; i < _size[1]; i++){
-        for(unsigned int j = 0; j < _size[2]; j++){
-            Vec left = particles.gas(igrid[i*_size[2]+j])->get_position();
-            Vec right = particles.gas(igrid[(_size[0]-1)*_size[1]*_size[2]+
-                                      i*_size[2]+j])->get_position();
-            _ghosts[2*(i*_size[2]+j)] = new VorGen(2.*box[0]-left.x(), left.y(),
-                                                   left.z());
-            _ghosts[2*(i*_size[2]+j)+1] =
-                    new VorGen(2.*(box[0]+box[3])-right.x(), right.y(),
-                               right.z());
-            if(periodic){
-                _ghosts[2*(i*_size[2]+j)]
-                        ->set_particle(particles.gas(igrid[(_size[0]-1)
-                                                     *_size[1]*_size[2]+
-                                                     i*_size[2]+j]));
-                _ghosts[2*(i*_size[2]+j)+1]
-                        ->set_particle(particles.gas(igrid[i*_size[2]+j]));
+    for(unsigned int i = 0; i < _size[1]; i++) {
+        for(unsigned int j = 0; j < _size[2]; j++) {
+            Vec left = particles.gas(igrid[i * _size[2] + j])->get_position();
+            Vec right =
+                    particles
+                            .gas(igrid[(_size[0] - 1) * _size[1] * _size[2] +
+                                       i * _size[2] + j])
+                            ->get_position();
+            _ghosts[2 * (i * _size[2] + j)] =
+                    new VorGen(2. * box[0] - left.x(), left.y(), left.z());
+            _ghosts[2 * (i * _size[2] + j) + 1] = new VorGen(
+                    2. * (box[0] + box[3]) - right.x(), right.y(), right.z());
+            if(periodic) {
+                _ghosts[2 * (i * _size[2] + j)]->set_particle(particles.gas(
+                        igrid[(_size[0] - 1) * _size[1] * _size[2] +
+                              i * _size[2] + j]));
+                _ghosts[2 * (i * _size[2] + j) + 1]->set_particle(
+                        particles.gas(igrid[i * _size[2] + j]));
             }
-            _ghosts[2*(i*_size[2]+j)]->set_id(1);
-            _ghosts[2*(i*_size[2]+j)+1]->set_id(1);
+            _ghosts[2 * (i * _size[2] + j)]->set_id(1);
+            _ghosts[2 * (i * _size[2] + j) + 1]->set_id(1);
         }
     }
 
     // y direction
-    for(unsigned int i = 0; i < _size[0]; i++){
-        for(unsigned int j = 0; j < _size[2]; j++){
-            Vec front = particles.gas(igrid[i*_size[1]*_size[2]+j])
-                            ->get_position();
-            Vec back = particles.gas(igrid[i*_size[1]*_size[2]+
-                                     (_size[1]-1)*_size[2]+j])->get_position();
-            _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+j)] =
-                    new VorGen(front.x(), 2.*box[1]-front.y(), front.z());
-            _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+j)+1] =
-                    new VorGen(back.x(), 2.*(box[1]+box[4])-back.y(), back.z());
-            if(periodic){
-                _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+j)]
-                        ->set_particle(particles.gas(igrid[i*_size[1]*_size[2]+
-                                                     (_size[1]-1)*_size[2]+j]));
-                _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+j)+1]
-                        ->set_particle(particles.gas(igrid[i*_size[1]
-                                                     *_size[2]+j]));
+    for(unsigned int i = 0; i < _size[0]; i++) {
+        for(unsigned int j = 0; j < _size[2]; j++) {
+            Vec front = particles.gas(igrid[i * _size[1] * _size[2] + j])
+                                ->get_position();
+            Vec back = particles
+                               .gas(igrid[i * _size[1] * _size[2] +
+                                          (_size[1] - 1) * _size[2] + j])
+                               ->get_position();
+            _ghosts[2 * _size[1] * _size[2] + 2 * (i * _size[2] + j)] =
+                    new VorGen(front.x(), 2. * box[1] - front.y(), front.z());
+            _ghosts[2 * _size[1] * _size[2] + 2 * (i * _size[2] + j) + 1] =
+                    new VorGen(back.x(), 2. * (box[1] + box[4]) - back.y(),
+                               back.z());
+            if(periodic) {
+                _ghosts[2 * _size[1] * _size[2] + 2 * (i * _size[2] + j)]
+                        ->set_particle(particles.gas(
+                                igrid[i * _size[1] * _size[2] +
+                                      (_size[1] - 1) * _size[2] + j]));
+                _ghosts[2 * _size[1] * _size[2] + 2 * (i * _size[2] + j) + 1]
+                        ->set_particle(particles.gas(
+                                igrid[i * _size[1] * _size[2] + j]));
             }
-            _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+j)]->set_id(1);
-            _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+j)+1]->set_id(1);
+            _ghosts[2 * _size[1] * _size[2] + 2 * (i * _size[2] + j)]->set_id(
+                    1);
+            _ghosts[2 * _size[1] * _size[2] + 2 * (i * _size[2] + j) + 1]
+                    ->set_id(1);
         }
     }
 
     // z direction
-    for(unsigned int i = 0; i < _size[0]; i++){
-        for(unsigned int j = 0; j < _size[1]; j++){
-            Vec bottom = particles.gas(igrid[i*_size[1]*_size[2]+j*_size[2]])
+    for(unsigned int i = 0; i < _size[0]; i++) {
+        for(unsigned int j = 0; j < _size[1]; j++) {
+            Vec bottom =
+                    particles
+                            .gas(igrid[i * _size[1] * _size[2] + j * _size[2]])
                             ->get_position();
-            Vec top = particles.gas(igrid[i*_size[1]*_size[2]
-                                    +j*_size[2]+_size[2]-1])->get_position();
-            _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2]
-                    + 2*(i*_size[1]+j)] = new VorGen(bottom.x(), bottom.y(),
-                                                     2.*box[2]-bottom.z());
-            _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2]
-                    + 2*(i*_size[1]+j)+1] =
-                    new VorGen(top.x(), top.y(), 2.*(box[2]+box[5])-top.z());
-            if(periodic){
-                _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2]
-                        + 2*(i*_size[1]+j)]
-                        ->set_particle(particles.gas(igrid[i*_size[1]*_size[2]+
-                                                     j*_size[2]+_size[2]-1]));
-                _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2]
-                        + 2*(i*_size[1]+j)+1]
-                        ->set_particle(particles.gas(igrid[i*_size[1]*_size[2]+
-                                                     j*_size[2]]));
+            Vec top = particles
+                              .gas(igrid[i * _size[1] * _size[2] +
+                                         j * _size[2] + _size[2] - 1])
+                              ->get_position();
+            _ghosts[2 * _size[1] * _size[2] + 2 * _size[0] * _size[2] +
+                    2 * (i * _size[1] + j)] =
+                    new VorGen(bottom.x(), bottom.y(),
+                               2. * box[2] - bottom.z());
+            _ghosts[2 * _size[1] * _size[2] + 2 * _size[0] * _size[2] +
+                    2 * (i * _size[1] + j) + 1] =
+                    new VorGen(top.x(), top.y(),
+                               2. * (box[2] + box[5]) - top.z());
+            if(periodic) {
+                _ghosts[2 * _size[1] * _size[2] + 2 * _size[0] * _size[2] +
+                        2 * (i * _size[1] + j)]
+                        ->set_particle(particles.gas(
+                                igrid[i * _size[1] * _size[2] + j * _size[2] +
+                                      _size[2] - 1]));
+                _ghosts[2 * _size[1] * _size[2] + 2 * _size[0] * _size[2] +
+                        2 * (i * _size[1] + j) + 1]
+                        ->set_particle(particles.gas(
+                                igrid[i * _size[1] * _size[2] + j * _size[2]]));
             }
-            _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2]
-                    + 2*(i*_size[1]+j)]->set_id(1);
-            _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2]
-                    + 2*(i*_size[1]+j)+1]->set_id(1);
+            _ghosts[2 * _size[1] * _size[2] + 2 * _size[0] * _size[2] +
+                    2 * (i * _size[1] + j)]
+                    ->set_id(1);
+            _ghosts[2 * _size[1] * _size[2] + 2 * _size[0] * _size[2] +
+                    2 * (i * _size[1] + j) + 1]
+                    ->set_id(1);
         }
     }
 
     // create faces...
-    _faces.resize((_size[0]+1)*_size[1]*_size[2]+_size[0]*(_size[1]+1)*_size[2]+
-                  _size[0]*_size[1]*(_size[2]+1));
+    _faces.resize((_size[0] + 1) * _size[1] * _size[2] +
+                  _size[0] * (_size[1] + 1) * _size[2] +
+                  _size[0] * _size[1] * (_size[2] + 1));
     // x direction
-    for(unsigned int i = 0; i < _size[0]+1; i++){
-        for(unsigned int j = 0; j < _size[1]; j++){
-            for(unsigned int k = 0; k < _size[2]; k++){
-                VorGen *left;
-                VorGen *right;
+    for(unsigned int i = 0; i < _size[0] + 1; i++) {
+        for(unsigned int j = 0; j < _size[1]; j++) {
+            for(unsigned int k = 0; k < _size[2]; k++) {
+                VorGen* left;
+                VorGen* right;
                 unsigned int lefti;
                 unsigned int righti;
-                if(!i){
-                    left = _ghosts[2*(j*_size[2]+k)];
-                    lefti = _size[0]*_size[1]*_size[2];
+                if(!i) {
+                    left = _ghosts[2 * (j * _size[2] + k)];
+                    lefti = _size[0] * _size[1] * _size[2];
                 } else {
-                    left = _vorgens[(i-1)*_size[1]*_size[2]+j*_size[2]+k];
-                    lefti = (i-1)*_size[1]*_size[2]+j*_size[2]+k;
+                    left = _vorgens[(i - 1) * _size[1] * _size[2] +
+                                    j * _size[2] + k];
+                    lefti = (i - 1) * _size[1] * _size[2] + j * _size[2] + k;
                 }
-                if(i == _size[0]){
-                    right = _ghosts[2*(j*_size[2]+k)+1];
-                    righti = _size[0]*_size[1]*_size[2];
+                if(i == _size[0]) {
+                    right = _ghosts[2 * (j * _size[2] + k) + 1];
+                    righti = _size[0] * _size[1] * _size[2];
                 } else {
-                    right = _vorgens[i*_size[1]*_size[2]+j*_size[2]+k];
-                    righti = i*_size[1]*_size[2]+j*_size[2]+k;
+                    right = _vorgens[i * _size[1] * _size[2] + j * _size[2] +
+                                     k];
+                    righti = i * _size[1] * _size[2] + j * _size[2] + k;
                 }
-                if(lefti < _size[0]*_size[1]*_size[2]){
-                    _faces[i*_size[1]*_size[2]+j*_size[2]+k] =
+                if(lefti < _size[0] * _size[1] * _size[2]) {
+                    _faces[i * _size[1] * _size[2] + j * _size[2] + k] =
                             new VorFace(lefti, _vorgens);
-                    _faces[i*_size[1]*_size[2]+j*_size[2]+k]->add_ngb(right);
-                    _faces[i*_size[1]*_size[2]+j*_size[2]+k]
+                    _faces[i * _size[1] * _size[2] + j * _size[2] + k]->add_ngb(
+                            right);
+                    _faces[i * _size[1] * _size[2] + j * _size[2] + k]
                             ->add_ngb_id(righti);
                 } else {
-                    _faces[i*_size[1]*_size[2]+j*_size[2]+k] =
+                    _faces[i * _size[1] * _size[2] + j * _size[2] + k] =
                             new VorFace(righti, _vorgens);
-                    _faces[i*_size[1]*_size[2]+j*_size[2]+k]->add_ngb(left);
-                    _faces[i*_size[1]*_size[2]+j*_size[2]+k]
+                    _faces[i * _size[1] * _size[2] + j * _size[2] + k]->add_ngb(
+                            left);
+                    _faces[i * _size[1] * _size[2] + j * _size[2] + k]
                             ->add_ngb_id(lefti);
                 }
-                _faces[i*_size[1]*_size[2]+j*_size[2]+k]
-                        ->set_area(cellsize[1]*cellsize[2]);
-                double midpoint[3] = {box[0]+i*cellsize[0],
-                                      box[1]+(j+0.5)*cellsize[1],
-                                      box[2]+(k+0.5)*cellsize[2]};
-                _faces[i*_size[1]*_size[2]+j*_size[2]+k]
+                _faces[i * _size[1] * _size[2] + j * _size[2] + k]->set_area(
+                        cellsize[1] * cellsize[2]);
+                double midpoint[3] = {box[0] + i * cellsize[0],
+                                      box[1] + (j + 0.5) * cellsize[1],
+                                      box[2] + (k + 0.5) * cellsize[2]};
+                _faces[i * _size[1] * _size[2] + j * _size[2] + k]
                         ->set_midpoint(midpoint);
-                if(lefti < _size[0]*_size[1]*_size[2]){
+                if(lefti < _size[0] * _size[1] * _size[2]) {
                     _cells[lefti]->add_ngb(right);
-                    _cells[lefti]->add_face(_faces[i*_size[1]*_size[2]+
-                                            j*_size[2]+k]);
+                    _cells[lefti]->add_face(
+                            _faces[i * _size[1] * _size[2] + j * _size[2] + k]);
                 }
-                if(righti < _size[0]*_size[1]*_size[2]){
+                if(righti < _size[0] * _size[1] * _size[2]) {
                     _cells[righti]->add_ngb(left);
-                    _cells[righti]->add_face(_faces[i*_size[1]*_size[2]+
-                                             j*_size[2]+k]);
+                    _cells[righti]->add_face(
+                            _faces[i * _size[1] * _size[2] + j * _size[2] + k]);
                 }
             }
         }
     }
 
     // y direction
-    for(unsigned int i = 0; i < _size[0]; i++){
-        for(unsigned int j = 0; j < _size[1]+1; j++){
-            for(unsigned int k = 0; k < _size[2]; k++){
-                VorGen *front;
-                VorGen *back;
+    for(unsigned int i = 0; i < _size[0]; i++) {
+        for(unsigned int j = 0; j < _size[1] + 1; j++) {
+            for(unsigned int k = 0; k < _size[2]; k++) {
+                VorGen* front;
+                VorGen* back;
                 unsigned int fronti;
                 unsigned int backi;
-                if(!j){
-                    front = _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+k)];
-                    fronti = _size[0]*_size[1]*_size[2];
+                if(!j) {
+                    front = _ghosts[2 * _size[1] * _size[2] +
+                                    2 * (i * _size[2] + k)];
+                    fronti = _size[0] * _size[1] * _size[2];
                 } else {
-                    front = _vorgens[i*_size[1]*_size[2]+(j-1)*_size[2]+k];
-                    fronti = i*_size[1]*_size[2]+(j-1)*_size[2]+k;
+                    front = _vorgens[i * _size[1] * _size[2] +
+                                     (j - 1) * _size[2] + k];
+                    fronti = i * _size[1] * _size[2] + (j - 1) * _size[2] + k;
                 }
-                if(j == _size[1]){
-                    back = _ghosts[2*_size[1]*_size[2] + 2*(i*_size[2]+k)+1];
-                    backi = _size[0]*_size[1]*_size[2];
+                if(j == _size[1]) {
+                    back = _ghosts[2 * _size[1] * _size[2] +
+                                   2 * (i * _size[2] + k) + 1];
+                    backi = _size[0] * _size[1] * _size[2];
                 } else {
-                    back = _vorgens[i*_size[1]*_size[2]+j*_size[2]+k];
-                    backi = i*_size[1]*_size[2]+j*_size[2]+k;
+                    back = _vorgens[i * _size[1] * _size[2] + j * _size[2] + k];
+                    backi = i * _size[1] * _size[2] + j * _size[2] + k;
                 }
-                if(fronti < _size[0]*_size[1]*_size[2]){
-                    _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                            i*_size[2]+k] = new VorFace(fronti, _vorgens);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                            i*_size[2]+k]->add_ngb(back);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                            i*_size[2]+k]->add_ngb_id(backi);
+                if(fronti < _size[0] * _size[1] * _size[2]) {
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           j * _size[0] * _size[2] + i * _size[2] + k] =
+                            new VorFace(fronti, _vorgens);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           j * _size[0] * _size[2] + i * _size[2] + k]
+                            ->add_ngb(back);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           j * _size[0] * _size[2] + i * _size[2] + k]
+                            ->add_ngb_id(backi);
                 } else {
-                    _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                            i*_size[2]+k] = new VorFace(backi, _vorgens);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                            i*_size[2]+k]->add_ngb(front);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                            i*_size[2]+k]->add_ngb_id(fronti);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           j * _size[0] * _size[2] + i * _size[2] + k] =
+                            new VorFace(backi, _vorgens);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           j * _size[0] * _size[2] + i * _size[2] + k]
+                            ->add_ngb(front);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           j * _size[0] * _size[2] + i * _size[2] + k]
+                            ->add_ngb_id(fronti);
                 }
-                _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                        i*_size[2]+k]->set_area(cellsize[0]*cellsize[2]);
-                double midpoint[3] = {box[0]+(i+0.5)*cellsize[0],
-                                      box[1]+j*cellsize[1],
-                                      box[2]+(k+0.5)*cellsize[2]};
-                _faces[(_size[0]+1)*_size[1]*_size[2] + j*_size[0]*_size[2]+
-                        i*_size[2]+k]->set_midpoint(midpoint);
-                if(fronti < _size[0]*_size[1]*_size[2]){
+                _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                       j * _size[0] * _size[2] + i * _size[2] + k]
+                        ->set_area(cellsize[0] * cellsize[2]);
+                double midpoint[3] = {box[0] + (i + 0.5) * cellsize[0],
+                                      box[1] + j * cellsize[1],
+                                      box[2] + (k + 0.5) * cellsize[2]};
+                _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                       j * _size[0] * _size[2] + i * _size[2] + k]
+                        ->set_midpoint(midpoint);
+                if(fronti < _size[0] * _size[1] * _size[2]) {
                     _cells[fronti]->add_ngb(back);
                     _cells[fronti]->add_face(
-                                _faces[(_size[0]+1)*_size[1]*_size[2] +
-                                j*_size[0]*_size[2]+i*_size[2]+k]
-                                );
+                            _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                                   j * _size[0] * _size[2] + i * _size[2] + k]);
                 }
-                if(backi < _size[0]*_size[1]*_size[2]){
+                if(backi < _size[0] * _size[1] * _size[2]) {
                     _cells[backi]->add_ngb(front);
                     _cells[backi]->add_face(
-                                _faces[(_size[0]+1)*_size[1]*_size[2] +
-                                j*_size[0]*_size[2]+i*_size[2]+k]
-                                );
+                            _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                                   j * _size[0] * _size[2] + i * _size[2] + k]);
                 }
             }
         }
     }
 
     // z direction
-    for(unsigned int i = 0; i < _size[0]; i++){
-        for(unsigned int j = 0; j < _size[1]; j++){
-            for(unsigned int k = 0; k < _size[2]+1; k++){
-                VorGen *bottom;
-                VorGen *top;
+    for(unsigned int i = 0; i < _size[0]; i++) {
+        for(unsigned int j = 0; j < _size[1]; j++) {
+            for(unsigned int k = 0; k < _size[2] + 1; k++) {
+                VorGen* bottom;
+                VorGen* top;
                 unsigned int bottomi;
                 unsigned int topi;
-                if(!k){
-                    bottom = _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2]
-                            + 2*(i*_size[1]+j)];
-                    bottomi = _size[0]*_size[1]*_size[2];
+                if(!k) {
+                    bottom = _ghosts[2 * _size[1] * _size[2] +
+                                     2 * _size[0] * _size[2] +
+                                     2 * (i * _size[1] + j)];
+                    bottomi = _size[0] * _size[1] * _size[2];
                 } else {
-                    bottom = _vorgens[i*_size[1]*_size[2]+j*_size[2]+k-1];
-                    bottomi = i*_size[1]*_size[2]+j*_size[2]+k-1;
+                    bottom = _vorgens[i * _size[1] * _size[2] + j * _size[2] +
+                                      k - 1];
+                    bottomi = i * _size[1] * _size[2] + j * _size[2] + k - 1;
                 }
-                if(k == _size[2]){
-                    top = _ghosts[2*_size[1]*_size[2] + 2*_size[0]*_size[2] +
-                            2*(i*_size[1]+j)+1];
-                    topi = _size[0]*_size[1]*_size[2];
+                if(k == _size[2]) {
+                    top = _ghosts[2 * _size[1] * _size[2] +
+                                  2 * _size[0] * _size[2] +
+                                  2 * (i * _size[1] + j) + 1];
+                    topi = _size[0] * _size[1] * _size[2];
                 } else {
-                    top = _vorgens[i*_size[1]*_size[2]+j*_size[2]+k];
-                    topi = i*_size[1]*_size[2]+j*_size[2]+k;
+                    top = _vorgens[i * _size[1] * _size[2] + j * _size[2] + k];
+                    topi = i * _size[1] * _size[2] + j * _size[2] + k;
                 }
-                if(bottomi < _size[0]*_size[1]*_size[2]){
-                    _faces[(_size[0]+1)*_size[1]*_size[2] +
-                            _size[0]*(_size[1]+1)*_size[2] +
-                            k*_size[0]*_size[1]+i*_size[1]+j] =
+                if(bottomi < _size[0] * _size[1] * _size[2]) {
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           _size[0] * (_size[1] + 1) * _size[2] +
+                           k * _size[0] * _size[1] + i * _size[1] + j] =
                             new VorFace(bottomi, _vorgens);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] +
-                            _size[0]*(_size[1]+1)*_size[2] +
-                            k*_size[0]*_size[1]+i*_size[1]+j]->add_ngb(top);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] +
-                            _size[0]*(_size[1]+1)*_size[2] +
-                            k*_size[0]*_size[1]+i*_size[1]+j]->add_ngb_id(topi);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           _size[0] * (_size[1] + 1) * _size[2] +
+                           k * _size[0] * _size[1] + i * _size[1] + j]
+                            ->add_ngb(top);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           _size[0] * (_size[1] + 1) * _size[2] +
+                           k * _size[0] * _size[1] + i * _size[1] + j]
+                            ->add_ngb_id(topi);
                 } else {
-                    _faces[(_size[0]+1)*_size[1]*_size[2] +
-                            _size[0]*(_size[1]+1)*_size[2] +
-                            k*_size[0]*_size[1]+i*_size[1]+j] =
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           _size[0] * (_size[1] + 1) * _size[2] +
+                           k * _size[0] * _size[1] + i * _size[1] + j] =
                             new VorFace(topi, _vorgens);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] +
-                            _size[0]*(_size[1]+1)*_size[2] +
-                            k*_size[0]*_size[1]+i*_size[1]+j]->add_ngb(bottom);
-                    _faces[(_size[0]+1)*_size[1]*_size[2] +
-                            _size[0]*(_size[1]+1)*_size[2] +
-                            k*_size[0]*_size[1]+i*_size[1]+j]
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           _size[0] * (_size[1] + 1) * _size[2] +
+                           k * _size[0] * _size[1] + i * _size[1] + j]
+                            ->add_ngb(bottom);
+                    _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                           _size[0] * (_size[1] + 1) * _size[2] +
+                           k * _size[0] * _size[1] + i * _size[1] + j]
                             ->add_ngb_id(bottomi);
                 }
-                _faces[(_size[0]+1)*_size[1]*_size[2] +
-                        _size[0]*(_size[1]+1)*_size[2] +
-                        k*_size[0]*_size[1]+i*_size[1]+j]
-                        ->set_area(cellsize[0]*cellsize[1]);
-                double midpoint[3] = {box[0]+(i+0.5)*cellsize[0],
-                                      box[1]+(j+0.5)*cellsize[1],
-                                      box[2]+k*cellsize[2]};
-                _faces[(_size[0]+1)*_size[1]*_size[2] +
-                        _size[0]*(_size[1]+1)*_size[2] +
-                        k*_size[0]*_size[1]+i*_size[1]+j]
+                _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                       _size[0] * (_size[1] + 1) * _size[2] +
+                       k * _size[0] * _size[1] + i * _size[1] + j]
+                        ->set_area(cellsize[0] * cellsize[1]);
+                double midpoint[3] = {box[0] + (i + 0.5) * cellsize[0],
+                                      box[1] + (j + 0.5) * cellsize[1],
+                                      box[2] + k * cellsize[2]};
+                _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                       _size[0] * (_size[1] + 1) * _size[2] +
+                       k * _size[0] * _size[1] + i * _size[1] + j]
                         ->set_midpoint(midpoint);
-                if(bottomi < _size[0]*_size[1]*_size[2]){
+                if(bottomi < _size[0] * _size[1] * _size[2]) {
                     _cells[bottomi]->add_ngb(top);
                     _cells[bottomi]->add_face(
-                                _faces[(_size[0]+1)*_size[1]*_size[2] +
-                                _size[0]*(_size[1]+1)*_size[2] +
-                                k*_size[0]*_size[1]+i*_size[1]+j]
-                                );
+                            _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                                   _size[0] * (_size[1] + 1) * _size[2] +
+                                   k * _size[0] * _size[1] + i * _size[1] + j]);
                 }
-                if(topi < _size[0]*_size[1]*_size[2]){
+                if(topi < _size[0] * _size[1] * _size[2]) {
                     _cells[topi]->add_ngb(bottom);
                     _cells[topi]->add_face(
-                                _faces[(_size[0]+1)*_size[1]*_size[2] +
-                                _size[0]*(_size[1]+1)*_size[2] +
-                                k*_size[0]*_size[1]+i*_size[1]+j]
-                                );
+                            _faces[(_size[0] + 1) * _size[1] * _size[2] +
+                                   _size[0] * (_size[1] + 1) * _size[2] +
+                                   k * _size[0] * _size[1] + i * _size[1] + j]);
                 }
             }
         }
     }
 #else
-    _ghosts.resize(2*_size[0]+2*_size[1]);
+    _ghosts.resize(2 * _size[0] + 2 * _size[1]);
 
-    for(unsigned int i = 0; i < _size[0]; i++){
-        Vec bottom = particles.gas(igrid[i*_size[1]])->get_position();
-        Vec top = particles.gas(igrid[(i+1)*_size[1]-1])->get_position();
-        _ghosts[2*i] = new VorGen(bottom.x(), 2.*box[1]-bottom.y());
-        _ghosts[2*i+1] = new VorGen(top.x(), 2.*(box[1]+box[3])-top.y());
+    for(unsigned int i = 0; i < _size[0]; i++) {
+        Vec bottom = particles.gas(igrid[i * _size[1]])->get_position();
+        Vec top = particles.gas(igrid[(i + 1) * _size[1] - 1])->get_position();
+        _ghosts[2 * i] = new VorGen(bottom.x(), 2. * box[1] - bottom.y());
+        _ghosts[2 * i + 1] =
+                new VorGen(top.x(), 2. * (box[1] + box[3]) - top.y());
         // we only set the particle if the box is periodic
         // if we do not set a particle, the boundary is treated as being
         // reflective
-        if(periodic){
-            _ghosts[2*i]->set_particle(particles.gas(igrid[(i+1)*_size[1]-1]));
-            _ghosts[2*i+1]->set_particle(particles.gas(igrid[i*_size[1]]));
+        if(periodic) {
+            _ghosts[2 * i]->set_particle(
+                    particles.gas(igrid[(i + 1) * _size[1] - 1]));
+            _ghosts[2 * i + 1]->set_particle(
+                    particles.gas(igrid[i * _size[1]]));
         }
-        _ghosts[2*i]->set_id(1);
-        _ghosts[2*i+1]->set_id(1);
+        _ghosts[2 * i]->set_id(1);
+        _ghosts[2 * i + 1]->set_id(1);
     }
 
-    for(unsigned int i = 0; i < _size[1]; i++){
+    for(unsigned int i = 0; i < _size[1]; i++) {
         Vec left = particles.gas(igrid[i])->get_position();
-        Vec right = particles.gas(igrid[(_size[0]-1)*_size[1]+i])
-                        ->get_position();
-        _ghosts[2*_size[0]+2*i] = new VorGen(2.*box[0]-left.x(), left.y());
-        _ghosts[2*_size[0]+2*i+1] = new VorGen(2.*(box[0]+box[2])-right.x(),
-                                               right.y());
-        if(periodic){
-            _ghosts[2*_size[0]+2*i]
-                    ->set_particle(
-                        particles.gas(igrid[(_size[0]-1)*_size[1]+i])
-                        );
-            _ghosts[2*_size[0]+2*i+1]->set_particle(particles.gas(igrid[i]));
+        Vec right = particles.gas(igrid[(_size[0] - 1) * _size[1] + i])
+                            ->get_position();
+        _ghosts[2 * _size[0] + 2 * i] =
+                new VorGen(2. * box[0] - left.x(), left.y());
+        _ghosts[2 * _size[0] + 2 * i + 1] =
+                new VorGen(2. * (box[0] + box[2]) - right.x(), right.y());
+        if(periodic) {
+            _ghosts[2 * _size[0] + 2 * i]->set_particle(
+                    particles.gas(igrid[(_size[0] - 1) * _size[1] + i]));
+            _ghosts[2 * _size[0] + 2 * i + 1]->set_particle(
+                    particles.gas(igrid[i]));
         }
-        _ghosts[2*_size[0]+2*i]->set_id(1);
-        _ghosts[2*_size[0]+2*i+1]->set_id(1);
+        _ghosts[2 * _size[0] + 2 * i]->set_id(1);
+        _ghosts[2 * _size[0] + 2 * i + 1]->set_id(1);
     }
 
     // create faces
-    _faces.resize((_size[0]+1)*_size[1]+_size[0]*(_size[1]+1));
-    for(unsigned int k = 0; k < _size[1]; k++){
-        for(unsigned int i = 0; i < _size[0]+1; i++){
+    _faces.resize((_size[0] + 1) * _size[1] + _size[0] * (_size[1] + 1));
+    for(unsigned int k = 0; k < _size[1]; k++) {
+        for(unsigned int i = 0; i < _size[0] + 1; i++) {
             VorGen* left;
             VorGen* right;
             unsigned int lefti;
             unsigned int righti;
-            if(!i){
-                left = _ghosts[2*_size[0]+2*k];
-                lefti = _size[0]*_size[1];
+            if(!i) {
+                left = _ghosts[2 * _size[0] + 2 * k];
+                lefti = _size[0] * _size[1];
             } else {
-                left = _vorgens[(i-1)*_size[1]+k];
-                lefti = (i-1)*_size[1]+k;
+                left = _vorgens[(i - 1) * _size[1] + k];
+                lefti = (i - 1) * _size[1] + k;
             }
-            if(i == _size[0]){
-                right = _ghosts[2*_size[0]+2*k+1];
-                righti = _size[0]*_size[1];
+            if(i == _size[0]) {
+                right = _ghosts[2 * _size[0] + 2 * k + 1];
+                righti = _size[0] * _size[1];
             } else {
-                right = _vorgens[i*_size[1]+k];
-                righti = i*_size[1]+k;
+                right = _vorgens[i * _size[1] + k];
+                righti = i * _size[1] + k;
             }
-            if(lefti < _size[0]*_size[1]){
-                _faces[i*_size[1]+k] = new VorFace(lefti, _vorgens);
-                _faces[i*_size[1]+k]->add_ngb(right);
-                _faces[i*_size[1]+k]->add_ngb_id(righti);
+            if(lefti < _size[0] * _size[1]) {
+                _faces[i * _size[1] + k] = new VorFace(lefti, _vorgens);
+                _faces[i * _size[1] + k]->add_ngb(right);
+                _faces[i * _size[1] + k]->add_ngb_id(righti);
             } else {
-                _faces[i*_size[1]+k] = new VorFace(righti, _vorgens);
-                _faces[i*_size[1]+k]->add_ngb(left);
-                _faces[i*_size[1]+k]->add_ngb_id(lefti);
+                _faces[i * _size[1] + k] = new VorFace(righti, _vorgens);
+                _faces[i * _size[1] + k]->add_ngb(left);
+                _faces[i * _size[1] + k]->add_ngb_id(lefti);
             }
-            _faces[i*_size[1]+k]->set_area(cellsize[1]);
-            double midpoint[2] = {box[0]+i*cellsize[0],
-                                  box[1]+(k+0.5)*cellsize[1]};
-            _faces[i*_size[1]+k]->set_midpoint(midpoint);
-            if(lefti < _size[0]*_size[1]){
+            _faces[i * _size[1] + k]->set_area(cellsize[1]);
+            double midpoint[2] = {box[0] + i * cellsize[0],
+                                  box[1] + (k + 0.5) * cellsize[1]};
+            _faces[i * _size[1] + k]->set_midpoint(midpoint);
+            if(lefti < _size[0] * _size[1]) {
                 _cells[lefti]->add_ngb(right);
-                _cells[lefti]->add_face(_faces[i*_size[1]+k]);
+                _cells[lefti]->add_face(_faces[i * _size[1] + k]);
             }
-            if(righti < _size[0]*_size[1]){
+            if(righti < _size[0] * _size[1]) {
                 _cells[righti]->add_ngb(left);
-                _cells[righti]->add_face(_faces[i*_size[1]+k]);
+                _cells[righti]->add_face(_faces[i * _size[1] + k]);
             }
         }
     }
-    for(unsigned int k = 0; k < _size[0]; k++){
-        for(unsigned int i = 0; i < _size[1]+1; i++){
+    for(unsigned int k = 0; k < _size[0]; k++) {
+        for(unsigned int i = 0; i < _size[1] + 1; i++) {
             VorGen* bottom;
             VorGen* top;
             unsigned int bottomi;
             unsigned int topi;
-            if(!i){
-                bottom = _ghosts[2*k];
-                bottomi = _size[0]*_size[1];
+            if(!i) {
+                bottom = _ghosts[2 * k];
+                bottomi = _size[0] * _size[1];
             } else {
-                bottom = _vorgens[k*_size[1]+(i-1)];
-                bottomi = k*_size[1]+(i-1);
+                bottom = _vorgens[k * _size[1] + (i - 1)];
+                bottomi = k * _size[1] + (i - 1);
             }
-            if(i == _size[1]){
-                top = _ghosts[2*k+1];
-                topi = _size[0]*_size[1];
+            if(i == _size[1]) {
+                top = _ghosts[2 * k + 1];
+                topi = _size[0] * _size[1];
             } else {
-                top = _vorgens[k*_size[1]+i];
-                topi = k*_size[1]+i;
+                top = _vorgens[k * _size[1] + i];
+                topi = k * _size[1] + i;
             }
-            if(bottomi < _size[0]*_size[1]){
-                _faces[(_size[0]+1)*_size[1]+i*_size[0]+k] =
+            if(bottomi < _size[0] * _size[1]) {
+                _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k] =
                         new VorFace(bottomi, _vorgens);
-                _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]->add_ngb(top);
-                _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]->add_ngb_id(topi);
+                _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]->add_ngb(
+                        top);
+                _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]
+                        ->add_ngb_id(topi);
             } else {
-                _faces[(_size[0]+1)*_size[1]+i*_size[0]+k] =
+                _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k] =
                         new VorFace(topi, _vorgens);
-                _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]->add_ngb(bottom);
-                _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]->add_ngb_id(bottomi);
+                _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]->add_ngb(
+                        bottom);
+                _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]
+                        ->add_ngb_id(bottomi);
             }
-            _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]->set_area(cellsize[0]);
-            double midpoint[2] = {box[0]+(k+0.5)*cellsize[0],
-                                  box[1]+i*cellsize[1]};
-            _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]->set_midpoint(midpoint);
-            if(bottomi < _size[0]*_size[1]){
+            _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]->set_area(
+                    cellsize[0]);
+            double midpoint[2] = {box[0] + (k + 0.5) * cellsize[0],
+                                  box[1] + i * cellsize[1]};
+            _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]->set_midpoint(
+                    midpoint);
+            if(bottomi < _size[0] * _size[1]) {
                 _cells[bottomi]->add_ngb(top);
                 _cells[bottomi]->add_face(
-                            _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]
-                            );
+                        _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]);
             }
-            if(topi < _size[0]*_size[1]){
+            if(topi < _size[0] * _size[1]) {
                 _cells[topi]->add_ngb(bottom);
                 _cells[topi]->add_face(
-                            _faces[(_size[0]+1)*_size[1]+i*_size[0]+k]
-                            );
+                        _faces[(_size[0] + 1) * _size[1] + i * _size[0] + k]);
             }
         }
     }
@@ -564,17 +606,17 @@ FixedGrid::FixedGrid(ParticleVector &particles, bool periodic){
  *
  * Clean up generators, ghosts, faces and cells.
  */
-FixedGrid::~FixedGrid(){
-    for(unsigned int i = 0; i < _vorgens.size(); i++){
+FixedGrid::~FixedGrid() {
+    for(unsigned int i = 0; i < _vorgens.size(); i++) {
         delete _vorgens[i];
     }
-    for(unsigned int i = 0; i < _ghosts.size(); i++){
+    for(unsigned int i = 0; i < _ghosts.size(); i++) {
         delete _ghosts[i];
     }
-    for(unsigned int i = 0; i < _faces.size(); i++){
+    for(unsigned int i = 0; i < _faces.size(); i++) {
         delete _faces[i];
     }
-    for(unsigned int i = 0; i < _cells.size(); i++){
+    for(unsigned int i = 0; i < _cells.size(); i++) {
         delete _cells[i];
     }
 }
@@ -588,9 +630,7 @@ FixedGrid::~FixedGrid(){
  *
  * @return The characteristic length of any cell in the grid
  */
-double FixedGrid::get_h(){
-    return _cellh;
-}
+double FixedGrid::get_h() { return _cellh; }
 
 /**
  * @brief Get the volume of any cell in the grid
@@ -600,9 +640,7 @@ double FixedGrid::get_h(){
  *
  * @return The volume of any cell in the grid
  */
-double FixedGrid::get_volume(){
-    return _cellvolume;
-}
+double FixedGrid::get_volume() { return _cellvolume; }
 
 /**
  * @brief Calculate hydrodynamical fluxes for all faces in the grid
@@ -611,9 +649,9 @@ double FixedGrid::get_volume(){
  * real time
  * @param solver RiemannSolver used to solve the Riemann problem at the faces
  */
-void FixedGrid::hydro(TimeLine &timeline, RiemannSolver &solver){
-    for(unsigned int i = 0; i < _faces.size(); i++){
-        VorFace *face = _faces[i];
+void FixedGrid::hydro(TimeLine& timeline, RiemannSolver& solver) {
+    for(unsigned int i = 0; i < _faces.size(); i++) {
+        VorFace* face = _faces[i];
         face->calculate_flux(timeline, solver);
     }
 }
@@ -628,6 +666,6 @@ void FixedGrid::hydro(TimeLine &timeline, RiemannSolver &solver){
  * want to compute gradients
  * @param delta Array to store the resulting gradients in
  */
-void FixedGrid::get_gradients(unsigned int index, StateVector *delta){
+void FixedGrid::get_gradients(unsigned int index, StateVector* delta) {
     _cells[_idx[index]]->estimate_gradient(delta);
 }

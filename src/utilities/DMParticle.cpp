@@ -32,27 +32,21 @@ using namespace std;
 /**
   * \brief Construct a default DMParticle with zero mass
   */
-DMParticle::DMParticle() : Particle() {
-    _mass = 0.;
-}
+DMParticle::DMParticle() : Particle() { _mass = 0.; }
 
 /**
   * \brief Construct a DMParticle with given position and zero mass
   *
   * @param pos Position of the particle
   */
-DMParticle::DMParticle(Vec pos) : Particle(pos) {
-    _mass = 0.;
-}
+DMParticle::DMParticle(Vec pos) : Particle(pos) { _mass = 0.; }
 
 /**
   * \brief Set the mass of the dark matter particle
   *
   * @param mass The mass of the dark matter particle
   */
-void DMParticle::set_mass(double mass){
-    _mass = mass;
-}
+void DMParticle::set_mass(double mass) { _mass = mass; }
 
 /**
   * \brief Construct a DMParticle from an MPI buffer (for parallellization
@@ -63,8 +57,8 @@ void DMParticle::set_mass(double mass){
   * @param position Pointer to the current position inside the buffer (is
   * updated internally)
   */
-DMParticle::DMParticle(void *buffer, int bufsize, int *position)
-    : Particle(buffer, bufsize, position) {
+DMParticle::DMParticle(void* buffer, int bufsize, int* position)
+        : Particle(buffer, bufsize, position) {
     MyMPI_Unpack(buffer, bufsize, position, &_mass, 1, MPI_DOUBLE);
 }
 
@@ -77,7 +71,7 @@ DMParticle::DMParticle(void *buffer, int bufsize, int *position)
   * @param position Pointer to the current position inside the buffer (is
   * updated internally)
   */
-void DMParticle::pack_data(void *buffer, int bufsize, int *position){
+void DMParticle::pack_data(void* buffer, int bufsize, int* position) {
     Particle::pack_data(buffer, bufsize, position);
     MyMPI_Pack(&_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
 }
@@ -87,7 +81,7 @@ void DMParticle::pack_data(void *buffer, int bufsize, int *position){
  *
  * @param rfile RestartFile to write to
  */
-void DMParticle::dump(RestartFile &rfile){
+void DMParticle::dump(RestartFile& rfile) {
     Particle::dump(rfile);
 
     rfile.write(_mass);
@@ -99,7 +93,7 @@ void DMParticle::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-DMParticle::DMParticle(RestartFile &rfile) : Particle(rfile){
+DMParticle::DMParticle(RestartFile& rfile) : Particle(rfile) {
     rfile.read(_mass);
 }
 
@@ -108,15 +102,15 @@ DMParticle::DMParticle(RestartFile &rfile) : Particle(rfile){
  *
  * @param stream std::ostream to write to
  */
-void DMParticle::dump_ascii(ostream &stream){
-#if ndim_==3
+void DMParticle::dump_ascii(ostream& stream) {
+#if ndim_ == 3
     stream << "_x:\n";
     stream << _x[0] << "\t" << _x[1] << "\t" << _x[2] << "\n";
     stream << "_v:\n";
     stream << _v[0] << "\t" << _v[1] << "\t" << _v[2] << "\n";
     stream << "_a_grav_new:\n";
     stream << _a_grav_new[0] << "\t" << _a_grav_new[1] << "\t" << _a_grav_new[2]
-                             << "\n";
+           << "\n";
 #else
     stream << "_x:\n";
     stream << _x[0] << "\t" << _x[1] << "\n";

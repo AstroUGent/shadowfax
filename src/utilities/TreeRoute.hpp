@@ -35,9 +35,9 @@
   * gives the index of the next node in the current node. In this way, the
   * TreeRoute effectively tells you how to reach a certain node.
   */
-class TreeRoute{
-private:
-#if ndim_==3
+class TreeRoute {
+  private:
+#if ndim_ == 3
     /*! \brief Indices of the child nodes per level of the tree */
     unsigned int _path[20];
 #else
@@ -49,7 +49,7 @@ private:
     /*! \brief Total length of the route in levels of the tree */
     unsigned int _length;
 
-public:
+  public:
     /**
      * @brief Empty constructor
      */
@@ -64,7 +64,7 @@ public:
      *
      * @param x Index of the node that is the next step in the route
      */
-    inline void add_step(unsigned int x){
+    inline void add_step(unsigned int x) {
         _path[_length] = x;
         _length++;
     }
@@ -78,30 +78,26 @@ public:
      *
      * @return Index of the next child node in the route
      */
-    inline unsigned int next(){
-        return _path[_curpos++];
-    }
+    inline unsigned int next() { return _path[_curpos++]; }
 
     /**
      * @brief Check if we are at the deepest level of the route
      *
      * @return True if we are at the end of the route, false otherwise
      */
-    inline bool finished(){
-        return _curpos == _length;
-    }
+    inline bool finished() { return _curpos == _length; }
 
     /**
      * @brief Print the route to the given stream
      *
      * @param stream std::ostream to write to
      */
-    inline void print(std::ostream& stream){
-        for(unsigned int i = 0; i < _length; i++){
+    inline void print(std::ostream& stream) {
+        for(unsigned int i = 0; i < _length; i++) {
             stream << _path[i] << " ";
         }
         stream << std::endl;
     }
 };
 
-#endif // TREEROUTE_HPP
+#endif  // TREEROUTE_HPP

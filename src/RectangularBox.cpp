@@ -24,9 +24,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "DelCont.hpp"
-#include "VorGen.hpp"
-#include "RestartFile.hpp"
 #include "ProgramLog.hpp"
+#include "RestartFile.hpp"
+#include "VorGen.hpp"
 #include "utilities/Hilbert.hpp"
 #include "utilities/Particle.hpp"
 using namespace std;
@@ -38,11 +38,11 @@ using namespace std;
  * @param sides Side lengths of the box
  */
 RectangularBox::RectangularBox(Vec center, Vec sides)
-    : _center(center), _sides(sides) {
+        : _center(center), _sides(sides) {
     _bitwidth = 1;
-    _bitwidth <<= (60/ndim_);
+    _bitwidth <<= (60 / ndim_);
     _maxside = std::max(sides[0], sides[1]);
-#if ndim_==3
+#if ndim_ == 3
     _maxside = std::max(_maxside, sides[2]);
 #endif
 
@@ -52,9 +52,9 @@ RectangularBox::RectangularBox(Vec center, Vec sides)
 /**
  * @brief Empty construcctor
  */
-RectangularBox::RectangularBox(){
+RectangularBox::RectangularBox() {
     _bitwidth = 1;
-    _bitwidth <<= (60/ndim_);
+    _bitwidth <<= (60 / ndim_);
     _maxside = 0.;
 
     LOGS("Empty RectangularBox created");
@@ -69,11 +69,11 @@ RectangularBox::RectangularBox(){
  * @return True if the sphere is inside the box or touches its border, false
  * otherwise
  */
-bool RectangularBox::inside(VorGen *point, double radius){
+bool RectangularBox::inside(VorGen* point, double radius) {
     Vec pntpos = point->get_position();
-    for(unsigned int i = 0; i < ndim_; i++){
-        double test = _sides[i]/2;
-        if(fabs(_center[i]-pntpos[i]) > test-radius){
+    for(unsigned int i = 0; i < ndim_; i++) {
+        double test = _sides[i] / 2;
+        if(fabs(_center[i] - pntpos[i]) > test - radius) {
             return false;
         }
     }
@@ -86,10 +86,10 @@ bool RectangularBox::inside(VorGen *point, double radius){
  * @param pntpos Vec specifying a set of coordinates
  * @return True if the coordinates lie inside the box, false otherwise
  */
-bool RectangularBox::inside(Vec pntpos){
-    for(unsigned int i = 0; i < ndim_; i++){
-        double test = _sides[i]/2;
-        if(fabs(_center[i] - pntpos[i]) > test){
+bool RectangularBox::inside(Vec pntpos) {
+    for(unsigned int i = 0; i < ndim_; i++) {
+        double test = _sides[i] / 2;
+        if(fabs(_center[i] - pntpos[i]) > test) {
             return false;
         }
     }
@@ -101,34 +101,34 @@ bool RectangularBox::inside(Vec pntpos){
  *
  * @return Coordinates of the vertices of a simplex that encompasses the box
  */
-vector<double> RectangularBox::get_bounding_tetrahedron(){
-    vector<double> coords( (ndim_+1)*ndim_ );
+vector<double> RectangularBox::get_bounding_tetrahedron() {
+    vector<double> coords((ndim_ + 1) * ndim_);
     double side = 0.;
-    for(unsigned int i = 0; i < ndim_; i++){
+    for(unsigned int i = 0; i < ndim_; i++) {
         side = std::max(side, _sides[i]);
     }
-#if ndim_==3
+#if ndim_ == 3
     // r = 4 * radius of sphere that contains cube
-    double r = sqrt( 12. )*side;
+    double r = sqrt(12.) * side;
     coords[0] = _center[0];
-    coords[1] = _center[1] + 3*r;
+    coords[1] = _center[1] + 3 * r;
     coords[2] = _center[2];
 
-    coords[3] = _center[0] + sqrt(8.0)*r;
+    coords[3] = _center[0] + sqrt(8.0) * r;
     coords[4] = _center[1] - r;
     coords[5] = _center[2];
 
-    coords[6] = _center[0] - sqrt(2.0)*r;
+    coords[6] = _center[0] - sqrt(2.0) * r;
     coords[7] = _center[1] - r;
-    coords[8] = _center[2] + sqrt(6.0)*r;
+    coords[8] = _center[2] + sqrt(6.0) * r;
 
-    coords[9] = _center[0] - sqrt(2.0)*r;
+    coords[9] = _center[0] - sqrt(2.0) * r;
     coords[10] = _center[1] - r;
-    coords[11] = _center[2] - sqrt(6.0)*r;
+    coords[11] = _center[2] - sqrt(6.0) * r;
 #else
     // r = 4 * radius of circle that contains square
-    double r = sqrt( 8. )*side;
-    double l = sqrt( 3. )*r;
+    double r = sqrt(8.) * side;
+    double l = sqrt(3.) * r;
     coords[0] = _center[0] - l;
     coords[1] = _center[1] - r;
 
@@ -136,7 +136,7 @@ vector<double> RectangularBox::get_bounding_tetrahedron(){
     coords[3] = _center[1] - r;
 
     coords[4] = _center[0];
-    coords[5] = _center[1]+ 2*r;
+    coords[5] = _center[1] + 2 * r;
 #endif
     return coords;
 }
@@ -146,10 +146,10 @@ vector<double> RectangularBox::get_bounding_tetrahedron(){
  *
  * @param box Array to store the result in
  */
-void RectangularBox::get_bounding_box(double *box){
-    for(int i = 0; i < ndim_; i++){
-        box[i] = _center[i] - 0.5*_sides[i];
-        box[ndim_+i] = _sides[i];
+void RectangularBox::get_bounding_box(double* box) {
+    for(int i = 0; i < ndim_; i++) {
+        box[i] = _center[i] - 0.5 * _sides[i];
+        box[ndim_ + i] = _sides[i];
     }
 }
 
@@ -161,7 +161,7 @@ void RectangularBox::get_bounding_box(double *box){
  *
  * @return 0, since this function should not be used
  */
-double RectangularBox::get_box_width(){
+double RectangularBox::get_box_width() {
     // problem!!!!
     return 0.;
 }
@@ -172,10 +172,11 @@ double RectangularBox::get_box_width(){
  * @param coords Vec specifying a set of coordinates
  * @return The Hilbert-key for the given coordinates
  */
-unsigned long RectangularBox::get_key(Vec &coords){
+unsigned long RectangularBox::get_key(Vec& coords) {
     unsigned long bits[ndim_] = {0};
-    for(unsigned int i = ndim_; i--;){
-        bits[i] = ((coords[i]-_center[i]+0.5*_maxside)/_maxside)*_bitwidth;
+    for(unsigned int i = ndim_; i--;) {
+        bits[i] = ((coords[i] - _center[i] + 0.5 * _maxside) / _maxside) *
+                  _bitwidth;
     }
     return HB::get_key(bits, 60);
 }
@@ -189,8 +190,8 @@ unsigned long RectangularBox::get_key(Vec &coords){
  * @param radius XXX
  * @param keys XXX
  */
-void RectangularBox::get_ngb_keys(Vec &coords, double radius,
-                                  unsigned long *keys){
+void RectangularBox::get_ngb_keys(Vec& coords, double radius,
+                                  unsigned long* keys) {
     // not used, so not implemented...
 }
 
@@ -200,15 +201,15 @@ void RectangularBox::get_ngb_keys(Vec &coords, double radius,
  *
  * @param p Particle that resides inside or outside the box
  */
-void RectangularBox::keep_inside(Particle *p){
-    for(unsigned int i = 0; i < ndim_; i++){
-        if(p->pos(i) < _center[i]-0.5*_sides[i]){
+void RectangularBox::keep_inside(Particle* p) {
+    for(unsigned int i = 0; i < ndim_; i++) {
+        if(p->pos(i) < _center[i] - 0.5 * _sides[i]) {
             p->get_position()[i] += _sides[i];
         }
         // if both boundaries are inclusive, this gives rise to problems
         // (because the boundaries are their own periodic copies)
         // hence the >=
-        if(p->pos(i) >= _center[i]+0.5*_sides[i]){
+        if(p->pos(i) >= _center[i] + 0.5 * _sides[i]) {
             p->get_position()[i] -= _sides[i];
         }
     }
@@ -219,12 +220,12 @@ void RectangularBox::keep_inside(Particle *p){
  *
  * @param v Given coordinates
  */
-void RectangularBox::closest_copy(Vec &v){
-    for(unsigned int i = 0; i < ndim_; i++){
-        if(v[i] > 0.5*_sides[i]){
+void RectangularBox::closest_copy(Vec& v) {
+    for(unsigned int i = 0; i < ndim_; i++) {
+        if(v[i] > 0.5 * _sides[i]) {
             v[i] -= _sides[i];
         }
-        if(v[i] < -0.5*_sides[i]){
+        if(v[i] < -0.5 * _sides[i]) {
             v[i] += _sides[i];
         }
     }
@@ -235,15 +236,15 @@ void RectangularBox::closest_copy(Vec &v){
  *
  * @return Cuboid specifying the dimensions of the box
  */
-Cuboid RectangularBox::get_cuboid(){
-#if ndim_==3
+Cuboid RectangularBox::get_cuboid() {
+#if ndim_ == 3
     Vec origin(_center[0], _center[1], _center[2]);
     Vec sides(_sides[0], _sides[1], _sides[2]);
 #else
     Vec origin(_center[0], _center[1]);
     Vec sides(_sides[0], _sides[1]);
 #endif
-    Cuboid cuboid(origin-0.5*sides, sides);
+    Cuboid cuboid(origin - 0.5 * sides, sides);
     return cuboid;
 }
 
@@ -252,7 +253,7 @@ Cuboid RectangularBox::get_cuboid(){
  *
  * @param rfile RestartFile to write to
  */
-void RectangularBox::dump(RestartFile &rfile){
+void RectangularBox::dump(RestartFile& rfile) {
     rfile.write(_center);
     rfile.write(_sides);
     rfile.write(_bitwidth);
@@ -266,7 +267,7 @@ void RectangularBox::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-RectangularBox::RectangularBox(RestartFile &rfile){
+RectangularBox::RectangularBox(RestartFile& rfile) {
     rfile.read(_center);
     rfile.read(_sides);
     rfile.read(_bitwidth);

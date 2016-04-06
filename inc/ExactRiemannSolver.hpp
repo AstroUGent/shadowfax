@@ -26,9 +26,9 @@
 #ifndef EXACTRIEMANNSOLVER_HPP
 #define EXACTRIEMANNSOLVER_HPP
 
+#include "../src/utilities/Timer.hpp"
 #include "RiemannSolver.hpp"
 #include "StateVector.hpp"
-#include "../src/utilities/Timer.hpp"
 
 class RestartFile;
 
@@ -39,8 +39,8 @@ class RestartFile;
  * mixed Brent/Newthon-Raphson iteration. This pressure is then used to
  * find the exact solution of the Riemann problem.
  */
-class ExactRiemannSolver : public RiemannSolver{
-private:
+class ExactRiemannSolver : public RiemannSolver {
+  private:
     /*! \brief Adiabatic index \f$\gamma\f$ of the fluid */
     double _gamma;
 
@@ -88,9 +88,8 @@ private:
     /*! \brief Timer for time spent in Riemann solver evaluations */
     Timer _timer;
 
-
     StateVector solve_vacuum(StateVector& WL, StateVector& WR, double vL,
-                             double vR, double aL, double aR, Vec &n);
+                             double vR, double aL, double aR, Vec& n);
     double fb(double p, StateVector& Wb, double a);
     double gb(double p, StateVector& Wb);
     double fprimeb(double p, StateVector& Wb, double a);
@@ -104,9 +103,9 @@ private:
                              double errorTol, StateVector& WL, StateVector& WR,
                              double vL, double vR, double aL, double aR);
 
-public:
+  public:
     ExactRiemannSolver(double gamma = 1.66667, double tolerance = 1.e-8,
-                  double cutoff = -5.);
+                       double cutoff = -5.);
     ~ExactRiemannSolver();
 
     /**
@@ -114,11 +113,9 @@ public:
      *
      * @return "EXAC"
      */
-    virtual std::string tag(){
-        return "EXAC";
-    }
+    virtual std::string tag() { return "EXAC"; }
 
-    StateVector solve(StateVector& WL, StateVector& WR, Vec &n, double& mach,
+    StateVector solve(StateVector& WL, StateVector& WR, Vec& n, double& mach,
                       bool reflective = false);
 
     /**
@@ -126,9 +123,7 @@ public:
      *
      * @return Adiabatic index of the fluid
      */
-    double get_gamma(){
-        return _gamma;
-    }
+    double get_gamma() { return _gamma; }
 
     double get_soundspeed(const StateVector& W);
 
@@ -136,15 +131,15 @@ public:
 
     void test();
 
-    StateVector get_Q(double volume, const StateVector &W);
-    StateVector get_W(double volume, StateVector &Q, bool use_energy = true);
-    StateVector get_flux(const Vec &v, unsigned int index,
-                         const StateVector &W);
+    StateVector get_Q(double volume, const StateVector& W);
+    StateVector get_W(double volume, StateVector& Q, bool use_energy = true);
+    StateVector get_flux(const Vec& v, unsigned int index,
+                         const StateVector& W);
 
     unsigned long get_neval();
 
-    void dump(RestartFile &rfile);
-    ExactRiemannSolver(RestartFile &rfile);
+    void dump(RestartFile& rfile);
+    ExactRiemannSolver(RestartFile& rfile);
 };
 
-#endif // EXACTRIEMANNSOLVER_HPP
+#endif  // EXACTRIEMANNSOLVER_HPP

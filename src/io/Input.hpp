@@ -28,9 +28,9 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
+#include <fstream>
 #include <hdf5.h>
 #include <string>
-#include <fstream>
 #include <vector>
 
 class Block;
@@ -42,8 +42,8 @@ class Header;
   * Data is organized in blocks which basically are tables with column names and
   * rows of data. Extra information is written to the file through a Header.
   */
-class Input{
-public:
+class Input {
+  public:
     /**
       * \brief Fill the given Block with data
       *
@@ -55,7 +55,7 @@ public:
       * @param block Block to be filled
       * @param npart Number of particles to read information for
       */
-    virtual void read(Block& block, unsigned int npart)=0;
+    virtual void read(Block& block, unsigned int npart) = 0;
 
     /**
       * \brief Fill the given Header with data
@@ -65,23 +65,23 @@ public:
       *
       * @param header Header to fill
       */
-    virtual void read_header(Header& header)=0;
+    virtual void read_header(Header& header) = 0;
 };
 
 /**
   * \brief Read in data from the default HDF5 snapshot format
   */
-class FileInput : public Input{
-private:
+class FileInput : public Input {
+  private:
     /*! \brief Name of the HDF5 file that is being read */
     std::string _filename;
 
-public:
+  public:
     FileInput(std::string filename);
-    ~FileInput(){}
+    ~FileInput() {}
 
     void read(Block& block, unsigned int npart);
-    void read_header(Header &header);
+    void read_header(Header& header);
 };
 
 /**
@@ -92,22 +92,22 @@ public:
   * information can be present in the file. All data is read in during
   * construction and is stored in internal vectors.
   */
-class AsciiInput : public Input{
-private:
+class AsciiInput : public Input {
+  private:
     /*! \brief Internal data vector */
-    std::vector< std::vector<double> > _data;
+    std::vector<std::vector<double> > _data;
 
     /*! \brief Internal vector of column names */
     std::vector<std::string> _column_names;
 
     void read_column_names(std::string line);
 
-public:
+  public:
     AsciiInput(std::string filename);
-    ~AsciiInput(){}
+    ~AsciiInput() {}
 
-    void read(Block &block, unsigned int npart);
-    void read_header(Header &header);
+    void read(Block& block, unsigned int npart);
+    void read_header(Header& header);
 };
 
-#endif // INPUT_HPP
+#endif  // INPUT_HPP

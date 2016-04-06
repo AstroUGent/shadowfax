@@ -41,8 +41,8 @@
 #ifndef HEAD_DELCONT
 #define HEAD_DELCONT
 
-#include "Vec.hpp"
 #include "../src/utilities/Cuboid.hpp"
+#include "Vec.hpp"
 #include <vector>
 
 class Particle;
@@ -55,9 +55,9 @@ class RestartFile;
  * A Container practically defines a volume (box or sphere), by making the
  * geometrical properties of the volume accessible to the rest of the program.
  */
-class DelCont{
-public:
-    virtual ~DelCont(){}
+class DelCont {
+  public:
+    virtual ~DelCont() {}
 
     /**
       * Assess whether the given VorGen and the region within a sphere with the
@@ -68,7 +68,7 @@ public:
       * @return true if the region is completely inside the DelCont (borders
       * exclusive), false otherwise
       */
-    virtual bool inside( VorGen* point, double radius )=0;
+    virtual bool inside(VorGen* point, double radius) = 0;
 
     /**
       * Assess whether the given Vec is inside the DelCont
@@ -77,7 +77,7 @@ public:
       * @return true if the coordinates are inside the DelCont (borders
       * inclusive), false otherwises
       */
-    virtual bool inside( Vec pntpos )=0;
+    virtual bool inside(Vec pntpos) = 0;
 
     /**
       * Get the 4 (or 3) coordinate triplets (/pairs) that make up the vertices
@@ -87,7 +87,7 @@ public:
       *
       * @return A vector containing the coordinates of a Simplex
       */
-    virtual std::vector< double > get_bounding_tetrahedron( )=0;
+    virtual std::vector<double> get_bounding_tetrahedron() = 0;
 
     /**
       * Return the width of the DelCont. For a non-cubic DelCont, this is the
@@ -95,14 +95,14 @@ public:
       *
       * @return The width of the DelCont
       */
-    virtual double get_box_width( )=0;
+    virtual double get_box_width() = 0;
 
     /**
       * Get the origin and side of a cubic box containing the entire DelCont
       *
       * @param box A 3- or 4-element array to fill.
       */
-    virtual void get_bounding_box(double* box)=0;
+    virtual void get_bounding_box(double* box) = 0;
 
     /**
       * Calculate a hilbert key for the given Vec and taking into account the
@@ -111,7 +111,7 @@ public:
       * @param coords A Vec specifying the coordinates of a Particle or VorGen
       * @return The hilbert key for the given coordinates
       */
-    virtual unsigned long get_key(Vec& coords)=0;
+    virtual unsigned long get_key(Vec& coords) = 0;
 
     /**
       * Get the hilbert keys of all blocks that overlap with the region defined
@@ -128,7 +128,7 @@ public:
       * unsigned longs in 2D and 27 in 3D)
       */
     virtual void get_ngb_keys(Vec& coords, double radius,
-                              unsigned long* keys)=0;
+                              unsigned long* keys) = 0;
 
     /**
       * Make sure that the given Particle has coordinates inside the DelCont,
@@ -136,7 +136,7 @@ public:
       *
       * @param p A Particle
       */
-    virtual void keep_inside(Particle* p)=0;
+    virtual void keep_inside(Particle* p) = 0;
 
     /**
       * Convert a distance Vec between two particles to the smallest possible
@@ -147,7 +147,7 @@ public:
       *
       * @param v A Vec
       */
-    virtual void closest_copy(Vec& v)=0;
+    virtual void closest_copy(Vec& v) = 0;
 
     /**
      * @brief Get a Cuboid specifying the exterior extents of the simulation box
@@ -155,7 +155,7 @@ public:
      * @return The dimensions of the smallest cuboid containing the entire
      * simulation box
      */
-    virtual Cuboid get_cuboid()=0;
+    virtual Cuboid get_cuboid() = 0;
 };
 
 /**
@@ -164,7 +164,7 @@ public:
  * The edges of the box are parallel to the coordinate axes.
  */
 class CubicBox : public DelCont {
-private:
+  private:
     /*! \brief The origin of the CubicBox (the coordinates of the center of the
      *  box) */
     Vec _origin;
@@ -176,19 +176,19 @@ private:
      *  the number of dimensions; n = 20 for 3D and n = 30 for 2D) */
     unsigned long _bitwidth;
 
-public:
+  public:
     CubicBox(Vec origin, double side);
     CubicBox();
-    virtual ~CubicBox(){}
-    bool inside( VorGen* point, double radius );
-    bool inside( Vec pntpos );
-    std::vector< double > get_bounding_tetrahedron( );
+    virtual ~CubicBox() {}
+    bool inside(VorGen* point, double radius);
+    bool inside(Vec pntpos);
+    std::vector<double> get_bounding_tetrahedron();
     void get_bounding_box(double* box);
-    double get_box_width( );
-    unsigned long get_key(Vec &coords);
+    double get_box_width();
+    unsigned long get_key(Vec& coords);
     void get_ngb_keys(Vec& coords, double radius, unsigned long* keys);
-    void keep_inside(Particle *p);
-    void closest_copy(Vec &v);
+    void keep_inside(Particle* p);
+    void closest_copy(Vec& v);
 
     Cuboid get_cuboid();
 };
@@ -199,7 +199,7 @@ public:
  * A sphere in 3D or a circle in 2D.
  */
 class CircularBox : public DelCont {
-private:
+  private:
     /*! \brief The origin of the sphere or circle */
     Vec _origin;
 
@@ -209,18 +209,18 @@ private:
     /*! \brief The radius squared of the sphere or circle (for convenience) */
     double _radius2;
 
-public:
-    CircularBox( Vec origin, double radius );
-    virtual ~CircularBox(){}
-    bool inside( VorGen* point, double radius );
-    bool inside( Vec pntpos );
-    std::vector< double > get_bounding_tetrahedron( );
+  public:
+    CircularBox(Vec origin, double radius);
+    virtual ~CircularBox() {}
+    bool inside(VorGen* point, double radius);
+    bool inside(Vec pntpos);
+    std::vector<double> get_bounding_tetrahedron();
     void get_bounding_box(double* box);
-    double get_box_width( );
-    unsigned long get_key(Vec &coords);
-    void get_ngb_keys(Vec& coords, double radius, unsigned long* keys){}
-    void keep_inside(Particle *p);
-    void closest_copy(Vec &v) {}
+    double get_box_width();
+    unsigned long get_key(Vec& coords);
+    void get_ngb_keys(Vec& coords, double radius, unsigned long* keys) {}
+    void keep_inside(Particle* p);
+    void closest_copy(Vec& v) {}
 
     Cuboid get_cuboid();
 };
@@ -230,8 +230,8 @@ public:
  *
  * The box can have different side lengths in different dimensions.
  */
-class RectangularBox : public DelCont{
-private:
+class RectangularBox : public DelCont {
+  private:
     /*! \brief Center of the cuboid */
     Vec _center;
 
@@ -244,25 +244,25 @@ private:
     /*! \brief Largest side length of the cuboid */
     double _maxside;
 
-public:
+  public:
     RectangularBox(Vec center, Vec sides);
     RectangularBox();
-    virtual ~RectangularBox(){}
+    virtual ~RectangularBox() {}
 
     bool inside(VorGen* point, double radius);
     bool inside(Vec pntpos);
-    std::vector< double > get_bounding_tetrahedron();
+    std::vector<double> get_bounding_tetrahedron();
     void get_bounding_box(double* box);
     double get_box_width();
-    unsigned long get_key(Vec &coords);
+    unsigned long get_key(Vec& coords);
     void get_ngb_keys(Vec& coords, double radius, unsigned long* keys);
-    void keep_inside(Particle *p);
-    void closest_copy(Vec &v);
+    void keep_inside(Particle* p);
+    void closest_copy(Vec& v);
 
     Cuboid get_cuboid();
 
-    void dump(RestartFile &rfile);
-    RectangularBox(RestartFile &rfile);
+    void dump(RestartFile& rfile);
+    RectangularBox(RestartFile& rfile);
 };
 
 #endif

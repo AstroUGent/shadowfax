@@ -38,7 +38,7 @@ using namespace std;
 
 //////////////////////////////////////////////////////////////////////
 
-#if ndim_==3
+#if ndim_ == 3
 /**
   * \brief A 2D or 3D vector
   *
@@ -55,15 +55,14 @@ using namespace std;
   * We acknowledge Peter Camps (Ghent University) for making this code available
   * to us.
   */
-class Vec
-{
-protected:
+class Vec {
+  protected:
     /*! \brief These data members represent the cartesian vector components.
      *  The anonymous union is used to permit indexing the components */
-    union{
+    union {
         /*! \brief Array storing the actual vector contents */
         double _c[3];
-        struct{
+        struct {
             /*! \brief x-component of the vector */
             double _x;
             /*! \brief y-component of the vector */
@@ -73,13 +72,13 @@ protected:
         };
     };
 
-public:
+  public:
     /**
      * @brief Default constructor
      *
      * All vector components are initialized to zero.
      */
-    inline Vec( ) : _x(0), _y(0), _z(0) { }
+    inline Vec() : _x(0), _y(0), _z(0) {}
 
     /**
      * @brief Constructor
@@ -90,7 +89,7 @@ public:
      * @param y y-component of the vector
      * @param z z-component of the vector
      */
-    inline Vec( double x, double y, double z ) : _x(x), _y(y), _z(z) { }
+    inline Vec(double x, double y, double z) : _x(x), _y(y), _z(z) {}
 
     /**
      * @brief This function sets the vector components to the values provided
@@ -100,7 +99,7 @@ public:
      * @param y y-component of the vector
      * @param z z-component of the vector
      */
-    inline void set( double x, double y, double z ){
+    inline void set(double x, double y, double z) {
         _x = x;
         _y = y;
         _z = z;
@@ -111,45 +110,35 @@ public:
      *
      * @return x-component of the vector
      */
-    inline double x( ) const{
-        return _x;
-    }
+    inline double x() const { return _x; }
 
     /**
      * @brief This function returns the \em y component of the vector
      *
      * @return y-component of the vector
      */
-    inline double y( ) const{
-        return _y;
-    }
+    inline double y() const { return _y; }
 
     /**
      * @brief This function returns the \em z component of the vector
      *
      * @return z-component of the vector
      */
-    inline double z( ) const{
-        return _z;
-    }
+    inline double z() const { return _z; }
 
     /**
      * @brief This function returns the norm of the vector
      *
      * @return Norm of the vector
      */
-    inline double norm( ) const{
-        return sqrt(_x*_x + _y*_y + _z*_z);
-    }
+    inline double norm() const { return sqrt(_x * _x + _y * _y + _z * _z); }
 
     /**
      * @brief This function returns the squared norm of the vector
      *
      * @return Norm of the vector squared
      */
-    inline double norm2( ) const{
-        return _x*_x + _y*_y + _z*_z;
-    }
+    inline double norm2() const { return _x * _x + _y * _y + _z * _z; }
 
     /**
      * @brief This static function returns the dot product (inner product) of
@@ -159,8 +148,8 @@ public:
      * @param b Second vector
      * @return Dot product of the two given vectors
      */
-    inline static double dot( Vec a, Vec b ){
-        return a._x*b._x + a._y*b._y + a._z*b._z;
+    inline static double dot(Vec a, Vec b) {
+        return a._x * b._x + a._y * b._y + a._z * b._z;
     }
 
     /**
@@ -171,9 +160,9 @@ public:
      * @param b Second vector
      * @return Vec that is the vector product of the two given vectors
      */
-    inline static Vec cross( Vec a, Vec b ){
-        return Vec( a._y*b._z - a._z*b._y, a._z*b._x - a._x*b._z,
-                    a._x*b._y - a._y*b._x );
+    inline static Vec cross(Vec a, Vec b) {
+        return Vec(a._y * b._z - a._z * b._y, a._z * b._x - a._x * b._z,
+                   a._x * b._y - a._y * b._x);
     }
 
     /**
@@ -182,7 +171,7 @@ public:
      * @param v Vector to add to this one
      * @return Reference to this vector
      */
-    inline Vec& operator+=( Vec v ){
+    inline Vec& operator+=(Vec v) {
         _x += v._x;
         _y += v._y;
         _z += v._z;
@@ -195,7 +184,7 @@ public:
      * @param s Scalar to add to every component of this vector
      * @return Reference to this vector
      */
-    inline Vec& operator+=( double s ){
+    inline Vec& operator+=(double s) {
         _x += s;
         _y += s;
         _z += s;
@@ -208,7 +197,7 @@ public:
      * @param v Vector to subtract from this one
      * @return Reference to this vector
      */
-    inline Vec& operator-=( Vec v ){
+    inline Vec& operator-=(Vec v) {
         _x -= v._x;
         _y -= v._y;
         _z -= v._z;
@@ -221,7 +210,7 @@ public:
      * @param v Vector to multiply piecewise with this one
      * @return Reference to this vector
      */
-    inline Vec& operator*=( Vec v ){
+    inline Vec& operator*=(Vec v) {
         _x *= v._x;
         _y *= v._y;
         _z *= v._z;
@@ -234,7 +223,7 @@ public:
      * @param s Scalar to subtract from every component of this vector
      * @return Reference to this vector
      */
-    inline Vec& operator-=( double s ){
+    inline Vec& operator-=(double s) {
         _x -= s;
         _y -= s;
         _z -= s;
@@ -247,7 +236,7 @@ public:
      * @param s Scalar to multiply with every component of this vector
      * @return Reference to this vector
      */
-    inline Vec& operator*=( double s ){
+    inline Vec& operator*=(double s) {
         _x *= s;
         _y *= s;
         _z *= s;
@@ -260,7 +249,7 @@ public:
      * @param s Scalar to divide every component of this vector by
      * @return Reference to this vector
      */
-    inline Vec& operator/=( double s ){
+    inline Vec& operator/=(double s) {
         _x /= s;
         _y /= s;
         _z /= s;
@@ -274,9 +263,7 @@ public:
      * @param i Index of requested component
      * @return ith element of the vector
      */
-    inline double operator[ ]( int i ) const{
-        return _c[i];
-    }
+    inline double operator[](int i) const { return _c[i]; }
 
     /**
      * @brief This operator return a reference to the ith element, where i = 0
@@ -287,9 +274,7 @@ public:
      * @param i Index of the requested component
      * @return Reference to the ith element of the vector
      */
-    inline double & operator[ ]( int i ){
-        return _c[i];
-    }
+    inline double& operator[](int i) { return _c[i]; }
 };
 #else
 /**
@@ -308,15 +293,14 @@ public:
   * We acknowledge Peter Camps (Ghent University) for making this code available
   * to us.
   */
-class Vec
-{
-protected:
+class Vec {
+  protected:
     /*! \brief These data members represent the cartesian vector components.
      *  The anonymous union is used to permit indexing the components */
-    union{
+    union {
         /*! \brief Array storing the actual vector contents */
         double _c[2];
-        struct{
+        struct {
             /*! \brief x-component of the vector */
             double _x;
             /*! \brief y-component of the vector */
@@ -324,13 +308,13 @@ protected:
         };
     };
 
-public:
+  public:
     /**
      * @brief Default constructor
      *
      * All vector components are initialized to zero.
      */
-    inline Vec( ) : _x(0), _y(0) { }
+    inline Vec() : _x(0), _y(0) {}
 
     /**
      * @brief Constructor
@@ -340,7 +324,7 @@ public:
      * @param x x-component of the vector
      * @param y y-component of the vector
      */
-    inline Vec( double x, double y ) : _x(x), _y(y) { }
+    inline Vec(double x, double y) : _x(x), _y(y) {}
 
     /**
      * @brief This function sets the vector components to the values provided
@@ -349,7 +333,7 @@ public:
      * @param x x-component of the vector
      * @param y y-component of the vector
      */
-    inline void set( double x, double y ){
+    inline void set(double x, double y) {
         _x = x;
         _y = y;
     }
@@ -359,36 +343,28 @@ public:
      *
      * @return x-component of the vector
      */
-    inline double x( ) const{
-        return _x;
-    }
+    inline double x() const { return _x; }
 
     /**
      * @brief This function returns the \em y component of the vector
      *
      * @return y-component of the vector
      */
-    inline double y( ) const{
-        return _y;
-    }
+    inline double y() const { return _y; }
 
     /**
      * @brief This function returns the norm of the vector
      *
      * @return Norm of the vector
      */
-    inline double norm( ) const{
-        return sqrt(_x*_x + _y*_y );
-    }
+    inline double norm() const { return sqrt(_x * _x + _y * _y); }
 
     /**
      * @brief This function returns the squared norm of the vector
      *
      * @return Norm of the vector squared
      */
-    inline double norm2( ) const{
-        return _x*_x + _y*_y;
-    }
+    inline double norm2() const { return _x * _x + _y * _y; }
 
     /**
      * @brief This static function returns the dot product (inner product) of
@@ -398,9 +374,7 @@ public:
      * @param b Second vector
      * @return Dot product of the two given vectors
      */
-    inline static double dot( Vec a, Vec b ){
-        return a._x*b._x + a._y*b._y;
-    }
+    inline static double dot(Vec a, Vec b) { return a._x * b._x + a._y * b._y; }
 
     /**
      * @brief This operator adds another vector to this one
@@ -408,7 +382,7 @@ public:
      * @param v Vector to add to this one
      * @return Reference to this vector
      */
-    inline Vec& operator+=( Vec v ){
+    inline Vec& operator+=(Vec v) {
         _x += v._x;
         _y += v._y;
         return *this;
@@ -420,7 +394,7 @@ public:
      * @param s Scalar to add to every component of this vector
      * @return Reference to this vector
      */
-    inline Vec& operator+=( double s ){
+    inline Vec& operator+=(double s) {
         _x += s;
         _y += s;
         return *this;
@@ -432,7 +406,7 @@ public:
      * @param v Vector to subtract from this one
      * @return Reference to this vector
      */
-    inline Vec& operator-=( Vec v ){
+    inline Vec& operator-=(Vec v) {
         _x -= v._x;
         _y -= v._y;
         return *this;
@@ -444,7 +418,7 @@ public:
      * @param v Vector to multiply piecewise with this one
      * @return Reference to this vector
      */
-    inline Vec& operator*=( Vec v ){
+    inline Vec& operator*=(Vec v) {
         _x *= v._x;
         _y *= v._y;
         return *this;
@@ -456,7 +430,7 @@ public:
      * @param s Scalar to subtract from every component of this vector
      * @return Reference to this vector
      */
-    inline Vec& operator-=( double s ){
+    inline Vec& operator-=(double s) {
         _x -= s;
         _y -= s;
         return *this;
@@ -468,7 +442,7 @@ public:
      * @param s Scalar to multiply with every component of this vector
      * @return Reference to this vector
      */
-    inline Vec& operator*=( double s ){
+    inline Vec& operator*=(double s) {
         _x *= s;
         _y *= s;
         return *this;
@@ -480,7 +454,7 @@ public:
      * @param s Scalar to divide every component of this vector by
      * @return Reference to this vector
      */
-    inline Vec& operator/=( double s ){
+    inline Vec& operator/=(double s) {
         _x /= s;
         _y /= s;
         return *this;
@@ -493,9 +467,7 @@ public:
      * @param i Index of requested component
      * @return ith element of the vector
      */
-    inline double operator[ ]( int i ) const{
-        return _c[i];
-    }
+    inline double operator[](int i) const { return _c[i]; }
 
     /**
      * @brief This operator return a reference to the ith element, where i = 0
@@ -506,9 +478,7 @@ public:
      * @param i Index of the requested component
      * @return Reference to the ith element of the vector
      */
-    inline double & operator[ ]( int i ){
-        return _c[i];
-    }
+    inline double& operator[](int i) { return _c[i]; }
 };
 #endif
 //////////////////////////////////////////////////////////////////////
@@ -520,9 +490,7 @@ public:
  * @param b Second vector
  * @return Vec that is the sum of the two given vectors
  */
-inline Vec operator+( Vec a, Vec b ){
-    return a += b;
-}
+inline Vec operator+(Vec a, Vec b) { return a += b; }
 
 /**
  * @brief This free operator subtracts two vectors
@@ -531,9 +499,7 @@ inline Vec operator+( Vec a, Vec b ){
  * @param b Second vector
  * @return Vec that is the first vector minus the second one
  */
-inline Vec operator-( Vec a, Vec b ){
-    return a -= b;
-}
+inline Vec operator-(Vec a, Vec b) { return a -= b; }
 
 /**
  * @brief This free operator piecewise multiplies two vectors
@@ -542,9 +508,7 @@ inline Vec operator-( Vec a, Vec b ){
  * @param b Second vector
  * @return Vec that is the piecewise multiplication of the two given vectors
  */
-inline Vec operator*( Vec a, Vec b){
-    return a *= b;
-}
+inline Vec operator*(Vec a, Vec b) { return a *= b; }
 
 /**
  * @brief This free operator multiplies a vector by a scalar
@@ -553,9 +517,7 @@ inline Vec operator*( Vec a, Vec b){
  * @param s Scalar
  * @return Vec that is the result of the multiplication
  */
-inline Vec operator*( Vec a, double s ){
-    return a *= s;
-}
+inline Vec operator*(Vec a, double s) { return a *= s; }
 
 /**
  * @brief This free operator multiplies a scalar by a vector
@@ -564,9 +526,7 @@ inline Vec operator*( Vec a, double s ){
  * @param b Vector
  * @return Vec that is the result of the multiplication
  */
-inline Vec operator*( double s, Vec b ){
-    return b *= s;
-}
+inline Vec operator*(double s, Vec b) { return b *= s; }
 
 /**
  * @brief This free operator adds a scalar to a vector
@@ -575,9 +535,7 @@ inline Vec operator*( double s, Vec b ){
  * @param s Scalar
  * @return Vec that is the result of the addition
  */
-inline Vec operator+( Vec a, double s ){
-    return a += s;
-}
+inline Vec operator+(Vec a, double s) { return a += s; }
 
 /**
  * @brief This free operator adds a vector to a scalar
@@ -586,9 +544,7 @@ inline Vec operator+( Vec a, double s ){
  * @param a Vector
  * @return Vec that is the result of the addition
  */
-inline Vec operator+( double s, Vec a ){
-    return a += s;
-}
+inline Vec operator+(double s, Vec a) { return a += s; }
 
 /**
  * @brief This free operator subtracts a scalar from a vector
@@ -597,9 +553,7 @@ inline Vec operator+( double s, Vec a ){
  * @param s Scalar
  * @return Vec that is the given vector minus the given scalar
  */
-inline Vec operator-( Vec a, double s ){
-    return a -= s;
-}
+inline Vec operator-(Vec a, double s) { return a -= s; }
 
 /**
  * @brief This free operator divides a vector by a scalar
@@ -608,10 +562,8 @@ inline Vec operator-( Vec a, double s ){
  * @param s Scalar
  * @return Vec that is the result of the division
  */
-inline Vec operator/( Vec a, double s ){
-    return a /= s;
-}
+inline Vec operator/(Vec a, double s) { return a /= s; }
 
 //////////////////////////////////////////////////////////////////////
 
-#endif // VEC_HPP
+#endif  // VEC_HPP

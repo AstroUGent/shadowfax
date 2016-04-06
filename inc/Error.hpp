@@ -28,11 +28,14 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include <iostream>
 #include <MPIGlobal.hpp>
+#include <iostream>
 
-#define my_exit() { \
-    std::cerr << MPIGlobal::rank << ": " << __FILE__ << "::" << __FUNCTION__ \
-    << ":" << __LINE__ << std::endl; MPI_Abort(MPI_COMM_WORLD, -1); }
+#define my_exit()                                                          \
+    {                                                                      \
+        std::cerr << MPIGlobal::rank << ": " << __FILE__                   \
+                  << "::" << __FUNCTION__ << ":" << __LINE__ << std::endl; \
+        MPI_Abort(MPI_COMM_WORLD, -1);                                     \
+    }
 
-#endif // ERROR_HPP
+#endif  // ERROR_HPP

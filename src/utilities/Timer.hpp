@@ -26,9 +26,9 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
 
-#include <sys/time.h>
-#include <ostream>
 #include <istream>
+#include <ostream>
+#include <sys/time.h>
 
 class RestartFile;
 
@@ -43,8 +43,8 @@ class RestartFile;
   * returns the total registered time, which is the sum of all individual
   * intervals measured.
   */
-class Timer{
-private:
+class Timer {
+  private:
     /*! \brief Starting time of the timer */
     timeval _start;
     /*! \brief Stop time of the timer */
@@ -52,9 +52,9 @@ private:
     /*! \brief Total time interval registered so far */
     timeval _diff;
 
-public:
+  public:
     Timer();
-    ~Timer(){}
+    ~Timer() {}
 
     void reset();
     void start();
@@ -64,8 +64,8 @@ public:
     double interval();
     void restart();
 
-    void dump(RestartFile &rfile);
-    Timer(RestartFile &rfile);
+    void dump(RestartFile& rfile);
+    Timer(RestartFile& rfile);
 };
 
-#endif // TIMER_HPP
+#endif  // TIMER_HPP

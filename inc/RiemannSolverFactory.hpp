@@ -27,9 +27,9 @@
 #ifndef RIEMANNSOLVERFACTORY_HPP
 #define RIEMANNSOLVERFACTORY_HPP
 
-#include <istream>
-#include "ExactRiemannSolver.hpp"
 #include "ApproximateSolver.hpp"
+#include "ExactRiemannSolver.hpp"
+#include <istream>
 
 #include "RestartFile.hpp"
 
@@ -40,8 +40,8 @@
  *  - RiemannSolver
  *  - TRRSSolver
  */
-class RiemannSolverFactory{
-public:
+class RiemannSolverFactory {
+  public:
     /**
      * @brief Load a Solver from the given RestartFile
      *
@@ -51,13 +51,13 @@ public:
      * @param rfile RestartFile to read from
      * @return Solver instance
      */
-    static RiemannSolver* load(RestartFile &rfile){
+    static RiemannSolver* load(RestartFile& rfile) {
         std::string tag;
         rfile.read(tag);
-        if(tag == "EXAC"){
+        if(tag == "EXAC") {
             return new ExactRiemannSolver(rfile);
         }
-        if(tag == "TRRS"){
+        if(tag == "TRRS") {
             return new TRRSSolver(rfile);
         }
         return NULL;
@@ -72,7 +72,7 @@ public:
      * @param rfile RestartFile to write to
      * @param solver RiemannSolver to dump
      */
-    static void dump(RestartFile &rfile, RiemannSolver* solver){
+    static void dump(RestartFile& rfile, RiemannSolver* solver) {
         // it is important we make a local copy of the tag, since otherwise it
         // is not written to the restart file correctly!
         std::string tag = solver->tag();
@@ -93,11 +93,11 @@ public:
      * @return A pointer to a Solver instance
      */
     static RiemannSolver* generate(std::string name, double gamma,
-                                   double tolerance, double cutoff){
-        if(name == "Exact"){
+                                   double tolerance, double cutoff) {
+        if(name == "Exact") {
             return new ExactRiemannSolver(gamma, tolerance, cutoff);
         }
-        if(name == "TRRS"){
+        if(name == "TRRS") {
             return new TRRSSolver(gamma);
         }
         std::cerr << "Error! Unknown Riemann solver type: " << name << "!"

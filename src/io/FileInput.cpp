@@ -25,18 +25,18 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Input.hpp"
-#include "UnitConverter.hpp"
 #include "Block.hpp"
-#include "Header.hpp"
 #include "HDF5tools.hpp"
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <cstdlib>
+#include "Header.hpp"
+#include "Input.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
+#include "UnitConverter.hpp"
+#include <cstdlib>
 #include <hdf5.h>
+#include <iostream>
+#include <sstream>
+#include <vector>
 using namespace std;
 
 /**
@@ -47,9 +47,7 @@ using namespace std;
   *
   * @param filename Name of the file (should end with .hdf5)
   */
-FileInput::FileInput(string filename){
-    _filename = filename;
-}
+FileInput::FileInput(string filename) { _filename = filename; }
 
 /**
   * @brief Read information from a HDF5-file and store the contents in the
@@ -68,35 +66,33 @@ FileInput::FileInput(string filename){
   * @param block Block to fill with data
   * @param npart Number of lines that should be read
   */
-void FileInput::read(Block& block, unsigned int npart){
+void FileInput::read(Block& block, unsigned int npart) {
     int rank = MPIGlobal::rank;
     int size = MPIGlobal::size;
     // if npart is a multiple of world.size(), we want nice blocks. If it is
     // not, we should make sure that all particles are read
-    unsigned int npart_local = npart/size + ((npart%size) > 0);
-    unsigned int npart_other = rank*npart_local;
-    while(npart_other + npart_local > npart){
+    unsigned int npart_local = npart / size + ((npart % size) > 0);
+    unsigned int npart_other = rank * npart_local;
+    while(npart_other + npart_local > npart) {
         npart_local--;
     }
-    for(int i = 0; i < size; i++){
-        if(i == rank){
-            hid_t file = H5Fopen(_filename.c_str(), H5F_ACC_RDONLY,
-                                 H5P_DEFAULT);
+    for(int i = 0; i < size; i++) {
+        if(i == rank) {
+            hid_t file =
+                    H5Fopen(_filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
             herr_t status;
             hid_t group = H5Gopen(file, block.get_name().c_str());
-            for(unsigned int j = 0; j < block.get_headers().size(); j++){
+            for(unsigned int j = 0; j < block.get_headers().size(); j++) {
                 stringstream name;
                 name << "/" << block.get_name() << "/"
                      << block.get_headers()[j];
                 hid_t dataset = H5Dopen(file, name.str().c_str());
                 Unit unit;
-                if(H5Aexists(dataset, "unit_quantity")){
-                    string unit_quantity =
-                            HDF5tools::read_attribute_string(dataset,
-                                                             "unit_quantity");
-                    string unit_name =
-                            HDF5tools::read_attribute_string(dataset,
-                                                             "unit_name");
+                if(H5Aexists(dataset, "unit_quantity")) {
+                    string unit_quantity = HDF5tools::read_attribute_string(
+                            dataset, "unit_quantity");
+                    string unit_name = HDF5tools::read_attribute_string(
+                            dataset, "unit_name");
                     HDF5tools::read_attribute(dataset, "unit_SI_value",
                                               HDF5types::DOUBLE,
                                               unit.SI_value());
@@ -119,7 +115,7 @@ void FileInput::read(Block& block, unsigned int npart){
                 status = H5Sclose(space);
                 status = H5Sclose(memspace);
                 status = H5Dclose(dataset);
-                for(unsigned int k = data.size(); k--;){
+                for(unsigned int k = data.size(); k--;) {
                     data[k] = uc.convert(data[k]);
                 }
                 block.add_column(data, j);
@@ -127,7 +123,7 @@ void FileInput::read(Block& block, unsigned int npart){
             status = H5Gclose(group);
             status = H5Fclose(file);
 
-            if(status < 0){
+            if(status < 0) {
                 std::cerr << "ERROR!" << std::endl;
             }
         }
@@ -144,9 +140,9 @@ void FileInput::read(Block& block, unsigned int npart){
   *
   * @param header Header to fill
   */
-void FileInput::read_header(Header &header){
+void FileInput::read_header(Header& header) {
     int rank = MPIGlobal::rank;
-    if(!rank){
+    if(!rank) {
         hid_t flag = H5Pcreate(H5P_FILE_ACCESS);
         H5Pset_fclose_degree(flag, H5F_CLOSE_SEMI);
         hid_t file = H5Fopen(_filename.c_str(), H5F_ACC_RDONLY, flag);
@@ -173,7 +169,7 @@ void FileInput::read_header(Header &header){
                                   header.get_gamma());
         HDF5tools::read_attribute(group, "gravity", HDF5types::BOOL,
                                   header.get_gravity());
-        if(header.ndmpart() && header.gravity()){
+        if(header.ndmpart() && header.gravity()) {
             HDF5tools::read_attribute(group, "hsoft", HDF5types::DOUBLE,
                                       header.get_hsoft());
         }
@@ -181,7 +177,7 @@ void FileInput::read_header(Header &header){
         status = H5Gclose(group);
         status = H5Fclose(file);
 
-        if(status < 0){
+        if(status < 0) {
             std::cerr << "ERROR!" << std::endl;
         }
 
@@ -190,14 +186,14 @@ void FileInput::read_header(Header &header){
     // we do not have the MPIGlobal buffer yet at this point,
     // so we have to provide our own buffer
     int bufsize = sizeof(Header);
-    char *buffer = new char[bufsize];
+    char* buffer = new char[bufsize];
     int send_pos = 0;
-    if(!rank){
+    if(!rank) {
         header.pack_data(buffer, bufsize, &send_pos);
     }
     MyMPI_Bcast(&send_pos, 1, MPI_INT, 0);
     MyMPI_Bcast(buffer, send_pos, MPI_PACKED, 0);
     int recv_pos = 0;
     header = Header(buffer, send_pos, &recv_pos);
-    delete [] buffer;
+    delete[] buffer;
 }

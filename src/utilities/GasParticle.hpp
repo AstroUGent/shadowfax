@@ -42,8 +42,8 @@ class Block;
   * the mesh generator. For most purposes however, it is easier to think of the
   * data being contained in a particle (e.g. for visualization).
   */
-class GasParticle : public Particle{
-private:
+class GasParticle : public Particle {
+  private:
     /*! \brief Gravitational acceleration from the previous timestep */
     Vec _a_grav_old;
 
@@ -71,7 +71,7 @@ private:
 
     /*! \brief Booleans specifying to which MPI processes this particle was
      *  already exported */
-    bool *_exports;
+    bool* _exports;
 
     /*! \brief Primitive variables (density, velocity and pressure) for the
      *  gas */
@@ -129,7 +129,7 @@ private:
      *  particle */
     double _total_area;
 
-public:
+  public:
     GasParticle();
     GasParticle(Vec pos);
     GasParticle(GasParticle& p);
@@ -141,9 +141,7 @@ public:
       *
       * @return PARTTYPE_GAS
       */
-    ParticleType type(){
-        return PARTTYPE_GAS;
-    }
+    ParticleType type() { return PARTTYPE_GAS; }
 
     void set_soundspeed(double csnd);
     double get_soundspeed();
@@ -178,9 +176,7 @@ public:
       *
       * @param old_mass Value to store in the conserved quantities StateVector
       */
-    void set_old_mass(double old_mass){
-        _old_Q[0] = old_mass;
-    }
+    void set_old_mass(double old_mass) { _old_Q[0] = old_mass; }
 
     /**
       * \brief Get the mass of the particle
@@ -189,9 +185,7 @@ public:
       *
       * @return The mass of the gas inside the Voronoi grid cell
       */
-    inline double get_mass(){
-        return _Q[0];
-    }
+    inline double get_mass() { return _Q[0]; }
 
     /**
       * \brief Get the mass of the particle during the previous timestep
@@ -199,9 +193,7 @@ public:
       * @return The mass of the gas inside the Voronoi grid cell during the
       * previous timestep
       */
-    inline double get_old_mass(){
-        return _old_Q[0];
-    }
+    inline double get_old_mass() { return _old_Q[0]; }
 
     void set_mesh_v(Vec& mesh_v);
     Vec& get_mesh_v();
@@ -231,8 +223,8 @@ public:
 
     void update_Q();
 
-    void make_copy(unsigned int id, unsigned int index=0);
-    bool is_copied(unsigned int id, unsigned int index=0);
+    void make_copy(unsigned int id, unsigned int index = 0);
+    bool is_copied(unsigned int id, unsigned int index = 0);
     void reset_copies();
 
     void do_export(unsigned int id);
@@ -257,7 +249,7 @@ public:
       *
       * @param a_grav New gravitational acceleration for the particle
       */
-    inline void set_gravitational_acceleration(Vec a_grav){
+    inline void set_gravitational_acceleration(Vec a_grav) {
         _a_grav_old = _a_grav_new;
         _a_grav_new = a_grav;
     }
@@ -267,8 +259,8 @@ public:
 
     virtual void pack_data(void* buffer, int bufsize, int* position);
 
-    virtual void dump(RestartFile &rfile);
-    GasParticle(RestartFile &rfile);
+    virtual void dump(RestartFile& rfile);
+    GasParticle(RestartFile& rfile);
 
     void dump_ascii(std::ostream& stream);
 
@@ -289,15 +281,15 @@ public:
  * @brief Exception thrown when something goes wrong during the update of the
  * conserved quantities
  */
-class UpdateQException : public std::exception{
-private:
+class UpdateQException : public std::exception {
+  private:
     /*! \brief GasParticle throwing the exception */
     GasParticle& _p;
 
-public:
+  public:
     UpdateQException(GasParticle& p);
 
     virtual const char* what() const throw();
 };
 
-#endif // GASPARTICLE_HPP
+#endif  // GASPARTICLE_HPP

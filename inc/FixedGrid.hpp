@@ -43,8 +43,8 @@ class StateVector;
  * work for specific initial particle configurations and should only be used
  * to test changes to the hydro solver in controlled test simulations.
  */
-class FixedGrid{
-private:
+class FixedGrid {
+  private:
     /*! \brief Number of grid cells in every dimension */
     unsigned int _size[ndim_];
 
@@ -69,7 +69,7 @@ private:
     /*! \brief Indices of the associated gasparticles in the internal grid */
     std::vector<unsigned int> _idx;
 
-public:
+  public:
     FixedGrid(ParticleVector& particles, bool periodic = false);
     ~FixedGrid();
 
@@ -80,4 +80,4 @@ public:
     void get_gradients(unsigned int index, StateVector* delta);
 };
 
-#endif // FIXEDGRID_HPP
+#endif  // FIXEDGRID_HPP

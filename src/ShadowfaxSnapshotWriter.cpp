@@ -24,6 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ShadowfaxSnapshotWriter.hpp"
+#include "MPIGlobal.hpp"
 #include "io/Block.hpp"
 #include "io/Header.hpp"
 #include "io/Output.hpp"
@@ -32,10 +33,9 @@
 #include "io/UnitSetGenerator.hpp"
 #include "utilities/DMParticle.hpp"
 #include "utilities/GasParticle.hpp"
-#include "utilities/ParticleVector.hpp"
 #include "utilities/HelperFunctions.hpp"
+#include "utilities/ParticleVector.hpp"
 #include <iostream>
-#include "MPIGlobal.hpp"
 using namespace std;
 
 /**
@@ -50,11 +50,12 @@ ShadowfaxSnapshotWriter::ShadowfaxSnapshotWriter(std::string basename,
                                                  UnitSet& units,
                                                  UnitSet& output_units,
                                                  int lastsnap)
-    : SnapshotWriter(basename, units, output_units, lastsnap) {
-    if(_per_node_output){
+        : SnapshotWriter(basename, units, output_units, lastsnap) {
+    if(_per_node_output) {
         cerr << "System setup requires per node output, but this is not "
                 "supported by ShadowfaxSnapshotWriter. Consider using another "
-                "snapshot format!" << endl;
+                "snapshot format!"
+             << endl;
         my_exit();
     }
 }
@@ -64,7 +65,7 @@ ShadowfaxSnapshotWriter::ShadowfaxSnapshotWriter(std::string basename,
  *
  * Print out the timer to the stdout.
  */
-ShadowfaxSnapshotWriter::~ShadowfaxSnapshotWriter(){
+ShadowfaxSnapshotWriter::~ShadowfaxSnapshotWriter() {
     cout << "Time spent writing snapshots: " << _timer.value() << "s" << endl;
 }
 
@@ -77,12 +78,12 @@ ShadowfaxSnapshotWriter::~ShadowfaxSnapshotWriter(){
  * @param particles ParticleVector to write out
  */
 void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
-                                             ParticleVector& particles){
+                                             ParticleVector& particles) {
     _timer.start();
     string snapname;
     // if _lastsnap is negative, we do not add an index to the snapshot name
     // this is e.g. done for IC-files
-    if(_lastsnap >= 0){
+    if(_lastsnap >= 0) {
         snapname = get_snapshot_name(_lastsnap);
     } else {
         snapname = HelperFunctions::make_hdf5_file(_name);
@@ -90,7 +91,7 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
     cout << "Saving snapshot " << snapname << "\n" << endl;
 
     // quantities in the Header always have SI units!
-    UnitSet *si_units = UnitSetGenerator::generate("SI");
+    UnitSet* si_units = UnitSetGenerator::generate("SI");
     double t = currentTime;
     FileOutput file(snapname);
     UnitConverter time_converter(_units.get_time_unit(),
@@ -102,21 +103,20 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
     particles.get_header().box(box);
     UnitConverter length_converter(_units.get_length_unit(),
                                    si_units->get_length_unit());
-    for(unsigned int i = 0; i < 6; i++){
+    for(unsigned int i = 0; i < 6; i++) {
         box[i] = length_converter.convert(box[i]);
     }
     particles.get_header().set_box(box);
     // convert softening length to correct units
-    if(particles.dmsize()){
+    if(particles.dmsize()) {
         particles.get_header().set_hsoft(
-                    length_converter.convert(particles.get_header().hsoft())
-                    );
+                length_converter.convert(particles.get_header().hsoft()));
     }
     file.write_header(particles.get_header());
 
     delete si_units;
 
-    if(particles.gassize()){
+    if(particles.gassize()) {
         vector<string> headers;
         vector<Unit> units;
         headers.push_back("id");
@@ -127,7 +127,7 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
         units.push_back(_output_units.get_velocity_unit());
         headers.push_back("velocity_y");
         units.push_back(_output_units.get_velocity_unit());
-#if ndim_==3
+#if ndim_ == 3
         headers.push_back("velocity_z");
         units.push_back(_output_units.get_velocity_unit());
 #endif
@@ -136,14 +136,14 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
         headers.push_back("timestep");
         units.push_back(_output_units.get_time_unit());
         headers.push_back("acceleration_x");
-        units.push_back(_output_units.get_velocity_unit()/
+        units.push_back(_output_units.get_velocity_unit() /
                         _output_units.get_time_unit());
         headers.push_back("acceleration_y");
-        units.push_back(_output_units.get_velocity_unit()/
+        units.push_back(_output_units.get_velocity_unit() /
                         _output_units.get_time_unit());
-#if ndim_==3
+#if ndim_ == 3
         headers.push_back("acceleration_z");
-        units.push_back(_output_units.get_velocity_unit()/
+        units.push_back(_output_units.get_velocity_unit() /
                         _output_units.get_time_unit());
 #endif
         headers.push_back("mass");
@@ -159,33 +159,28 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
                                          _output_units.get_pressure_unit());
         UnitConverter time_converter(_units.get_time_unit(),
                                      _output_units.get_time_unit());
-        for(unsigned int i = 0; i < particles.gassize(); i++){
+        for(unsigned int i = 0; i < particles.gassize(); i++) {
             data[0] = particles.gas(i)->id();
             StateVector W = particles.gas(i)->get_Wvec();
             data[1] = density_converter.convert(W.rho());
             data[2] = velocity_converter.convert(W.vx());
             data[3] = velocity_converter.convert(W.vy());
-#if ndim_==3
+#if ndim_ == 3
             data[4] = velocity_converter.convert(W.vz());
 #endif
-            data[ndim_+2] = pressure_converter.convert(W.p());
-            data[ndim_+3] = time_converter.convert(
-                        particles.gas(i)->get_timestep()
-                        );
-            data[ndim_+4] = density_converter.convert(
-                        particles.gas(i)->get_gravitational_acceleration().x()
-                        );
-            data[ndim_+5] = density_converter.convert(
-                        particles.gas(i)->get_gravitational_acceleration().y()
-                        );
-#if ndim_==3
-            data[ndim_+6] = density_converter.convert(
-                        particles.gas(i)->get_gravitational_acceleration().z()
-                        );
+            data[ndim_ + 2] = pressure_converter.convert(W.p());
+            data[ndim_ + 3] =
+                    time_converter.convert(particles.gas(i)->get_timestep());
+            data[ndim_ + 4] = density_converter.convert(
+                    particles.gas(i)->get_gravitational_acceleration().x());
+            data[ndim_ + 5] = density_converter.convert(
+                    particles.gas(i)->get_gravitational_acceleration().y());
+#if ndim_ == 3
+            data[ndim_ + 6] = density_converter.convert(
+                    particles.gas(i)->get_gravitational_acceleration().z());
 #endif
-            data[ndim_+ndim_+4] = density_converter.convert(
-                        particles.gas(i)->get_mass()
-                        );
+            data[ndim_ + ndim_ + 4] =
+                    density_converter.convert(particles.gas(i)->get_mass());
             block.add_data(data);
         }
         file.write(block);
@@ -203,11 +198,11 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
         data.resize(headers.size());
         UnitConverter length_converter(_units.get_length_unit(),
                                        _output_units.get_length_unit());
-        for(unsigned int i = 0; i < particles.gassize(); i++){
+        for(unsigned int i = 0; i < particles.gassize(); i++) {
             Vec& position = particles.gas(i)->get_position();
             data[0] = length_converter.convert(position.x());
             data[1] = length_converter.convert(position.y());
-#if ndim_==3
+#if ndim_ == 3
             data[2] = length_converter.convert(position.z());
 #else
             data[2] = 0.;
@@ -216,7 +211,7 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
         }
         file.write(block2);
     }
-    if(particles.dmsize()){
+    if(particles.dmsize()) {
         vector<string> headers;
         vector<Unit> units;
         headers.push_back("id");
@@ -246,7 +241,7 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
                                        _output_units.get_length_unit());
         UnitConverter velocity_converter(_units.get_velocity_unit(),
                                          _output_units.get_velocity_unit());
-        for(unsigned int i = 0; i < particles.dmsize(); i++){
+        for(unsigned int i = 0; i < particles.dmsize(); i++) {
             double mass = particles.dm(i)->get_mass();
             Vec position = particles.dm(i)->get_position();
             Vec velocity = particles.dm(i)->get_velocity();
@@ -254,12 +249,12 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
             data[1] = mass_converter.convert(mass);
             data[2] = length_converter.convert(position.x());
             data[3] = length_converter.convert(position.y());
-#if ndim_==3
+#if ndim_ == 3
             data[4] = length_converter.convert(position.z());
 #endif
             data[5] = velocity_converter.convert(velocity.x());
             data[6] = velocity_converter.convert(velocity.y());
-#if ndim_==3
+#if ndim_ == 3
             data[7] = velocity_converter.convert(velocity.z());
 #endif
             data[8] = MPIGlobal::rank;
@@ -276,7 +271,7 @@ void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
  *
  * @param rfile RestartFile to write to
  */
-void ShadowfaxSnapshotWriter::dump(RestartFile &rfile){
+void ShadowfaxSnapshotWriter::dump(RestartFile& rfile) {
     SnapshotWriter::dump(rfile);
     _timer.dump(rfile);
 }
@@ -289,7 +284,7 @@ void ShadowfaxSnapshotWriter::dump(RestartFile &rfile){
  * @param units Internal simulation UnitSet
  * @param output_units Output UnitSet
  */
-ShadowfaxSnapshotWriter::ShadowfaxSnapshotWriter(RestartFile &rfile,
-                                                 UnitSet &units,
-                                                 UnitSet &output_units)
-    : SnapshotWriter(rfile, units, output_units), _timer(rfile) {}
+ShadowfaxSnapshotWriter::ShadowfaxSnapshotWriter(RestartFile& rfile,
+                                                 UnitSet& units,
+                                                 UnitSet& output_units)
+        : SnapshotWriter(rfile, units, output_units), _timer(rfile) {}

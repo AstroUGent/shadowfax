@@ -41,8 +41,8 @@ class RiemannSolver;
  *
  * Information written every timestep to inform the user about what is going on.
  */
-class LogFiles{
-private:
+class LogFiles {
+  private:
     // time log
     /*! \brief Path of the time log file */
     std::string _timename;
@@ -68,21 +68,21 @@ private:
     /*! \brief Timer to quantify time spent writing log files */
     Timer _timer;
 
-    void copy_file_single(std::ifstream &ifile, std::ofstream &ofile, long pos);
-    void copy_file_buffer(std::ifstream &ifile, std::ofstream &ofile, long pos);
-    void copy_file(const std::string &iname, const std::string &oname,
+    void copy_file_single(std::ifstream& ifile, std::ofstream& ofile, long pos);
+    void copy_file_buffer(std::ifstream& ifile, std::ofstream& ofile, long pos);
+    void copy_file(const std::string& iname, const std::string& oname,
                    long pos);
     void reset_file(std::string name, long pos);
 
-public:
+  public:
     LogFiles(std::string outputdir);
     ~LogFiles();
 
-    void write_to_logs(TimeLine* &timeline, ParticleVector* &particles,
-                       RiemannSolver* &solver);
+    void write_to_logs(TimeLine*& timeline, ParticleVector*& particles,
+                       RiemannSolver*& solver);
 
-    LogFiles(RestartFile &rfile);
-    void dump(RestartFile &rfile);
+    LogFiles(RestartFile& rfile);
+    void dump(RestartFile& rfile);
 };
 
-#endif // LOGFILES_HPP
+#endif  // LOGFILES_HPP

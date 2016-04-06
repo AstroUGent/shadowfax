@@ -24,16 +24,16 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "RestartFile.hpp"
+#include "../inc/ShadowfaxVersion.hpp"
+#include "Error.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
-#include "Error.hpp"
-#include "../inc/ShadowfaxVersion.hpp"
 #include <cstring>
+#include <dirent.h>
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
-#include <dirent.h>
 using namespace std;
 
 /**
@@ -45,23 +45,23 @@ using namespace std;
  * number of digits in the string
  * @return String containing the digit with extra zeros added
  */
-string RestartFile::get_padded_digit(int digit, int limit){
+string RestartFile::get_padded_digit(int digit, int limit) {
     stringstream name;
     // if limit is 1, the procedure below will set the width to zero, which
     // results in strange behaviour
     // in this case, we can just add the digit to the stringstream without
     // padding
-    if(limit > 1){
+    if(limit > 1) {
         int digits = 0;
         int limitcopy = limit;
         int check = 1;
-        while(limitcopy){
+        while(limitcopy) {
             limitcopy /= 10;
             check *= 10;
             digits++;
         }
         check /= 10;
-        if(check == limit){
+        if(check == limit) {
             digits--;
         }
         name.fill('0');
@@ -84,7 +84,7 @@ string RestartFile::get_padded_digit(int digit, int limit){
  * @return Filename
  */
 string RestartFile::get_filename(string prefix, int rank, int size,
-                                 string suffix){
+                                 string suffix) {
     return prefix + string(".") + get_padded_digit(rank, size) + suffix;
 }
 
@@ -101,7 +101,7 @@ string RestartFile::get_filename(string prefix, int rank, int size,
  * @return Folder name
  */
 string RestartFile::get_foldername(string prefix, int rank, int size,
-                                   string suffix){
+                                   string suffix) {
     return prefix + string("_") + get_padded_digit(rank, size) + suffix;
 }
 
@@ -119,33 +119,30 @@ string RestartFile::get_foldername(string prefix, int rank, int size,
  * folder
  * @param simtime Current time of the simulation, written to the general file
  */
-RestartFile::RestartFile(std::string outputdir, double simtime){
-    if(!MPIGlobal::local_rank){
-        string restartfile = get_filename(outputdir + string("/restart"),
-                                          MPIGlobal::noderank,
-                                          MPIGlobal::nodesize, ".txt");
+RestartFile::RestartFile(std::string outputdir, double simtime) {
+    if(!MPIGlobal::local_rank) {
+        string restartfile =
+                get_filename(outputdir + string("/restart"),
+                             MPIGlobal::noderank, MPIGlobal::nodesize, ".txt");
         string restartfileback = get_filename(outputdir + string("/restart"),
                                               MPIGlobal::noderank,
                                               MPIGlobal::nodesize, ".txt.back");
-        string restartfolder = get_foldername(outputdir +
-                                              string("/restart_files"),
-                                              MPIGlobal::noderank,
-                                              MPIGlobal::nodesize);
-        string restartfolderback = get_foldername(outputdir +
-                                                  string("/restart_files"),
-                                                  MPIGlobal::noderank,
-                                                  MPIGlobal::nodesize,
-                                                  "_back");
+        string restartfolder =
+                get_foldername(outputdir + string("/restart_files"),
+                               MPIGlobal::noderank, MPIGlobal::nodesize);
+        string restartfolderback = get_foldername(
+                outputdir + string("/restart_files"), MPIGlobal::noderank,
+                MPIGlobal::nodesize, "_back");
 
         // backup existing restart file
         ifstream file(restartfile.c_str());
         // check if the file exists
-        if(file){
+        if(file) {
             rename(restartfile.c_str(), restartfileback.c_str());
 
             struct stat info;
             // check if the folder exists
-            if(stat(restartfolder.c_str(), &info) != 0){
+            if(stat(restartfolder.c_str(), &info) != 0) {
                 cerr << "Error! Restart file found, but folder is missing!"
                      << endl;
                 my_exit();
@@ -153,15 +150,15 @@ RestartFile::RestartFile(std::string outputdir, double simtime){
 
             // check if there is already a backed up folder
             // if so: delete its contents, since otherwise rename won't work
-            DIR *dp;
+            DIR* dp;
             dp = opendir(restartfolderback.c_str());
-            if(dp){
+            if(dp) {
                 // we have to delete every file in the folder
                 // this is accomplished using the ancient code below
-                struct dirent *dirp;
-                while( (dirp = readdir(dp)) ){
+                struct dirent* dirp;
+                while((dirp = readdir(dp))) {
                     string filename(dirp->d_name);
-                    if(filename != "." && filename != ".."){
+                    if(filename != "." && filename != "..") {
                         filename = restartfolderback + string("/") + filename;
                         remove(filename.c_str());
                     }
@@ -203,7 +200,7 @@ RestartFile::RestartFile(std::string outputdir, double simtime){
         // (doing so gives an error and is not allowed, see
         // http://stackoverflow.com/questions/8694365/how-is-the-result-struct-
         // of-localtime-allocated-in-c)
-        struct tm *date;
+        struct tm* date;
         // get the local time in seconds since the epoch (with microsecond
         // precision)
         gettimeofday(&time, NULL);
@@ -221,12 +218,12 @@ RestartFile::RestartFile(std::string outputdir, double simtime){
     // make sure the folder exists before trying to write new restart files
     MyMPI_Barrier();
 
-    string restartfolder = get_foldername(outputdir + string("/restart_files"),
-                                          MPIGlobal::noderank,
-                                          MPIGlobal::nodesize);
-    string restartname = get_filename(restartfolder + string("/restart"),
-                                      MPIGlobal::local_rank,
-                                      MPIGlobal::local_size, ".dat");
+    string restartfolder =
+            get_foldername(outputdir + string("/restart_files"),
+                           MPIGlobal::noderank, MPIGlobal::nodesize);
+    string restartname =
+            get_filename(restartfolder + string("/restart"),
+                         MPIGlobal::local_rank, MPIGlobal::local_size, ".dat");
     _ofile.open(restartname.c_str(), ios::out | ios::binary);
 }
 
@@ -244,13 +241,13 @@ RestartFile::RestartFile(std::string outputdir, double simtime){
  *
  * @param filename
  */
-RestartFile::RestartFile(std::string filename){
+RestartFile::RestartFile(std::string filename) {
     char filenamebuffer[100];
-    if(!MPIGlobal::local_rank){
+    if(!MPIGlobal::local_rank) {
         string restartfilename = get_filename(filename, MPIGlobal::noderank,
                                               MPIGlobal::nodesize, ".txt");
         ifstream rfile(restartfilename.c_str());
-        if(!rfile.is_open()){
+        if(!rfile.is_open()) {
             cerr << "Cannot open file \"" << restartfilename << "\"!" << endl;
             my_exit();
         }
@@ -280,7 +277,7 @@ RestartFile::RestartFile(std::string filename){
         sscanf(line.c_str(), "System name: %s %s (%s", sysnamebuf, machinebuf,
                releasebuf);
         // remove the trailing ) from syskernel
-        releasebuf[strlen(releasebuf)-1] = '\0';
+        releasebuf[strlen(releasebuf) - 1] = '\0';
         sysname = string(sysnamebuf);
         machine = string(machinebuf);
         release = string(releasebuf);
@@ -315,7 +312,7 @@ RestartFile::RestartFile(std::string filename){
         check &= string(osinfo.nodename) == nodename;
         check &= MPIGlobal::local_size == local_size;
         check &= MPIGlobal::size == mpisize;
-        if(!check){
+        if(!check) {
             cerr << "Cannot restart, systems are incompatible!" << endl;
             my_exit();
         }
@@ -337,7 +334,7 @@ RestartFile::RestartFile(std::string filename){
         cout << endl;
 
         // check if version is compatible
-        if(codeversion != GIT_BUILD_STRING){
+        if(codeversion != GIT_BUILD_STRING) {
             cerr << "Cannot restart, code versions are incompatible!" << endl;
             my_exit();
         }
@@ -348,9 +345,10 @@ RestartFile::RestartFile(std::string filename){
         // method below... (there might possibly be a difference of a few
         // milliseconds)
         compilationstring << COMPILE_DATE << ", " << COMPILE_TIME;
-        if(compilationstring.str() != compiletime){
+        if(compilationstring.str() != compiletime) {
             cout << "Warning: code compilation time does not match with the "
-                    "code used in the restart file!" << endl;
+                    "code used in the restart file!"
+                 << endl;
             cout << "This code: " << compilationstring.str() << endl;
             cout << "Restart file: " << compiletime << endl;
             cout << endl;
@@ -379,9 +377,9 @@ RestartFile::RestartFile(std::string filename){
 
     // everything is ok, we start reading the restart file
     string restartfolder(filenamebuffer);
-    string restartname = get_filename(restartfolder + string("/restart"),
-                                      MPIGlobal::local_rank,
-                                      MPIGlobal::local_size, ".dat");
+    string restartname =
+            get_filename(restartfolder + string("/restart"),
+                         MPIGlobal::local_rank, MPIGlobal::local_size, ".dat");
     cout << "Reading " << restartname << endl;
     _ifile.open(restartname.c_str(), ios::in | ios::binary);
 }

@@ -27,12 +27,12 @@
 #ifndef HEAD_TETRAHEDRON
 #define HEAD_TETRAHEDRON
 
-#include "VorGen.hpp"
-#include "ExArith.h"
 #include "Error.hpp"
-#include <vector>
+#include "ExArith.h"
+#include "VorGen.hpp"
 #include <iostream>
 #include <map>
+#include <vector>
 
 /**
  * @brief 2D triangle or 3D tetrahedron
@@ -43,18 +43,18 @@
  * Voronoi tesselation, which are the midpoints of the circumspheres of the
  * simplices that make up the Delaunay tesselation.
  */
-class Simplex{
-private:
+class Simplex {
+  private:
     /*! \brief Indices of the vertices that make up the simplex in the DelTess
      *  VorGen list */
-    unsigned int _vorgens[ndim_+1];
+    unsigned int _vorgens[ndim_ + 1];
 
     /*! \brief Indices of the neighbouring simplices in the DelTess Simplex
      *  list */
-    unsigned int _ngbs[ndim_+1];
+    unsigned int _ngbs[ndim_ + 1];
 
     /*! \brief Indices in the neighbouring simplices of this simplex */
-    int _ngbface[ndim_+1];
+    int _ngbface[ndim_ + 1];
 
     /*! \brief Midpoint of the circumsphere of this simplex. This will be a
      *  vertex of the final Voronoi grid, if this Simplex is retained */
@@ -67,14 +67,14 @@ private:
      *  check */
     unsigned int _previous_check;
 
-public:
-#if ndim_==3
+  public:
+#if ndim_ == 3
     /**
      * @brief Empty constructor
      *
      * Construct an empty Simplex
      */
-    inline Simplex(){
+    inline Simplex() {
         _vorgens[0] = 0;
         _vorgens[1] = 0;
         _vorgens[2] = 0;
@@ -101,20 +101,19 @@ public:
      * @param points Reference to the DelTess VorGen list
      */
     inline Simplex(unsigned int id1, unsigned int id2, unsigned int id3,
-                   unsigned int id4, std::vector<VorGen*>& points){
+                   unsigned int id4, std::vector<VorGen*>& points) {
         VorGen* point1 = points[id1];
         VorGen* point2 = points[id2];
         VorGen* point3 = points[id3];
         VorGen* point4 = points[id4];
         double det_or;
-        det_or = ExactArithmetic::orient3d(point1->get_p12(),
-                                           point2->get_p12(),
-                                           point3->get_p12(),
-                                           point4->get_p12());
+        det_or =
+                ExactArithmetic::orient3d(point1->get_p12(), point2->get_p12(),
+                                          point3->get_p12(), point4->get_p12());
 
         // to make things more interesting, orient3d uses the opposite notion of
         // positively oriented. We stick however to Springel's definition.
-        if(det_or <= 0){
+        if(det_or <= 0) {
             _vorgens[0] = id1;
             _vorgens[1] = id2;
             _vorgens[2] = id3;
@@ -146,14 +145,14 @@ public:
      *
      * Clean up the midpoint, if it exists
      */
-    ~Simplex(){
+    ~Simplex() {
         // deleting a NULL pointer does not give rise to errors
         delete _midpoint_circumsphere;
     }
 
     int inside(VorGen* point, std::vector<VorGen*>& points);
 
-#if ndim_==3
+#if ndim_ == 3
     /**
      * @brief Check if the given testpoint lies inside the face between an
      * invalid tetrahedron and its neighbour opposite to the newly added point,
@@ -169,42 +168,42 @@ public:
      */
     inline unsigned int flip_test(unsigned int tid, VorGen* testpoint,
                                   unsigned int* indices,
-                                  std::vector<VorGen*>& points){
+                                  std::vector<VorGen*>& points) {
         // tid contains the index of toppoint in _points (we call it i for the
         // rest of this function)
         unsigned int result = 0;
         int j = 0;
         double test;
-        while(!result && j < 3){
+        while(!result && j < 3) {
             // for even i: have to check (i,i+1,i+2); (i,i+3,i+1); (i,i+2,i+3)
             // (always oriented counterclockwise with the upward direction
             // inside the tetrahedron)
             // for odd i: have to check (i,i+2,i+1); (i,i+1,i+3); (i,i+3,i+2)
-            if(tid%2 == 0){
+            if(tid % 2 == 0) {
                 test = ExactArithmetic::orient3d(
-                            points[_vorgens[tid]]->get_p12(),
-                            points[_vorgens[(tid+j+1)%4]]->get_p12(),
-                            points[_vorgens[(tid+j+2+(j==2))%4]]->get_p12(),
-                            testpoint->get_p12()
-                            );
+                        points[_vorgens[tid]]->get_p12(),
+                        points[_vorgens[(tid + j + 1) % 4]]->get_p12(),
+                        points[_vorgens[(tid + j + 2 + (j == 2)) % 4]]
+                                ->get_p12(),
+                        testpoint->get_p12());
             } else {
                 test = ExactArithmetic::orient3d(
-                            points[_vorgens[tid]]->get_p12(),
-                            points[_vorgens[(tid+j+2+(j==2))%4]]->get_p12(),
-                            points[_vorgens[(tid+j+1)%4]]->get_p12(),
-                            testpoint->get_p12()
-                            );
+                        points[_vorgens[tid]]->get_p12(),
+                        points[_vorgens[(tid + j + 2 + (j == 2)) % 4]]
+                                ->get_p12(),
+                        points[_vorgens[(tid + j + 1) % 4]]->get_p12(),
+                        testpoint->get_p12());
             }
-            if(test >= 0){
-                indices[0] = (tid+j+1)%4;
-                indices[1] = (tid+j+2+(j==2))%4;
+            if(test >= 0) {
+                indices[0] = (tid + j + 1) % 4;
+                indices[1] = (tid + j + 2 + (j == 2)) % 4;
                 result = 2;
-                if(test == 0){
+                if(test == 0) {
                     // we have to somehow signal this case; the most efficient
                     // way is by adding an element to result, so its size is >2
                     // we need the point of the triangle that is not on the side
                     // anyway, so may as well use that one
-                    indices[2] = (tid+j+3+(j==2 || j==1))%4;
+                    indices[2] = (tid + j + 3 + (j == 2 || j == 1)) % 4;
                     result = 3;
                 }
             }
@@ -214,7 +213,7 @@ public:
     }
 #endif
 
-#if ndim_==3
+#if ndim_ == 3
     /**
      * @brief Test whether the given point is inside the circumsphere of the
      * tetrahedron
@@ -226,14 +225,12 @@ public:
      * @param points Reference to the DelTess VorGen list
      * @return True if the point lies inside the sphere, false otherwise
      */
-    inline bool in_sphere(VorGen* point, std::vector<VorGen*>& points){
-        return ExactArithmetic::insphere(
-                    points[_vorgens[0]]->get_p12(),
-                    points[_vorgens[1]]->get_p12(),
-                    points[_vorgens[2]]->get_p12(),
-                    points[_vorgens[3]]->get_p12(),
-                    point->get_p12()
-                    ) < 0;
+    inline bool in_sphere(VorGen* point, std::vector<VorGen*>& points) {
+        return ExactArithmetic::insphere(points[_vorgens[0]]->get_p12(),
+                                         points[_vorgens[1]]->get_p12(),
+                                         points[_vorgens[2]]->get_p12(),
+                                         points[_vorgens[3]]->get_p12(),
+                                         point->get_p12()) < 0;
     }
 #else
     /**
@@ -247,7 +244,7 @@ public:
      * @param points Reference to the DelTess VorGen list
      * @return True if the point liest inside the circle, false otherwise
      */
-    inline bool in_sphere(VorGen* point, std::vector<VorGen*>& points){
+    inline bool in_sphere(VorGen* point, std::vector<VorGen*>& points) {
         return ExactArithmetic::incircle(points[_vorgens[0]]->get_p12(),
                                          points[_vorgens[1]]->get_p12(),
                                          points[_vorgens[2]]->get_p12(),
@@ -260,25 +257,21 @@ public:
      *
      * @param next_check Next Simplex to check
      */
-    void set_next_check(unsigned int next_check){
-        _next_check = next_check;
-    }
+    void set_next_check(unsigned int next_check) { _next_check = next_check; }
 
     /**
      * @brief Get the next Simplex to check in a linked list
      *
      * @return Next Simplex to check
      */
-    unsigned int get_next_check(){
-        return _next_check;
-    }
+    unsigned int get_next_check() { return _next_check; }
 
     /**
      * @brief Set the previous Simplex to check in a linked list
      *
      * @param previous_check Previous Simplex to check
      */
-    void set_previous_check(unsigned int previous_check){
+    void set_previous_check(unsigned int previous_check) {
         _previous_check = previous_check;
     }
 
@@ -287,9 +280,7 @@ public:
      *
      * @return Previous Simplex to check
      */
-    unsigned int get_previous_check(){
-        return _previous_check;
-    }
+    unsigned int get_previous_check() { return _previous_check; }
 
     VorGen* get_special_point(std::vector<VorGen*>& points);
 
@@ -298,9 +289,7 @@ public:
      *
      * @return A pointer to the internal vertex list
      */
-    unsigned int* get_vorgens(){
-        return _vorgens;
-    }
+    unsigned int* get_vorgens() { return _vorgens; }
 
     /**
      * @brief Get the vertex with the given index
@@ -308,11 +297,9 @@ public:
      * @param index Index of the vertex
      * @return Index of the requested vertex in the DelTess VorGen list
      */
-    inline unsigned int vorgen(int index){
-        return _vorgens[index];
-    }
+    inline unsigned int vorgen(int index) { return _vorgens[index]; }
 
-    void print(std::ostream &stream, std::vector<VorGen*>& points);
+    void print(std::ostream& stream, std::vector<VorGen*>& points);
 
     /**
      * @brief Add a neighbour to the list using the given point for index lookup
@@ -323,9 +310,9 @@ public:
      * @return Index of the neighbour in the internal neighbour list
      */
     inline int add_ngb_from_vorgen(unsigned int point, unsigned int simplex,
-                                   int ngbindex=0){
+                                   int ngbindex = 0) {
         int i = 0;
-        while(_vorgens[i] != point){
+        while(_vorgens[i] != point) {
             i++;
         }
         _ngbs[i] = simplex;
@@ -342,15 +329,16 @@ public:
      * @param point Index of a vertex in the DelTess VorGen list
      * @return Index of the neighbouring Simplex in the DelTess Simplex list
      */
-    inline unsigned int get_ngb_from_vorgen(unsigned int point){
+    inline unsigned int get_ngb_from_vorgen(unsigned int point) {
         unsigned int i = 0;
-        while(i < ndim_+1 && _vorgens[i] != point){
+        while(i < ndim_ + 1 && _vorgens[i] != point) {
             i++;
         }
-        if(i == ndim_+1){
+        if(i == ndim_ + 1) {
             // should not happen
             std::cerr << "Asked neighbour of point that is not part of "
-                         "tetrahedron. Error!" << std::endl;
+                         "tetrahedron. Error!"
+                      << std::endl;
             my_exit();
         }
         return _ngbs[i];
@@ -364,7 +352,7 @@ public:
      * @param simplex Index of the neighbour in the DelTess Simplex list
      * @param ngbindex Index of this simplex in the neighbouring simplex
      */
-    inline void add_ngb(int index, unsigned int simplex, int ngbindex=0){
+    inline void add_ngb(int index, unsigned int simplex, int ngbindex = 0) {
         _ngbs[index] = simplex;
         _ngbface[index] = ngbindex;
     }
@@ -377,7 +365,7 @@ public:
      * @param ngbindex Index of this simplex in the neighbouring simplex
      */
     inline void change_ngb(unsigned int index, unsigned int new_value,
-                           int ngbindex=0){
+                           int ngbindex = 0) {
         _ngbs[index] = new_value;
         _ngbface[index] = ngbindex;
     }
@@ -388,9 +376,7 @@ public:
      * @param index Index of the neighbour in the internal list
      * @return Index of the neighbour in the DelTess Simplex list
      */
-    inline unsigned int get_ngb(int index){
-        return _ngbs[index];
-    }
+    inline unsigned int get_ngb(int index) { return _ngbs[index]; }
 
     /**
      * @brief Get the index of the given point in the internal vertex list
@@ -398,14 +384,15 @@ public:
      * @param point Index of the point in the DelTess VorGen list
      * @return Index of the point in the internal vertex list
      */
-    inline int get_index(unsigned int point){
+    inline int get_index(unsigned int point) {
         int i = ndim_;
-        while(i >= 0 && _vorgens[i] != point){
+        while(i >= 0 && _vorgens[i] != point) {
             i--;
         }
-        if(i < 0){
+        if(i < 0) {
             std::cerr << "Asked index of point that is not inside simplex. "
-                         "Error!" << std::endl;
+                         "Error!"
+                      << std::endl;
             my_exit();
         }
         return i;
@@ -419,9 +406,7 @@ public:
      * @return Index of this simplex in the neighbour list of the given
      * neighbour
      */
-    inline int get_ngbindex(unsigned int ngb){
-        return _ngbface[ngb];
-    }
+    inline int get_ngbindex(unsigned int ngb) { return _ngbface[ngb]; }
 
     void get_centroid(double* centroid, std::vector<VorGen*>& points);
 
@@ -435,7 +420,7 @@ public:
      * @return Index of this simplex in the neighbour list of the given
      * neighbour
      */
-    inline unsigned int get_ngbface(unsigned int index){
+    inline unsigned int get_ngbface(unsigned int index) {
         return _ngbface[index];
     }
 
@@ -450,9 +435,9 @@ public:
      * @return Index of this simplex in the neighbour corresponding to the
      * given point
      */
-    inline unsigned int get_ngbface_from_vorgen(unsigned int point){
+    inline unsigned int get_ngbface_from_vorgen(unsigned int point) {
         unsigned int i = 0;
-        while(_vorgens[i] != point){
+        while(_vorgens[i] != point) {
             i++;
         }
         return _ngbface[i];

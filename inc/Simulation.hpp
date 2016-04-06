@@ -26,9 +26,9 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
-#include <vector>
 #include <string>
 #include <utilities/Timer.hpp>
+#include <vector>
 
 class ParameterFile;
 class RiemannSolver;
@@ -49,8 +49,8 @@ class Physics;
   * provided. The constructor then sets up the required objects to run the
   * simulation and starts the time integration.
   */
-class Simulation{
-private:
+class Simulation {
+  private:
     /*! \brief Flag indicating if the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
@@ -59,7 +59,7 @@ private:
     ParameterFile* _parameterfile;
 
     /*! \brief User-friendly log files */
-    LogFiles *_logfiles;
+    LogFiles* _logfiles;
 
     /*! \brief RiemannSolver used to solve the Riemann problem for the
      *  hydrodynamics */
@@ -80,7 +80,7 @@ private:
     TimeLine* _timeline;
 
     /*! \brief Physical constants used during the simulation */
-    Physics *_physics;
+    Physics* _physics;
 
     /*! \brief VorTessManager used to calculate the Voronoi grid used for the
      *  hydrodynamical integration */
@@ -115,15 +115,15 @@ private:
                 UnitSet& simulation_units);
 
     void initialize_MPI_buffer(unsigned int partsize, unsigned int maxsize);
-    void dump(RestartFile &restartfile);
+    void dump(RestartFile& restartfile);
     void restart(std::string filename);
 
     void check_for_restart(bool force_restart = false);
 
-public:
+  public:
     Simulation(int argc, char** argv);
 
     ~Simulation();
 };
 
-#endif // SIMULATION_HPP
+#endif  // SIMULATION_HPP

@@ -35,10 +35,10 @@ class AdaptiveVorTess3d;
 class FixedGrid;
 class RestartFile;
 
-#include "utilities/Tree.hpp"
-#include "utilities/Timer.hpp"
-#include "TimeLine.hpp"
 #include "RiemannSolver.hpp"
+#include "TimeLine.hpp"
+#include "utilities/Timer.hpp"
+#include "utilities/Tree.hpp"
 
 /**
  * @brief General Voronoi tesselation that is accessed by Simulation
@@ -52,8 +52,8 @@ class RestartFile;
  * stuff without having to bother with the slow Voronoi grid, but this only
  * works in ideal cases.
  */
-class VorTessManager{
-private:
+class VorTessManager {
+  private:
     /*! \brief Pointer to a VorTess, only used if this tesselation uses the old
      *  algorithm */
     VorTess* _tesselation;
@@ -78,7 +78,7 @@ private:
      *  tests */
     double _tolerance;
 
-public:
+  public:
     VorTessManager(ParticleVector& particles, bool periodic = false,
                    double tolerance = 1.e-9, bool evolve = true);
     ~VorTessManager();
@@ -92,13 +92,13 @@ public:
     void update_dts(unsigned long currentTime);
     void update_gravitational_corrections();
     void hydro(TimeLine& timeline, RiemannSolver& solver,
-               ParticleVector &particles);
+               ParticleVector& particles);
     void update_dQs();
 
-    void print_tesselation_gnuplot(std::ostream &stream);
+    void print_tesselation_gnuplot(std::ostream& stream);
 
-    void dump(RestartFile &rfile);
-    VorTessManager(RestartFile &rfile, ParticleVector &particles);
+    void dump(RestartFile& rfile);
+    VorTessManager(RestartFile& rfile, ParticleVector& particles);
 
     Vec get_velocity(unsigned int index);
     void estimate_gradients(unsigned int index, StateVector* delta);

@@ -26,11 +26,11 @@
 #include "GadgetSnapshotWriter.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/HelperFunctions.hpp"
 #include "io/HDF5tools.hpp"
 #include "io/UnitConverter.hpp"
 #include "io/UnitSetGenerator.hpp"
+#include "utilities/HelperFunctions.hpp"
+#include "utilities/ParticleVector.hpp"
 using namespace std;
 
 /**
@@ -47,8 +47,8 @@ using namespace std;
 GadgetSnapshotWriter::GadgetSnapshotWriter(std::string basename, UnitSet& units,
                                            UnitSet& output_units, int lastsnap,
                                            bool per_node_output)
-    : SnapshotWriter(basename, units, output_units, lastsnap, per_node_output)
-{}
+        : SnapshotWriter(basename, units, output_units, lastsnap,
+                         per_node_output) {}
 
 /**
  * @brief Write a snapshot containing data from the given ParticleVector at the
@@ -64,13 +64,13 @@ GadgetSnapshotWriter::GadgetSnapshotWriter(std::string basename, UnitSet& units,
  * @param particles Reference to the ParticleVector that should be dumped in the
  * snapshot
  */
-void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
+void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
 
     string snapname;
     // if _lastsnap is negative, we do not add an index to the snapshot name
     // this is e.g. done for IC-files
-    if(_lastsnap >= 0){
-        if(_per_node_output){
+    if(_lastsnap >= 0) {
+        if(_per_node_output) {
             snapname = get_snapshot_name(_lastsnap, MPIGlobal::noderank,
                                          MPIGlobal::nodesize);
         } else {
@@ -84,7 +84,7 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
     int rank;
     int size;
     MPI_Comm comm;
-    if(_per_node_output){
+    if(_per_node_output) {
         rank = MPIGlobal::local_rank;
         size = MPIGlobal::local_size;
         comm = MPIGlobal::nodecomm;
@@ -96,8 +96,8 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
 
     // units
     double uI = 1.;
-    double uL = 100.*_output_units.get_length_unit().get_SI_value();
-    double uM = 1000.*_output_units.get_mass_unit().get_SI_value();
+    double uL = 100. * _output_units.get_length_unit().get_SI_value();
+    double uM = 1000. * _output_units.get_mass_unit().get_SI_value();
     double uT = 1.;
     double utime = _output_units.get_time_unit().get_SI_value();
 
@@ -120,18 +120,18 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
     vector<unsigned int> gassizes(size);
     vector<unsigned int> dmsizes(size);
     MyMPI_Allgather(&ngaspart_loc, 1, MPI_UNSIGNED, &gassizes[0], 1,
-            MPI_UNSIGNED, comm);
-    MyMPI_Allgather(&ndmpart_loc, 1, MPI_UNSIGNED, &dmsizes[0], 1,
-            MPI_UNSIGNED, comm);
+                    MPI_UNSIGNED, comm);
+    MyMPI_Allgather(&ndmpart_loc, 1, MPI_UNSIGNED, &dmsizes[0], 1, MPI_UNSIGNED,
+                    comm);
 
     // make size vectors cumulative
-    for(unsigned int i = 1; i < gassizes.size(); i++){
-        gassizes[i] += gassizes[i-1];
-        dmsizes[i] += dmsizes[i-1];
+    for(unsigned int i = 1; i < gassizes.size(); i++) {
+        gassizes[i] += gassizes[i - 1];
+        dmsizes[i] += dmsizes[i - 1];
     }
 
     unsigned int ngas_glob, ndm_glob;
-    if(_per_node_output){
+    if(_per_node_output) {
         MyMPI_Allreduce(&ngaspart_loc, &ngas_glob, 1, MPI_UNSIGNED, MPI_SUM);
         MyMPI_Allreduce(&ndmpart_loc, &ndm_glob, 1, MPI_UNSIGNED, MPI_SUM);
     } else {
@@ -139,12 +139,12 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
         ndm_glob = dmsizes.back();
     }
 
-    for(int irank = 0; irank < size; irank++){
-        if(irank == rank){
+    for(int irank = 0; irank < size; irank++) {
+        if(irank == rank) {
             hid_t file;
             herr_t status;
 
-            if(!rank){
+            if(!rank) {
                 // create file
                 file = H5Fcreate(snapname.c_str(),
                                  HDF5constants::OVERWRITE_EXISTING_FILES,
@@ -158,13 +158,13 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
 
             double box[6];
             // write header, runtimepars and units: only process 0
-            if(!rank){
+            if(!rank) {
                 // for now, we assume that the anchor of the box is (0,0,0). We
                 // should generalize this to other anchors and move the
                 // particles accordingly if necessary...
                 particles.get_local_header().box(box);
                 vector<double> simbox(3, 0.);
-#if ndim_==3
+#if ndim_ == 3
                 simbox[0] = box[3];
                 simbox[1] = box[4];
                 simbox[2] = box[5];
@@ -174,17 +174,17 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
                 simbox[2] = 0.;
 #endif
                 // convert units
-                for(unsigned int i = 0; i < 3; i++){
+                for(unsigned int i = 0; i < 3; i++) {
                     simbox[i] = length_converter.convert(simbox[i]);
                 }
 
                 vector<unsigned int> flag_entropy_ics(6, 0);
                 vector<double> mass_table(6, 0.);
                 int numfilespersnapshot;
-                if(_per_node_output){
-                    numfilespersnapshot= MPIGlobal::nodesize;
+                if(_per_node_output) {
+                    numfilespersnapshot = MPIGlobal::nodesize;
                 } else {
-                    numfilespersnapshot= 1;
+                    numfilespersnapshot = 1;
                 }
                 vector<unsigned int> numpart(6, 0);
                 numpart[0] = gassizes.back();
@@ -196,8 +196,7 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
                 unsigned int periodic = particles.get_local_header().periodic();
                 unsigned int gravity = particles.get_local_header().gravity();
                 double hsoft = length_converter.convert(
-                            particles.get_local_header().hsoft()
-                            );
+                        particles.get_local_header().hsoft());
 
                 // write header
                 hid_t group = H5Gcreate(file, "Header", -1);
@@ -216,10 +215,9 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
                                                  HDF5types::UINT, numpart);
                 HDF5tools::write_attribute_array(group, "NumPart_Total",
                                                  HDF5types::UINT, numpart_tot);
-                HDF5tools::write_attribute_array(group,
-                                                 "NumPart_Total_HighWord",
-                                                 HDF5types::UINT,
-                                                 numpart_highword);
+                HDF5tools::write_attribute_array(
+                        group, "NumPart_Total_HighWord", HDF5types::UINT,
+                        numpart_highword);
                 float time = time_converter.convert(t);
                 HDF5tools::write_attribute_array(group, "Time",
                                                  HDF5types::FLOAT, time);
@@ -233,7 +231,7 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
                                                  HDF5types::BOOL, periodic);
                 HDF5tools::write_attribute_array(group, "GravityOn",
                                                  HDF5types::BOOL, gravity);
-                if(gravity){
+                if(gravity) {
                     HDF5tools::write_attribute_array(group, "SofteningLength",
                                                      HDF5types::DOUBLE, hsoft);
                 }
@@ -249,13 +247,11 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
                 HDF5tools::write_attribute_array(group,
                                                  "Unit length in cgs (U_L)",
                                                  HDF5types::DOUBLE, uL);
-                HDF5tools::write_attribute_array(group,
-                                                 "Unit mass in cgs (U_M)",
-                                                 HDF5types::DOUBLE, uM);
                 HDF5tools::write_attribute_array(
-                            group, "Unit temperature in cgs (U_T)",
-                            HDF5types::DOUBLE, uT
-                            );
+                        group, "Unit mass in cgs (U_M)", HDF5types::DOUBLE, uM);
+                HDF5tools::write_attribute_array(
+                        group, "Unit temperature in cgs (U_T)",
+                        HDF5types::DOUBLE, uT);
                 HDF5tools::write_attribute_array(group,
                                                  "Unit time in cgs (U_t)",
                                                  HDF5types::DOUBLE, utime);
@@ -267,94 +263,78 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
             MyMPI_Bcast(box, 6, MPI_DOUBLE, 0);
 
             // gas particles
-            if(gassizes.back()){
-                vector<double> coords(particles.gassize()*3, 0.);
+            if(gassizes.back()) {
+                vector<double> coords(particles.gassize() * 3, 0.);
                 vector<double> density(particles.gassize(), 0.);
-                vector<float> velocity(particles.gassize()*3, 0.);
+                vector<float> velocity(particles.gassize() * 3, 0.);
                 vector<double> internalenergy(particles.gassize(), 0.);
                 vector<unsigned long> ids(particles.gassize(), 0);
-                for(unsigned int i = 0; i < particles.gassize(); i++){
-                    coords[3*i] = length_converter.convert(
-                                particles.gas(i)->x() - box[0]
-                                );
-                    coords[3*i+1] = length_converter.convert(
-                                particles.gas(i)->y() - box[1]
-                                );
-                    coords[3*i+2] = length_converter.convert(
-                                particles.gas(i)->z() - box[2]
-                                );
+                for(unsigned int i = 0; i < particles.gassize(); i++) {
+                    coords[3 * i] = length_converter.convert(
+                            particles.gas(i)->x() - box[0]);
+                    coords[3 * i + 1] = length_converter.convert(
+                            particles.gas(i)->y() - box[1]);
+                    coords[3 * i + 2] = length_converter.convert(
+                            particles.gas(i)->z() - box[2]);
                     StateVector W = particles.gas(i)->get_Wvec();
                     density[i] = density_converter.convert(W.rho());
-                    velocity[3*i] = velocity_converter.convert(W.vx());
-                    velocity[3*i+1] = velocity_converter.convert(W.vy());
-#if ndim_==3
-                    velocity[3*i+2] = velocity_converter.convert(W.vz());
+                    velocity[3 * i] = velocity_converter.convert(W.vx());
+                    velocity[3 * i + 1] = velocity_converter.convert(W.vy());
+#if ndim_ == 3
+                    velocity[3 * i + 2] = velocity_converter.convert(W.vz());
 #else
-                    velocity[3*i+2] = 0.;
+                    velocity[3 * i + 2] = 0.;
 #endif
                     // we assume gamma=5/3
-                    if(W.rho()){
-                        internalenergy[i] = 1.5*
-                                pressure_converter.convert(W.p())/
-                                density_converter.convert(W.rho());
-                    } else{
+                    if(W.rho()) {
+                        internalenergy[i] = 1.5 *
+                                            pressure_converter.convert(W.p()) /
+                                            density_converter.convert(W.rho());
+                    } else {
                         internalenergy[i] = 0.;
                     }
                     ids[i] = particles.gas(i)->id();
                 }
                 // write particle data
-                if(!rank){
+                if(!rank) {
                     // process 0 creates the group and datasets
                     // the datasets that are created have the size of the total
                     // data over all processes
                     hid_t group = H5Gcreate(file, "PartType0", -1);
 
-                    hid_t dataset =
-                            HDF5tools::create_dataset_vector(group,
-                                                             "Coordinates",
-                                                             HDF5types::DOUBLE,
-                                                             gassizes.back());
-                    HDF5tools::write_dataset_vector_chunk(dataset,
-                                                          HDF5types::DOUBLE, 0,
-                                                          coords);
+                    hid_t dataset = HDF5tools::create_dataset_vector(
+                            group, "Coordinates", HDF5types::DOUBLE,
+                            gassizes.back());
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::DOUBLE, 0, coords);
                     status = H5Dclose(dataset);
 
-                    dataset =
-                            HDF5tools::create_dataset_scalar(group, "Density",
-                                                             HDF5types::DOUBLE,
-                                                             gassizes.back());
-                    HDF5tools::write_dataset_scalar_chunk(dataset,
-                                                          HDF5types::DOUBLE, 0,
-                                                          density);
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "Density", HDF5types::DOUBLE,
+                            gassizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::DOUBLE, 0, density);
                     status = H5Dclose(dataset);
 
-                    dataset = HDF5tools::create_dataset_vector(group,
-                                                               "Velocities",
-                                                               HDF5types::FLOAT,
-                                                               gassizes.back());
-                    HDF5tools::write_dataset_vector_chunk(dataset,
-                                                          HDF5types::FLOAT, 0,
-                                                          velocity);
+                    dataset = HDF5tools::create_dataset_vector(
+                            group, "Velocities", HDF5types::FLOAT,
+                            gassizes.back());
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::FLOAT, 0, velocity);
                     status = H5Dclose(dataset);
 
-                    dataset =
-                            HDF5tools::create_dataset_scalar(group,
-                                                             "InternalEnergy",
-                                                             HDF5types::DOUBLE,
-                                                             gassizes.back());
-                    HDF5tools::write_dataset_scalar_chunk(dataset,
-                                                          HDF5types::DOUBLE, 0,
-                                                          internalenergy);
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "InternalEnergy", HDF5types::DOUBLE,
+                            gassizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::DOUBLE, 0, internalenergy);
                     status = H5Dclose(dataset);
 
-                    dataset =
-                            HDF5tools::create_dataset_scalar(group,
-                                                             "ParticleIDs",
-                                                             HDF5types::ULONG,
-                                                             gassizes.back());
-                    HDF5tools::write_dataset_scalar_chunk(dataset,
-                                                          HDF5types::ULONG, 0,
-                                                          ids);
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "ParticleIDs", HDF5types::ULONG,
+                            gassizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::ULONG, 0, ids);
                     status = H5Dclose(dataset);
 
                     status = H5Gclose(group);
@@ -365,37 +345,31 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
 
                     hid_t dataset = H5Dopen(group, "Coordinates");
                     HDF5tools::write_dataset_vector_chunk(
-                                dataset, HDF5types::DOUBLE,
-                                gassizes[rank-1], coords
-                                );
+                            dataset, HDF5types::DOUBLE, gassizes[rank - 1],
+                            coords);
                     status = H5Dclose(dataset);
 
                     dataset = H5Dopen(group, "Density");
                     HDF5tools::write_dataset_scalar_chunk(
-                                dataset, HDF5types::DOUBLE,
-                                gassizes[rank-1], density
-                                );
+                            dataset, HDF5types::DOUBLE, gassizes[rank - 1],
+                            density);
                     status = H5Dclose(dataset);
 
                     dataset = H5Dopen(group, "Velocities");
                     HDF5tools::write_dataset_vector_chunk(
-                                dataset, HDF5types::FLOAT,
-                                gassizes[rank-1], velocity
-                                );
+                            dataset, HDF5types::FLOAT, gassizes[rank - 1],
+                            velocity);
                     status = H5Dclose(dataset);
 
                     dataset = H5Dopen(group, "InternalEnergy");
                     HDF5tools::write_dataset_scalar_chunk(
-                                dataset, HDF5types::DOUBLE,
-                                gassizes[rank-1], internalenergy
-                                );
+                            dataset, HDF5types::DOUBLE, gassizes[rank - 1],
+                            internalenergy);
                     status = H5Dclose(dataset);
 
                     dataset = H5Dopen(group, "ParticleIDs");
                     HDF5tools::write_dataset_scalar_chunk(
-                                dataset, HDF5types::ULONG,
-                                gassizes[rank-1], ids
-                                );
+                            dataset, HDF5types::ULONG, gassizes[rank - 1], ids);
                     status = H5Dclose(dataset);
 
                     status = H5Gclose(group);
@@ -403,78 +377,60 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
             }
 
             // dm particles
-            if(dmsizes.back()){
-                vector<double> coords(particles.dmsize()*3, 0.);
+            if(dmsizes.back()) {
+                vector<double> coords(particles.dmsize() * 3, 0.);
                 vector<double> masses(particles.dmsize(), 0.);
-                vector<float> velocity(particles.dmsize()*3, 0.);
+                vector<float> velocity(particles.dmsize() * 3, 0.);
                 vector<unsigned long> ids(particles.dmsize(), 0);
-                for(unsigned int i = 0; i < particles.dmsize(); i++){
-                    coords[3*i] = length_converter.convert(
-                                particles.dm(i)->x() - box[0]
-                                );
-                    coords[3*i+1] = length_converter.convert(
-                                particles.dm(i)->y() - box[1]
-                                );
-                    coords[3*i+2] = length_converter.convert(
-                                particles.dm(i)->z() - box[2]
-                                );
-                    masses[i] = mass_converter.convert(
-                                particles.dm(i)->get_mass()
-                                );
-                    velocity[3*i] = velocity_converter.convert(
-                                particles.dm(i)->vx()
-                                );
-                    velocity[3*i+1] = velocity_converter.convert(
-                                particles.dm(i)->vy()
-                                );
-                    velocity[3*i+2] = velocity_converter.convert(
-                                particles.dm(i)->vz()
-                                );
+                for(unsigned int i = 0; i < particles.dmsize(); i++) {
+                    coords[3 * i] = length_converter.convert(
+                            particles.dm(i)->x() - box[0]);
+                    coords[3 * i + 1] = length_converter.convert(
+                            particles.dm(i)->y() - box[1]);
+                    coords[3 * i + 2] = length_converter.convert(
+                            particles.dm(i)->z() - box[2]);
+                    masses[i] =
+                            mass_converter.convert(particles.dm(i)->get_mass());
+                    velocity[3 * i] =
+                            velocity_converter.convert(particles.dm(i)->vx());
+                    velocity[3 * i + 1] =
+                            velocity_converter.convert(particles.dm(i)->vy());
+                    velocity[3 * i + 2] =
+                            velocity_converter.convert(particles.dm(i)->vz());
                     ids[i] = particles.dm(i)->id();
                 }
                 // write particle data
-                if(!rank){
+                if(!rank) {
                     // process 0 creates the group and datasets
                     // the datasets that are created have the size of the total
                     // data over all processes
                     hid_t group = H5Gcreate(file, "PartType1", -1);
 
-                    hid_t dataset =
-                            HDF5tools::create_dataset_vector(group,
-                                                             "Coordinates",
-                                                             HDF5types::DOUBLE,
-                                                             dmsizes.back());
-                    HDF5tools::write_dataset_vector_chunk(dataset,
-                                                          HDF5types::DOUBLE, 0,
-                                                          coords);
+                    hid_t dataset = HDF5tools::create_dataset_vector(
+                            group, "Coordinates", HDF5types::DOUBLE,
+                            dmsizes.back());
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::DOUBLE, 0, coords);
                     status = H5Dclose(dataset);
 
-                    dataset =
-                            HDF5tools::create_dataset_scalar(group, "Masses",
-                                                             HDF5types::DOUBLE,
-                                                             dmsizes.back());
-                    HDF5tools::write_dataset_scalar_chunk(dataset,
-                                                          HDF5types::DOUBLE, 0,
-                                                          masses);
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "Masses", HDF5types::DOUBLE, dmsizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::DOUBLE, 0, masses);
                     status = H5Dclose(dataset);
 
-                    dataset = HDF5tools::create_dataset_vector(group,
-                                                               "Velocities",
-                                                               HDF5types::FLOAT,
-                                                               dmsizes.back());
-                    HDF5tools::write_dataset_vector_chunk(dataset,
-                                                          HDF5types::FLOAT, 0,
-                                                          velocity);
+                    dataset = HDF5tools::create_dataset_vector(
+                            group, "Velocities", HDF5types::FLOAT,
+                            dmsizes.back());
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::FLOAT, 0, velocity);
                     status = H5Dclose(dataset);
 
-                    dataset =
-                            HDF5tools::create_dataset_scalar(group,
-                                                             "ParticleIDs",
-                                                             HDF5types::ULONG,
-                                                             dmsizes.back());
-                    HDF5tools::write_dataset_scalar_chunk(dataset,
-                                                          HDF5types::ULONG, 0,
-                                                          ids);
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "ParticleIDs", HDF5types::ULONG,
+                            dmsizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::ULONG, 0, ids);
                     status = H5Dclose(dataset);
 
                     status = H5Gclose(group);
@@ -485,30 +441,25 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
 
                     hid_t dataset = H5Dopen(group, "Coordinates");
                     HDF5tools::write_dataset_vector_chunk(
-                                dataset, HDF5types::DOUBLE,
-                                dmsizes[rank-1], coords
-                                );
+                            dataset, HDF5types::DOUBLE, dmsizes[rank - 1],
+                            coords);
                     status = H5Dclose(dataset);
 
                     dataset = H5Dopen(group, "Masses");
                     HDF5tools::write_dataset_scalar_chunk(
-                                dataset, HDF5types::DOUBLE,
-                                dmsizes[rank-1], masses
-                                );
+                            dataset, HDF5types::DOUBLE, dmsizes[rank - 1],
+                            masses);
                     status = H5Dclose(dataset);
 
                     dataset = H5Dopen(group, "Velocities");
                     HDF5tools::write_dataset_vector_chunk(
-                                dataset, HDF5types::FLOAT,
-                                dmsizes[rank-1], velocity
-                                );
+                            dataset, HDF5types::FLOAT, dmsizes[rank - 1],
+                            velocity);
                     status = H5Dclose(dataset);
 
                     dataset = H5Dopen(group, "ParticleIDs");
                     HDF5tools::write_dataset_scalar_chunk(
-                                dataset, HDF5types::ULONG,
-                                dmsizes[rank-1], ids
-                                );
+                            dataset, HDF5types::ULONG, dmsizes[rank - 1], ids);
                     status = H5Dclose(dataset);
 
                     status = H5Gclose(group);
@@ -517,7 +468,7 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
 
             status = H5Fclose(file);
 
-            if(status < 0){
+            if(status < 0) {
                 std::cerr << "ERROR!" << std::endl;
             }
         }
@@ -526,7 +477,7 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
     }
 
     // put a global barrier as well
-    if(_per_node_output){
+    if(_per_node_output) {
         MyMPI_Barrier();
     }
 
@@ -538,7 +489,7 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles){
  *
  * @param rfile RestartFile to write to
  */
-void GadgetSnapshotWriter::dump(RestartFile &rfile){
+void GadgetSnapshotWriter::dump(RestartFile& rfile) {
     SnapshotWriter::dump(rfile);
 }
 
@@ -553,6 +504,6 @@ void GadgetSnapshotWriter::dump(RestartFile &rfile){
  * @param units Internal UnitSet of the simulation
  * @param output_units
  */
-GadgetSnapshotWriter::GadgetSnapshotWriter(RestartFile &rfile, UnitSet &units,
-                                           UnitSet &output_units)
-    : SnapshotWriter(rfile, units, output_units) {}
+GadgetSnapshotWriter::GadgetSnapshotWriter(RestartFile& rfile, UnitSet& units,
+                                           UnitSet& output_units)
+        : SnapshotWriter(rfile, units, output_units) {}

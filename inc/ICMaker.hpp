@@ -37,10 +37,10 @@
   * Alternatively, a SpecificICGenerator can be used to generate hard-coded
   * initial conditions.
   */
-class ICMaker{
-public:
+class ICMaker {
+  public:
     ICMaker(int argc, char** argv);
-    ~ICMaker(){}
+    ~ICMaker() {}
 };
 
-#endif // ICMAKER_H
+#endif  // ICMAKER_H

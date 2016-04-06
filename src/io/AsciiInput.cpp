@@ -23,13 +23,13 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Input.hpp"
 #include "Block.hpp"
-#include "Header.hpp"
 #include "Error.hpp"
+#include "Header.hpp"
+#include "Input.hpp"
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 /**
@@ -40,23 +40,23 @@ using namespace std;
   *
   * @param filename Name of the ASCII file
   */
-AsciiInput::AsciiInput(std::string filename){
+AsciiInput::AsciiInput(std::string filename) {
     ifstream is(filename.c_str());
-    if(!is){
+    if(!is) {
         cerr << "Error! Cannot open file \"" << filename << "\"!" << endl;
         my_exit();
     }
     string line;
     double val;
-    while(getline(is, line)){
-        if(line[0] == '#'){
-            line.erase(0,1);
+    while(getline(is, line)) {
+        if(line[0] == '#') {
+            line.erase(0, 1);
             read_column_names(line);
             continue;
         }
         vector<double> row;
         istringstream linestream(line);
-        while(linestream >> val){
+        while(linestream >> val) {
             row.push_back(val);
         }
         _data.push_back(row);
@@ -77,37 +77,40 @@ AsciiInput::AsciiInput(std::string filename){
   * @param npart Number of particles to read (actually not used in this
   * function)
   */
-void AsciiInput::read(Block &block, unsigned int npart){
-    if(_column_names.size()){
+void AsciiInput::read(Block& block, unsigned int npart) {
+    if(_column_names.size()) {
         vector<string> headers = block.get_headers();
         vector<unsigned int> indices(headers.size());
-        for(unsigned int i = headers.size(); i--;){
+        for(unsigned int i = headers.size(); i--;) {
             unsigned int j = 0;
             while(j < _column_names.size() &&
-                  headers[i].compare(_column_names[j])){
+                  headers[i].compare(_column_names[j])) {
                 j++;
             }
-            if(j == _column_names.size()){
-                cerr << "Requested column '" << headers[i] << "' which is not "
-                        "part of the Ascii file" << endl;
+            if(j == _column_names.size()) {
+                cerr << "Requested column '" << headers[i]
+                     << "' which is not "
+                        "part of the Ascii file"
+                     << endl;
                 my_exit();
             }
             indices[i] = j;
         }
-        for(unsigned int i = 0; i < _data.size(); i++){
+        for(unsigned int i = 0; i < _data.size(); i++) {
             vector<double> data(indices.size());
-            for(unsigned int j = indices.size(); j--;){
+            for(unsigned int j = indices.size(); j--;) {
                 data[j] = _data[i][indices[j]];
             }
             block.add_data(data);
         }
     } else {
-        if(_data[0].size() != block.get_headers().size()){
+        if(_data[0].size() != block.get_headers().size()) {
             cerr << "Number of colums in ASCII file is incompatible with "
-                    "requested number of columns. Error!" << endl;
+                    "requested number of columns. Error!"
+                 << endl;
             my_exit();
         }
-        for(unsigned int i = 0; i < _data.size(); i++){
+        for(unsigned int i = 0; i < _data.size(); i++) {
             block.add_data(_data[i]);
         }
     }
@@ -121,7 +124,7 @@ void AsciiInput::read(Block &block, unsigned int npart){
   *
   * @param header The Header to fill
   */
-void AsciiInput::read_header(Header &header){
+void AsciiInput::read_header(Header& header) {
     header.set_ngaspart(_data.size());
 }
 
@@ -133,10 +136,10 @@ void AsciiInput::read_header(Header &header){
   *
   * @param line String containing column names separated by whitespace
   */
-void AsciiInput::read_column_names(string line){
+void AsciiInput::read_column_names(string line) {
     istringstream row(line);
     string name;
-    while(row >> name){
+    while(row >> name) {
         _column_names.push_back(name);
     }
 }

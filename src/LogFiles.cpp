@@ -24,13 +24,13 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "LogFiles.hpp"
-#include "TimeLine.hpp"
 #include "MPIGlobal.hpp"
 #include "ProgramLog.hpp"
 #include "RestartFile.hpp"
-#include "utilities/ParticleVector.hpp"
 #include "RiemannSolver.hpp"
+#include "TimeLine.hpp"
 #include "utilities/HelperFunctions.hpp"
+#include "utilities/ParticleVector.hpp"
 using namespace std;
 
 /**
@@ -41,18 +41,18 @@ using namespace std;
  * @param outputdir Directory where the logfiles should be stored
  */
 LogFiles::LogFiles(std::string outputdir) {
-    if(!MPIGlobal::rank){
+    if(!MPIGlobal::rank) {
         _timer.start();
 
         // time log
         _timename = outputdir + string("/timelog.txt");
         _timefile.open(_timename);
-        _timefile <<  "#time\titime\tdt" << endl;
+        _timefile << "#time\titime\tdt" << endl;
 
         // energy log
         _energyname = outputdir + string("/energylog.txt");
         _energyfile.open(_energyname);
-        _energyfile <<  "#time\te\tekiny\tu\tepot\tekin\tesum" << endl;
+        _energyfile << "#time\te\tekiny\tu\tepot\tekin\tesum" << endl;
 
         // statistics log
         _statname = outputdir + string("/statistics.txt");
@@ -66,7 +66,7 @@ LogFiles::LogFiles(std::string outputdir) {
     }
 }
 
-LogFiles::~LogFiles(){
+LogFiles::~LogFiles() {
     cout << "Spent " << _timer.value() << "s writing log files." << endl;
 }
 
@@ -78,8 +78,8 @@ LogFiles::~LogFiles(){
  * @param solver RiemannSolver used to solve the Riemann problem for the
  * hydrodynamics
  */
-void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector* &particles,
-                             RiemannSolver* &solver){
+void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector*& particles,
+                             RiemannSolver*& solver) {
     _timer.start();
     // gather data
 
@@ -90,30 +90,30 @@ void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector* &particles,
     double e_pot = 0.;
     double e_kin = 0.;
     double e_tot = 0.;
-    for(unsigned int i = particles->gassize(); i--;){
+    for(unsigned int i = particles->gassize(); i--;) {
         totenergy += particles->gas(i)->get_Qvec().e();
-        ekiny += 0.5*particles->gas(i)->get_Qvec().m()*
-                particles->gas(i)->get_Wvec().vy()*
-                particles->gas(i)->get_Wvec().vy();
+        ekiny += 0.5 * particles->gas(i)->get_Qvec().m() *
+                 particles->gas(i)->get_Wvec().vy() *
+                 particles->gas(i)->get_Wvec().vy();
         StateVector Wp = particles->gas(i)->get_Wvec();
         StateVector Qp = particles->gas(i)->get_Qvec();
-        double p_e_therm = Wp.p()/Wp.rho()/(solver->get_gamma()-1.)*
-                Qp.m();
-        if(!Qp.m() || !Wp.rho()){
+        double p_e_therm =
+                Wp.p() / Wp.rho() / (solver->get_gamma() - 1.) * Qp.m();
+        if(!Qp.m() || !Wp.rho()) {
             p_e_therm = 0.;
         }
-        double p_e_pot = 0.5*Qp.m()*
-                particles->gas(i)->get_gravitational_potential();
-        if(!Qp.m()){
+        double p_e_pot =
+                0.5 * Qp.m() * particles->gas(i)->get_gravitational_potential();
+        if(!Qp.m()) {
             p_e_pot = 0.;
         }
-#if ndim_==3
+#if ndim_ == 3
         Vec mom(Qp.px(), Qp.py(), Qp.pz());
 #else
         Vec mom(Qp.px(), Qp.py());
 #endif
-        double p_e_kin = 0.5*mom.norm2()/Qp.m();
-        if(!Qp.m()){
+        double p_e_kin = 0.5 * mom.norm2() / Qp.m();
+        if(!Qp.m()) {
             p_e_kin = 0.;
         }
         double p_e_tot = p_e_therm + p_e_pot + p_e_kin;
@@ -122,14 +122,14 @@ void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector* &particles,
         e_kin += p_e_kin;
         e_tot += p_e_tot;
     }
-    for(unsigned int i = particles->dmsize(); i--;){
-        ekiny += 0.5*particles->dm(i)->get_mass()*
-                particles->dm(i)->get_velocity().y()*
-                particles->dm(i)->get_velocity().y();
-        double p_e_pot = 0.5*particles->dm(i)->get_mass()*
-                particles->dm(i)->get_gravitational_potential();
-        double p_e_kin = 0.5*particles->dm(i)->get_mass()*
-                particles->dm(i)->get_velocity().norm2();
+    for(unsigned int i = particles->dmsize(); i--;) {
+        ekiny += 0.5 * particles->dm(i)->get_mass() *
+                 particles->dm(i)->get_velocity().y() *
+                 particles->dm(i)->get_velocity().y();
+        double p_e_pot = 0.5 * particles->dm(i)->get_mass() *
+                         particles->dm(i)->get_gravitational_potential();
+        double p_e_kin = 0.5 * particles->dm(i)->get_mass() *
+                         particles->dm(i)->get_velocity().norm2();
         double p_e_tot = p_e_pot + p_e_kin;
         e_pot += p_e_pot;
         e_kin += p_e_kin;
@@ -157,7 +157,7 @@ void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector* &particles,
     MyMPI_Reduce(&numactive, &glob_numactive, 1, MPI_UNSIGNED, MPI_SUM, 0);
     numactive = glob_numactive;
 
-    unsigned long solvercount = solver->get_neval()-_stat_solvercount;
+    unsigned long solvercount = solver->get_neval() - _stat_solvercount;
     _stat_solvercount = solver->get_neval();
     unsigned long glob_solvercount;
     MyMPI_Reduce(&solvercount, &glob_solvercount, 1, MPI_UNSIGNED_LONG, MPI_SUM,
@@ -165,15 +165,14 @@ void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector* &particles,
     solvercount = glob_solvercount;
 
     // only rank 0 writes log files
-    if(MPIGlobal::rank){
+    if(MPIGlobal::rank) {
         return;
     }
 
     // time log
     _timefile << timeline->get_time() << "\t"
               << HelperFunctions::human_readable_long(
-                     timeline->get_integertime()
-                     )
+                         timeline->get_integertime())
               << "\t" << timeline->get_realtime(timeline->get_timestep())
               << endl;
 
@@ -211,11 +210,11 @@ void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector* &particles,
  * @param ofile Output file
  * @param pos Size of the block to copy (from the start of the file)
  */
-void LogFiles::copy_file_single(ifstream &ifile, ofstream &ofile, long pos){
-    char *contents = new char[pos];
+void LogFiles::copy_file_single(ifstream& ifile, ofstream& ofile, long pos) {
+    char* contents = new char[pos];
     ifile.read(contents, pos);
     ofile.write(contents, pos);
-    delete [] contents;
+    delete[] contents;
 }
 
 /**
@@ -229,18 +228,18 @@ void LogFiles::copy_file_single(ifstream &ifile, ofstream &ofile, long pos){
  * @param ofile Output file
  * @param pos Size of the block to copy (from the start of the file)
  */
-void LogFiles::copy_file_buffer(ifstream &ifile, ofstream &ofile, long pos){
-    unsigned int bufsize = 1<<20;
-    char *contents = new char[bufsize];
+void LogFiles::copy_file_buffer(ifstream& ifile, ofstream& ofile, long pos) {
+    unsigned int bufsize = 1 << 20;
+    char* contents = new char[bufsize];
     unsigned int numread = 0;
-    while(numread*bufsize < pos){
-        unsigned int blocksize = pos-numread*bufsize;
+    while(numread * bufsize < pos) {
+        unsigned int blocksize = pos - numread * bufsize;
         blocksize = std::min(bufsize, blocksize);
         ifile.read(contents, blocksize);
         ofile.write(contents, blocksize);
         numread++;
     }
-    delete [] contents;
+    delete[] contents;
 }
 
 /**
@@ -250,12 +249,12 @@ void LogFiles::copy_file_buffer(ifstream &ifile, ofstream &ofile, long pos){
  * @param oname Name of the (new) output file
  * @param pos Size of the block (from the start of the file) that will be copied
  */
-void LogFiles::copy_file(const string &iname, const string &oname, long pos){
+void LogFiles::copy_file(const string& iname, const string& oname, long pos) {
     ifstream ifile(iname);
     ofstream ofile(oname);
     // if the file is larger than 1 MB, we don't read and write all contents
     // at once
-    if(pos > (1<<20)){
+    if(pos > (1 << 20)) {
         copy_file_buffer(ifile, ofile, pos);
     } else {
         copy_file_single(ifile, ofile, pos);
@@ -272,7 +271,7 @@ void LogFiles::copy_file(const string &iname, const string &oname, long pos){
  * @param name Name of the file
  * @param pos Position in the file
  */
-void LogFiles::reset_file(string name, long pos){
+void LogFiles::reset_file(string name, long pos) {
     string tempname = name + ".temp";
     copy_file(name, tempname, pos);
     rename(tempname.c_str(), name.c_str());
@@ -289,8 +288,8 @@ void LogFiles::reset_file(string name, long pos){
  *
  * @param rfile RestartFile to read from
  */
-LogFiles::LogFiles(RestartFile &rfile) : _timer(rfile) {
-    if(!MPIGlobal::rank){
+LogFiles::LogFiles(RestartFile& rfile) : _timer(rfile) {
+    if(!MPIGlobal::rank) {
         _timer.start();
 
         // time log
@@ -330,9 +329,9 @@ LogFiles::LogFiles(RestartFile &rfile) : _timer(rfile) {
  *
  * @param rfile RestartFile to write to
  */
-void LogFiles::dump(RestartFile &rfile){
+void LogFiles::dump(RestartFile& rfile) {
     _timer.dump(rfile);
-    if(!MPIGlobal::rank){
+    if(!MPIGlobal::rank) {
         // time log
         rfile.write(_timename);
         long timepos = _timefile.tellp();

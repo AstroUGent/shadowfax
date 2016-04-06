@@ -48,12 +48,12 @@
  * problems, we dynamically allocate and deallocate memory for the internal
  * table.
  */
-class EwaldTable{
-private:
+class EwaldTable {
+  private:
     void construct();
     bool read_table();
 
-#if ndim_==3
+#if ndim_ == 3
     /*! \brief A multidimensional array of Vec force corrections */
     Vec*** _f;
 #else
@@ -73,7 +73,7 @@ private:
      *  the table is a power of this */
     unsigned int _size;
 
-public:
+  public:
     EwaldTable(double alpha = 2., unsigned int size = 64);
     ~EwaldTable();
 
@@ -81,4 +81,4 @@ public:
     void set_boxsize(double L);
 };
 
-#endif // EWALDTABLE_HPP
+#endif  // EWALDTABLE_HPP

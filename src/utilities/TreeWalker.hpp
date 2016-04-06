@@ -26,10 +26,10 @@
 #ifndef TREEWALKER_HPP
 #define TREEWALKER_HPP
 
-#include "Vec.hpp"
 #include "EwaldTable.hpp"
-#include <vector>
 #include "Particle.hpp"
+#include "Vec.hpp"
+#include <vector>
 
 class TreeNode;
 class Leaf;
@@ -50,8 +50,8 @@ class PseudoNode;
  * action the implementation performs. It only implements auxiliary functions
  * to work with periodic boxes.
  */
-class TreeWalker{
-protected:
+class TreeWalker {
+  protected:
     /*! \brief Size of the simulation box */
     double _boxsize;
 
@@ -67,11 +67,11 @@ protected:
      *
      * @param x Distance to trim
      */
-    inline void nearest(double& x){
-        if(x > _boxhalf){
+    inline void nearest(double& x) {
+        if(x > _boxhalf) {
             x -= _boxsize;
         } else {
-            if(x < -_boxhalf){
+            if(x < -_boxhalf) {
                 x += _boxsize;
             }
         }
@@ -84,19 +84,19 @@ protected:
      *
      * @param v Given Vec
      */
-    inline void nearest(Vec& v){
+    inline void nearest(Vec& v) {
         nearest(v[0]);
         nearest(v[1]);
-#if ndim_==3
+#if ndim_ == 3
         nearest(v[2]);
 #endif
     }
 
-public:
+  public:
     /**
      * @brief Empty constructor
      */
-    TreeWalker(){
+    TreeWalker() {
         _boxsize = 0.;
         _boxhalf = 0.;
     }
@@ -106,9 +106,9 @@ public:
      *
      * @param boxsize Size of the simulation box
      */
-    void set_boxsize(double boxsize){
+    void set_boxsize(double boxsize) {
         _boxsize = boxsize;
-        _boxhalf = 0.5*boxsize;
+        _boxhalf = 0.5 * boxsize;
     }
 
     /**
@@ -119,9 +119,7 @@ public:
      * @return True: we always open all nodes if no splitnode function is
      * implemented
      */
-    virtual bool splitnode(TreeNode* node){
-        return true;
-    }
+    virtual bool splitnode(TreeNode* node) { return true; }
 
     /**
      * @brief Dummy splitaction
@@ -166,7 +164,7 @@ public:
      *
      * Does nothing.
      */
-    virtual void after_walk(){}
+    virtual void after_walk() {}
 };
 
 /**
@@ -174,20 +172,20 @@ public:
  *
  * @deprecated No longer used.
  */
-class PeriodicTreeWalker : public TreeWalker{
-public:
+class PeriodicTreeWalker : public TreeWalker {
+  public:
     /**
      * @brief Set the position used for the treewalk
      * @param position Position for the treewalk
      */
-    virtual void set_position(Vec position)=0;
+    virtual void set_position(Vec position) = 0;
 
     /**
      * @brief Get the position used for the treewalk
      *
      * @return Position used for the treewalk
      */
-    virtual Vec get_position()=0;
+    virtual Vec get_position() = 0;
 
     /**
      * @brief Periodic version of TreeWalker::splitnode()
@@ -198,7 +196,7 @@ public:
      * @param ewald_table EwaldTable used for periodic correction terms
      * @return True if the node should be opened, false otherwise
      */
-    virtual bool periodicsplitnode(TreeNode* node, EwaldTable& ewald_table)=0;
+    virtual bool periodicsplitnode(TreeNode* node, EwaldTable& ewald_table) = 0;
 
     /**
      * @brief Periodic version of TreeWalker::pseudonodeaction()
@@ -207,7 +205,7 @@ public:
      * @param ewald_table EwaldTable used for periodic correction terms
      */
     virtual void periodicpseudonodeaction(PseudoNode* pseudonode,
-                                          EwaldTable& ewald_table)=0;
+                                          EwaldTable& ewald_table) = 0;
 
     /**
      * @brief Periodic version of TreeWalker::leafaction()
@@ -215,15 +213,15 @@ public:
      * @param leaf Leaf on which to operate
      * @param ewald_table EwaldTable used for periodic correction terms
      */
-    virtual void periodicleafaction(Leaf* leaf, EwaldTable& ewald_table)=0;
+    virtual void periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) = 0;
 };
 
 /**
  * @brief TreeWalker specialization used to search neighbours for a given
  * GasParticle
  */
-class NgbSearch : public TreeWalker{
-private:
+class NgbSearch : public TreeWalker {
+  private:
     /*! \brief Center of the neighbour search */
     Vec _center;
 
@@ -236,23 +234,23 @@ private:
     /*! \brief Flags for MPI-communication */
     std::vector<bool>& _exportlist;
 
-public:
+  public:
     NgbSearch(Vec center, double radius, std::vector<bool>& exportlist,
               unsigned int reserve = 0);
 
     std::vector<GasParticle*> get_ngbs();
 
-    bool splitnode(TreeNode *node);
-    void leafaction(Leaf *leaf);
-    void pseudonodeaction(PseudoNode *pseudonode);
+    bool splitnode(TreeNode* node);
+    void leafaction(Leaf* leaf);
+    void pseudonodeaction(PseudoNode* pseudonode);
 };
 
 /**
  * @brief TreeWalker implementation used to find the closest neighbour of a
  * given GasParticle
  */
-class ClosestNgbSearch : public TreeWalker{
-private:
+class ClosestNgbSearch : public TreeWalker {
+  private:
     /*! \brief Center of the closest neighbour search */
     Vec _center;
 
@@ -262,7 +260,7 @@ private:
     /*! \brief Current closest particle */
     GasParticle* _closest;
 
-public:
+  public:
     ClosestNgbSearch(Vec center, double radius);
     void set_position(Vec position);
     Vec get_position();
@@ -271,9 +269,9 @@ public:
 
     void increase_radius();
 
-    bool splitnode(TreeNode *node);
-    void leafaction(Leaf *leaf);
-    void pseudonodeaction(PseudoNode *pseudonode);
+    bool splitnode(TreeNode* node);
+    void leafaction(Leaf* leaf);
+    void pseudonodeaction(PseudoNode* pseudonode);
 };
 
-#endif // TREEWALKER_HPP
+#endif  // TREEWALKER_HPP

@@ -36,9 +36,9 @@
  *
  * @param rank Pointer to the integer to store the result in
  */
-inline void MyMPI_Comm_rank(int *rank){
+inline void MyMPI_Comm_rank(int* rank) {
     int status = MPI_Comm_rank(MPI_COMM_WORLD, rank);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Failed to obtain process rank!" << std::endl;
         my_exit();
     }
@@ -52,9 +52,9 @@ inline void MyMPI_Comm_rank(int *rank){
  *
  * @param size Pointer to the integer to store the result in
  */
-inline void MyMPI_Comm_size(int *size){
+inline void MyMPI_Comm_size(int* size) {
     int status = MPI_Comm_size(MPI_COMM_WORLD, size);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Failed to obtain MPI world size!" << std::endl;
         my_exit();
     }
@@ -75,11 +75,11 @@ inline void MyMPI_Comm_size(int *size){
  * @param name Name of a MPI node
  * @return Semi-unique integer hash of the name
  */
-inline int MyMPI_hash(std::string name){
+inline int MyMPI_hash(std::string name) {
     int a = 1, b = 0;
 
     /* Process each byte of the data in order */
-    for(unsigned int index = 0; index < name.size(); ++index){
+    for(unsigned int index = 0; index < name.size(); ++index) {
         a = (a + name[index]) % 65521;
         b = (b + a) % 65521;
     }
@@ -98,12 +98,12 @@ inline int MyMPI_hash(std::string name){
  * @param resultlen Length of the node name
  * @return MPI error code
  */
-inline int MyMPI_Get_processor_name(char *name, int *resultlen){
+inline int MyMPI_Get_processor_name(char* name, int* resultlen) {
 
 //#define EMULATE_MULTINODES
 
 #ifdef EMULATE_MULTINODES
-    if(MPIGlobal::rank%2){
+    if(MPIGlobal::rank % 2) {
         sprintf(name, "%s", "even");
         *resultlen = 4;
     } else {
@@ -149,14 +149,14 @@ inline int MyMPI_Get_processor_name(char *name, int *resultlen){
  * @param nodesize Size of the space of all nodes
  * @param nodecomm Variable to store the local node communicator in
  */
-inline void MyMPI_Comm_local_vars(int *rank, int *size, int *noderank,
-                                  int *nodesize, MPI_Comm *nodecomm){
+inline void MyMPI_Comm_local_vars(int* rank, int* size, int* noderank,
+                                  int* nodesize, MPI_Comm* nodecomm) {
     MPIGlobal::commtimer.start();
 
-    char *name = new char[MPI_MAX_PROCESSOR_NAME];
+    char* name = new char[MPI_MAX_PROCESSOR_NAME];
     int namesize;
     int status = MyMPI_Get_processor_name(name, &namesize);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while obtaining MPI processor name!" << std::endl;
         my_exit();
     }
@@ -168,82 +168,85 @@ inline void MyMPI_Comm_local_vars(int *rank, int *size, int *noderank,
     MPI_Comm local_world = MPI_COMM_NULL;
     status = MPI_Comm_split(MPI_COMM_WORLD, color, MPIGlobal::rank,
                             &local_world);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while splitting MPI communicator in local MPI "
-                     "communicators!" << std::endl;
+                     "communicators!"
+                  << std::endl;
         my_exit();
     }
 
     status = MPI_Comm_rank(local_world, rank);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while obtaining local MPI rank!" << std::endl;
         my_exit();
     }
     status = MPI_Comm_size(local_world, size);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while obtaining local MPI size!" << std::endl;
         my_exit();
     }
 
     // check if the processes in local_world are really on a single node
-    char *allnames = new char[(*size)*MPI_MAX_PROCESSOR_NAME];
+    char* allnames = new char[(*size) * MPI_MAX_PROCESSOR_NAME];
     status = MPI_Allgather(name, MPI_MAX_PROCESSOR_NAME, MPI_CHAR, allnames,
                            MPI_MAX_PROCESSOR_NAME, MPI_CHAR, local_world);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while gathering processor names on the presumably "
-                     "local communicator!" << std::endl;
+                     "local communicator!"
+                  << std::endl;
         my_exit();
     }
 
     int owni = 0;
     bool is_single = true;
-    for(int i = 0; i < (*size); i++){
-        std::string othername(&allnames[i*MPI_MAX_PROCESSOR_NAME]);
-        if(othername != procname){
+    for(int i = 0; i < (*size); i++) {
+        std::string othername(&allnames[i * MPI_MAX_PROCESSOR_NAME]);
+        if(othername != procname) {
             is_single = false;
         } else {
             owni = i;
         }
     }
-    if(!is_single){
+    if(!is_single) {
         MPI_Comm real_local_world = MPI_COMM_NULL;
         status = MPI_Comm_split(local_world, owni, (*rank), &real_local_world);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while splitting the local communicator in the "
-                         "real node communicators!" << std::endl;
+                         "real node communicators!"
+                      << std::endl;
             my_exit();
         }
 
         status = MPI_Comm_rank(real_local_world, rank);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while obtaining real local MPI rank!"
                       << std::endl;
             my_exit();
         }
 
         status = MPI_Comm_size(real_local_world, size);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while obtaining real local MPI size!"
                       << std::endl;
             my_exit();
         }
 
         status = MPI_Comm_free(&real_local_world);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while freeing real local MPI communicator!"
                       << std::endl;
             my_exit();
         }
 
         status = MPI_Comm_dup(real_local_world, nodecomm);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while duplicating local MPI communicator!"
                       << std::endl;
             my_exit();
         }
     } else {
         status = MPI_Comm_dup(local_world, nodecomm);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while duplicating local MPI communicator!"
                       << std::endl;
             my_exit();
@@ -251,50 +254,50 @@ inline void MyMPI_Comm_local_vars(int *rank, int *size, int *noderank,
     }
 
     status = MPI_Comm_free(&local_world);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while freeing local MPI communicator!" << std::endl;
         my_exit();
     }
 
-    delete [] name;
+    delete[] name;
 
     // obtain noderank and nodesize
     MPI_Comm nodeworld;
     int nodemaster = (*rank == 0);
     status = MPI_Comm_split(MPI_COMM_WORLD, nodemaster, MPIGlobal::rank,
                             &nodeworld);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while obtaining node world!" << std::endl;
         my_exit();
     }
-    if(*rank == 0){
+    if(*rank == 0) {
         status = MPI_Comm_rank(nodeworld, noderank);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while obtaining noderank!" << std::endl;
             my_exit();
         }
 
         status = MPI_Comm_size(nodeworld, nodesize);
-        if(status != MPI_SUCCESS){
+        if(status != MPI_SUCCESS) {
             std::cerr << "Error while obtaining nodesize!" << std::endl;
             my_exit();
         }
     }
 
     status = MPI_Comm_free(&nodeworld);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while freeing nodeworld!" << std::endl;
         my_exit();
     }
 
     status = MPI_Bcast(noderank, 1, MPI_INT, 0, *nodecomm);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while broadcasting noderank!" << std::endl;
         my_exit();
     }
 
     status = MPI_Bcast(nodesize, 1, MPI_INT, 0, *nodecomm);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while broadcasting nodesize!" << std::endl;
         my_exit();
     }
@@ -314,12 +317,12 @@ inline void MyMPI_Comm_local_vars(int *rank, int *size, int *noderank,
  * @param datatype MPI datatype of the elements
  * @param op Global reduce operation
  */
-inline void MyMPI_Allreduce(void *sendbuf, void *recvbuf, int count,
-                           MPI_Datatype datatype, MPI_Op op){
+inline void MyMPI_Allreduce(void* sendbuf, void* recvbuf, int count,
+                            MPI_Datatype datatype, MPI_Op op) {
     MPIGlobal::commtimer.start();
     int status = MPI_Allreduce(sendbuf, recvbuf, count, datatype, op,
                                MPI_COMM_WORLD);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Allreduce!" << std::endl;
         my_exit();
     }
@@ -339,11 +342,11 @@ inline void MyMPI_Allreduce(void *sendbuf, void *recvbuf, int count,
  * @param comm Communicator identifying the participating processes (default:
  * MPI_COMM_WORLD)
  */
-inline void MyMPI_Bcast(void *buffer, int count, MPI_Datatype datatype,
-                        int root, MPI_Comm comm = MPI_COMM_WORLD){
+inline void MyMPI_Bcast(void* buffer, int count, MPI_Datatype datatype,
+                        int root, MPI_Comm comm = MPI_COMM_WORLD) {
     MPIGlobal::commtimer.start();
     int status = MPI_Bcast(buffer, count, datatype, root, comm);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Bcast!" << std::endl;
         my_exit();
     }
@@ -360,10 +363,10 @@ inline void MyMPI_Bcast(void *buffer, int count, MPI_Datatype datatype,
  * @param comm Communicator identifying the participating processes (default:
  * MPI_COMM_WORLD)
  */
-inline void MyMPI_Barrier(MPI_Comm comm = MPI_COMM_WORLD){
+inline void MyMPI_Barrier(MPI_Comm comm = MPI_COMM_WORLD) {
     MPIGlobal::idletimer.start();
     int status = MPI_Barrier(comm);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error in MPI_Barrier!" << std::endl;
         my_exit();
     }
@@ -382,12 +385,12 @@ inline void MyMPI_Barrier(MPI_Comm comm = MPI_COMM_WORLD){
  * @param datatype MPI datatype of the elements
  * @param op Global reduce operation
  */
-inline void MyMPI_Scan(void *sendbuf, void *recvbuf, int count,
-                       MPI_Datatype datatype, MPI_Op op){
+inline void MyMPI_Scan(void* sendbuf, void* recvbuf, int count,
+                       MPI_Datatype datatype, MPI_Op op) {
     MPIGlobal::commtimer.start();
-    int status = MPI_Scan(sendbuf, recvbuf, count, datatype, op,
-                          MPI_COMM_WORLD);
-    if(status != MPI_SUCCESS){
+    int status =
+            MPI_Scan(sendbuf, recvbuf, count, datatype, op, MPI_COMM_WORLD);
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Scan!" << std::endl;
         my_exit();
     }
@@ -407,12 +410,12 @@ inline void MyMPI_Scan(void *sendbuf, void *recvbuf, int count,
  * @param tag Tag identifying this message
  * @param request Request to store status information in
  */
-inline void MyMPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest,
-                      int tag, MPI_Request *request){
+inline void MyMPI_Isend(void* buf, int count, MPI_Datatype datatype, int dest,
+                        int tag, MPI_Request* request) {
     MPIGlobal::commtimer.start();
-    int status = MPI_Isend(buf, count, datatype, dest, tag, MPI_COMM_WORLD,
-                           request);
-    if(status != MPI_SUCCESS){
+    int status =
+            MPI_Isend(buf, count, datatype, dest, tag, MPI_COMM_WORLD, request);
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Isend!" << std::endl;
         my_exit();
     }
@@ -432,12 +435,12 @@ inline void MyMPI_Isend(void *buf, int count, MPI_Datatype datatype, int dest,
  * @param tag Tag identifying this message
  * @param status Status information about the reception
  */
-inline void MyMPI_Recv(void *buf, int count, MPI_Datatype datatype, int source,
-                     int tag, MPI_Status *status){
+inline void MyMPI_Recv(void* buf, int count, MPI_Datatype datatype, int source,
+                       int tag, MPI_Status* status) {
     MPIGlobal::commtimer.start();
-    int result = MPI_Recv(buf, count, datatype, source, tag, MPI_COMM_WORLD,
-                          status);
-    if(result != MPI_SUCCESS){
+    int result =
+            MPI_Recv(buf, count, datatype, source, tag, MPI_COMM_WORLD, status);
+    if(result != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Recv!" << std::endl;
         my_exit();
     }
@@ -453,10 +456,10 @@ inline void MyMPI_Recv(void *buf, int count, MPI_Datatype datatype, int source,
  * @param datatype MPI datatype of the elements that were received
  * @param count Pointer to an integer to store the result in
  */
-inline void MyMPI_Get_count(MPI_Status *status, MPI_Datatype datatype,
-                            int *count){
+inline void MyMPI_Get_count(MPI_Status* status, MPI_Datatype datatype,
+                            int* count) {
     int result = MPI_Get_count(status, datatype, count);
-    if(result != MPI_SUCCESS){
+    if(result != MPI_SUCCESS) {
         std::cerr << "Error in MPI_Get_count!" << std::endl;
         my_exit();
     }
@@ -472,10 +475,10 @@ inline void MyMPI_Get_count(MPI_Status *status, MPI_Datatype datatype,
  * @param tag Tag identifying the message
  * @param status MPI status object to store information in
  */
-inline void MyMPI_Probe(int source, int tag, MPI_Status *status){
+inline void MyMPI_Probe(int source, int tag, MPI_Status* status) {
     MPIGlobal::idletimer.start();
     int result = MPI_Probe(source, tag, MPI_COMM_WORLD, status);
-    if(result != MPI_SUCCESS){
+    if(result != MPI_SUCCESS) {
         std::cerr << "Error in MPI_Probe!" << std::endl;
         my_exit();
     }
@@ -500,12 +503,12 @@ inline void MyMPI_Probe(int source, int tag, MPI_Status *status){
  * @param function Function name of the calling function
  * @param line Line number in the source code file where the call happens
  */
-inline void MyMPI_Pack_real(void *inbuf, int incount, MPI_Datatype datatype,
-                            void *outbuf, int outsize, int *position,
-                            std::string file, std::string function, int line){
+inline void MyMPI_Pack_real(void* inbuf, int incount, MPI_Datatype datatype,
+                            void* outbuf, int outsize, int* position,
+                            std::string file, std::string function, int line) {
     int status = MPI_Pack(inbuf, incount, datatype, outbuf, outsize, position,
                           MPI_COMM_WORLD);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Pack!" << std::endl;
         std::cerr << MPIGlobal::rank << ": " << file << "::" << function << ":"
                   << line << std::endl;
@@ -513,9 +516,10 @@ inline void MyMPI_Pack_real(void *inbuf, int incount, MPI_Datatype datatype,
     }
 }
 
-#define MyMPI_Pack(buf, count, type, out, outs, pos) {\
-    MyMPI_Pack_real(buf, count, type, out, outs, pos, __FILE__, __FUNCTION__,\
-    __LINE__);\
+#define MyMPI_Pack(buf, count, type, out, outs, pos)                \
+    {                                                               \
+        MyMPI_Pack_real(buf, count, type, out, outs, pos, __FILE__, \
+                        __FUNCTION__, __LINE__);                    \
     }
 
 /**
@@ -534,12 +538,13 @@ inline void MyMPI_Pack_real(void *inbuf, int incount, MPI_Datatype datatype,
  * @param function Function name of the calling function
  * @param line Line number in the source code file where the call happens
  */
-inline void MyMPI_Unpack_real(void *inbuf, int insize, int *position,
-                              void *outbuf, int outcount, MPI_Datatype datatype,
-                              std::string file, std::string function, int line){
+inline void MyMPI_Unpack_real(void* inbuf, int insize, int* position,
+                              void* outbuf, int outcount, MPI_Datatype datatype,
+                              std::string file, std::string function,
+                              int line) {
     int status = MPI_Unpack(inbuf, insize, position, outbuf, outcount, datatype,
                             MPI_COMM_WORLD);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Unpack!" << std::endl;
         std::cerr << insize << "\t" << *position << "\t" << std::endl;
         std::cerr << MPIGlobal::rank << ": " << file << "::" << function << ":"
@@ -548,9 +553,10 @@ inline void MyMPI_Unpack_real(void *inbuf, int insize, int *position,
     }
 }
 
-#define MyMPI_Unpack(ib, is, po, ob, oc, dt){\
-    MyMPI_Unpack_real(ib, is, po, ob, oc, dt, __FILE__, __FUNCTION__,\
-    __LINE__);\
+#define MyMPI_Unpack(ib, is, po, ob, oc, dt)                              \
+    {                                                                     \
+        MyMPI_Unpack_real(ib, is, po, ob, oc, dt, __FILE__, __FUNCTION__, \
+                          __LINE__);                                      \
     }
 
 /**
@@ -568,13 +574,13 @@ inline void MyMPI_Unpack_real(void *inbuf, int insize, int *position,
  * @param comm Communicator identifying the participating processes (default:
  * MPI_COMM_WORLD)
  */
-inline void MyMPI_Allgather(void *sendbuf, int sendcount, MPI_Datatype sendtype,
-                            void *recvbuf, int recvcount, MPI_Datatype recvtype,
-                            MPI_Comm comm = MPI_COMM_WORLD){
+inline void MyMPI_Allgather(void* sendbuf, int sendcount, MPI_Datatype sendtype,
+                            void* recvbuf, int recvcount, MPI_Datatype recvtype,
+                            MPI_Comm comm = MPI_COMM_WORLD) {
     MPIGlobal::commtimer.start();
     int status = MPI_Allgather(sendbuf, sendcount, sendtype, recvbuf, recvcount,
                                recvtype, comm);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Allgather!" << std::endl;
         my_exit();
     }
@@ -594,12 +600,12 @@ inline void MyMPI_Allgather(void *sendbuf, int sendcount, MPI_Datatype sendtype,
  * @param op Global reduce operation
  * @param root Rank of the process where the result will be stored
  */
-inline void MyMPI_Reduce(void *sendbuf, void *recvbuf, int count,
-                         MPI_Datatype datatype, MPI_Op op, int root){
+inline void MyMPI_Reduce(void* sendbuf, void* recvbuf, int count,
+                         MPI_Datatype datatype, MPI_Op op, int root) {
     MPIGlobal::commtimer.start();
     int status = MPI_Reduce(sendbuf, recvbuf, count, datatype, op, root,
                             MPI_COMM_WORLD);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Reduce!" << std::endl;
         my_exit();
     }
@@ -619,12 +625,12 @@ inline void MyMPI_Reduce(void *sendbuf, void *recvbuf, int count,
  * @param tag Tag identifying this message
  * @param request MPI request to store information in
  */
-inline void MyMPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source,
-                        int tag, MPI_Request *request){
+inline void MyMPI_Irecv(void* buf, int count, MPI_Datatype datatype, int source,
+                        int tag, MPI_Request* request) {
     MPIGlobal::commtimer.start();
     int status = MPI_Irecv(buf, count, datatype, source, tag, MPI_COMM_WORLD,
                            request);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Irecv!" << std::endl;
         my_exit();
     }
@@ -640,11 +646,11 @@ inline void MyMPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source,
  * @param array_of_requests Array of requests
  * @param array_of_statuses Array to store status information about the requests
  */
-inline void MyMPI_Waitall(int count, MPI_Request *array_of_requests,
-                        MPI_Status *array_of_statuses){
+inline void MyMPI_Waitall(int count, MPI_Request* array_of_requests,
+                          MPI_Status* array_of_statuses) {
     MPIGlobal::idletimer.start();
     int status = MPI_Waitall(count, array_of_requests, array_of_statuses);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Waitall!" << std::endl;
         my_exit();
     }
@@ -660,10 +666,10 @@ inline void MyMPI_Waitall(int count, MPI_Request *array_of_requests,
  * @param flag Flag to store the result of the test in
  * @param status MPI_Status object to store status information about the request
  */
-inline void MyMPI_Test(MPI_Request *request, int *flag, MPI_Status *status){
+inline void MyMPI_Test(MPI_Request* request, int* flag, MPI_Status* status) {
     MPIGlobal::commtimer.start();
     int result = MPI_Test(request, flag, status);
-    if(result != MPI_SUCCESS){
+    if(result != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Test!" << std::endl;
         my_exit();
     }
@@ -680,9 +686,9 @@ inline void MyMPI_Test(MPI_Request *request, int *flag, MPI_Status *status){
  * @param argc Pointer to the number of command line arguments
  * @param argv Pointer to the command line arguments
  */
-inline void MyMPI_Init(int *argc, char ***argv){
+inline void MyMPI_Init(int* argc, char*** argv) {
     int status = MPI_Init(argc, argv);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Failed to initialize MPI environment!" << std::endl;
         my_exit();
     }
@@ -714,16 +720,16 @@ inline void MyMPI_Init(int *argc, char ***argv){
  *
  * @return The error code of MPI_Finalize
  */
-inline int MyMPI_Finalize(){
+inline int MyMPI_Finalize() {
     int status = MPI_Comm_free(&MPIGlobal::nodecomm);
-    if(status != MPI_SUCCESS){
+    if(status != MPI_SUCCESS) {
         std::cerr << "Error while freeing node communicator!" << std::endl;
         my_exit();
     }
 
     // deallocate communication buffers
-    delete [] MPIGlobal::sendbuffer;
-    delete [] MPIGlobal::recvbuffer;
+    delete[] MPIGlobal::sendbuffer;
+    delete[] MPIGlobal::recvbuffer;
 
     double locidletime, loccommtime;
     double totidletime, totcommtime;
@@ -744,4 +750,4 @@ inline int MyMPI_Finalize(){
     return MPI_Finalize();
 }
 
-#endif // MPIMETHODS_HPP
+#endif  // MPIMETHODS_HPP

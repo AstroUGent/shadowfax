@@ -33,7 +33,7 @@ class RestartFile;
 /**
  * @brief Predefined UnitSet types
  */
-enum UnitType{
+enum UnitType {
     /*! \brief Default UnitSet: SI-units */
     UNITS_DEFAULT
 };
@@ -45,8 +45,8 @@ enum UnitType{
   * by the time unit associated with the set, you arrive at the velocity unit
   * associated with the set.
   */
-class UnitSet{
-private:
+class UnitSet {
+  private:
     /*! \brief Length Unit associated with this UnitSet */
     Unit _unit_position;
 
@@ -65,11 +65,11 @@ private:
     /*! \brief Mass Unit associated with this UnitSet */
     Unit _unit_mass;
 
-public:
+  public:
     UnitSet(UnitType type = UNITS_DEFAULT);
     UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time);
 
-    ~UnitSet(){}
+    ~UnitSet() {}
 
     Unit get_length_unit();
     Unit get_density_unit();
@@ -80,8 +80,8 @@ public:
 
     Unit get_unit(std::string quantity);
 
-    void dump(RestartFile &rfile);
-    UnitSet(RestartFile &rfile);
+    void dump(RestartFile& rfile);
+    UnitSet(RestartFile& rfile);
 };
 
-#endif // UNITSET_HPP
+#endif  // UNITSET_HPP

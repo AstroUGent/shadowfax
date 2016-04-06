@@ -29,45 +29,45 @@
 #ifndef MPIGLOBAL_HPP
 #define MPIGLOBAL_HPP
 
-#include <mpi.h>
 #include "Error.hpp"
 #include "utilities/Timer.hpp"
+#include <mpi.h>
 
 /**
  * \brief Global MPI variables used throughout the program
  */
-namespace MPIGlobal{
-    /*! \brief Number of MPI processes in the system */
-    extern int size;
-    /*! \brief Rank of the local MPI process in the system */
-    extern int rank;
+namespace MPIGlobal {
+/*! \brief Number of MPI processes in the system */
+extern int size;
+/*! \brief Rank of the local MPI process in the system */
+extern int rank;
 
-    /*! \brief Number of MPI processes on the local node */
-    extern int local_size;
-    /*! \brief Rank of the local MPI process on the local node */
-    extern int local_rank;
-    /*! \brief Size of the space of all nodes */
-    extern int nodesize;
-    /*! \brief Rank of the node in the space of all nodes */
-    extern int noderank;
-    /*! \brief Local node communicator */
-    extern MPI_Comm nodecomm;
+/*! \brief Number of MPI processes on the local node */
+extern int local_size;
+/*! \brief Rank of the local MPI process on the local node */
+extern int local_rank;
+/*! \brief Size of the space of all nodes */
+extern int nodesize;
+/*! \brief Rank of the node in the space of all nodes */
+extern int noderank;
+/*! \brief Local node communicator */
+extern MPI_Comm nodecomm;
 
-    /*! \brief Buffer used to send data to other MPI processes */
-    extern char* sendbuffer;
-    /*! \brief Size of the send buffer in bytes */
-    extern unsigned int sendsize;
-    /*! \brief Buffer used to receive data from other MPI processes */
-    extern char* recvbuffer;
-    /*! \brief Size of the receive buffer in bytes */
-    extern unsigned int recvsize;
+/*! \brief Buffer used to send data to other MPI processes */
+extern char* sendbuffer;
+/*! \brief Size of the send buffer in bytes */
+extern unsigned int sendsize;
+/*! \brief Buffer used to receive data from other MPI processes */
+extern char* recvbuffer;
+/*! \brief Size of the receive buffer in bytes */
+extern unsigned int recvsize;
 
-    /*! \brief Timer to quantify idle time spent waiting on other MPI
-     *  processes */
-    extern Timer idletimer;
-    /*! \brief Timer to quantify time spent during MPI communication
-     *  operations */
-    extern Timer commtimer;
+/*! \brief Timer to quantify idle time spent waiting on other MPI
+ *  processes */
+extern Timer idletimer;
+/*! \brief Timer to quantify time spent during MPI communication
+ *  operations */
+extern Timer commtimer;
 }
 
-#endif // MPIGLOBAL_HPP
+#endif  // MPIGLOBAL_HPP

@@ -26,10 +26,10 @@
 #ifndef ICGENERATOR_HPP
 #define ICGENERATOR_HPP
 
-#include <vector>
-#include <string>
-#include "Vec.hpp"
 #include "StateVector.hpp"
+#include "Vec.hpp"
+#include <string>
+#include <vector>
 
 class ParticleVector;
 class DelCont;
@@ -39,20 +39,20 @@ class ICRegion;
 /**
   * \brief Interface for initial conditions generators
   */
-class ICGenerator{
-public:
-    virtual ~ICGenerator(){}
+class ICGenerator {
+  public:
+    virtual ~ICGenerator() {}
 
     /**
       * \brief Generate initial conditions and return them as a ParticleVector
       */
-    virtual ParticleVector generate()=0;
+    virtual ParticleVector generate() = 0;
 };
 
 /**
   * \brief Possible modes for initial condition generation
   */
-enum ICMode{
+enum ICMode {
     /*! Set up a regularized uniform random grid */
     IC_RAND,
     /*! Set up a cartesian grid */
@@ -68,8 +68,8 @@ enum ICMode{
   * generating initial conditions is similar to how the initial conditions are
   * set up in the AMR code RAMSES (Teyssier, 2001)
   */
-class BlockICGenerator : public ICGenerator{
-private:
+class BlockICGenerator : public ICGenerator {
+  private:
     /*! \brief DelCont specifying the entire simulation box */
     DelCont* _container;
 
@@ -134,14 +134,14 @@ private:
 
     void make_cartesian_grid(ParticleVector& plist);
     void make_random_grid(ParticleVector& plist);
-    void relax_grid(ParticleVector &grid);
-    void apply_regions(ParticleVector &grid);
+    void relax_grid(ParticleVector& grid);
+    void apply_regions(ParticleVector& grid);
     bool regions_accepted(Vec& p);
     bool regions_accepted_dm(Vec& p);
 
     void add_DM(ParticleVector& plist);
 
-public:
+  public:
     BlockICGenerator(unsigned int npart, unsigned int mode = IC_RAND,
                      unsigned int seed = 42, double gamma = 1.66667);
     virtual ~BlockICGenerator();
@@ -152,7 +152,7 @@ public:
 };
 
 /*! \brief Type of special initial condition to generate */
-enum ICSpecType{
+enum ICSpecType {
     /*! Gresho vortex (2D only) */
     IC_SPEC_GRESHO,
     /*! Sedov-Taylor blastwave */
@@ -172,8 +172,8 @@ enum ICSpecType{
  * BlockICGenerator. Code to generate positions and hydrodynamical quantities
  * is hardcoded in member functions of this class.
  */
-class SpecificICGenerator : public ICGenerator{
-private:
+class SpecificICGenerator : public ICGenerator {
+  private:
     /*! \brief Adiabatic index of the gas in the initial condition */
     double _gamma;
 
@@ -201,29 +201,29 @@ private:
 
     void make_cartesian_grid(ParticleVector& plist);
     void make_random_grid(ParticleVector& plist);
-    void relax_grid(ParticleVector &grid);
-    void apply_profiles(ParticleVector &grid);
+    void relax_grid(ParticleVector& grid);
+    void apply_profiles(ParticleVector& grid);
 
-    void apply_profile_gresho(ParticleVector &grid);
-    void apply_profile_sedov_taylor(ParticleVector &grid);
-    void apply_profile_dwarf(ParticleVector &grid);
-    void apply_profile_kh(ParticleVector &grid);
-    void apply_profile_evrard(ParticleVector &grid);
+    void apply_profile_gresho(ParticleVector& grid);
+    void apply_profile_sedov_taylor(ParticleVector& grid);
+    void apply_profile_dwarf(ParticleVector& grid);
+    void apply_profile_kh(ParticleVector& grid);
+    void apply_profile_evrard(ParticleVector& grid);
 
-    void add_DM(ParticleVector &grid);
+    void add_DM(ParticleVector& grid);
 
-    void add_DM_plummer(ParticleVector &grid);
+    void add_DM_plummer(ParticleVector& grid);
     double rand_double();
     double gplummer(double q);
 
-public:
+  public:
     SpecificICGenerator(unsigned int ngaspart, unsigned int ndmpart,
                         unsigned int type = IC_SPEC_GRESHO,
-                        unsigned int seed = 42,
-                        unsigned int mode = IC_RAND, double gamma = 1.66667);
+                        unsigned int seed = 42, unsigned int mode = IC_RAND,
+                        double gamma = 1.66667);
     virtual ~SpecificICGenerator();
 
     ParticleVector generate();
 };
 
-#endif // ICGENERATOR_HPP
+#endif  // ICGENERATOR_HPP

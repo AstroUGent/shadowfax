@@ -39,16 +39,16 @@ using namespace std;
  * @param local Flag indicating whether the Particle resides on the local
  * MPI-process
  */
-GravityWalker::GravityWalker(Particle *p, bool local){
+GravityWalker::GravityWalker(Particle* p, bool local) {
     _p = p;
     _position = p->get_position();
     _olda = p->get_old_acceleration();
     _hsoft = p->get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
     _comp_cost = 0;
-    if(_p->type() == PARTTYPE_GAS){
+    if(_p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
         _eta = 0.;
     } else {
@@ -64,16 +64,16 @@ GravityWalker::GravityWalker(Particle *p, bool local){
  *
  * @param import Import with imported data
  */
-GravityWalker::GravityWalker(Import &import){
+GravityWalker::GravityWalker(Import& import) {
     _p = NULL;
     _position = import.get_position();
     _olda = import.get_olda();
     _hsoft = import.get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
     _comp_cost = 0;
-    if(import.get_type() == PARTTYPE_GAS){
+    if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
         _eta = 0.;
     } else {
@@ -87,18 +87,14 @@ GravityWalker::GravityWalker(Import &import){
  *
  * Free GravityKernel memory.
  */
-GravityWalker::~GravityWalker(){
-    delete _kernel;
-}
+GravityWalker::~GravityWalker() { delete _kernel; }
 
 /**
  * @brief Get the resulting gravitational acceleration
  *
  * @return The result of the treewalk
  */
-Vec GravityWalker::get_acceleration(){
-    return _a;
-}
+Vec GravityWalker::get_acceleration() { return _a; }
 
 /**
  * @brief Decide whether the given TreeNode should be opened or can be treated
@@ -110,20 +106,20 @@ Vec GravityWalker::get_acceleration(){
  * @param node TreeNode on which we operate
  * @return True if the TreeNode should be opened, false otherwise
  */
-bool GravityWalker::splitnode(TreeNode *node){
+bool GravityWalker::splitnode(TreeNode* node) {
     Vec r = node->get_center_of_mass_node() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double r2 = r.norm2();
-    if(node->get_width()*node->get_width()*node->get_mass_node() <=
-            r2*r2*_olda){
+    if(node->get_width() * node->get_width() * node->get_mass_node() <=
+       r2 * r2 * _olda) {
         Vec center = node->get_center();
-        double nodewidth = 0.6*node->get_width();
-        if(abs(center.x() - _position.x()) < nodewidth){
-            if(abs(center.y() - _position.y()) < nodewidth){
-#if ndim_==3
-                if(abs(center.z() - _position.z()) < nodewidth){
+        double nodewidth = 0.6 * node->get_width();
+        if(abs(center.x() - _position.x()) < nodewidth) {
+            if(abs(center.y() - _position.y()) < nodewidth) {
+#if ndim_ == 3
+                if(abs(center.z() - _position.z()) < nodewidth) {
                     return true;
                 }
 #else
@@ -133,14 +129,14 @@ bool GravityWalker::splitnode(TreeNode *node){
         }
         double kernel;
         double rnrm = sqrt(r2);
-        if(rnrm >= _hsoft && rnrm >= node->get_hmax()){
-            kernel =  node->get_mass_node()/(rnrm*r2);
+        if(rnrm >= _hsoft && rnrm >= node->get_hmax()) {
+            kernel = node->get_mass_node() / (rnrm * r2);
         } else {
             // we open a node if the force has to be softened
             return true;
         }
-        if(_local || node->is_local()){
-            _a += r*kernel;
+        if(_local || node->is_local()) {
+            _a += r * kernel;
             _comp_cost++;
         }
         return false;
@@ -156,7 +152,7 @@ bool GravityWalker::splitnode(TreeNode *node){
  *
  * @param node TreeNode on which we operate
  */
-void GravityWalker::nodeaction(TreeNode *node){
+void GravityWalker::nodeaction(TreeNode* node) {
     // obsolete, action is perfomed by splitnode()
 }
 
@@ -165,10 +161,10 @@ void GravityWalker::nodeaction(TreeNode *node){
  *
  * @param leaf Leaf on which we operate
  */
-void GravityWalker::leafaction(Leaf *leaf){
+void GravityWalker::leafaction(Leaf* leaf) {
     Particle* pj = leaf->get_particle();
     Vec r = pj->get_position() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double m = pj->get_mass();
@@ -177,32 +173,32 @@ void GravityWalker::leafaction(Leaf *leaf){
     // we need both r2 and rnrm for all cases
     double r2 = r.norm2();
     double rnrm = sqrt(r2);
-    if(rnrm >= _hsoft && rnrm >= hj){
-        kernel =  m/(rnrm*r2);
+    if(rnrm >= _hsoft && rnrm >= hj) {
+        kernel = m / (rnrm * r2);
     } else {
         double kernel1, kernel2;
-        if(rnrm >= _hsoft){
-            kernel1 = m/(rnrm*r2);
+        if(rnrm >= _hsoft) {
+            kernel1 = m / (rnrm * r2);
         } else {
-            double u = rnrm*_hsoftinv;
+            double u = rnrm * _hsoftinv;
             kernel1 = m * (*_kernel)(u, _hsoftinv3);
 
-            if(_type == PARTTYPE_GAS){
+            if(_type == PARTTYPE_GAS) {
                 _eta += m * _kernel->derivative(u, _hsoftinv);
             }
         }
-        if(rnrm >= hj){
-            kernel2 = m/(rnrm*r2);
+        if(rnrm >= hj) {
+            kernel2 = m / (rnrm * r2);
         } else {
-            double hjinv = 1./hj;
-            double hjinv2 = hjinv*hjinv;
-            double hjinv3 = hjinv2*hjinv;
-            double u = rnrm*hjinv;
+            double hjinv = 1. / hj;
+            double hjinv2 = hjinv * hjinv;
+            double hjinv3 = hjinv2 * hjinv;
+            double u = rnrm * hjinv;
             kernel2 = m * (*_kernel)(u, hjinv3);
         }
-        kernel = 0.5*(kernel1+kernel2);
+        kernel = 0.5 * (kernel1 + kernel2);
     }
-    _a += r*kernel;
+    _a += r * kernel;
     _comp_cost++;
 }
 
@@ -213,7 +209,7 @@ void GravityWalker::leafaction(Leaf *leaf){
  *
  * @param pseudonode PseudoNode on which we operate
  */
-void GravityWalker::pseudonodeaction(PseudoNode *pseudonode){
+void GravityWalker::pseudonodeaction(PseudoNode* pseudonode) {
     // do nothing
 }
 
@@ -225,7 +221,7 @@ void GravityWalker::pseudonodeaction(PseudoNode *pseudonode){
  * @return True, since the gravitational force is only approximated for a local
  * TreeNode
  */
-bool GravityWalker::export_to_pseudonode(PseudoNode *pseudonode){
+bool GravityWalker::export_to_pseudonode(PseudoNode* pseudonode) {
     return true;
 }
 
@@ -236,18 +232,14 @@ bool GravityWalker::export_to_pseudonode(PseudoNode *pseudonode){
  *
  * @param position New position for the treewalk
  */
-void GravityWalker::set_position(Vec position){
-    _position = position;
-}
+void GravityWalker::set_position(Vec position) { _position = position; }
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec GravityWalker::get_position(){
-    return _position;
-}
+Vec GravityWalker::get_position() { return _position; }
 
 /**
  * @brief Periodic version of GravityWalker::splitnode()
@@ -258,20 +250,21 @@ Vec GravityWalker::get_position(){
  * @param ewald_table EwaldTable used for periodic correction terms
  * @return True if the TreeNode should be opened, false otherwise
  */
-bool GravityWalker::periodicsplitnode(TreeNode *node, EwaldTable& ewald_table){
+bool GravityWalker::periodicsplitnode(TreeNode* node, EwaldTable& ewald_table) {
     Vec r = node->get_center_of_mass_node() - _position;
     nearest(r);
     double r2 = r.norm2();
     bool openflag = false;
-    if(node->get_width()*node->get_width()*node->get_mass_node() > r2*r2*_olda){
+    if(node->get_width() * node->get_width() * node->get_mass_node() >
+       r2 * r2 * _olda) {
         openflag = true;
     } else {
         Vec center = node->get_center();
-        double nodewidth = 0.6*node->get_width();
-        if(abs(center.x() - _position.x()) < nodewidth){
-            if(abs(center.y() - _position.y()) < nodewidth){
-#if ndim_==3
-                if(abs(center.z() - _position.z()) < nodewidth){
+        double nodewidth = 0.6 * node->get_width();
+        if(abs(center.x() - _position.x()) < nodewidth) {
+            if(abs(center.y() - _position.y()) < nodewidth) {
+#if ndim_ == 3
+                if(abs(center.z() - _position.z()) < nodewidth) {
                     openflag = true;
                 }
 #else
@@ -280,20 +273,20 @@ bool GravityWalker::periodicsplitnode(TreeNode *node, EwaldTable& ewald_table){
             }
         }
     }
-    if(openflag){
+    if(openflag) {
         Vec center = node->get_center();
-        for(unsigned int i = 0; i < ndim_; i++){
+        for(unsigned int i = 0; i < ndim_; i++) {
             double u = center[i] - _position[i];
             nearest(u);
-            if(abs(u) >= 0.5*(_boxsize - node->get_width())){
+            if(abs(u) >= 0.5 * (_boxsize - node->get_width())) {
                 return true;
             }
         }
-        if(node->get_width() > 0.2*_boxsize){
+        if(node->get_width() > 0.2 * _boxsize) {
             return true;
         }
     }
-    _a += node->get_mass_node()*ewald_table.get_correction(r);
+    _a += node->get_mass_node() * ewald_table.get_correction(r);
     return false;
 }
 
@@ -306,10 +299,8 @@ bool GravityWalker::periodicsplitnode(TreeNode *node, EwaldTable& ewald_table){
  * @param pseudonode PseudoNode on which we operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void GravityWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
-                                             EwaldTable& ewald_table){
-
-}
+void GravityWalker::periodicpseudonodeaction(PseudoNode* pseudonode,
+                                             EwaldTable& ewald_table) {}
 
 /**
  * @brief Periodic version of GravityWalker::leafaction()
@@ -319,20 +310,20 @@ void GravityWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
  * @param leaf Leaf on which we operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void GravityWalker::periodicleafaction(Leaf *leaf, EwaldTable& ewald_table){
+void GravityWalker::periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) {
     Vec r = leaf->get_particle()->get_position() - _position;
     nearest(r);
-    _a += leaf->get_particle()->get_mass()*ewald_table.get_correction(r);
+    _a += leaf->get_particle()->get_mass() * ewald_table.get_correction(r);
 }
 
 /**
  * @brief Finalize the treewalk by setting the gravitational acceleration of the
  * Particle
  */
-void GravityWalker::after_walk(){
+void GravityWalker::after_walk() {
     _p->set_gravitational_acceleration(_a);
     _p->add_comp_cost(_comp_cost);
-    if(_p->type() == PARTTYPE_GAS){
+    if(_p->type() == PARTTYPE_GAS) {
         GasParticle* gas = (GasParticle*)_p;
         gas->set_eta(_eta);
     }
@@ -344,9 +335,7 @@ void GravityWalker::after_walk(){
  * @return An Export that can be used to communicate relevant Particle data to
  * another MPI-process
  */
-GravityWalker::Export GravityWalker::get_export(){
-    return Export(_p, _olda);
-}
+GravityWalker::Export GravityWalker::get_export() { return Export(_p, _olda); }
 
 /**
  * @brief Finalize the local treewalk for another MPI-process by setting the
@@ -354,7 +343,7 @@ GravityWalker::Export GravityWalker::get_export(){
  *
  * @param import Import that will be sent back to the original MPI-process
  */
-void GravityWalker::after_walk(Import& import){
+void GravityWalker::after_walk(Import& import) {
     import.set_a(_a);
     import.set_comp_cost(_comp_cost);
 }
@@ -368,16 +357,16 @@ void GravityWalker::after_walk(Import& import){
  * @param local Flag indicating whether the treewalk is performed for a Particle
  * residing on the local MPI-process
  */
-PotentialWalker::PotentialWalker(Particle *p, bool local){
+PotentialWalker::PotentialWalker(Particle* p, bool local) {
     _p = p;
     _position = p->get_position();
     _olda = p->get_old_acceleration();
     _hsoft = p->get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
     _comp_cost = 0;
-    if(p->type() == PARTTYPE_GAS){
+    if(p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
         _kernel = new DMGravityKernel();
@@ -394,16 +383,16 @@ PotentialWalker::PotentialWalker(Particle *p, bool local){
  *
  * @param import Import containing imported data from another MPI-process
  */
-PotentialWalker::PotentialWalker(Import &import){
+PotentialWalker::PotentialWalker(Import& import) {
     _p = NULL;
     _position = import.get_position();
     _olda = import.get_olda();
     _hsoft = import.get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
     _comp_cost = 0;
-    if(import.get_type() == PARTTYPE_GAS){
+    if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
         _kernel = new DMGravityKernel();
@@ -416,18 +405,14 @@ PotentialWalker::PotentialWalker(Import &import){
  *
  * Free GravityKernel memory.
  */
-PotentialWalker::~PotentialWalker(){
-    delete _kernel;
-}
+PotentialWalker::~PotentialWalker() { delete _kernel; }
 
 /**
  * @brief Get the resulting gravitational potential
  *
  * @return The result of the treewalk
  */
-double PotentialWalker::get_epot(){
-    return _epot;
-}
+double PotentialWalker::get_epot() { return _epot; }
 
 /**
  * @brief Decide if the given TreeNode should be opened
@@ -437,20 +422,20 @@ double PotentialWalker::get_epot(){
  * @param node TreeNode on which to operate
  * @return True if the TreeNode should be opened, false otherwise
  */
-bool PotentialWalker::splitnode(TreeNode *node){
+bool PotentialWalker::splitnode(TreeNode* node) {
     Vec r = node->get_center_of_mass_node() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double r2 = r.norm2();
-    if(node->get_width()*node->get_width()*node->get_mass_node() <=
-            r2*r2*_olda){
+    if(node->get_width() * node->get_width() * node->get_mass_node() <=
+       r2 * r2 * _olda) {
         Vec center = node->get_center();
-        double nodewidth = 0.6*node->get_width();
-        if(abs(center.x() - _position.x()) < nodewidth){
-            if(abs(center.y() - _position.y()) < nodewidth){
-#if ndim_==3
-                if(abs(center.z() - _position.z()) < nodewidth){
+        double nodewidth = 0.6 * node->get_width();
+        if(abs(center.x() - _position.x()) < nodewidth) {
+            if(abs(center.y() - _position.y()) < nodewidth) {
+#if ndim_ == 3
+                if(abs(center.z() - _position.z()) < nodewidth) {
                     return true;
                 }
 #else
@@ -459,15 +444,15 @@ bool PotentialWalker::splitnode(TreeNode *node){
             }
         }
         double rnrm = sqrt(r2);
-        if(rnrm >= _hsoft && rnrm >= node->get_hmax()){
-            if(_local || node->is_local()){
-                _epot -= node->get_mass_node()/rnrm;
+        if(rnrm >= _hsoft && rnrm >= node->get_hmax()) {
+            if(_local || node->is_local()) {
+                _epot -= node->get_mass_node() / rnrm;
             }
         } else {
             // force opening of node
             return true;
         }
-        if(_local || node->is_local()){
+        if(_local || node->is_local()) {
             _comp_cost++;
         }
         return false;
@@ -484,7 +469,7 @@ bool PotentialWalker::splitnode(TreeNode *node){
  *
  * @param node TreeNode on which we operate
  */
-void PotentialWalker::nodeaction(TreeNode *node){
+void PotentialWalker::nodeaction(TreeNode* node) {
     // obsolete, action is performed by splitnode()
 }
 
@@ -493,35 +478,35 @@ void PotentialWalker::nodeaction(TreeNode *node){
  *
  * @param leaf Leaf on which we operate
  */
-void PotentialWalker::leafaction(Leaf *leaf){
+void PotentialWalker::leafaction(Leaf* leaf) {
     Particle* pj = leaf->get_particle();
     Vec r = pj->get_position() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double m = pj->get_mass();
     double hj = pj->get_hsoft();
     double rnrm = r.norm();
     double kernel;
-    if(rnrm >= _hsoft && rnrm >= hj){
-        kernel = -m/rnrm;
+    if(rnrm >= _hsoft && rnrm >= hj) {
+        kernel = -m / rnrm;
     } else {
         double kernel1, kernel2;
-        if(rnrm >= _hsoft){
-            kernel1 = -m/rnrm;
+        if(rnrm >= _hsoft) {
+            kernel1 = -m / rnrm;
         } else {
-            double u = rnrm*_hsoftinv;
-            kernel1 = m*_kernel->primitive(u, _hsoftinv);
+            double u = rnrm * _hsoftinv;
+            kernel1 = m * _kernel->primitive(u, _hsoftinv);
         }
-        if(rnrm >= hj){
-            kernel2 = -m/rnrm;
+        if(rnrm >= hj) {
+            kernel2 = -m / rnrm;
         } else {
-            double hjinv = 1./hj;
-            double u = rnrm*hjinv;
-            kernel2 = m*_kernel->primitive(u, hjinv);
+            double hjinv = 1. / hj;
+            double u = rnrm * hjinv;
+            kernel2 = m * _kernel->primitive(u, hjinv);
         }
 
-        kernel = 0.5*(kernel1+kernel2);
+        kernel = 0.5 * (kernel1 + kernel2);
     }
     _epot += kernel;
     _comp_cost++;
@@ -535,7 +520,7 @@ void PotentialWalker::leafaction(Leaf *leaf){
  *
  * @param pseudonode PseudoNode on which we operate
  */
-void PotentialWalker::pseudonodeaction(PseudoNode *pseudonode){
+void PotentialWalker::pseudonodeaction(PseudoNode* pseudonode) {
     // do nothing
 }
 
@@ -546,7 +531,7 @@ void PotentialWalker::pseudonodeaction(PseudoNode *pseudonode){
  * @param pseudonode PseudoNode on which we operate
  * @return True, since we only approximate the potential for a local TreeNode
  */
-bool PotentialWalker::export_to_pseudonode(PseudoNode *pseudonode){
+bool PotentialWalker::export_to_pseudonode(PseudoNode* pseudonode) {
     return true;
 }
 
@@ -557,18 +542,14 @@ bool PotentialWalker::export_to_pseudonode(PseudoNode *pseudonode){
  *
  * @param position New position for the treewalk
  */
-void PotentialWalker::set_position(Vec position){
-    _position = position;
-}
+void PotentialWalker::set_position(Vec position) { _position = position; }
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec PotentialWalker::get_position(){
-    return _position;
-}
+Vec PotentialWalker::get_position() { return _position; }
 
 /**
  * @brief Periodic version of PotentialWalker::splitnode()
@@ -579,22 +560,22 @@ Vec PotentialWalker::get_position(){
  * @param ewald_table EwaldTable used for periodic correction terms
  * @return True if the TreeNode should be opened, false otherwise
  */
-bool PotentialWalker::periodicsplitnode(TreeNode *node,
-                                        EwaldTable& ewald_table){
+bool PotentialWalker::periodicsplitnode(TreeNode* node,
+                                        EwaldTable& ewald_table) {
     Vec r = node->get_center_of_mass_node() - _position;
     nearest(r);
     double r2 = r.norm2();
     bool openflag = false;
-    if(node->get_width()*node->get_width()*node->get_mass_node() >
-            r2*r2*_olda){
+    if(node->get_width() * node->get_width() * node->get_mass_node() >
+       r2 * r2 * _olda) {
         openflag = true;
     } else {
         Vec center = node->get_center();
-        double nodewidth = 0.6*node->get_width();
-        if(abs(center.x() - _position.x()) < nodewidth){
-            if(abs(center.y() - _position.y()) < nodewidth){
-#if ndim_==3
-                if(abs(center.z() - _position.z()) < nodewidth){
+        double nodewidth = 0.6 * node->get_width();
+        if(abs(center.x() - _position.x()) < nodewidth) {
+            if(abs(center.y() - _position.y()) < nodewidth) {
+#if ndim_ == 3
+                if(abs(center.z() - _position.z()) < nodewidth) {
                     openflag = true;
                 }
 #else
@@ -603,16 +584,16 @@ bool PotentialWalker::periodicsplitnode(TreeNode *node,
             }
         }
     }
-    if(openflag){
+    if(openflag) {
         Vec center = node->get_center();
-        for(unsigned int i = 0; i < ndim_; i++){
+        for(unsigned int i = 0; i < ndim_; i++) {
             double u = center[i] - _position[i];
             nearest(u);
-            if(abs(u) >= 0.5*(_boxsize - node->get_width())){
+            if(abs(u) >= 0.5 * (_boxsize - node->get_width())) {
                 return true;
             }
         }
-        if(node->get_width() > 0.2*_boxsize){
+        if(node->get_width() > 0.2 * _boxsize) {
             return true;
         }
     }
@@ -627,10 +608,8 @@ bool PotentialWalker::periodicsplitnode(TreeNode *node,
  * @param pseudonode PseudoNode on which we operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void PotentialWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
-                                               EwaldTable& ewald_table){
-
-}
+void PotentialWalker::periodicpseudonodeaction(PseudoNode* pseudonode,
+                                               EwaldTable& ewald_table) {}
 
 /**
  * @brief Periodic version of PotentialWalker::leafaction()
@@ -640,19 +619,20 @@ void PotentialWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
  * @param leaf Leaf on which we operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void PotentialWalker::periodicleafaction(Leaf *leaf, EwaldTable& ewald_table){
+void PotentialWalker::periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) {
     Vec r = leaf->get_particle()->get_position() - _position;
     nearest(r);
     // not sure if this is right. Pretty sure it is not, since Springel uses
     // a different correction for his potential...
-//    _epot += leaf->get_particle()->get_mass()*ewald_table.get_correction(r);
+    //    _epot +=
+    //    leaf->get_particle()->get_mass()*ewald_table.get_correction(r);
 }
 
 /**
  * @brief Finalize the treewalk by setting the gravitational potential of the
  * Particle
  */
-void PotentialWalker::after_walk(){
+void PotentialWalker::after_walk() {
     _p->set_gravitational_potential(_epot);
     _p->add_comp_cost(_comp_cost);
 }
@@ -663,7 +643,7 @@ void PotentialWalker::after_walk(){
  *
  * @return An Export that can be sent to another MPI-process
  */
-PotentialWalker::Export PotentialWalker::get_export(){
+PotentialWalker::Export PotentialWalker::get_export() {
     return Export(_p, _olda);
 }
 
@@ -673,7 +653,7 @@ PotentialWalker::Export PotentialWalker::get_export(){
  *
  * @param import Import that will be sent back to the original MPI-process
  */
-void PotentialWalker::after_walk(Import& import){
+void PotentialWalker::after_walk(Import& import) {
     import.set_epot(_epot);
     import.set_comp_cost(_comp_cost);
 }
@@ -687,15 +667,15 @@ void PotentialWalker::after_walk(Import& import){
  * @param local Flag indicating whether the treewalk is done for a Particle
  * residing on the local MPI-process
  */
-BHGravityWalker::BHGravityWalker(Particle *p, bool local){
+BHGravityWalker::BHGravityWalker(Particle* p, bool local) {
     _p = p;
     _position = p->get_position();
     _hsoft = p->get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
     _comp_cost = 0;
-    if(_p->type() == PARTTYPE_GAS){
+    if(_p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
         _kernel = new DMGravityKernel();
@@ -711,39 +691,34 @@ BHGravityWalker::BHGravityWalker(Particle *p, bool local){
  * @param import Import containing imported Particle data from another
  * MPI-process
  */
-BHGravityWalker::BHGravityWalker(Import& import){
+BHGravityWalker::BHGravityWalker(Import& import) {
     _p = NULL;
     _position = import.get_position();
     _hsoft = import.get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
     _comp_cost = 0;
-    if(import.get_type() == PARTTYPE_GAS){
+    if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
         _kernel = new DMGravityKernel();
     }
 }
 
-
 /**
  * @brief Destructor
  *
  * Free GravityKernel memory.
  */
-BHGravityWalker::~BHGravityWalker(){
-    delete _kernel;
-}
+BHGravityWalker::~BHGravityWalker() { delete _kernel; }
 
 /**
  * @brief Get the resulting gravitational acceleration
  *
  * @return Result of the treewalk
  */
-Vec BHGravityWalker::get_acceleration(){
-    return _a;
-}
+Vec BHGravityWalker::get_acceleration() { return _a; }
 
 /**
  * @brief Decide whether to open the given TreeNode or treat it as a whole
@@ -754,30 +729,30 @@ Vec BHGravityWalker::get_acceleration(){
  * @param node TreeNode on which to operate
  * @return True if the TreeNode should be opened, false otherwise
  */
-bool BHGravityWalker::splitnode(TreeNode *node){
+bool BHGravityWalker::splitnode(TreeNode* node) {
     Vec r = node->get_center_of_mass_node() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double r2 = r.norm2();
     // opening angle = 0.5 (0.5^2 = 0.25)
-    if(node->get_width()*node->get_width() <= r2*0.25){
+    if(node->get_width() * node->get_width() <= r2 * 0.25) {
         // if the node is not local, it means that the same treenode is also in
         // the tree on the original process
         // since it is not opened here, it was not opened there and the force
         // was already calculated on the original process
         double kernel;
         double rnrm = sqrt(r2);
-        if(rnrm >= _hsoft && rnrm >= node->get_hmax()){
-            kernel =  node->get_mass_node()/(rnrm*r2);
+        if(rnrm >= _hsoft && rnrm >= node->get_hmax()) {
+            kernel = node->get_mass_node() / (rnrm * r2);
         } else {
             // if the node is within the softening length, open it up
             // this way, we never calculate softened forces between particles
             // and nodes
             return true;
         }
-        if(_local || node->is_local()){
-            _a += r*kernel;
+        if(_local || node->is_local()) {
+            _a += r * kernel;
             _comp_cost++;
         }
         return false;
@@ -794,7 +769,7 @@ bool BHGravityWalker::splitnode(TreeNode *node){
  *
  * @param node TreeNode on which to operate
  */
-void BHGravityWalker::nodeaction(TreeNode *node){
+void BHGravityWalker::nodeaction(TreeNode* node) {
     // obsolete, action is perfomed by splitnode()
 }
 
@@ -803,11 +778,11 @@ void BHGravityWalker::nodeaction(TreeNode *node){
  *
  * @param leaf Leaf on which to operate
  */
-void BHGravityWalker::leafaction(Leaf *leaf){
+void BHGravityWalker::leafaction(Leaf* leaf) {
     // version with variable softening lengths
     Particle* pj = leaf->get_particle();
     Vec r = pj->get_position() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double m = pj->get_mass();
@@ -818,29 +793,29 @@ void BHGravityWalker::leafaction(Leaf *leaf){
     // we need both r2 and rnrm for all cases
     double r2 = r.norm2();
     double rnrm = sqrt(r2);
-    if(rnrm >= _hsoft && rnrm >= hj){
-        kernel =  m/(rnrm*r2);
+    if(rnrm >= _hsoft && rnrm >= hj) {
+        kernel = m / (rnrm * r2);
     } else {
         // version where we average the contributions of both particles
         double kernel1, kernel2;
-        if(rnrm >= _hsoft){
-            kernel1 = m/(rnrm*r2);
+        if(rnrm >= _hsoft) {
+            kernel1 = m / (rnrm * r2);
         } else {
-            double u = rnrm*_hsoftinv;
+            double u = rnrm * _hsoftinv;
             kernel1 = m * (*_kernel)(u, _hsoftinv3);
         }
-        if(rnrm >= hj){
-            kernel2 = m/(rnrm*r2);
+        if(rnrm >= hj) {
+            kernel2 = m / (rnrm * r2);
         } else {
-            double hjinv = 1./hj;
-            double hjinv2 = hjinv*hjinv;
-            double hjinv3 = hjinv2*hjinv;
-            double u = rnrm*hjinv;
+            double hjinv = 1. / hj;
+            double hjinv2 = hjinv * hjinv;
+            double hjinv3 = hjinv2 * hjinv;
+            double u = rnrm * hjinv;
             kernel2 = m * (*_kernel)(u, hjinv3);
         }
-        kernel = 0.5*(kernel1+kernel2);
+        kernel = 0.5 * (kernel1 + kernel2);
     }
-    _a += r*kernel;
+    _a += r * kernel;
     _comp_cost++;
 }
 
@@ -851,7 +826,7 @@ void BHGravityWalker::leafaction(Leaf *leaf){
  *
  * @param pseudonode PseudoNode on which to operate
  */
-void BHGravityWalker::pseudonodeaction(PseudoNode *pseudonode){
+void BHGravityWalker::pseudonodeaction(PseudoNode* pseudonode) {
     // do nothing
 }
 
@@ -863,7 +838,7 @@ void BHGravityWalker::pseudonodeaction(PseudoNode *pseudonode){
  * @return True, since the gravitational acceleration is only approximated for
  * a local TreeNode
  */
-bool BHGravityWalker::export_to_pseudonode(PseudoNode *pseudonode){
+bool BHGravityWalker::export_to_pseudonode(PseudoNode* pseudonode) {
     return true;
 }
 
@@ -874,18 +849,14 @@ bool BHGravityWalker::export_to_pseudonode(PseudoNode *pseudonode){
  *
  * @param position New value for the position
  */
-void BHGravityWalker::set_position(Vec position){
-    _position = position;
-}
+void BHGravityWalker::set_position(Vec position) { _position = position; }
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec BHGravityWalker::get_position(){
-    return _position;
-}
+Vec BHGravityWalker::get_position() { return _position; }
 
 /**
  * @brief Periodic version of BHGravityWalker::splitnode
@@ -896,26 +867,26 @@ Vec BHGravityWalker::get_position(){
  * @param ewald_table EwaldTable used for periodic correction terms
  * @return
  */
-bool BHGravityWalker::periodicsplitnode(TreeNode *node,
-                                        EwaldTable& ewald_table){
+bool BHGravityWalker::periodicsplitnode(TreeNode* node,
+                                        EwaldTable& ewald_table) {
     Vec r = node->get_center_of_mass_node() - _position;
     nearest(r);
     double r2 = r.norm2();
     // opening angle = 0.5 (0.5^2 = 0.25)
-    if(node->get_width()*node->get_width() > r2*0.25){
+    if(node->get_width() * node->get_width() > r2 * 0.25) {
         Vec center = node->get_center();
-        for(unsigned int i = 0; i < ndim_; i++){
+        for(unsigned int i = 0; i < ndim_; i++) {
             double u = center[i] - _position[i];
             nearest(u);
-            if(abs(u) >= 0.5*(_boxsize - node->get_width())){
+            if(abs(u) >= 0.5 * (_boxsize - node->get_width())) {
                 return true;
             }
         }
-        if(node->get_width() > 0.2*_boxsize){
+        if(node->get_width() > 0.2 * _boxsize) {
             return true;
         }
     }
-    _a += node->get_mass_node()*ewald_table.get_correction(r);
+    _a += node->get_mass_node() * ewald_table.get_correction(r);
     return false;
 }
 
@@ -927,8 +898,8 @@ bool BHGravityWalker::periodicsplitnode(TreeNode *node,
  * @param pseudonode PseudoNode on which to operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void BHGravityWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
-                                               EwaldTable& ewald_table){
+void BHGravityWalker::periodicpseudonodeaction(PseudoNode* pseudonode,
+                                               EwaldTable& ewald_table) {
     // do nothing
 }
 
@@ -940,17 +911,17 @@ void BHGravityWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
  * @param leaf Leaf on which to operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void BHGravityWalker::periodicleafaction(Leaf *leaf, EwaldTable& ewald_table){
+void BHGravityWalker::periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) {
     Vec r = leaf->get_particle()->get_position() - _position;
     nearest(r);
-    _a += leaf->get_particle()->get_mass()*ewald_table.get_correction(r);
+    _a += leaf->get_particle()->get_mass() * ewald_table.get_correction(r);
 }
 
 /**
  * @brief Finalize the treewalk by setting the gravitational acceleration of the
  * Particle
  */
-void BHGravityWalker::after_walk(){
+void BHGravityWalker::after_walk() {
     _p->set_gravitational_acceleration(_a);
     _p->add_comp_cost(_comp_cost);
 }
@@ -960,9 +931,7 @@ void BHGravityWalker::after_walk(){
  *
  * @return An Export that can be sent to another MPI-process
  */
-BHGravityWalker::Export BHGravityWalker::get_export(){
-    return Export(_p);
-}
+BHGravityWalker::Export BHGravityWalker::get_export() { return Export(_p); }
 
 /**
  * @brief Finalize the local treewalk for another MPI-process by setting the
@@ -970,7 +939,7 @@ BHGravityWalker::Export BHGravityWalker::get_export(){
  *
  * @param import Import that will be sent back to the original MPI-process
  */
-void BHGravityWalker::after_walk(Import &import){
+void BHGravityWalker::after_walk(Import& import) {
     import.set_a(_a);
     import.set_comp_cost(_comp_cost);
 }
@@ -984,15 +953,15 @@ void BHGravityWalker::after_walk(Import &import){
  * @param local Flag indicating if the treewalk is done for a Particle
  * residing on the local MPI-process
  */
-BHPotentialWalker::BHPotentialWalker(Particle *p, bool local){
+BHPotentialWalker::BHPotentialWalker(Particle* p, bool local) {
     _p = p;
     _position = p->get_position();
     _hsoft = p->get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
     _comp_cost = 0;
-    if(_p->type() == PARTTYPE_GAS){
+    if(_p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
         _kernel = new DMGravityKernel();
@@ -1009,15 +978,15 @@ BHPotentialWalker::BHPotentialWalker(Particle *p, bool local){
  *
  * @param import Import containing imported Particle data
  */
-BHPotentialWalker::BHPotentialWalker(Import& import){
+BHPotentialWalker::BHPotentialWalker(Import& import) {
     _p = NULL;
     _position = import.get_position();
     _hsoft = import.get_hsoft();
-    _hsoftinv = 1./_hsoft;
-    _hsoftinv3 = _hsoftinv*_hsoftinv*_hsoftinv;
+    _hsoftinv = 1. / _hsoft;
+    _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
     _comp_cost = 0;
-    if(import.get_type() == PARTTYPE_GAS){
+    if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
         _kernel = new DMGravityKernel();
@@ -1031,18 +1000,14 @@ BHPotentialWalker::BHPotentialWalker(Import& import){
  *
  * Free GravityKernel memory.
  */
-BHPotentialWalker::~BHPotentialWalker(){
-    delete _kernel;
-}
+BHPotentialWalker::~BHPotentialWalker() { delete _kernel; }
 
 /**
  * @brief Get the resulting gravitational potential
  *
  * @return Result of the treewalk
  */
-double BHPotentialWalker::get_epot(){
-    return _epot;
-}
+double BHPotentialWalker::get_epot() { return _epot; }
 
 /**
  * @brief Decide whether to split the given TreeNode or treat it as a whole
@@ -1052,29 +1017,29 @@ double BHPotentialWalker::get_epot(){
  * @param node TreeNode on which to operate
  * @return True if the TreeNode should be opened, false otherwise
  */
-bool BHPotentialWalker::splitnode(TreeNode *node){
+bool BHPotentialWalker::splitnode(TreeNode* node) {
     Vec r = node->get_center_of_mass_node() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double r2 = r.norm2();
     // opening angle = 0.5 (0.5^2 = 0.25)
-    if(node->get_width()*node->get_width() <= r2*0.25){
+    if(node->get_width() * node->get_width() <= r2 * 0.25) {
         // if the node is not local, it means that the same treenode is also in
         // the tree on the original process
         // since it is not opened here, it was not opened there and the force
         // was already calculated on the original process
         double kernel;
         double rnrm = sqrt(r2);
-        if(rnrm >= _hsoft && rnrm >= node->get_hmax()){
-            kernel =  -node->get_mass_node()/rnrm;
+        if(rnrm >= _hsoft && rnrm >= node->get_hmax()) {
+            kernel = -node->get_mass_node() / rnrm;
         } else {
             // if the node is within the softening length, open it up
             // this way, we never calculate softened forces between particles
             // and nodes
             return true;
         }
-        if(_local || node->is_local()){
+        if(_local || node->is_local()) {
             _epot += kernel;
             _comp_cost++;
         }
@@ -1092,7 +1057,7 @@ bool BHPotentialWalker::splitnode(TreeNode *node){
  *
  * @param node TreeNode on which to operate
  */
-void BHPotentialWalker::nodeaction(TreeNode *node){
+void BHPotentialWalker::nodeaction(TreeNode* node) {
     // obsolete, action is perfomed by splitnode()
 }
 
@@ -1101,11 +1066,11 @@ void BHPotentialWalker::nodeaction(TreeNode *node){
  *
  * @param leaf Leaf on which to operate
  */
-void BHPotentialWalker::leafaction(Leaf *leaf){
+void BHPotentialWalker::leafaction(Leaf* leaf) {
     // version with variable softening lengths
     Particle* pj = leaf->get_particle();
     Vec r = pj->get_position() - _position;
-    if(_boxsize){
+    if(_boxsize) {
         nearest(r);
     }
     double m = pj->get_mass();
@@ -1117,26 +1082,26 @@ void BHPotentialWalker::leafaction(Leaf *leaf){
     // we need both r2 and rnrm for all cases
     double r2 = r.norm2();
     double rnrm = sqrt(r2);
-    if(rnrm >= _hsoft && rnrm >= hj){
-        kernel =  -m/rnrm;
+    if(rnrm >= _hsoft && rnrm >= hj) {
+        kernel = -m / rnrm;
     } else {
         // version where we average the contributions of both particles
         double kernel1, kernel2;
-        if(rnrm >= _hsoft){
-            kernel1 = -m/rnrm;
+        if(rnrm >= _hsoft) {
+            kernel1 = -m / rnrm;
         } else {
-            double u = rnrm*_hsoftinv;
-            kernel1 = m*_kernel->primitive(u, _hsoftinv);
+            double u = rnrm * _hsoftinv;
+            kernel1 = m * _kernel->primitive(u, _hsoftinv);
         }
-        if(rnrm >= hj){
-            kernel2 = -m/rnrm;
+        if(rnrm >= hj) {
+            kernel2 = -m / rnrm;
         } else {
-            double hjinv = 1./hj;
-            double u = rnrm*hjinv;
-            kernel2 = m*_kernel->primitive(u, hjinv);
+            double hjinv = 1. / hj;
+            double u = rnrm * hjinv;
+            kernel2 = m * _kernel->primitive(u, hjinv);
         }
 
-        kernel = 0.5*(kernel1+kernel2);
+        kernel = 0.5 * (kernel1 + kernel2);
     }
     _epot += kernel;
     _comp_cost++;
@@ -1149,7 +1114,7 @@ void BHPotentialWalker::leafaction(Leaf *leaf){
  *
  * @param pseudonode PseudoNode on which to operate
  */
-void BHPotentialWalker::pseudonodeaction(PseudoNode *pseudonode){
+void BHPotentialWalker::pseudonodeaction(PseudoNode* pseudonode) {
     // nothing
 }
 
@@ -1160,7 +1125,7 @@ void BHPotentialWalker::pseudonodeaction(PseudoNode *pseudonode){
  * @param pseudonode PseudoNode on which to operate
  * @return True, since the potential is only approximated for a local TreeNode
  */
-bool BHPotentialWalker::export_to_pseudonode(PseudoNode *pseudonode){
+bool BHPotentialWalker::export_to_pseudonode(PseudoNode* pseudonode) {
     return true;
 }
 
@@ -1171,18 +1136,14 @@ bool BHPotentialWalker::export_to_pseudonode(PseudoNode *pseudonode){
  *
  * @param position New position used for the treewalk
  */
-void BHPotentialWalker::set_position(Vec position){
-    _position = position;
-}
+void BHPotentialWalker::set_position(Vec position) { _position = position; }
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec BHPotentialWalker::get_position(){
-    return _position;
-}
+Vec BHPotentialWalker::get_position() { return _position; }
 
 /**
  * @brief Periodic version of BHPotentialWalker::splitnode()
@@ -1193,26 +1154,26 @@ Vec BHPotentialWalker::get_position(){
  * @param ewald_table EwaldTable used for periodic correction terms
  * @return True if the TreeNode should be opened, false otherwise
  */
-bool BHPotentialWalker::periodicsplitnode(TreeNode *node,
-                                          EwaldTable& ewald_table){
+bool BHPotentialWalker::periodicsplitnode(TreeNode* node,
+                                          EwaldTable& ewald_table) {
     Vec r = node->get_center_of_mass_node() - _position;
     nearest(r);
     double r2 = r.norm2();
     // opening angle = 0.5 (0.5^2 = 0.25)
-    if(node->get_width()*node->get_width() > r2*0.25){
+    if(node->get_width() * node->get_width() > r2 * 0.25) {
         Vec center = node->get_center();
-        for(unsigned int i = 0; i < ndim_; i++){
+        for(unsigned int i = 0; i < ndim_; i++) {
             double u = center[i] - _position[i];
             nearest(u);
-            if(abs(u) >= 0.5*(_boxsize - node->get_width())){
+            if(abs(u) >= 0.5 * (_boxsize - node->get_width())) {
                 return true;
             }
         }
-        if(node->get_width() > 0.2*_boxsize){
+        if(node->get_width() > 0.2 * _boxsize) {
             return true;
         }
     }
-//    _a += node->get_mass_node()*ewald_table.get_correction(r);
+    //    _a += node->get_mass_node()*ewald_table.get_correction(r);
     return false;
 }
 
@@ -1224,8 +1185,8 @@ bool BHPotentialWalker::periodicsplitnode(TreeNode *node,
  * @param pseudonode PseudoNode on which to operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void BHPotentialWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
-                                                 EwaldTable& ewald_table){
+void BHPotentialWalker::periodicpseudonodeaction(PseudoNode* pseudonode,
+                                                 EwaldTable& ewald_table) {
     // do nothing
 }
 
@@ -1237,17 +1198,18 @@ void BHPotentialWalker::periodicpseudonodeaction(PseudoNode *pseudonode,
  * @param leaf Leaf on which to operate
  * @param ewald_table EwaldTable used for periodic correction terms
  */
-void BHPotentialWalker::periodicleafaction(Leaf *leaf, EwaldTable& ewald_table){
+void BHPotentialWalker::periodicleafaction(Leaf* leaf,
+                                           EwaldTable& ewald_table) {
     Vec r = leaf->get_particle()->get_position() - _position;
     nearest(r);
-//    _a += leaf->get_particle()->get_mass()*ewald_table.get_correction(r);
+    //    _a += leaf->get_particle()->get_mass()*ewald_table.get_correction(r);
 }
 
 /**
  * @brief Finalize the treewalk by setting the gravitational potential of the
  * Particle
  */
-void BHPotentialWalker::after_walk(){
+void BHPotentialWalker::after_walk() {
     _p->set_gravitational_potential(_epot);
     _p->add_comp_cost(_comp_cost);
 }
@@ -1258,9 +1220,7 @@ void BHPotentialWalker::after_walk(){
  *
  * @return An Export that can be exported to another MPI-process
  */
-BHPotentialWalker::Export BHPotentialWalker::get_export(){
-    return Export(_p);
-}
+BHPotentialWalker::Export BHPotentialWalker::get_export() { return Export(_p); }
 
 /**
  * @brief Finalize the local treewalk for another MPI-process by setting the
@@ -1268,7 +1228,7 @@ BHPotentialWalker::Export BHPotentialWalker::get_export(){
  *
  * @param import Import that will be sent back to the original MPI-process
  */
-void BHPotentialWalker::after_walk(Import &import){
+void BHPotentialWalker::after_walk(Import& import) {
     import.set_epot(_epot);
     import.set_comp_cost(_comp_cost);
 }

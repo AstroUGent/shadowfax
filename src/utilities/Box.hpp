@@ -34,15 +34,15 @@
  * Stores an anchor and a side. A Box is similar to a Cuboid, but with a side
  * that is equal for all dimensions.
  */
-class Box{
-private:
+class Box {
+  private:
     /*! \brief Bottom left (front) corner of the box */
     Vec _anchor;
 
     /*! \brief Side length of the box */
     double _side;
 
-public:
+  public:
     /**
      * @brief Constructor. Initialize a box width zero extents
      */
@@ -61,18 +61,14 @@ public:
      *
      * @return Bottom left (front) corner of the box
      */
-    inline Vec get_anchor(){
-        return _anchor;
-    }
+    inline Vec get_anchor() { return _anchor; }
 
     /**
      * @brief Get the side length of the box
      *
      * @return Side length of the box
      */
-    inline double get_side(){
-        return _side;
-    }
+    inline double get_side() { return _side; }
 };
 
-#endif // BOX_HPP
+#endif  // BOX_HPP

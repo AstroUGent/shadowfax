@@ -32,7 +32,7 @@
 // for std::max and std::min
 #include <algorithm>
 
-#if ndim_==3
+#if ndim_ == 3
 /**
  * @brief 2D or 3D hydrodynamical state vector
  *
@@ -42,8 +42,8 @@
  * We store them in a single container because this is how the hydrodynamical
  * equations are expressed in literature, e.g. Toro (2009).
  */
-class StateVector{
-protected:
+class StateVector {
+  protected:
     /**
      * \brief Contents of the state vector
      *
@@ -56,12 +56,12 @@ protected:
      * possible to store e.g. a density and a mass at the same time, because
      * they use the same memory!
      */
-    union{
+    union {
         /*! \brief Auxiliary array to help indexing the contents of this
          *  vector */
         double _c[5];
         /*! \brief Primitive variables */
-        struct{
+        struct {
             /*! \brief Density */
             double _rho;
             /*! \brief x-component of the velocity */
@@ -74,7 +74,7 @@ protected:
             double _p;
         };
         /*! \brief Conserved variables */
-        struct{
+        struct {
             /*! \brief Mass */
             double _m;
             /*! \brief x-component of the momentum */
@@ -91,7 +91,7 @@ protected:
     /*! \brief Passively Advected Quantity that is advected with the flow */
     double _paq;
 
-public:
+  public:
     /**
      * @brief Empty constructor
      */
@@ -105,8 +105,8 @@ public:
      * @param singleVal Value for all 5 components of the vector
      */
     inline StateVector(double singleVal)
-        : _rho(singleVal), _vx(singleVal), _vy(singleVal), _vz(singleVal),
-          _p(singleVal), _paq(singleVal) {}
+            : _rho(singleVal), _vx(singleVal), _vy(singleVal), _vz(singleVal),
+              _p(singleVal), _paq(singleVal) {}
 
     /**
      * @brief Constructor
@@ -118,7 +118,7 @@ public:
      * @param p Pressure/energy
      */
     inline StateVector(double rho, double vx, double vy, double vz, double p)
-        : _rho(rho), _vx(vx), _vy(vy), _vz(vz), _p(p), _paq(0) {}
+            : _rho(rho), _vx(vx), _vy(vy), _vz(vz), _p(p), _paq(0) {}
 
     /**
      * @brief Set the elements of the state vector to the given values
@@ -129,7 +129,7 @@ public:
      * @param vz z-component of the velocity/momentum
      * @param p Pressure/energy
      */
-    inline void set( double rho, double vx, double vy, double vz, double p ){
+    inline void set(double rho, double vx, double vy, double vz, double p) {
         _rho = rho;
         _vx = vx;
         _vy = vy;
@@ -142,198 +142,154 @@ public:
      *
      * @param rho Density
      */
-    inline void set_rho(double rho){
-        _rho = rho;
-    }
+    inline void set_rho(double rho) { _rho = rho; }
 
     /**
      * @brief Set the x-component of the velocity
      *
      * @param u x-component of the velocity
      */
-    inline void set_vx(double u){
-        _vx = u;
-    }
+    inline void set_vx(double u) { _vx = u; }
 
     /**
      * @brief Set the y-component of the velocity
      *
      * @param u y-component of the velocity
      */
-    inline void set_vy(double u){
-        _vy = u;
-    }
+    inline void set_vy(double u) { _vy = u; }
 
     /**
      * @brief Set the z-component of the velocity
      *
      * @param u z-component of the velocity
      */
-    inline void set_vz(double u){
-        _vz = u;
-    }
+    inline void set_vz(double u) { _vz = u; }
 
     /**
      * @brief Set the pressure
      *
      * @param p Pressure
      */
-    inline void set_p(double p){
-        _p = p;
-    }
+    inline void set_p(double p) { _p = p; }
 
     /**
      * @brief Set the mass
      *
      * @param m Mass
      */
-    inline void set_m(double m){
-        _m = m;
-    }
+    inline void set_m(double m) { _m = m; }
 
     /**
      * @brief Set the x-component of the momentum
      *
      * @param px x-component of the momentum
      */
-    inline void set_px(double px){
-        _px = px;
-    }
+    inline void set_px(double px) { _px = px; }
 
     /**
      * @brief Set the y-component of the momentum
      *
      * @param py y-component of the momentum
      */
-    inline void set_py(double py){
-        _py = py;
-    }
+    inline void set_py(double py) { _py = py; }
 
     /**
      * @brief Set the z-component of the momentum
      *
      * @param pz z-component of the momentum
      */
-    inline void set_pz(double pz){
-        _pz = pz;
-    }
+    inline void set_pz(double pz) { _pz = pz; }
 
     /**
      * @brief Set the energy
      *
      * @param e Energy
      */
-    inline void set_e(double e){
-        _e = e;
-    }
+    inline void set_e(double e) { _e = e; }
 
     /**
      * @brief Set the Passively Advected Quantity (PAQ)
      *
      * @param paq PAQ
      */
-    inline void set_paq(double paq){
-        _paq = paq;
-    }
+    inline void set_paq(double paq) { _paq = paq; }
 
     /**
      * @brief Get the density
      *
      * @return Density
      */
-    inline double rho() const{
-        return _rho;
-    }
+    inline double rho() const { return _rho; }
 
     /**
      * @brief Get the x-component of the velocity
      *
      * @return x-component of the velocity
      */
-    inline double vx( ) const{
-        return _vx;
-    }
+    inline double vx() const { return _vx; }
 
     /**
      * @brief Get the y-component of the velocity
      *
      * @return y-component of the velocity
      */
-    inline double vy( ) const{
-        return _vy;
-    }
+    inline double vy() const { return _vy; }
 
     /**
      * @brief Get the z-component of the velocity
      *
      * @return z-component of the velocity
      */
-    inline double vz( ) const{
-        return _vz;
-    }
+    inline double vz() const { return _vz; }
 
     /**
      * @brief Get the pressure
      *
      * @return Pressure
      */
-    inline double p() const{
-        return _p;
-    }
+    inline double p() const { return _p; }
 
     /**
      * @brief Get the mass
      *
      * @return Mass
      */
-    inline double m() const{
-        return _m;
-    }
+    inline double m() const { return _m; }
 
     /**
      * @brief Get the x-component of the momentum
      *
      * @return x-component of the momentum
      */
-    inline double px() const{
-        return _px;
-    }
+    inline double px() const { return _px; }
 
     /**
      * @brief Get the y-component of the momentum
      *
      * @return y-component of the momentum
      */
-    inline double py() const{
-        return _py;
-    }
+    inline double py() const { return _py; }
 
     /**
      * @brief Get the z-component of the momentum
      *
      * @return z-component of the momentum
      */
-    inline double pz() const{
-        return _pz;
-    }
+    inline double pz() const { return _pz; }
 
     /**
      * @brief Get the energy
      *
      * @return Energy
      */
-    inline double e() const{
-        return _e;
-    }
+    inline double e() const { return _e; }
 
     /**
      * @brief Get the Passively Advected Quantity (PAQ)
      *
      * @return PAQ
      */
-    inline double paq() const{
-        return _paq;
-    }
+    inline double paq() const { return _paq; }
 
     /**
      * @brief Add another state vector to this one
@@ -341,7 +297,7 @@ public:
      * @param v StateVector to add
      * @return Reference to this state vector
      */
-    inline StateVector& operator+=( StateVector v ){
+    inline StateVector& operator+=(StateVector v) {
         _m += v._m;
         _px += v._px;
         _py += v._py;
@@ -357,7 +313,7 @@ public:
      * @param v StateVector to subtract
      * @return Reference to this state vector
      */
-    inline StateVector& operator-=( StateVector v ){
+    inline StateVector& operator-=(StateVector v) {
         _m -= v._m;
         _px -= v._px;
         _py -= v._py;
@@ -373,7 +329,7 @@ public:
      * @param v Vec to add
      * @return Reference to this state vector
      */
-    inline StateVector& operator+=(Vec v){
+    inline StateVector& operator+=(Vec v) {
         _vx += v.x();
         _vy += v.y();
         _vz += v.z();
@@ -387,7 +343,7 @@ public:
      * @param v Vec to subtract
      * @return Reference to this state vector
      */
-    inline StateVector& operator-=(Vec v){
+    inline StateVector& operator-=(Vec v) {
         _vx -= v.x();
         _vy -= v.y();
         _vz -= v.z();
@@ -400,7 +356,7 @@ public:
      * @param s Scalar to multiply with
      * @return Reference to this state vector
      */
-    inline StateVector& operator*=( double s ){
+    inline StateVector& operator*=(double s) {
         _m *= s;
         _px *= s;
         _py *= s;
@@ -416,7 +372,7 @@ public:
      * @param s Scalar to divide by
      * @return Reference to this state vector
      */
-    inline StateVector& operator/=( double s ){
+    inline StateVector& operator/=(double s) {
         _m /= s;
         _px /= s;
         _py /= s;
@@ -433,7 +389,7 @@ public:
      * @param v StateVector to multiply with
      * @return Reference to this state vector
      */
-    inline StateVector& operator*=( StateVector v){
+    inline StateVector& operator*=(StateVector v) {
         _m *= v._m;
         _px *= v._px;
         _py *= v._py;
@@ -453,33 +409,33 @@ public:
      * @param v StateVector to divide by
      * @return Reference to this state vector
      */
-    inline StateVector& operator/=(StateVector v){
-        if(v._m){
+    inline StateVector& operator/=(StateVector v) {
+        if(v._m) {
             _m /= v._m;
         } else {
             _m = 1;
         }
-        if(v._px){
+        if(v._px) {
             _px /= v._px;
         } else {
             _px = 1;
         }
-        if(v._py){
+        if(v._py) {
             _py /= v._py;
         } else {
             _py = 1;
         }
-        if(v._pz){
+        if(v._pz) {
             _pz /= v._pz;
         } else {
             _pz = 1;
         }
-        if(v._e){
+        if(v._e) {
             _e /= v._e;
         } else {
             _e = 1;
         }
-        if(v._paq){
+        if(v._paq) {
             _paq /= v._paq;
         } else {
             _paq = 1;
@@ -494,7 +450,7 @@ public:
      * @param v Second StateVector
      * @return Reference to this state vector
      */
-    inline StateVector& max(StateVector v){
+    inline StateVector& max(StateVector v) {
         _m = std::max(_m, v._m);
         _px = std::max(_px, v._px);
         _py = std::max(_py, v._py);
@@ -511,7 +467,7 @@ public:
      * @param v Second StateVector
      * @return Reference to this state vector
      */
-    inline StateVector& min(StateVector v){
+    inline StateVector& min(StateVector v) {
         _m = std::min(_m, v._m);
         _px = std::min(_px, v._px);
         _py = std::min(_py, v._py);
@@ -524,7 +480,7 @@ public:
     /**
      * @brief Clear the state vector by setting all of its elements to zero
      */
-    inline void reset(){
+    inline void reset() {
         _rho = 0;
         _vx = 0;
         _vy = 0;
@@ -539,9 +495,7 @@ public:
      * @param i Index of the element in the internal array
      * @return Element at the given index
      */
-    inline double operator[](int i) const{
-        return _c[i];
-    }
+    inline double operator[](int i) const { return _c[i]; }
 
     /**
      * @brief Access individual elements by index
@@ -549,9 +503,7 @@ public:
      * @param i Index of the element in the internal array
      * @return Element at the given index
      */
-    inline double & operator[](int i){
-        return _c[i];
-    }
+    inline double& operator[](int i) { return _c[i]; }
 };
 #else
 /**
@@ -563,8 +515,8 @@ public:
  * We store them in a single container because this is how the hydrodynamical
  * equations are expressed in literature, e.g. Toro (2009).
  */
-class StateVector{
-protected:
+class StateVector {
+  protected:
     /**
      * \brief Contents of the state vector
      *
@@ -577,12 +529,12 @@ protected:
      * possible to store e.g. a density and a mass at the same time, because
      * they use the same memory!
      */
-    union{
+    union {
         /*! \brief Auxiliary array to help indexing the contents of this
          *  vector */
         double _c[4];
         /*! \brief Primitive variables */
-        struct{
+        struct {
             /*! \brief Density */
             double _rho;
             /*! \brief x-component of the velocity */
@@ -593,7 +545,7 @@ protected:
             double _p;
         };
         /*! \brief Conserved variables */
-        struct{
+        struct {
             /*! \brief Mass */
             double _m;
             /*! \brief x-component of the momentum */
@@ -608,7 +560,7 @@ protected:
     /*! \brief Passively Advected Quantity that is advected with the flow */
     double _paq;
 
-public:
+  public:
     /**
      * @brief Empty constructor
      */
@@ -621,9 +573,9 @@ public:
      *
      * @param singleVal Value for all 4 components of the vector
      */
-    inline StateVector( double singleVal)
-        : _rho(singleVal), _vx(singleVal), _vy(singleVal), _p(singleVal),
-          _paq(singleVal) {}
+    inline StateVector(double singleVal)
+            : _rho(singleVal), _vx(singleVal), _vy(singleVal), _p(singleVal),
+              _paq(singleVal) {}
 
     /**
      * @brief Constructor
@@ -634,7 +586,7 @@ public:
      * @param p Pressure/energy
      */
     inline StateVector(double rho, double vx, double vy, double p)
-        : _rho(rho), _vx (vx), _vy(vy), _p(p), _paq(0) {}
+            : _rho(rho), _vx(vx), _vy(vy), _p(p), _paq(0) {}
 
     /**
      * @brief Set the elements of the state vector to the given values
@@ -644,7 +596,7 @@ public:
      * @param vy y-component of the velocity/momentum
      * @param p Pressure/energy
      */
-    inline void set( double rho, double vx, double vy, double p ){
+    inline void set(double rho, double vx, double vy, double p) {
         _rho = rho;
         _vx = vx;
         _vy = vy;
@@ -656,162 +608,126 @@ public:
      *
      * @param rho Density
      */
-    inline void set_rho(double rho){
-        _rho = rho;
-    }
+    inline void set_rho(double rho) { _rho = rho; }
 
     /**
      * @brief Set the x-component of the velocity
      *
      * @param u x-component of the velocity
      */
-    inline void set_vx(double u){
-        _vx = u;
-    }
+    inline void set_vx(double u) { _vx = u; }
 
     /**
      * @brief Set the y-component of the velocity
      *
      * @param u y-component of the velocity
      */
-    inline void set_vy(double u){
-        _vy = u;
-    }
+    inline void set_vy(double u) { _vy = u; }
 
     /**
      * @brief Set the pressure
      *
      * @param p Pressure
      */
-    inline void set_p(double p){
-        _p = p;
-    }
+    inline void set_p(double p) { _p = p; }
 
     /**
      * @brief Set the mass
      *
      * @param m Mass
      */
-    inline void set_m(double m){
-        _m = m;
-    }
+    inline void set_m(double m) { _m = m; }
 
     /**
      * @brief Set the x-component of the momentum
      *
      * @param px x-component of the momentum
      */
-    inline void set_px(double px){
-        _px = px;
-    }
+    inline void set_px(double px) { _px = px; }
 
     /**
      * @brief Set the y-component of the momentum
      *
      * @param py y-component of the momentum
      */
-    inline void set_py(double py){
-        _py = py;
-    }
+    inline void set_py(double py) { _py = py; }
 
     /**
      * @brief Set the energy
      *
      * @param e Energy
      */
-    inline void set_e(double e){
-        _e = e;
-    }
+    inline void set_e(double e) { _e = e; }
 
     /**
      * @brief Set the Passively Advected Quantity (PAQ)
      *
      * @param paq PAQ
      */
-    inline void set_paq(double paq){
-        _paq = paq;
-    }
+    inline void set_paq(double paq) { _paq = paq; }
 
     /**
      * @brief Get the density
      *
      * @return Density
      */
-    inline double rho() const{
-        return _rho;
-    }
+    inline double rho() const { return _rho; }
 
     /**
      * @brief Get the x-component of the velocity
      *
      * @return x-component of the velocity
      */
-    inline double vx( ) const{
-        return _vx;
-    }
+    inline double vx() const { return _vx; }
 
     /**
      * @brief Get the y-component of the velocity
      *
      * @return y-component of the velocity
      */
-    inline double vy( ) const{
-        return _vy;
-    }
+    inline double vy() const { return _vy; }
 
     /**
      * @brief Get the pressure
      *
      * @return Pressure
      */
-    inline double p() const{
-        return _p;
-    }
+    inline double p() const { return _p; }
 
     /**
      * @brief Get the mass
      *
      * @return Mass
      */
-    inline double m() const{
-        return _m;
-    }
+    inline double m() const { return _m; }
 
     /**
      * @brief Get the x-component of the momentum
      *
      * @return x-component of the momentum
      */
-    inline double px() const{
-        return _px;
-    }
+    inline double px() const { return _px; }
 
     /**
      * @brief Get the y-component of the momentum
      *
      * @return y-component of the momentum
      */
-    inline double py() const{
-        return _py;
-    }
+    inline double py() const { return _py; }
 
     /**
      * @brief Get the energy
      *
      * @return Energy
      */
-    inline double e() const{
-        return _e;
-    }
+    inline double e() const { return _e; }
 
     /**
      * @brief Get the Passively Advected Quantity (PAQ)
      *
      * @return PAQ
      */
-    inline double paq() const{
-        return _paq;
-    }
+    inline double paq() const { return _paq; }
 
     /**
      * @brief Add another state vector to this one
@@ -819,7 +735,7 @@ public:
      * @param v StateVector to add
      * @return Reference to this state vector
      */
-    inline StateVector& operator+=( StateVector v ){
+    inline StateVector& operator+=(StateVector v) {
         _m += v._m;
         _px += v._px;
         _py += v._py;
@@ -834,7 +750,7 @@ public:
      * @param v StateVector to subtract
      * @return Reference to this state vector
      */
-    inline StateVector& operator-=( StateVector v ){
+    inline StateVector& operator-=(StateVector v) {
         _m -= v._m;
         _px -= v._px;
         _py -= v._py;
@@ -849,7 +765,7 @@ public:
      * @param v Vec to add
      * @return Reference to this state vector
      */
-    inline StateVector& operator+=(Vec v){
+    inline StateVector& operator+=(Vec v) {
         _vx += v.x();
         _vy += v.y();
         return *this;
@@ -862,7 +778,7 @@ public:
      * @param v Vec to subtract
      * @return Reference to this state vector
      */
-    inline StateVector& operator-=(Vec v){
+    inline StateVector& operator-=(Vec v) {
         _vx -= v.x();
         _vy -= v.y();
         return *this;
@@ -874,7 +790,7 @@ public:
      * @param s Scalar to multiply with
      * @return Reference to this state vector
      */
-    inline StateVector& operator*=( double s ){
+    inline StateVector& operator*=(double s) {
         _m *= s;
         _px *= s;
         _py *= s;
@@ -889,7 +805,7 @@ public:
      * @param s Scalar to divide by
      * @return Reference to this state vector
      */
-    inline StateVector& operator/=( double s ){
+    inline StateVector& operator/=(double s) {
         _m /= s;
         _px /= s;
         _py /= s;
@@ -905,7 +821,7 @@ public:
      * @param v StateVector to multiply with
      * @return Reference to this state vector
      */
-    inline StateVector& operator*=( StateVector v){
+    inline StateVector& operator*=(StateVector v) {
         _m *= v._m;
         _px *= v._px;
         _py *= v._py;
@@ -924,28 +840,28 @@ public:
      * @param v StateVector to divide by
      * @return Reference to this state vector
      */
-    inline StateVector& operator/=(StateVector v){
-        if(v._m){
+    inline StateVector& operator/=(StateVector v) {
+        if(v._m) {
             _m /= v._m;
         } else {
             _m = 1;
         }
-        if(v._px){
+        if(v._px) {
             _px /= v._px;
         } else {
             _px = 1;
         }
-        if(v._py){
+        if(v._py) {
             _py /= v._py;
         } else {
             _py = 1;
         }
-        if(v._e){
+        if(v._e) {
             _e /= v._e;
         } else {
             _e = 1;
         }
-        if(v._paq){
+        if(v._paq) {
             _paq /= v._paq;
         } else {
             _paq = 1;
@@ -960,7 +876,7 @@ public:
      * @param v Second StateVector
      * @return Reference to this state vector
      */
-    inline StateVector& max(StateVector v){
+    inline StateVector& max(StateVector v) {
         _m = std::max(_m, v._m);
         _px = std::max(_px, v._px);
         _py = std::max(_py, v._py);
@@ -976,7 +892,7 @@ public:
      * @param v Second StateVector
      * @return Reference to this state vector
      */
-    inline StateVector& min(StateVector v){
+    inline StateVector& min(StateVector v) {
         _m = std::min(_m, v._m);
         _px = std::min(_px, v._px);
         _py = std::min(_py, v._py);
@@ -988,7 +904,7 @@ public:
     /**
      * @brief Clear the state vector by setting all of its elements to zero
      */
-    inline void reset(){
+    inline void reset() {
         _rho = 0;
         _vx = 0;
         _vy = 0;
@@ -1002,9 +918,7 @@ public:
      * @param i Index of the element in the internal array
      * @return Element at the given index
      */
-    inline double operator[ ]( int i ) const{
-        return _c[i];
-    }
+    inline double operator[](int i) const { return _c[i]; }
 
     /**
      * @brief Access individual elements by index
@@ -1012,9 +926,7 @@ public:
      * @param i Index of the element in the internal array
      * @return Element at the given index
      */
-    inline double & operator[ ]( int i ){
-        return _c[i];
-    }
+    inline double& operator[](int i) { return _c[i]; }
 };
 #endif
 
@@ -1025,9 +937,7 @@ public:
  * @param b Second StateVector
  * @return Resulting StateVector
  */
-inline StateVector operator+( StateVector a, StateVector b ){
-    return a += b;
-}
+inline StateVector operator+(StateVector a, StateVector b) { return a += b; }
 
 /**
  * @brief This operator subtracts a state vector from another state vector
@@ -1036,9 +946,7 @@ inline StateVector operator+( StateVector a, StateVector b ){
  * @param b Second StateVector that is subtracted from the first
  * @return Resulting StateVector
  */
-inline StateVector operator-( StateVector a, StateVector b ){
-    return a -= b;
-}
+inline StateVector operator-(StateVector a, StateVector b) { return a -= b; }
 
 /**
  * @brief This operator multiplies two state vectors element-wise
@@ -1047,9 +955,7 @@ inline StateVector operator-( StateVector a, StateVector b ){
  * @param b Second StateVector
  * @return Resulting StateVector
  */
-inline StateVector operator*( StateVector a, StateVector b ){
-    return a *= b;
-}
+inline StateVector operator*(StateVector a, StateVector b) { return a *= b; }
 
 /**
  * @brief This operator multiplies a state vector with a scalar
@@ -1058,9 +964,7 @@ inline StateVector operator*( StateVector a, StateVector b ){
  * @param s Scalar to multiply with
  * @return Resulting StateVector
  */
-inline StateVector operator*( StateVector a, double s ){
-    return a *= s;
-}
+inline StateVector operator*(StateVector a, double s) { return a *= s; }
 
 /**
  * @brief This operator multiplies a scalar with a state vector
@@ -1069,9 +973,7 @@ inline StateVector operator*( StateVector a, double s ){
  * @param b StateVector to multiply with
  * @return Resulting StateVector
  */
-inline StateVector operator*( double s, StateVector b ){
-    return b *= s;
-}
+inline StateVector operator*(double s, StateVector b) { return b *= s; }
 
 /**
  * @brief This operator divides a state vector by a scalar
@@ -1080,9 +982,7 @@ inline StateVector operator*( double s, StateVector b ){
  * @param s Scalar to divide by
  * @return Resulting StateVector
  */
-inline StateVector operator/( StateVector a, double s ){
-    return a /= s;
-}
+inline StateVector operator/(StateVector a, double s) { return a /= s; }
 
 /**
  * @brief Get a state vector with components that are the maximum of the
@@ -1092,9 +992,7 @@ inline StateVector operator/( StateVector a, double s ){
  * @param b Second StateVector
  * @return Resulting StateVector
  */
-inline StateVector max( StateVector a, StateVector b){
-    return a.max(b);
-}
+inline StateVector max(StateVector a, StateVector b) { return a.max(b); }
 
 /**
  * @brief Get a state vector with components that are the minimum of the
@@ -1104,9 +1002,7 @@ inline StateVector max( StateVector a, StateVector b){
  * @param b Second StateVector
  * @return Resulting StateVector
  */
-inline StateVector min( StateVector a, StateVector b){
-    return a.min(b);
-}
+inline StateVector min(StateVector a, StateVector b) { return a.min(b); }
 
 /**
  * @brief Operator that divides a state vector element-wise by another state
@@ -1116,8 +1012,6 @@ inline StateVector min( StateVector a, StateVector b){
  * @param b Second StateVector to divide by
  * @return Resulting StateVector
  */
-inline StateVector operator/(StateVector a, StateVector b){
-    return a /= b;
-}
+inline StateVector operator/(StateVector a, StateVector b) { return a /= b; }
 
-#endif // STATEVECTOR_HPP
+#endif  // STATEVECTOR_HPP

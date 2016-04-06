@@ -26,10 +26,10 @@
 #ifndef UNITCONVERTER_HPP
 #define UNITCONVERTER_HPP
 
-#include "Unit.hpp"
 #include "Error.hpp"
-#include <iostream>
+#include "Unit.hpp"
 #include <cstdlib>
+#include <iostream>
 
 /**
   * \brief Convert from one Unit to another.
@@ -37,13 +37,13 @@
   * This is of course only possible if both units are compatible, i.e. if the
   * quantities of both units are the same.
   */
-class UnitConverter{
-private:
+class UnitConverter {
+  private:
     /*! \brief Conversion factor that converts the SI-value of one Unit to that
      *  of another */
     double _conversion_factor;
 
-public:
+  public:
     /**
       * @brief Constructor
       *
@@ -53,8 +53,8 @@ public:
       * @param in Original Unit, i.e. the Unit you feed to the converter
       * @param out New Unit, what comes out of the converter
       */
-    UnitConverter(Unit in, Unit out){
-        if(in.get_quantity().compare(out.get_quantity())){
+    UnitConverter(Unit in, Unit out) {
+        if(in.get_quantity().compare(out.get_quantity())) {
             std::cerr << in.get_quantity() << "\t" << out.get_quantity()
                       << std::endl;
             std::cerr << in.get_quantity().compare(out.get_quantity())
@@ -62,10 +62,10 @@ public:
             std::cerr << "Units are not compatible!" << std::endl;
             my_exit();
         }
-        _conversion_factor = in.get_SI_value()/out.get_SI_value();
+        _conversion_factor = in.get_SI_value() / out.get_SI_value();
     }
 
-    ~UnitConverter(){}
+    ~UnitConverter() {}
 
     /**
       * @brief Convert the given value from the input Unit to the output Unit
@@ -73,9 +73,7 @@ public:
       * @param value Input value, in original Unit
       * @returns Converted value in the new Unit
       */
-    double convert(const double value){
-        return value*_conversion_factor;
-    }
+    double convert(const double value) { return value * _conversion_factor; }
 };
 
-#endif // UNITCONVERTER_HPP
+#endif  // UNITCONVERTER_HPP

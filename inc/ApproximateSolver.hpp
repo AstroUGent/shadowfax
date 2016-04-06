@@ -38,8 +38,8 @@ class RestartFile;
  * waves. This allows us to skip the iterative procedure for finding p and
  * speeds up the solution of the Riemann problem.
  */
-class TRRSSolver : public RiemannSolver{
-private:
+class TRRSSolver : public RiemannSolver {
+  private:
     /*! \brief Adiabatic index \f$\gamma{}\f$ of the gas */
     double _gamma;
     /*! \brief \f$\frac{\gamma{}+1}{2\gamma{}}\f$ */
@@ -67,7 +67,7 @@ private:
 
     double get_energy(const StateVector& W);
 
-public:
+  public:
     TRRSSolver(double gamma);
     ~TRRSSolver();
 
@@ -76,11 +76,9 @@ public:
      *
      * @return "TRRS", because this is a TRRSSolver
      */
-    virtual std::string tag(){
-        return "TRRS";
-    }
+    virtual std::string tag() { return "TRRS"; }
 
-    virtual StateVector solve(StateVector& WL, StateVector& WR, Vec &n,
+    virtual StateVector solve(StateVector& WL, StateVector& WR, Vec& n,
                               double& mach0, bool reflective = false);
     virtual double get_soundspeed(const StateVector& W);
     virtual void test();
@@ -92,8 +90,8 @@ public:
 
     unsigned long get_neval();
 
-    virtual void dump(RestartFile &rfile);
-    TRRSSolver(RestartFile &rfile);
+    virtual void dump(RestartFile& rfile);
+    TRRSSolver(RestartFile& rfile);
 };
 
 #endif

@@ -24,23 +24,23 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorTess.hpp"
+#include "DelCont.hpp"
 #include "DelTess.hpp"
 #include "Line.hpp"
-#include "VorGen.hpp"
-#include "DelCont.hpp"
-#include "VorFace.hpp"
+#include "ProgramLog.hpp"
 #include "Simplex.hpp"
 #include "VorCell.hpp"
-#include "ProgramLog.hpp"
+#include "VorFace.hpp"
+#include "VorGen.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"
 #include "utilities/Timer.hpp"
-#include <iostream>
-#include <vector>
 #include <cstdlib>
-#include <ostream>
 #include <fstream>
+#include <iostream>
+#include <ostream>
 #include <sstream>
+#include <vector>
 using namespace std;
 
 /**
@@ -55,7 +55,7 @@ using namespace std;
  * tests
  */
 VorTess::VorTess(DelCont* delcont, unsigned int numpart, bool periodic,
-                 double tolerance){
+                 double tolerance) {
     _delaunay = new DelTess(delcont, numpart, periodic, tolerance);
     _delaunay->add_voronoi_tesselation(this);
 
@@ -67,12 +67,12 @@ VorTess::VorTess(DelCont* delcont, unsigned int numpart, bool periodic,
  *
  * Remove all cells and points to ensure proper garbage collection.
  */
-VorTess::~VorTess(){
-    for(unsigned int i = 0; i < _cells.size(); i++){
+VorTess::~VorTess() {
+    for(unsigned int i = 0; i < _cells.size(); i++) {
         delete _cells[i];
     }
     _cells.clear();
-    for(unsigned int i = _faces.size(); i--;){
+    for(unsigned int i = _faces.size(); i--;) {
         delete _faces[i];
     }
     _faces.clear();
@@ -94,9 +94,9 @@ VorTess::~VorTess(){
  *
  * @param stream std::ostream to write to
  */
-void VorTess::print_tesselation(ostream &stream){
+void VorTess::print_tesselation(ostream& stream) {
     //    stream << "Outputting Voronoi tesselation:\n";
-    for(unsigned int i = 0; i < _cells.size(); i++){
+    for(unsigned int i = 0; i < _cells.size(); i++) {
         _cells[i]->print(stream);
     }
     stream << flush;
@@ -108,8 +108,8 @@ void VorTess::print_tesselation(ostream &stream){
  *
  * @param stream std::ostream to write to
  */
-void VorTess::print_tesselation_gnuplot(ostream& stream){
-    for(unsigned int i = 0; i < _cells.size(); i++){
+void VorTess::print_tesselation_gnuplot(ostream& stream) {
+    for(unsigned int i = 0; i < _cells.size(); i++) {
         _cells[i]->print_gnuplot(stream, i);
     }
     stream << flush;
@@ -122,9 +122,7 @@ void VorTess::print_tesselation_gnuplot(ostream& stream){
  *
  * @return std::vector containing the cells of the tesselation
  */
-vector<VorCell*> VorTess::get_cells(){
-    return _cells;
-}
+vector<VorCell*> VorTess::get_cells() { return _cells; }
 
 /**
  * @brief Add the given GasParticle with the given index to the tesselation
@@ -136,7 +134,7 @@ vector<VorCell*> VorTess::get_cells(){
  * @param index Index of the particle in the internal lists, can be used to
  * retrieve it later
  */
-void VorTess::add_point(GasParticle* part, unsigned int index){
+void VorTess::add_point(GasParticle* part, unsigned int index) {
     _delaunay->add_particle(part, index);
 }
 
@@ -150,13 +148,13 @@ void VorTess::add_point(GasParticle* part, unsigned int index){
  * neighbouring point (that is part of a neighbouring tetrahedron) a VorFace is
  * constructed (by rotating around the axis), which is then added to the cell.
  */
-#if ndim_==3
-void VorTess::construct(){
+#if ndim_ == 3
+void VorTess::construct() {
     LOGS("Starting VorTess construction");
     _delaunay->set_relations();
     vector<VorGen*> points = _delaunay->get_points();
-    for(unsigned int i = 0; i < _delaunay->get_size(); i++){
-        if(!points[i]){
+    for(unsigned int i = 0; i < _delaunay->get_size(); i++) {
+        if(!points[i]) {
             continue;
         }
         _cells.push_back(new VorCell(points[i]));
@@ -164,35 +162,36 @@ void VorTess::construct(){
         list<Simplex*> tetrahedra = points[i]->get_tetrahedra();
         Simplex* current_tetrahedron;
         for(list<Simplex*>::iterator it = tetrahedra.begin();
-            it != tetrahedra.end(); it++){
+            it != tetrahedra.end(); it++) {
             current_tetrahedron = *it;
             unsigned int* vorgens2 = current_tetrahedron->get_vorgens();
             VorGen* points2[4] = {points[vorgens2[0]], points[vorgens2[1]],
                                   points[vorgens2[2]], points[vorgens2[3]]};
             unsigned int k = current_tetrahedron->get_index(i);
             // k now contains the index of points[i] in points2
-            for(int l = 0; l < 3; l++){
-                if(!points2[(k+l+1)%4]->flagged()){
-                    points2[(k+l+1)%4]->flag();
-                    _cells.back()->add_ngb(points2[(k+l+1)%4]);
-                    _cells.back()->add_ngb_id(vorgens2[(k+l+1)%4]-4);
+            for(int l = 0; l < 3; l++) {
+                if(!points2[(k + l + 1) % 4]->flagged()) {
+                    points2[(k + l + 1) % 4]->flag();
+                    _cells.back()->add_ngb(points2[(k + l + 1) % 4]);
+                    _cells.back()->add_ngb_id(vorgens2[(k + l + 1) % 4] - 4);
                     VorFace* face;
-                    if(points2[(k+l+1)%4]->get_cell() == NULL){
+                    if(points2[(k + l + 1) % 4]->get_cell() == NULL) {
                         _faces.push_back(new VorFace(i, points));
                         _cells.back()->add_face(_faces.back());
                         face = _faces.back();
-                        face->add_ngb(points2[(k+l+1)%4]);
-                        face->add_ngb_id(points2[(k+l+1)%4]->get_particle_id());
-                        VorGen* axis = points2[(k+l+1)%4];
-                        VorGen* start = points2[(k+(l+1)%3+1)%4];
-                        VorGen* other = points2[(k+(l+2)%3+1)%4];
-                        unsigned int vstart = vorgens2[(k+(l+1)%3+1)%4];
-                        unsigned int vother = vorgens2[(k+(l+2)%3+1)%4];
-                        Simplex* next_tetrahedron =
-                                _delaunay->get_simplex(
-                                    current_tetrahedron
-                                    ->get_ngb((k+(l+1)%3+1)%4)
-                                    );
+                        face->add_ngb(points2[(k + l + 1) % 4]);
+                        face->add_ngb_id(
+                                points2[(k + l + 1) % 4]->get_particle_id());
+                        VorGen* axis = points2[(k + l + 1) % 4];
+                        VorGen* start = points2[(k + (l + 1) % 3 + 1) % 4];
+                        VorGen* other = points2[(k + (l + 2) % 3 + 1) % 4];
+                        unsigned int vstart =
+                                vorgens2[(k + (l + 1) % 3 + 1) % 4];
+                        unsigned int vother =
+                                vorgens2[(k + (l + 2) % 3 + 1) % 4];
+                        Simplex* next_tetrahedron = _delaunay->get_simplex(
+                                current_tetrahedron->get_ngb(
+                                        (k + (l + 1) % 3 + 1) % 4));
                         unsigned int* next_vorgens =
                                 next_tetrahedron->get_vorgens();
                         VorGen* next_points[4] = {points[next_vorgens[0]],
@@ -200,8 +199,8 @@ void VorTess::construct(){
                                                   points[next_vorgens[2]],
                                                   points[next_vorgens[3]]};
                         unsigned int next_index =
-                                current_tetrahedron
-                                ->get_ngbface((k+(l+1)%3+1)%4);
+                                current_tetrahedron->get_ngbface(
+                                        (k + (l + 1) % 3 + 1) % 4);
                         VorGen* next_point = next_points[next_index];
                         unsigned int vnext = next_vorgens[next_index];
                         start = other;
@@ -210,24 +209,22 @@ void VorTess::construct(){
                                 next_tetrahedron->get_special_point(points);
                         VorGen* prev_special = NULL;
                         unsigned int count = 0;
-                        while(next_point != other){
+                        while(next_point != other) {
                             VorGen* next_special =
                                     next_tetrahedron->get_special_point(points);
                             if(prev_special == NULL ||
-                                    (next_special->distance(*prev_special) >
-                                     1.e-13 &&
-                                     next_special->distance(*first_special) >
-                                     1.e-13)){
+                               (next_special->distance(*prev_special) >
+                                        1.e-13 &&
+                                next_special->distance(*first_special) >
+                                        1.e-13)) {
                                 face->add_vertex(next_special);
                                 count++;
                             }
                             face->add_facengb(start);
                             prev_special = next_special;
-                            next_tetrahedron =
-                                    _delaunay->get_simplex(
-                                        next_tetrahedron
-                                        ->get_ngb_from_vorgen(vstart)
-                                        );
+                            next_tetrahedron = _delaunay->get_simplex(
+                                    next_tetrahedron->get_ngb_from_vorgen(
+                                            vstart));
                             next_vorgens = next_tetrahedron->get_vorgens();
                             next_points[0] = points[next_vorgens[0]];
                             next_points[1] = points[next_vorgens[1]];
@@ -236,7 +233,7 @@ void VorTess::construct(){
                             next_index = 0;
                             while(next_points[next_index] == axis ||
                                   next_points[next_index] == points2[k] ||
-                                  next_points[next_index] == next_point){
+                                  next_points[next_index] == next_point) {
                                 next_index++;
                             }
                             start = next_point;
@@ -247,8 +244,7 @@ void VorTess::construct(){
                         VorGen* next_special =
                                 next_tetrahedron->get_special_point(points);
                         if(next_special->distance(*prev_special) > 1.e-13 &&
-                                next_special->distance(*first_special) >
-                                1.e-13){
+                           next_special->distance(*first_special) > 1.e-13) {
                             face->add_vertex(next_special);
                             count++;
                         }
@@ -257,7 +253,7 @@ void VorTess::construct(){
                         // exist, but in this case, we don't use it during the
                         // remainder of the calculation. We therefore set its
                         // area to 0
-                        if(count < 3){
+                        if(count < 3) {
                             face->set_area(0.);
                         } else {
                             // the order does matter: midpoint is used in area
@@ -266,8 +262,8 @@ void VorTess::construct(){
                             face->calculate_area();
                         }
                     } else {
-                        face = points2[(k+l+1)%4]->get_cell()
-                                ->get_face(points[i]);
+                        face = points2[(k + l + 1) % 4]->get_cell()->get_face(
+                                points[i]);
                         _cells.back()->add_face(face);
                     }
                 }
@@ -275,7 +271,7 @@ void VorTess::construct(){
         }
         // clear flags
         vector<VorGen*> ngbs = _cells.back()->get_ngbs();
-        for(unsigned int j = 0; j < ngbs.size(); j++){
+        for(unsigned int j = 0; j < ngbs.size(); j++) {
             ngbs[j]->unflag();
         }
 
@@ -285,12 +281,12 @@ void VorTess::construct(){
     LOGS("VorTess construction ready");
 }
 #else
-void VorTess::construct(){
+void VorTess::construct() {
     LOGS("Starting VorTess construction");
     _delaunay->set_relations();
     vector<VorGen*> points = _delaunay->get_points();
-    for(unsigned int i = 0; i < _delaunay->get_size(); i++){
-        if(!points[i]){
+    for(unsigned int i = 0; i < _delaunay->get_size(); i++) {
+        if(!points[i]) {
             continue;
         }
         _cells.push_back(new VorCell(points[i]));
@@ -305,13 +301,13 @@ void VorTess::construct(){
                               points[cvorgens[2]]};
         // start is the first point in counterclockwise order after the central
         // point
-        VorGen* start = cpoints[(iindex+1)%3];
+        VorGen* start = cpoints[(iindex + 1) % 3];
         // next is the second point in counterclockwise order after the central
         // point
         // it will be the first point after the central point in the next
         // triangle
-        VorGen* next = cpoints[(iindex+2)%3];
-        unsigned int vnext = cvorgens[(iindex+2)%3];
+        VorGen* next = cpoints[(iindex + 2) % 3];
+        unsigned int vnext = cvorgens[(iindex + 2) % 3];
         // prevsp is the midpoint of the circumsphere of the current triangle
         VorGen* prevsp = current->get_special_point(points);
         // firstsp is the first midpoint, to be used in the end to connect the
@@ -322,13 +318,14 @@ void VorTess::construct(){
         VorGen* cursp = NULL;
         // iterate until next == start, at this point, we have completed a full
         // walk-around
-        while(next != start){
+        while(next != start) {
             // use the information stored in the current triangle to retrieve
             // absolute index information for the next triangle without
             // searching for points
-            int nindex = current->get_ngbindex((iindex+1)%3);
+            int nindex = current->get_ngbindex((iindex + 1) % 3);
             // go to the next triangle
-            current = _delaunay->get_simplex(current->get_ngb((iindex+1)%3));
+            current =
+                    _delaunay->get_simplex(current->get_ngb((iindex + 1) % 3));
             cursp = current->get_special_point(points);
             //      double distance = fabs(cursp->distance(*prevsp));
             VorFace* face;
@@ -338,7 +335,7 @@ void VorTess::construct(){
             // or it is not yet processed
             // either way, this point (and cell) becomes the owner
             // of the face
-            if(next->get_cell() == NULL){
+            if(next->get_cell() == NULL) {
                 _faces.push_back(new VorFace(i, points));
                 face = _faces.back();
                 _cells.back()->add_face(face);
@@ -348,7 +345,7 @@ void VorTess::construct(){
                 face->add_ngb_id(next->get_particle_id());
                 face->calculate_area();
                 // try to solve problems with accuracy
-                if(prevsp->distance(*cursp) < 1.e-13){
+                if(prevsp->distance(*cursp) < 1.e-13) {
                     face->set_area(0.);
                 }
                 face->calculate_midpoint();
@@ -366,12 +363,12 @@ void VorTess::construct(){
             // update loop variables
             next = cpoints[nindex];
             vnext = cvorgens[nindex];
-            iindex = (nindex+1)%3;
+            iindex = (nindex + 1) % 3;
             prevsp = cursp;
         }
         VorFace* face;
         // construct the final face
-        if(next->get_cell() == NULL){
+        if(next->get_cell() == NULL) {
             _faces.push_back(new VorFace(i, points));
             face = _faces.back();
             _cells.back()->add_face(face);
@@ -381,7 +378,7 @@ void VorTess::construct(){
             face->add_ngb_id(next->get_particle_id());
             face->calculate_area();
             // try to solve problems with accuracy
-            if(prevsp->distance(*firstsp) < 1.e-13){
+            if(prevsp->distance(*firstsp) < 1.e-13) {
                 face->set_area(0.);
             }
             face->calculate_midpoint();
@@ -410,9 +407,9 @@ void VorTess::construct(){
  */
 #ifndef ICMAKER
 void VorTess::hydro(TimeLine& timeline, RiemannSolver& solver,
-                    ParticleVector& particles){
+                    ParticleVector& particles) {
     LOGS("Starting flux calculation");
-    for(unsigned int i = _faces.size(); i--;){
+    for(unsigned int i = _faces.size(); i--;) {
         _faces[i]->set_v(particles);
         _faces[i]->calculate_flux(timeline, solver);
     }
@@ -427,11 +424,11 @@ void VorTess::hydro(TimeLine& timeline, RiemannSolver& solver,
  *
  * @param dt Timestep
  */
-void VorTess::advect(double dt){
-    for(unsigned int i = _faces.size(); i--;){
+void VorTess::advect(double dt) {
+    for(unsigned int i = _faces.size(); i--;) {
         _faces[i]->calculate_advection_flux(dt);
     }
-    for(unsigned int i = _cells.size(); i--;){
+    for(unsigned int i = _cells.size(); i--;) {
         _cells[i]->get_particle()->update_Q();
     }
 }
@@ -442,9 +439,9 @@ void VorTess::advect(double dt){
  *
  * @param stream std::ostream to write to
  */
-void VorTess::print_cell_statistics(ostream &stream){
+void VorTess::print_cell_statistics(ostream& stream) {
     double totvol = 0.;
-    for(unsigned int i = 0; i < _cells.size(); i++){
+    for(unsigned int i = 0; i < _cells.size(); i++) {
         totvol += _cells[i]->get_volume();
     }
     stream << "Total volume: " << totvol << endl;
@@ -456,7 +453,7 @@ void VorTess::print_cell_statistics(ostream &stream){
  *
  * @param stream std::ostream to write to
  */
-void VorTess::print_delaunay(ostream &stream){
+void VorTess::print_delaunay(ostream& stream) {
     _delaunay->output_tesselation(stream);
 }
 
@@ -466,8 +463,8 @@ void VorTess::print_delaunay(ostream &stream){
  *
  * @param stream std::ostream to write to
  */
-void VorTess::print_tesselation_pov(ostream &stream){
-    for(unsigned int i = _cells.size(); i--;){
+void VorTess::print_tesselation_pov(ostream& stream) {
+    for(unsigned int i = _cells.size(); i--;) {
         _cells[i]->print_pov(stream);
     }
 }
@@ -482,13 +479,13 @@ void VorTess::print_tesselation_pov(ostream &stream){
  * @param minW Minimal primitive variables StateVector
  */
 void VorTess::print_tesselation_leaflet(ColorMap* colormap, StateVector maxW,
-                                        StateVector minW){
-    double tilesize = 1./64.;
+                                        StateVector minW) {
+    double tilesize = 1. / 64.;
     ofstream ofiles[256];
-    for(unsigned int xblock = 0; xblock < 4; xblock++){
-        for(unsigned int yblock = 0; yblock < 4; yblock++){
-            for(unsigned int i = xblock*16; i < (xblock+1)*16; i++){
-                for(unsigned int j = yblock*16; j < (yblock+1)*16; j++){
+    for(unsigned int xblock = 0; xblock < 4; xblock++) {
+        for(unsigned int yblock = 0; yblock < 4; yblock++) {
+            for(unsigned int i = xblock * 16; i < (xblock + 1) * 16; i++) {
+                for(unsigned int j = yblock * 16; j < (yblock + 1) * 16; j++) {
                     stringstream name;
                     name << "grid/x";
                     name.fill('0');
@@ -497,34 +494,36 @@ void VorTess::print_tesselation_leaflet(ColorMap* colormap, StateVector maxW,
                     name << "y";
                     name.fill('0');
                     name.width(2);
-                    name << (63-j);
+                    name << (63 - j);
                     name << ".dat";
-                    ofiles[(i-xblock*16)*16+(j-yblock*16)]
-                            .open(name.str().c_str(), ios::out | ios::binary);
+                    ofiles[(i - xblock * 16) * 16 + (j - yblock * 16)].open(
+                            name.str().c_str(), ios::out | ios::binary);
                 }
             }
-            for(unsigned int i = _cells.size(); i--;){
-                double box[4] = {xblock*16*tilesize, yblock*16*tilesize,
-                                 (xblock+1)*16*tilesize,
-                                 (yblock+1)*16*tilesize};
-                if(!_cells[i]->overlap(box)){
+            for(unsigned int i = _cells.size(); i--;) {
+                double box[4] = {xblock * 16 * tilesize, yblock * 16 * tilesize,
+                                 (xblock + 1) * 16 * tilesize,
+                                 (yblock + 1) * 16 * tilesize};
+                if(!_cells[i]->overlap(box)) {
                     continue;
                 }
-                for(unsigned int ix = xblock*16; ix < (xblock+1)*16; ix++){
-                    for(unsigned int iy = yblock*16; iy < (yblock+1)*16; iy++){
-                        double smallbox[4] = {ix*tilesize, iy*tilesize,
-                                              (ix+1)*tilesize, (iy+1)*tilesize};
-                        if(_cells[i]->overlap(smallbox)){
+                for(unsigned int ix = xblock * 16; ix < (xblock + 1) * 16;
+                    ix++) {
+                    for(unsigned int iy = yblock * 16; iy < (yblock + 1) * 16;
+                        iy++) {
+                        double smallbox[4] = {ix * tilesize, iy * tilesize,
+                                              (ix + 1) * tilesize,
+                                              (iy + 1) * tilesize};
+                        if(_cells[i]->overlap(smallbox)) {
                             _cells[i]->print_leaflet(
-                                        ofiles[(ix-xblock*16)*16+
-                                    (iy-yblock*16)], ix*256, iy*256, colormap,
-                                    maxW, minW
-                                    );
+                                    ofiles[(ix - xblock * 16) * 16 +
+                                           (iy - yblock * 16)],
+                                    ix * 256, iy * 256, colormap, maxW, minW);
                         }
                     }
                 }
             }
-            for(int i = 0; i < 256; i++){
+            for(int i = 0; i < 256; i++) {
                 ofiles[i].close();
             }
         }
@@ -537,8 +536,8 @@ void VorTess::print_tesselation_leaflet(ColorMap* colormap, StateVector maxW,
  *
  * @param stream std::ostream to write to
  */
-void VorTess::print_tesselation_vtk(ostream &stream){
-#if ndim_==2
+void VorTess::print_tesselation_vtk(ostream& stream) {
+#if ndim_ == 2
     stream << "# vtk DataFile Version 3.0\n";
     stream << "vtk output\n";
     stream << "ASCII\n";
@@ -550,7 +549,7 @@ void VorTess::print_tesselation_vtk(ostream &stream){
     unsigned int numpolygons = 0;
     unsigned int numconnections = 0;
     unsigned int numcells = _cells.size();
-    for(unsigned int i = numcells; i--;){
+    for(unsigned int i = numcells; i--;) {
         _cells[i]->print_vtk(points, numpoints, polygons, numpolygons,
                              numconnections, density);
     }
@@ -570,68 +569,68 @@ void VorTess::print_tesselation_vtk(ostream &stream){
     stream << "BINARY\n";
     stream << "DATASET UNSTRUCTURED_GRID\n";
     stream << "POINTS 5 float\n";
-    float positions[15] = {0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0., 1., 1.,
-                           1., 1.};
+    float positions[15] = {0., 0., 0., 1., 0., 0., 0., 1.,
+                           0., 0., 0., 1., 1., 1., 1.};
     char* bytes = reinterpret_cast<char*>(positions);
-    for(unsigned int i = 0; i < 15; i++){
+    for(unsigned int i = 0; i < 15; i++) {
         char fbytes[4];
-        fbytes[0] = bytes[4*i];
-        fbytes[1] = bytes[4*i+1];
-        fbytes[2] = bytes[4*i+2];
-        fbytes[3] = bytes[4*i+3];
-        bytes[4*i] = fbytes[3];
-        bytes[4*i+1] = fbytes[2];
-        bytes[4*i+2] = fbytes[1];
-        bytes[4*i+3] = fbytes[0];
+        fbytes[0] = bytes[4 * i];
+        fbytes[1] = bytes[4 * i + 1];
+        fbytes[2] = bytes[4 * i + 2];
+        fbytes[3] = bytes[4 * i + 3];
+        bytes[4 * i] = fbytes[3];
+        bytes[4 * i + 1] = fbytes[2];
+        bytes[4 * i + 2] = fbytes[1];
+        bytes[4 * i + 3] = fbytes[0];
     }
-    stream.write(bytes, 15*sizeof(float));
+    stream.write(bytes, 15 * sizeof(float));
     stream << "CELLS 2 10\n";
     int connectivity[10] = {4, 0, 1, 2, 3, 4, 0, 1, 2, 4};
     bytes = reinterpret_cast<char*>(connectivity);
-    for(unsigned int i = 0; i < 10; i++){
+    for(unsigned int i = 0; i < 10; i++) {
         char fbytes[4];
-        fbytes[0] = bytes[4*i];
-        fbytes[1] = bytes[4*i+1];
-        fbytes[2] = bytes[4*i+2];
-        fbytes[3] = bytes[4*i+3];
-        bytes[4*i] = fbytes[3];
-        bytes[4*i+1] = fbytes[2];
-        bytes[4*i+2] = fbytes[1];
-        bytes[4*i+3] = fbytes[0];
+        fbytes[0] = bytes[4 * i];
+        fbytes[1] = bytes[4 * i + 1];
+        fbytes[2] = bytes[4 * i + 2];
+        fbytes[3] = bytes[4 * i + 3];
+        bytes[4 * i] = fbytes[3];
+        bytes[4 * i + 1] = fbytes[2];
+        bytes[4 * i + 2] = fbytes[1];
+        bytes[4 * i + 3] = fbytes[0];
     }
-    stream.write(bytes, 10*sizeof(int));
+    stream.write(bytes, 10 * sizeof(int));
     stream << "CELL_TYPES 2\n";
     int celltype[2] = {10, 10};
     bytes = reinterpret_cast<char*>(celltype);
-    for(unsigned int i = 0; i < 2; i++){
+    for(unsigned int i = 0; i < 2; i++) {
         char fbytes[4];
-        fbytes[0] = bytes[4*i];
-        fbytes[1] = bytes[4*i+1];
-        fbytes[2] = bytes[4*i+2];
-        fbytes[3] = bytes[4*i+3];
-        bytes[4*i] = fbytes[3];
-        bytes[4*i+1] = fbytes[2];
-        bytes[4*i+2] = fbytes[1];
-        bytes[4*i+3] = fbytes[0];
+        fbytes[0] = bytes[4 * i];
+        fbytes[1] = bytes[4 * i + 1];
+        fbytes[2] = bytes[4 * i + 2];
+        fbytes[3] = bytes[4 * i + 3];
+        bytes[4 * i] = fbytes[3];
+        bytes[4 * i + 1] = fbytes[2];
+        bytes[4 * i + 2] = fbytes[1];
+        bytes[4 * i + 3] = fbytes[0];
     }
-    stream.write(bytes, 2*sizeof(int));
+    stream.write(bytes, 2 * sizeof(int));
     stream << "CELL_DATA 2\n";
     stream << "SCALARS name float\n";
     stream << "LOOKUP_TABLE default\n";
-    float data[2] = {0.,1.};
+    float data[2] = {0., 1.};
     bytes = reinterpret_cast<char*>(data);
-    for(unsigned int i = 0; i < 2; i++){
+    for(unsigned int i = 0; i < 2; i++) {
         char fbytes[4];
-        fbytes[0] = bytes[4*i];
-        fbytes[1] = bytes[4*i+1];
-        fbytes[2] = bytes[4*i+2];
-        fbytes[3] = bytes[4*i+3];
-        bytes[4*i] = fbytes[3];
-        bytes[4*i+1] = fbytes[2];
-        bytes[4*i+2] = fbytes[1];
-        bytes[4*i+3] = fbytes[0];
+        fbytes[0] = bytes[4 * i];
+        fbytes[1] = bytes[4 * i + 1];
+        fbytes[2] = bytes[4 * i + 2];
+        fbytes[3] = bytes[4 * i + 3];
+        bytes[4 * i] = fbytes[3];
+        bytes[4 * i + 1] = fbytes[2];
+        bytes[4 * i + 2] = fbytes[1];
+        bytes[4 * i + 3] = fbytes[0];
     }
-    stream.write(bytes, 2*sizeof(float));
+    stream.write(bytes, 2 * sizeof(float));
     stream << "POINT_DATA 5\n";
 #endif
 }
@@ -642,8 +641,8 @@ void VorTess::print_tesselation_vtk(ostream &stream){
  * The characteristic length of a cell is the radius of a sphere/circle with the
  * same volume/face area as the cell.
  */
-void VorTess::set_hs(){
-    for(unsigned int i = _cells.size(); i--;){
+void VorTess::set_hs() {
+    for(unsigned int i = _cells.size(); i--;) {
         _cells[i]->set_h();
     }
 }
@@ -654,46 +653,38 @@ void VorTess::set_hs(){
  *
  * @param parttree Tree for the particle set
  */
-void VorTess::complete(Tree &parttree){
-    _delaunay->add_mirrors(parttree);
-}
+void VorTess::complete(Tree& parttree) { _delaunay->add_mirrors(parttree); }
 
 /**
  * @brief Communicate primitive variables between MPI processes
  */
-void VorTess::update_Ws(){
-    _delaunay->update_Ws();
-}
+void VorTess::update_Ws() { _delaunay->update_Ws(); }
 
 /**
  * @brief Communicate gradients between MPI processes
  */
-void VorTess::update_gradients(){
-    _delaunay->update_gradients();
-}
+void VorTess::update_gradients() { _delaunay->update_gradients(); }
 
 /**
  * @brief Communicate fluxes between MPI processes
  */
-void VorTess::update_dQs(){
-    _delaunay->update_dQs();
-}
+void VorTess::update_dQs() { _delaunay->update_dQs(); }
 
 /**
  * @brief Communicate timesteps between MPI processes
  *
  * @param currentTime Current integer time of the simulation
  */
-void VorTess::update_dts(unsigned long currentTime){
+void VorTess::update_dts(unsigned long currentTime) {
     _delaunay->update_dts(currentTime);
 }
 
 /**
  * @brief Communicate gravitational correction terms between MPI processes
  */
-void VorTess::update_gravitational_corrections(){
+void VorTess::update_gravitational_corrections() {
     // we first make sure all local factors are added to eta
-    for(unsigned int i = 0; i < _cells.size(); i++){
+    for(unsigned int i = 0; i < _cells.size(); i++) {
         _cells[i]->finalize_eta();
     }
     _delaunay->update_gravitational_corrections();
@@ -706,9 +697,7 @@ void VorTess::update_gravitational_corrections(){
  * added to the tesselation
  * @return VorCell corresponding to the given index
  */
-VorCell* VorTess::get_cell(unsigned int index){
-    return _cells[index];
-}
+VorCell* VorTess::get_cell(unsigned int index) { return _cells[index]; }
 
 /**
  * @brief Check if the Delaunay tesselation fulfils the geometrical criterion
@@ -716,18 +705,14 @@ VorCell* VorTess::get_cell(unsigned int index){
  * @warning This method is computationally very expensive and should only be
  * used for debugging and for small point sets!
  */
-void VorTess::check_delaunay(){
-    _delaunay->check_tesselation();
-}
+void VorTess::check_delaunay() { _delaunay->check_tesselation(); }
 
 /**
  * @brief Get the faces of the tesselation
  *
  * @return Reference to the face list
  */
-vector<VorFace*>& VorTess::get_faces(){
-    return _faces;
-}
+vector<VorFace*>& VorTess::get_faces() { return _faces; }
 
 /**
  * @brief Get the triangles that make up the cells of the tesselation
@@ -736,10 +721,10 @@ vector<VorFace*>& VorTess::get_faces(){
  * @param connectivity List with connectivity information to add to
  * @param data List with particle data to add to
  */
-void VorTess::get_triangles(std::vector<float> &positions,
-                            std::vector<int> &connectivity,
-                            std::vector<StateVector> &data){
-    for(unsigned int i = 0; i < _cells.size(); i++){
+void VorTess::get_triangles(std::vector<float>& positions,
+                            std::vector<int>& connectivity,
+                            std::vector<StateVector>& data) {
+    for(unsigned int i = 0; i < _cells.size(); i++) {
         _cells[i]->get_triangles(positions, connectivity, data);
     }
 }
@@ -750,8 +735,8 @@ void VorTess::get_triangles(std::vector<float> &positions,
  * @param connectivity Connections between the positions that form the actual
  * triangles
  */
-void VorTess::get_delaunay_triangles(vector<float> &positions,
-                                     vector<int> &connectivity){
+void VorTess::get_delaunay_triangles(vector<float>& positions,
+                                     vector<int>& connectivity) {
     _delaunay->get_triangles(positions, connectivity);
 }
 
@@ -764,11 +749,11 @@ void VorTess::get_delaunay_triangles(vector<float> &positions,
  * @param cell VorCell for which we want the neighbours
  * @return List of neighbour indices
  */
-vector<unsigned long> VorTess::get_ngb_ids(VorCell* cell){
+vector<unsigned long> VorTess::get_ngb_ids(VorCell* cell) {
     vector<unsigned long> ngb_ids;
     vector<VorGen*> ngbs = cell->get_ngbs();
-    for(unsigned int i = 0; i < ngbs.size(); i++){
-        if(ngbs[i]->get_particle()){
+    for(unsigned int i = 0; i < ngbs.size(); i++) {
+        if(ngbs[i]->get_particle()) {
             ngb_ids.push_back(ngbs[i]->get_particle()->id());
         } else {
             VorCell* original = _cells[ngbs[i]->get_original()];

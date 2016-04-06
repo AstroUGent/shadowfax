@@ -26,8 +26,8 @@
 #ifndef TIMELINE_HPP
 #define TIMELINE_HPP
 
-#include "ShadowfaxSnapshotWriter.hpp"
 #include "GadgetSnapshotWriter.hpp"
+#include "ShadowfaxSnapshotWriter.hpp"
 #include "utilities/Timer.hpp"
 #include <iostream>
 #include <string>
@@ -46,8 +46,8 @@ class RestartFile;
   * The TimeLine is also responsible for detecting when a snapshot has to be
   * written and calls a SnapshotWriter to do so.
   */
-class TimeLine{
-private:
+class TimeLine {
+  private:
     /*! \brief End time of the simulation */
     double _maxtime;
     /*! \brief End time on the integer timeline */
@@ -62,7 +62,7 @@ private:
     /*! \brief Reference to the simulation ParticleVector */
     ParticleVector& _particles;
     /*! \brief SnapshotWriter used to write snapshots */
-    SnapshotWriter *_snapshotwriter;
+    SnapshotWriter* _snapshotwriter;
     /*! \brief Courant-Friedrich-Levy constant for hydrodynamical timestep
      *  calculation */
     double _cfl;
@@ -88,7 +88,7 @@ private:
     /*! \brief Timer to quantify time spent in writing snapshot files */
     Timer* _iotimer;
 
-public:
+  public:
     TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
              ParticleVector& particlevector, std::string snaptype,
              std::string snapname, UnitSet& units, UnitSet& output_units,
@@ -101,7 +101,7 @@ public:
      *
      * Clean up the snapshot writer.
      */
-    ~TimeLine(){
+    ~TimeLine() {
         std::cout << "Spent " << _iotimer->value() << "s writing snapshots"
                   << std::endl;
         delete _iotimer;
@@ -125,9 +125,9 @@ public:
     // temporary fix to access gravity in VorFace
     bool has_gravity();
 
-    void dump(RestartFile &rfile);
-    TimeLine(RestartFile &rfile, ParticleVector& particlevector, UnitSet &units,
-             UnitSet &output_units);
+    void dump(RestartFile& rfile);
+    TimeLine(RestartFile& rfile, ParticleVector& particlevector, UnitSet& units,
+             UnitSet& output_units);
 };
 
-#endif // TIMELINE_HPP
+#endif  // TIMELINE_HPP

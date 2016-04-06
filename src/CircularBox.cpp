@@ -26,8 +26,8 @@
 #include "DelCont.hpp"
 #include "VorGen.hpp"
 #include <cmath>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 using namespace std;
 
 /**
@@ -35,11 +35,11 @@ using namespace std;
  * @param origin Coordinates of the origin
  * @param radius The radius of the sphere
  */
-CircularBox::CircularBox( Vec origin, double radius ){
-    _origin  = origin;
-    _radius  = radius;
+CircularBox::CircularBox(Vec origin, double radius) {
+    _origin = origin;
+    _radius = radius;
     // storing the radius squared makes internal checks faster
-    _radius2 = radius*radius;
+    _radius2 = radius * radius;
 }
 
 /**
@@ -52,11 +52,11 @@ CircularBox::CircularBox( Vec origin, double radius ){
  * @return True if the radius of the given coordinates is smaller than the
  * radius of the sphere
  */
-bool CircularBox::inside( Vec pntpos ){
+bool CircularBox::inside(Vec pntpos) {
     double radius = 0.0;
-    for( unsigned i=ndim_; i--; ){
+    for(unsigned i = ndim_; i--;) {
         pntpos[i] -= _origin[i];
-        radius += pntpos[i]*pntpos[i];
+        radius += pntpos[i] * pntpos[i];
     }
     return radius < _radius2;
 }
@@ -73,11 +73,11 @@ bool CircularBox::inside( Vec pntpos ){
  * @return True if the complete region specified by the Point and radius are
  * strictly inside the sphere
  */
-bool CircularBox::inside( VorGen* point, double radius ){
+bool CircularBox::inside(VorGen* point, double radius) {
     double r2 = 0;
-    for( unsigned int i = ndim_; i--; ){
+    for(unsigned int i = ndim_; i--;) {
         double diff = point->pos(i) - _origin[i];
-        r2 += diff*diff;
+        r2 += diff * diff;
     }
     return radius + sqrt(r2) < _radius;
 }
@@ -91,31 +91,31 @@ bool CircularBox::inside( VorGen* point, double radius ){
  *
  * @return A vector with coordinate-vectors of 4 points.
  */
-vector<double> CircularBox::get_bounding_tetrahedron( ){
-    vector<double> coords( (ndim_+1)*ndim_ );
-    double r = 4*_radius;
-#if ndim_==3
+vector<double> CircularBox::get_bounding_tetrahedron() {
+    vector<double> coords((ndim_ + 1) * ndim_);
+    double r = 4 * _radius;
+#if ndim_ == 3
     // equilateral tetrahedron symmetrically enclosing a sphere with
     // radius==4*_radius at its center
     coords[0] = _origin[0];
-    coords[1] = _origin[1] + 3*r;
+    coords[1] = _origin[1] + 3 * r;
     coords[2] = _origin[2];
 
-    coords[3] = _origin[0] + sqrt(8.0)*r;
+    coords[3] = _origin[0] + sqrt(8.0) * r;
     coords[4] = _origin[1] - r;
     coords[5] = _origin[2];
 
-    coords[6] = _origin[0] - sqrt(2.0)*r;
+    coords[6] = _origin[0] - sqrt(2.0) * r;
     coords[7] = _origin[1] - r;
-    coords[8] = _origin[2] + sqrt(6.0)*r;
+    coords[8] = _origin[2] + sqrt(6.0) * r;
 
-    coords[9] = _origin[0] - sqrt(2.0)*r;
+    coords[9] = _origin[0] - sqrt(2.0) * r;
     coords[10] = _origin[1] - r;
-    coords[11] = _origin[2] - sqrt(6.0)*r;
+    coords[11] = _origin[2] - sqrt(6.0) * r;
 #else
     // equilateral triangle symmetrically enclosing a circle with
     // radius==4*_radius at its center
-    double side = sqrt(3.0)*r;
+    double side = sqrt(3.0) * r;
     coords[0] = _origin[0] - side;
     coords[1] = _origin[1] - r;
 
@@ -123,7 +123,7 @@ vector<double> CircularBox::get_bounding_tetrahedron( ){
     coords[3] = _origin[1] - r;
 
     coords[4] = _origin[0];
-    coords[5] = _origin[1]+ 2*r;
+    coords[5] = _origin[1] + 2 * r;
 #endif
     return coords;
 }
@@ -134,11 +134,11 @@ vector<double> CircularBox::get_bounding_tetrahedron( ){
   *
   * @param box A 3- or 4-element array to store the radius and side in
   */
-void CircularBox::get_bounding_box(double* box){
-    for(unsigned int i = ndim_; i--;){
+void CircularBox::get_bounding_box(double* box) {
+    for(unsigned int i = ndim_; i--;) {
         box[i] = _origin[i] - _radius;
     }
-    box[ndim_] = 2.*_radius;
+    box[ndim_] = 2. * _radius;
 }
 
 /**
@@ -148,9 +148,7 @@ void CircularBox::get_bounding_box(double* box){
  *
  * @return 2 times the radius of the sphere
  */
-double CircularBox::get_box_width( ){
-    return 2*_radius;
-}
+double CircularBox::get_box_width() { return 2 * _radius; }
 
 /**
   * @brief Calculate the key for the given coordinates.
@@ -162,9 +160,7 @@ double CircularBox::get_box_width( ){
   * @return The hilbert key for the given coordinates, taking into account the
   * size of the internal volume
   */
-unsigned long CircularBox::get_key(Vec &coords){
-    return 0;
-}
+unsigned long CircularBox::get_key(Vec& coords) { return 0; }
 
 /**
   * @brief Keep the given particle inside the CircularBox, using periodicity.
@@ -173,7 +169,7 @@ unsigned long CircularBox::get_key(Vec &coords){
   *
   * @param p A particle, not necessarily inside the CircularBox
   */
-void CircularBox::keep_inside(Particle *p){
+void CircularBox::keep_inside(Particle* p) {
     // do nothing
 }
 
@@ -184,7 +180,7 @@ void CircularBox::keep_inside(Particle *p){
  *
  * @return Cuboid specifying the dimensions of the surrouning box
  */
-Cuboid CircularBox::get_cuboid(){
+Cuboid CircularBox::get_cuboid() {
     Cuboid cuboid;
     return cuboid;
 }

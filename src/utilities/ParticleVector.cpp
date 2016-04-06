@@ -24,14 +24,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ParticleVector.hpp"
-#include "ParallelSorter.hpp"
-#include "Particle.hpp"
-#include "GasParticle.hpp"
 #include "DMParticle.hpp"
-#include "RestartFile.hpp"
-#include <fstream>
+#include "GasParticle.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
+#include "ParallelSorter.hpp"
+#include "Particle.hpp"
+#include "RestartFile.hpp"
+#include <fstream>
 using namespace std;
 
 /**
@@ -51,14 +51,14 @@ using namespace std;
 ParticleVector::ParticleVector(bool global_timestep, RectangularBox container,
                                bool periodic, bool do_ewald, double alpha,
                                unsigned int size)
-    : _tree(container.get_cuboid(), periodic, do_ewald, alpha, size),
-      _container(container){
-    double box[2*ndim_] = {0.};
+        : _tree(container.get_cuboid(), periodic, do_ewald, alpha, size),
+          _container(container) {
+    double box[2 * ndim_] = {0.};
     _container.get_bounding_box(box);
     _header.set_box(box);
     _header.set_global_timestep(global_timestep);
     _header.set_periodic(periodic);
-    for(unsigned int i = 0; i < PARTTYPE_COUNTER; i++){
+    for(unsigned int i = 0; i < PARTTYPE_COUNTER; i++) {
         _offsets[i] = 0;
         _sizes[i] = 0;
     }
@@ -71,8 +71,8 @@ ParticleVector::ParticleVector(bool global_timestep, RectangularBox container,
  * Free particle memory and print out the sorting and tree building timers to
  * the stdout.
  */
-ParticleVector::~ParticleVector(){
-    for(unsigned int i = 0; i < _sizes[PARTTYPE_COUNTER]; i++){
+ParticleVector::~ParticleVector() {
+    for(unsigned int i = 0; i < _sizes[PARTTYPE_COUNTER]; i++) {
         delete _particles[i];
     }
     cout << "Spent " << _sorttimer.value() << "s sorting particles" << endl;
@@ -85,9 +85,9 @@ ParticleVector::~ParticleVector(){
  * @param container RectangularBox specifying the new dimensions of the box that
  * contains all particles
  */
-void ParticleVector::set_container(RectangularBox container){
+void ParticleVector::set_container(RectangularBox container) {
     _container = container;
-    double box[ndim_+ndim_] = {0.};
+    double box[ndim_ + ndim_] = {0.};
     _container.get_bounding_box(box);
     _header.set_box(box);
     _tree.reset(_container.get_cuboid());
@@ -98,7 +98,7 @@ void ParticleVector::set_container(RectangularBox container){
  *
  * @param periodic True if the box is periodic, false if it is reflective
  */
-void ParticleVector::set_periodic(bool periodic){
+void ParticleVector::set_periodic(bool periodic) {
     _header.set_periodic(periodic);
     _tree.set_periodic(periodic);
 }
@@ -108,7 +108,7 @@ void ParticleVector::set_periodic(bool periodic){
  *
  * This will consolidate the total number of particles in the Header.
  */
-void ParticleVector::finalize(){
+void ParticleVector::finalize() {
     unsigned int globsizes[PARTTYPE_COUNTER];
     MyMPI_Allreduce(_sizes, globsizes, PARTTYPE_COUNTER, MPI_UNSIGNED, MPI_SUM);
     _header.set_ngaspart(globsizes[PARTTYPE_GAS]);
@@ -120,12 +120,13 @@ void ParticleVector::finalize(){
  *
  * @param particle GasParticle to add
  */
-void ParticleVector::add_gas_particle(GasParticle *particle){
+void ParticleVector::add_gas_particle(GasParticle* particle) {
     particle->set_key(_container.get_key(particle->get_position()));
-    _particles.insert(_particles.begin()+_offsets[PARTTYPE_GAS]+
-                      _sizes[PARTTYPE_GAS], particle);
+    _particles.insert(
+            _particles.begin() + _offsets[PARTTYPE_GAS] + _sizes[PARTTYPE_GAS],
+            particle);
     // shift the offsets of all particles of other types
-    for(int i = PARTTYPE_GAS+1; i < PARTTYPE_COUNTER; i++){
+    for(int i = PARTTYPE_GAS + 1; i < PARTTYPE_COUNTER; i++) {
         _offsets[i]++;
     }
     _sizes[PARTTYPE_GAS]++;
@@ -137,12 +138,13 @@ void ParticleVector::add_gas_particle(GasParticle *particle){
  *
  * @param particle DMParticle to add
  */
-void ParticleVector::add_DM_particle(DMParticle *particle){
+void ParticleVector::add_DM_particle(DMParticle* particle) {
     particle->set_key(_container.get_key(particle->get_position()));
-    _particles.insert(_particles.begin()+_offsets[PARTTYPE_DM]+
-                      _sizes[PARTTYPE_DM], particle);
+    _particles.insert(
+            _particles.begin() + _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM],
+            particle);
     // shift the offsets of all particles of other types
-    for(int i = PARTTYPE_DM+1; i < PARTTYPE_COUNTER; i++){
+    for(int i = PARTTYPE_DM + 1; i < PARTTYPE_COUNTER; i++) {
         _offsets[i]++;
     }
     _sizes[PARTTYPE_DM]++;
@@ -153,8 +155,8 @@ void ParticleVector::add_DM_particle(DMParticle *particle){
  * @brief Construct the octtree containing all particles by adding all particles
  * to it
  */
-void ParticleVector::construct_tree(){
-    for(unsigned int i = 0; i < _particles.size(); i++){
+void ParticleVector::construct_tree() {
+    for(unsigned int i = 0; i < _particles.size(); i++) {
         _tree.add_particle(_particles[i]);
     }
 }
@@ -177,12 +179,11 @@ void ParticleVector::construct_tree(){
  * holds a compact block of particles with an approximately equal computational
  * cost.
  */
-void ParticleVector::sort(){
+void ParticleVector::sort() {
     _sorttimer.start();
-    for(unsigned int i = 0; i < _sizes[PARTTYPE_COUNTER]; i++){
+    for(unsigned int i = 0; i < _sizes[PARTTYPE_COUNTER]; i++) {
         _particles[i]->set_key(
-                    _container.get_key(_particles[i]->get_position())
-                    );
+                _container.get_key(_particles[i]->get_position()));
     }
     _tree.reset(_container.get_cuboid());
     ParallelSorter sorter;
@@ -190,24 +191,24 @@ void ParticleVector::sort(){
     sorter.sort(_particles);
 
     // check for duplicate keys
-    for(unsigned int i = 1; i < _particles.size(); i++){
-        if(_particles[i-1]->get_key() == _particles[i]->get_key()){
-            // randomize the key to make sure tree building will succeed
-            // we do have to make sure that the particle falls withing the same
-            // lowest level node
-#if ndim_==3
+    for(unsigned int i = 1; i < _particles.size(); i++) {
+        if(_particles[i - 1]->get_key() == _particles[i]->get_key()) {
+// randomize the key to make sure tree building will succeed
+// we do have to make sure that the particle falls withing the same
+// lowest level node
+#if ndim_ == 3
             unsigned int nodekey = _particles[i]->get_key() & 7;
-            if(nodekey == 7){
-                _particles[i-1]->set_key(_particles[i-1]->get_key()-1);
+            if(nodekey == 7) {
+                _particles[i - 1]->set_key(_particles[i - 1]->get_key() - 1);
             } else {
-                _particles[i]->set_key(_particles[i]->get_key()+1);
+                _particles[i]->set_key(_particles[i]->get_key() + 1);
             }
 #else
             unsigned int nodekey = _particles[i]->get_key() & 3;
-            if(nodekey == 3){
-                _particles[i-1]->set_key(_particles[i-1]->get_key()-1);
+            if(nodekey == 3) {
+                _particles[i - 1]->set_key(_particles[i - 1]->get_key() - 1);
             } else {
-                _particles[i]->set_key(_particles[i]->get_key()+1);
+                _particles[i]->set_key(_particles[i]->get_key() + 1);
             }
 #endif
         }
@@ -220,25 +221,26 @@ void ParticleVector::sort(){
 
     // set the offsets and sizes of the local particles
     _sizes[PARTTYPE_COUNTER] = _particles.size();
-    for(int type = 0; type < PARTTYPE_COUNTER; type++){
+    for(int type = 0; type < PARTTYPE_COUNTER; type++) {
         _sizes[type] = 0;
     }
-    for(unsigned int i = 0; i < _sizes[PARTTYPE_COUNTER]; i++){
+    for(unsigned int i = 0; i < _sizes[PARTTYPE_COUNTER]; i++) {
         _sizes[_particles[i]->type()]++;
     }
-    for(int type = 1; type < PARTTYPE_COUNTER; type++){
-        _offsets[type] = _offsets[type-1]+_sizes[type-1];
+    for(int type = 1; type < PARTTYPE_COUNTER; type++) {
+        _offsets[type] = _offsets[type - 1] + _sizes[type - 1];
     }
 
     // set the internal ids for the gas particles
-    for(unsigned int i = _offsets[PARTTYPE_GAS]; i < _sizes[PARTTYPE_GAS]; i++){
-        ((GasParticle*)_particles[i])->set_local_id(i-_offsets[PARTTYPE_GAS]);
+    for(unsigned int i = _offsets[PARTTYPE_GAS]; i < _sizes[PARTTYPE_GAS];
+        i++) {
+        ((GasParticle*)_particles[i])->set_local_id(i - _offsets[PARTTYPE_GAS]);
     }
 
     _sorttimer.stop();
     _treetimer.start();
     construct_tree();
-    if(MPIGlobal::size < 2){
+    if(MPIGlobal::size < 2) {
         _tree.finalize();
         _treetimer.stop();
         return;
@@ -251,24 +253,24 @@ void ParticleVector::sort(){
     vector<unsigned long> glo_min(MPIGlobal::size);
     vector<unsigned long> glo_max(MPIGlobal::size);
     MyMPI_Allgather(&loc_min, 1, MPI_UNSIGNED_LONG, &glo_min[0], 1,
-            MPI_UNSIGNED_LONG);
+                    MPI_UNSIGNED_LONG);
     MyMPI_Allgather(&loc_max, 1, MPI_UNSIGNED_LONG, &glo_max[0], 1,
-            MPI_UNSIGNED_LONG);
+                    MPI_UNSIGNED_LONG);
 
     glo_min[0] = 0;
-    glo_max[MPIGlobal::size-1] = maxkey-1;
-    for(unsigned int i = MPIGlobal::size-1; i--;){
+    glo_max[MPIGlobal::size - 1] = maxkey - 1;
+    for(unsigned int i = MPIGlobal::size - 1; i--;) {
         unsigned int count = 0;
-        while(((glo_min[i+1]>>1)<<(count+1)) > glo_max[i]){
-            glo_min[i+1] >>= 1;
+        while(((glo_min[i + 1] >> 1) << (count + 1)) > glo_max[i]) {
+            glo_min[i + 1] >>= 1;
             count++;
         }
-        glo_min[i+1] <<= count;
-        glo_max[i] = glo_min[i+1]-1;
+        glo_min[i + 1] <<= count;
+        glo_max[i] = glo_min[i + 1] - 1;
     }
     // add pseudoparticles to tree
-    for(int i = MPIGlobal::size; i--;){
-        if(i != MPIGlobal::rank){
+    for(int i = MPIGlobal::size; i--;) {
+        if(i != MPIGlobal::rank) {
             _tree.add_pseudoparticles(glo_min[i], glo_max[i], i);
         }
     }
@@ -286,11 +288,11 @@ void ParticleVector::sort(){
  *
  * @param filename Name of the file to write
  */
-void ParticleVector::print_local_particles(string filename){
+void ParticleVector::print_local_particles(string filename) {
     // construct file name
     stringstream name;
     name << filename;
-    if(MPIGlobal::size > 1){
+    if(MPIGlobal::size > 1) {
         name << "." << MPIGlobal::rank;
     }
     name << ".txt";
@@ -300,20 +302,20 @@ void ParticleVector::print_local_particles(string filename){
 
     // write header
     ofile << "#x\ty";
-#if ndim_==3
+#if ndim_ == 3
     ofile << "\tz";
 #endif
     ofile << "\n";
 
     // gas particles
-    if(_sizes[PARTTYPE_GAS]){
+    if(_sizes[PARTTYPE_GAS]) {
         ofile << "#gas\n";
 
         for(unsigned int i = _offsets[PARTTYPE_GAS]; i < _sizes[PARTTYPE_GAS];
-            i++){
+            i++) {
             Particle* p = _particles[i];
             ofile << p->x() << "\t" << p->y();
-#if ndim_==3
+#if ndim_ == 3
             ofile << "\t" << p->z();
 #endif
             ofile << "\n";
@@ -321,14 +323,14 @@ void ParticleVector::print_local_particles(string filename){
     }
 
     // dm particles
-    if(_sizes[PARTTYPE_DM]){
+    if(_sizes[PARTTYPE_DM]) {
         ofile << "#dm\n";
 
         for(unsigned int i = _offsets[PARTTYPE_DM]; i < _sizes[PARTTYPE_DM];
-            i++){
+            i++) {
             Particle* p = _particles[i];
             ofile << p->x() << "\t" << p->y();
-#if ndim_==3
+#if ndim_ == 3
             ofile << "\t" << p->z();
 #endif
             ofile << "\n";
@@ -341,16 +343,14 @@ void ParticleVector::print_local_particles(string filename){
  *
  * @return Reference to the Header
  */
-Header& ParticleVector::get_header(){
-    return _header;
-}
+Header& ParticleVector::get_header() { return _header; }
 
 /**
  * @brief Set the number of active particles at the current system time
  *
  * @param numactive Number of active particles
  */
-void ParticleVector::set_numactive(unsigned int numactive){
+void ParticleVector::set_numactive(unsigned int numactive) {
     _numactive = numactive;
 }
 
@@ -359,30 +359,27 @@ void ParticleVector::set_numactive(unsigned int numactive){
  *
  * @return Number of active particles
  */
-unsigned int ParticleVector::get_numactive(){
-    return _numactive;
-}
+unsigned int ParticleVector::get_numactive() { return _numactive; }
 
 /**
  * @brief Dump the particle vector to the given RestartFile
  *
  * @param rfile RestartFile to write to
  */
-void ParticleVector::dump(RestartFile &rfile){
+void ParticleVector::dump(RestartFile& rfile) {
     _header.dump(rfile);
     unsigned int vsize = _sizes[PARTTYPE_GAS];
     rfile.write(vsize);
     for(unsigned int i = _offsets[PARTTYPE_GAS];
-        i < _offsets[PARTTYPE_GAS] + _sizes[PARTTYPE_GAS]; i++){
+        i < _offsets[PARTTYPE_GAS] + _sizes[PARTTYPE_GAS]; i++) {
         _particles[i]->dump(rfile);
     }
     vsize = _sizes[PARTTYPE_DM];
     rfile.write(vsize);
     for(unsigned int i = _offsets[PARTTYPE_DM];
-        i < _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM]; i++){
+        i < _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM]; i++) {
         _particles[i]->dump(rfile);
     }
-
 }
 
 /**
@@ -399,18 +396,18 @@ void ParticleVector::dump(RestartFile &rfile){
  * @param alpha Ewald \f$\alpha\f$ factor
  * @param size Size of the Ewald table
  */
-ParticleVector::ParticleVector(RestartFile &rfile, RectangularBox& box,
+ParticleVector::ParticleVector(RestartFile& rfile, RectangularBox& box,
                                bool periodic, bool do_ewald, double alpha,
                                unsigned int size)
-    : _tree(box.get_cuboid(), periodic, do_ewald, alpha, size), _container(box),
-      _header(rfile){
+        : _tree(box.get_cuboid(), periodic, do_ewald, alpha, size),
+          _container(box), _header(rfile) {
     unsigned int vsize;
     rfile.read(vsize);
     _particles.resize(vsize, NULL);
     _sizes[PARTTYPE_GAS] = vsize;
     _sizes[PARTTYPE_COUNTER] = vsize;
     _offsets[PARTTYPE_GAS] = 0;
-    for(unsigned int i = 0; i < vsize; i++){
+    for(unsigned int i = 0; i < vsize; i++) {
         _particles[i] = new GasParticle(rfile);
     }
     rfile.read(vsize);
@@ -419,7 +416,7 @@ ParticleVector::ParticleVector(RestartFile &rfile, RectangularBox& box,
     _offsets[PARTTYPE_DM] = _sizes[PARTTYPE_GAS];
     _particles.resize(_sizes[PARTTYPE_COUNTER], NULL);
     for(unsigned int i = _offsets[PARTTYPE_DM];
-        i < _offsets[PARTTYPE_DM]+_sizes[PARTTYPE_DM]; i++){
+        i < _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM]; i++) {
         _particles[i] = new DMParticle(rfile);
     }
 }

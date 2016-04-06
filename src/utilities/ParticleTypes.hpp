@@ -29,7 +29,7 @@
 /**
  * @brief Particle types
  */
-enum ParticleType{
+enum ParticleType {
     /*! Gas particle */
     PARTTYPE_GAS = 0,
     /*! Dark matter particle */
@@ -39,4 +39,4 @@ enum ParticleType{
     PARTTYPE_COUNTER
 };
 
-#endif // PARTICLETYPES_HPP
+#endif  // PARTICLETYPES_HPP

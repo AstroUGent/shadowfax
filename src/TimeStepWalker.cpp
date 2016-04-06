@@ -34,11 +34,11 @@ using namespace std;
  *
  * @param p GasParticle for which the timestep is calculated
  */
-TimeStepWalker::TimeStepWalker(GasParticle *p){
+TimeStepWalker::TimeStepWalker(GasParticle* p) {
     _p = p;
     _position = p->get_position();
     StateVector W = p->get_Wvec();
-#if ndim_==3
+#if ndim_ == 3
     _v.set(W[1], W[2], W[3]);
 #else
     _v.set(W[1], W[2]);
@@ -46,7 +46,7 @@ TimeStepWalker::TimeStepWalker(GasParticle *p){
     _v -= p->get_velocity();
     _vi = _v.norm();
     _ci = _p->get_soundspeed();
-    _t = p->h()/(_vi+p->get_soundspeed());
+    _t = p->h() / (_vi + p->get_soundspeed());
     _local = true;
 }
 
@@ -56,7 +56,7 @@ TimeStepWalker::TimeStepWalker(GasParticle *p){
  * @param import Import holding information about the external GasParticle for
  * which the timestep is calculated
  */
-TimeStepWalker::TimeStepWalker(Import &import){
+TimeStepWalker::TimeStepWalker(Import& import) {
     _p = NULL;
     _position = import.get_position();
     _v = import.get_v();
@@ -71,27 +71,21 @@ TimeStepWalker::TimeStepWalker(Import &import){
  *
  * @param position Position for the tree walk
  */
-void TimeStepWalker::set_position(Vec position){
-    _position = position;
-}
+void TimeStepWalker::set_position(Vec position) { _position = position; }
 
 /**
  * @brief Get the position for the tree walk
  *
  * @return Position for the tree walk
  */
-Vec TimeStepWalker::get_position(){
-    return _position;
-}
+Vec TimeStepWalker::get_position() { return _position; }
 
 /**
  * @brief Get the resulting timestep
  *
  * @return Resulting particle timestep
  */
-double TimeStepWalker::get_timestep(){
-    return _t;
-}
+double TimeStepWalker::get_timestep() { return _t; }
 
 /**
  * @brief Decide if the given TreeNode should be opened or treated as a whole
@@ -102,11 +96,11 @@ double TimeStepWalker::get_timestep(){
  * @return True if the node should be opened, false if the tree walk can
  * continue without opening the node
  */
-bool TimeStepWalker::splitnode(TreeNode *node){
-    double radius = _t*(_vi+_ci+node->get_cmax()+node->get_vmax());
+bool TimeStepWalker::splitnode(TreeNode* node) {
+    double radius = _t * (_vi + _ci + node->get_cmax() + node->get_vmax());
     radius *= radius;
     double distance = node->get_distance(_position);
-    if(_boxsize){
+    if(_boxsize) {
         nearest(distance);
     }
     return distance <= radius;
@@ -117,30 +111,31 @@ bool TimeStepWalker::splitnode(TreeNode *node){
  *
  * @param leaf Leaf on which to act
  */
-void TimeStepWalker::leafaction(Leaf *leaf){
+void TimeStepWalker::leafaction(Leaf* leaf) {
     Particle* pj = leaf->get_particle();
-    if(pj->type() == PARTTYPE_GAS){
+    if(pj->type() == PARTTYPE_GAS) {
         Vec rij = _position - pj->get_position();
-        if(_boxsize){
+        if(_boxsize) {
             nearest(rij);
         }
         double r2 = rij.norm2();
-        if(r2){
-            double radius = _t*(_vi+_ci+leaf->get_cmax()+leaf->get_vmax());
+        if(r2) {
+            double radius =
+                    _t * (_vi + _ci + leaf->get_cmax() + leaf->get_vmax());
             radius *= radius;
-            if(r2 <= radius){
+            if(r2 <= radius) {
                 StateVector Wj = ((GasParticle*)pj)->get_Wvec();
-#if ndim_==3
+#if ndim_ == 3
                 Vec vij(Wj[1], Wj[2], Wj[3]);
 #else
                 Vec vij(Wj[1], Wj[2]);
 #endif
-                vij = _v-vij;
+                vij = _v - vij;
                 double rnrm = sqrt(r2);
-                double denom = _ci+((GasParticle*)pj)->get_soundspeed() -
-                        Vec::dot(vij, rij)/rnrm;
-                if(denom > 0.){
-                    _t = std::min(_t, rnrm/denom);
+                double denom = _ci + ((GasParticle*)pj)->get_soundspeed() -
+                               Vec::dot(vij, rij) / rnrm;
+                if(denom > 0.) {
+                    _t = std::min(_t, rnrm / denom);
                 }
             }
         }
@@ -154,15 +149,16 @@ void TimeStepWalker::leafaction(Leaf *leaf){
  *
  * @param pseudonode PseudoNode on which to act
  */
-void TimeStepWalker::pseudonodeaction(PseudoNode *pseudonode){
-    double radius = _t*(_vi+_ci+pseudonode->get_cmax()+pseudonode->get_vmax());
+void TimeStepWalker::pseudonodeaction(PseudoNode* pseudonode) {
+    double radius =
+            _t * (_vi + _ci + pseudonode->get_cmax() + pseudonode->get_vmax());
     radius *= radius;
     double distance = pseudonode->get_distance(_position);
-    if(_boxsize){
+    if(_boxsize) {
         nearest(distance);
     }
-    if(distance <= radius){
-//        _exportlist[pseudonode->get_source()] = true;
+    if(distance <= radius) {
+        //        _exportlist[pseudonode->get_source()] = true;
     }
 }
 
@@ -176,11 +172,12 @@ void TimeStepWalker::pseudonodeaction(PseudoNode *pseudonode){
  * @param pseudonode PseudoNode on which to act
  * @return True if the treewalk should be exported, false otherwise
  */
-bool TimeStepWalker::export_to_pseudonode(PseudoNode *pseudonode){
-    double radius = _t*(_vi+_ci+pseudonode->get_cmax()+pseudonode->get_vmax());
+bool TimeStepWalker::export_to_pseudonode(PseudoNode* pseudonode) {
+    double radius =
+            _t * (_vi + _ci + pseudonode->get_cmax() + pseudonode->get_vmax());
     radius *= radius;
     double distance = pseudonode->get_distance(_position);
-    if(_boxsize){
+    if(_boxsize) {
         nearest(distance);
     }
     return distance <= radius;
@@ -189,24 +186,20 @@ bool TimeStepWalker::export_to_pseudonode(PseudoNode *pseudonode){
 /**
  * @brief Finalize the treewalk by setting the timestep of the GasParticle
  */
-void TimeStepWalker::after_walk(){
-    _p->set_real_timestep(_t);
-}
+void TimeStepWalker::after_walk() { _p->set_real_timestep(_t); }
 
 /**
  * @brief Finalize the external treewalk by setting the timestep of the Import
  *
  * @param import Import that will be exported back to the original MPI process
  */
-void TimeStepWalker::after_walk(Import &import){
-    import.set_t(_t);
-}
+void TimeStepWalker::after_walk(Import& import) { import.set_t(_t); }
 
 /**
  * @brief Get an Export to export the treewalk to another MPI process
  *
  * @return Export that can be exported to other MPI processes
  */
-TimeStepWalker::Export TimeStepWalker::get_export(){
+TimeStepWalker::Export TimeStepWalker::get_export() {
     return Export(_p, _v, _position, _vi, _ci, _t);
 }

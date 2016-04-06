@@ -137,8 +137,8 @@ OutputUnits = SI
 RealPhysics = true
 \endverbatim
  */
-class ParameterFile{
-private:
+class ParameterFile {
+  private:
     // time options
     /*! \brief End time of the simulation in internal units */
     double _maxtime;
@@ -233,9 +233,9 @@ private:
 
     void print_contents();
 
-public:
+  public:
     ParameterFile(std::string name);
-    ~ParameterFile(){}
+    ~ParameterFile() {}
 
     // time options
     double get_maxtime();
@@ -291,8 +291,8 @@ public:
     // Physics options
     bool has_real_physics();
 
-    void dump(RestartFile &rfile);
-    ParameterFile(RestartFile &rfile);
+    void dump(RestartFile& rfile);
+    ParameterFile(RestartFile& rfile);
 };
 
-#endif // PARAMETERFILE_HPP
+#endif  // PARAMETERFILE_HPP

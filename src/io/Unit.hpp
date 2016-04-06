@@ -26,9 +26,9 @@
 #ifndef UNIT_HPP
 #define UNIT_HPP
 
-#include <string>
-#include <ostream>
 #include <istream>
+#include <ostream>
+#include <string>
 
 #include "RestartFile.hpp"
 
@@ -54,8 +54,8 @@
   *  - luminous intensity: candela (cd)
   *  - amount of substance: mole (mol)
   */
-class Unit{
-protected:
+class Unit {
+  protected:
     /*! \brief Name of the Unit */
     std::string _name;
 
@@ -66,7 +66,7 @@ protected:
      *  Unit */
     double _SI_value;
 
-public:
+  public:
     /**
       * @brief Default constructor
       *
@@ -86,9 +86,9 @@ public:
      * SI-units
      */
     Unit(std::string quantity, std::string name, double SI_value)
-        : _name(name), _quantity(quantity), _SI_value(SI_value){}
+            : _name(name), _quantity(quantity), _SI_value(SI_value) {}
 
-    ~Unit(){}
+    ~Unit() {}
 
     /**
       * @brief Get the SI value of this unit in the basic SI unit for that
@@ -96,9 +96,7 @@ public:
       *
       * @returns The SI value of the Unit
       */
-    inline double get_SI_value(){
-        return _SI_value;
-    }
+    inline double get_SI_value() { return _SI_value; }
 
     /**
       * @brief Get the quantity associated with this Unit
@@ -114,9 +112,7 @@ public:
       *
       * @returns The name of the quantity of the Unit
       */
-    inline const std::string get_quantity(){
-        return _quantity;
-    }
+    inline const std::string get_quantity() { return _quantity; }
 
     /**
       * @brief Get the name of the Unit
@@ -129,36 +125,28 @@ public:
       *
       * @returns The name of the Unit
       */
-    inline const std::string get_name(){
-        return _name;
-    }
+    inline const std::string get_name() { return _name; }
 
     /**
       * @brief void pointer to the SI value needed for C-style writing routines
       *
       * @returns A void pointer to the internal _SI_value
       */
-    inline void* SI_value(){
-        return &_SI_value;
-    }
+    inline void* SI_value() { return &_SI_value; }
 
     /**
       * @brief void pointer to the name needed for C-style writing routines
       *
       * @returns A void pointer to the internal _name
       */
-    inline const void* name(){
-        return &_name;
-    }
+    inline const void* name() { return &_name; }
 
     /**
       * @brief void pointer to the quantity needed for C-style writing routines
       *
       * @returns A void pointer to the internal _quantity
       */
-    inline const void* quantity(){
-        return &_quantity;
-    }
+    inline const void* quantity() { return &_quantity; }
 
     /**
       * @brief Divide this Unit by another Unit
@@ -169,7 +157,7 @@ public:
       * @param u Unit to divide this Unit by
       * @returns Reference to this Unit
       */
-    inline Unit& operator/=(Unit u){
+    inline Unit& operator/=(Unit u) {
         _quantity += "/" + u._quantity;
         _name += "/" + u._name;
         _SI_value /= u._SI_value;
@@ -185,7 +173,7 @@ public:
       * @param u Unit to multiply this Unit with
       * @returns Reference to this Unit
       */
-    inline Unit& operator*=(Unit u){
+    inline Unit& operator*=(Unit u) {
         _quantity += "*" + u._quantity;
         _name += "*" + u._name;
         _SI_value *= u._SI_value;
@@ -197,7 +185,7 @@ public:
      *
      * @param rfile RestartFile to write to
      */
-    inline void dump(RestartFile &rfile){
+    inline void dump(RestartFile& rfile) {
         rfile.write(_name);
         rfile.write(_quantity);
         rfile.write(_SI_value);
@@ -209,7 +197,7 @@ public:
      *
      * @param rfile RestartFile to write to
      */
-    inline Unit(RestartFile &rfile){
+    inline Unit(RestartFile& rfile) {
         rfile.read(_name);
         rfile.read(_quantity);
         rfile.read(_SI_value);
@@ -223,9 +211,7 @@ public:
   * @param b Unit in denominator of the division
   * @returns A new Unit which is the result of the division
   */
-inline Unit operator/(Unit a, Unit b){
-    return a /= b;
-}
+inline Unit operator/(Unit a, Unit b) { return a /= b; }
 
 /**
   * @brief Multiply two units
@@ -234,8 +220,6 @@ inline Unit operator/(Unit a, Unit b){
   * @param b Unit two
   * @returns A new Unit which is the result of the multiplication
   */
-inline Unit operator*(Unit a, Unit b){
-    return a *= b;
-}
+inline Unit operator*(Unit a, Unit b) { return a *= b; }
 
-#endif // UNIT_HPP
+#endif  // UNIT_HPP

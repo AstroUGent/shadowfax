@@ -31,12 +31,12 @@
 /**
  * @brief SnapshotWriter implementation to write default Shadowfax snapshots
  */
-class ShadowfaxSnapshotWriter : public SnapshotWriter{
-private:
+class ShadowfaxSnapshotWriter : public SnapshotWriter {
+  private:
     /*! \brief Timer used to quantify time spent writing snapshots */
     Timer _timer;
 
-public:
+  public:
     ShadowfaxSnapshotWriter(std::string basename, UnitSet& units,
                             UnitSet& output_units, int lastsnap = 0);
     virtual ~ShadowfaxSnapshotWriter();
@@ -47,15 +47,13 @@ public:
      *
      * @return SHAD, because this is ShadowfaxSnapshotWriter
      */
-    virtual std::string get_tag(){
-        return "SHAD";
-    }
+    virtual std::string get_tag() { return "SHAD"; }
 
     void write_snapshot(double currentTime, ParticleVector& particles);
 
-    virtual void dump(RestartFile &rfile);
-    ShadowfaxSnapshotWriter(RestartFile &rfile, UnitSet &units,
-                            UnitSet &output_units);
+    virtual void dump(RestartFile& rfile);
+    ShadowfaxSnapshotWriter(RestartFile& rfile, UnitSet& units,
+                            UnitSet& output_units);
 };
 
-#endif // SHADOWFAXSNAPSHOTWRITER_HPP
+#endif  // SHADOWFAXSNAPSHOTWRITER_HPP

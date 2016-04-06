@@ -44,10 +44,10 @@ using namespace std;
  */
 ShadowfaxSnapshotReader::ShadowfaxSnapshotReader(std::string name,
                                                  UnitSet& units)
-    : SnapshotReader(name, units){
+        : SnapshotReader(name, units) {
     // check if the given snapshot exists
     ifstream file(name.c_str());
-    if(!file){
+    if(!file) {
         cerr << "Cannot open " << name << "!" << endl;
         my_exit();
     }
@@ -66,7 +66,7 @@ ShadowfaxSnapshotReader::ShadowfaxSnapshotReader(std::string name,
 ShadowfaxSnapshotReader::ShadowfaxSnapshotReader(std::string basename,
                                                  UnitSet& units,
                                                  unsigned int nr)
-    : SnapshotReader(basename, units){
+        : SnapshotReader(basename, units) {
     _name = get_snapshot_name(nr);
 }
 
@@ -76,7 +76,7 @@ ShadowfaxSnapshotReader::ShadowfaxSnapshotReader(std::string basename,
  * @param particles ParticleVector to fill
  * @return Header containing general information about the snapshot
  */
-Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles){
+Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles) {
     Header header;
     FileInput file(_name);
     file.read_header(header);
@@ -86,9 +86,9 @@ Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles){
     UnitSet* si_units = UnitSetGenerator::generate("SI");
     UnitConverter length_converter(si_units->get_length_unit(),
                                    _units.get_length_unit());
-    double box[ndim_+ndim_];
+    double box[ndim_ + ndim_];
     header.box(box);
-    for(unsigned int i = 0; i < ndim_+ndim_; i++){
+    for(unsigned int i = 0; i < ndim_ + ndim_; i++) {
         box[i] = length_converter.convert(box[i]);
     }
     header.set_box(box);
@@ -102,7 +102,7 @@ Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles){
     header.set_hsoft(hsoft);
     delete si_units;
 
-    if(header.ngaspart()){
+    if(header.ngaspart()) {
         vector<string> headers;
         vector<Unit> units;
         headers.push_back("x");
@@ -115,9 +115,9 @@ Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles){
         Block block2("grid", headers, dimensions, units);
         file.read(block2, header.ngaspart());
         particles.resizegas(block2.number_of_lines());
-        for(unsigned int i = 0; i < block2.number_of_lines(); i++){
+        for(unsigned int i = 0; i < block2.number_of_lines(); i++) {
             vector<double> coords = block2.get_line(i);
-#if ndim_==3
+#if ndim_ == 3
             Vec pcoords(coords[0], coords[1], coords[2]);
 #else
             Vec pcoords(coords[0], coords[1]);
@@ -132,7 +132,7 @@ Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles){
         units.push_back(_units.get_velocity_unit());
         headers.push_back("velocity_y");
         units.push_back(_units.get_velocity_unit());
-#if ndim_==3
+#if ndim_ == 3
         headers.push_back("velocity_z");
         units.push_back(_units.get_velocity_unit());
 #endif
@@ -144,20 +144,20 @@ Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles){
         dimensions.resize(headers.size(), 1);
         Block block("cells", headers, dimensions, units);
         file.read(block, header.ngaspart());
-        for(unsigned int i = 0; i < particles.gassize(); i++){
+        for(unsigned int i = 0; i < particles.gassize(); i++) {
             vector<double> Wvec = block.get_line(i);
-#if ndim_==3
+#if ndim_ == 3
             StateVector W(Wvec[0], Wvec[1], Wvec[2], Wvec[3], Wvec[4]);
 #else
             StateVector W(Wvec[0], Wvec[1], Wvec[2], Wvec[3]);
 #endif
             particles.gas(i)->set_W(W);
-            particles.gas(i)->set_v(0.,0.,0.);
-            particles.gas(i)->set_id(Wvec[ndim_+2]);
+            particles.gas(i)->set_v(0., 0., 0.);
+            particles.gas(i)->set_id(Wvec[ndim_ + 2]);
         }
     }
 
-    if(header.ndmpart()){
+    if(header.ndmpart()) {
         vector<string> headers;
         vector<Unit> units;
         headers.push_back("id");
@@ -180,11 +180,11 @@ Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles){
         Block block("DM", headers, dimensions, units, header.ndmpart());
         file.read(block, header.ndmpart());
         particles.resizedm(block.number_of_lines());
-        for(unsigned int i = 0; i < particles.dmsize(); i++){
+        for(unsigned int i = 0; i < particles.dmsize(); i++) {
             vector<double> row = block.get_line(i);
             unsigned long id = row[0];
             double mass = row[1];
-#if ndim_==3
+#if ndim_ == 3
             Vec position(row[2], row[3], row[4]);
 #else
             Vec position(row[2], row[3]);

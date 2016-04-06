@@ -36,7 +36,7 @@ using namespace std;
  * @param units Internal simulation UnitSet
  */
 SnapshotHandler::SnapshotHandler(std::string name, UnitSet& units)
-    : _units(units){
+        : _units(units) {
     _name = name;
 }
 
@@ -53,18 +53,18 @@ SnapshotHandler::SnapshotHandler(std::string name, UnitSet& units)
  * @return Name of the snapshot file
  */
 std::string SnapshotHandler::get_snapshot_name(unsigned int nr, int rank,
-                                               int size){
+                                               int size) {
     stringstream name;
     name << _name;
     name.fill('0');
     name.width(3);
     name << nr;
-    if(rank >= 0){
+    if(rank >= 0) {
         name << ".";
         int digits = 0;
         int sizecopy = size;
         int check = 1;
-        while(sizecopy){
+        while(sizecopy) {
             sizecopy /= 10;
             check *= 10;
             digits++;
@@ -72,7 +72,7 @@ std::string SnapshotHandler::get_snapshot_name(unsigned int nr, int rank,
         check /= 10;
         // if size has one digit more than the largest rank in the range, remove
         // the extra digit
-        if(check == size){
+        if(check == size) {
             digits--;
         }
         name.fill('0');
@@ -88,9 +88,7 @@ std::string SnapshotHandler::get_snapshot_name(unsigned int nr, int rank,
  *
  * @param rfile RestartFile to write to
  */
-void SnapshotHandler::dump(RestartFile &rfile){
-    rfile.write(_name);
-}
+void SnapshotHandler::dump(RestartFile& rfile) { rfile.write(_name); }
 
 /**
  * @brief Restart constructor. Initialize the snapshot handler using the given
@@ -99,7 +97,7 @@ void SnapshotHandler::dump(RestartFile &rfile){
  * @param rfile RestartFile to read from
  * @param units Internal simulation UnitSet
  */
-SnapshotHandler::SnapshotHandler(RestartFile &rfile, UnitSet &units)
-    : _units(units){
+SnapshotHandler::SnapshotHandler(RestartFile& rfile, UnitSet& units)
+        : _units(units) {
     rfile.read(_name);
 }

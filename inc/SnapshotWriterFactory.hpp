@@ -27,19 +27,19 @@
 #ifndef SNAPSHOTWRITERFACTORY_HPP
 #define SNAPSHOTWRITERFACTORY_HPP
 
-#include <istream>
-#include "SnapshotHandler.hpp"
-#include "GadgetSnapshotWriter.hpp"
-#include "ShadowfaxSnapshotWriter.hpp"
-#include "RestartFile.hpp"
 #include "Error.hpp"
+#include "GadgetSnapshotWriter.hpp"
+#include "RestartFile.hpp"
+#include "ShadowfaxSnapshotWriter.hpp"
+#include "SnapshotHandler.hpp"
+#include <istream>
 
 /**
  * @brief Factory to generate a SnapshotWriter from a given std::string and to
  * dump or read a SnapshotWriter to/from a RestartFile
  */
-class SnapshotWriterFactory{
-public:
+class SnapshotWriterFactory {
+  public:
     /**
      * @brief Load a SnapshotWriter from the given RestartFile
      *
@@ -51,14 +51,14 @@ public:
      * @param output_units Output UnitSet
      * @return Pointer to a SnapshotWriter implementation instance
      */
-    static SnapshotWriter* load(RestartFile &rfile, UnitSet &units,
-                                UnitSet &output_units){
+    static SnapshotWriter* load(RestartFile& rfile, UnitSet& units,
+                                UnitSet& output_units) {
         std::string tag;
         rfile.read(tag);
-        if(tag == "SHAD"){
+        if(tag == "SHAD") {
             return new ShadowfaxSnapshotWriter(rfile, units, output_units);
         }
-        if(tag == "GADG"){
+        if(tag == "GADG") {
             return new GadgetSnapshotWriter(rfile, units, output_units);
         }
         return NULL;
@@ -74,7 +74,7 @@ public:
      * @param rfile RestartFile to write to
      * @param writer SnapshotWriter instance to dump
      */
-    static void dump(RestartFile &rfile, SnapshotWriter *writer){
+    static void dump(RestartFile& rfile, SnapshotWriter* writer) {
         std::string tag = writer->get_tag();
         rfile.write(tag);
         writer->dump(rfile);
@@ -96,12 +96,12 @@ public:
     static SnapshotWriter* generate(std::string name, std::string basename,
                                     UnitSet& units, UnitSet& output_units,
                                     int lastsnap = 0,
-                                    bool per_node_output = false){
-        if(name == "Shadowfax"){
+                                    bool per_node_output = false) {
+        if(name == "Shadowfax") {
             return new ShadowfaxSnapshotWriter(basename, units, output_units,
                                                lastsnap);
         }
-        if(name == "Gadget"){
+        if(name == "Gadget") {
             return new GadgetSnapshotWriter(basename, units, output_units,
                                             lastsnap, per_node_output);
         }
@@ -112,4 +112,4 @@ public:
     }
 };
 
-#endif // SNAPSHOTWRITERFACTORY_HPP
+#endif  // SNAPSHOTWRITERFACTORY_HPP

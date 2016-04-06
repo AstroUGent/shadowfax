@@ -33,14 +33,14 @@
  *
  * The Shadowfax snapshot format is the native and default snapshot type.
  */
-class ShadowfaxSnapshotReader : public SnapshotReader{
-public:
+class ShadowfaxSnapshotReader : public SnapshotReader {
+  public:
     ShadowfaxSnapshotReader(std::string name, UnitSet& units);
     ShadowfaxSnapshotReader(std::string basename, UnitSet& units,
                             unsigned int nr);
-    ~ShadowfaxSnapshotReader(){}
+    ~ShadowfaxSnapshotReader() {}
 
     Header read_snapshot(ParticleVector& particles);
 };
 
-#endif // SHADOWFAXSNAPSHOTREADER_HPP
+#endif  // SHADOWFAXSNAPSHOTREADER_HPP

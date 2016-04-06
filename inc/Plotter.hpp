@@ -26,21 +26,21 @@
 #ifndef PLOTTER_HPP
 #define PLOTTER_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
 /**
  * @brief SideProgram used to plot snapshots in PPM format
  *
  * All capabilities are now also supported by using VisIt and the vtkmaker.
  */
-class Plotter{
-private:
+class Plotter {
+  private:
     std::string get_filename(std::string filename);
 
-public:
+  public:
     Plotter(int argc, char** argv);
-    ~Plotter(){}
+    ~Plotter() {}
 };
 
-#endif // PLOTTER_HPP
+#endif  // PLOTTER_HPP

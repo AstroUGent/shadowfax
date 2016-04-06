@@ -26,10 +26,10 @@
 #ifndef PARTICLEVECTOR_HPP
 #define PARTICLEVECTOR_HPP
 
-#include "Tree.hpp"
+#include "../src/io/Header.hpp"
 #include "DelCont.hpp"
 #include "ParticleTypes.hpp"
-#include "../src/io/Header.hpp"
+#include "Tree.hpp"
 #include "utilities/Timer.hpp"
 #include <vector>
 
@@ -54,8 +54,8 @@ class DMParticle;
  * It implements methods to sort the particles (in parallel) and to build and
  * update the Tree.
  */
-class ParticleVector{
-private:
+class ParticleVector {
+  private:
     /*! \brief List of particles */
     std::vector<Particle*> _particles;
 
@@ -64,7 +64,7 @@ private:
     unsigned int _offsets[PARTTYPE_COUNTER];
 
     /*! \brief Sizes of the different particle types on the local process */
-    unsigned int _sizes[PARTTYPE_COUNTER+1];
+    unsigned int _sizes[PARTTYPE_COUNTER + 1];
 
     /*! \brief The number of active particles at the current system time */
     unsigned int _numactive;
@@ -93,11 +93,11 @@ private:
      * @return True if the ParticleType of B is larger than the ParticleType of
      * A
      */
-    static bool compare_type(Particle *a, Particle *b){
+    static bool compare_type(Particle* a, Particle* b) {
         return a->type() < b->type();
     }
 
-public:
+  public:
     ParticleVector(bool global_timestep, RectangularBox container,
                    bool periodic = false, bool do_ewald = false,
                    double alpha = 2., unsigned int size = 64);
@@ -118,33 +118,29 @@ public:
      *
      * @return Size of the local gas particle list
      */
-    unsigned int gassize(){
-        return _sizes[PARTTYPE_GAS];
-    }
+    unsigned int gassize() { return _sizes[PARTTYPE_GAS]; }
 
     /**
      * @brief Get the size of the dark matter particle list
      *
      * @return Size of the local dark matter particle list
      */
-    unsigned int dmsize(){
-        return _sizes[PARTTYPE_DM];
-    }
+    unsigned int dmsize() { return _sizes[PARTTYPE_DM]; }
 
     /**
      * @brief Resize the gas particle list
      *
      * @param size New size for the gas particle list
      */
-    void resizegas(unsigned int size){
+    void resizegas(unsigned int size) {
         _sizes[PARTTYPE_GAS] = size;
         _sizes[PARTTYPE_COUNTER] = 0;
-        for(int type = 0; type < PARTTYPE_COUNTER; type++){
+        for(int type = 0; type < PARTTYPE_COUNTER; type++) {
             _sizes[PARTTYPE_COUNTER] += _sizes[type];
         }
         _particles.resize(_sizes[PARTTYPE_COUNTER]);
-        for(int type = PARTTYPE_GAS+1; type < PARTTYPE_COUNTER; type++){
-            _offsets[type] = _offsets[type-1] + _sizes[type-1];
+        for(int type = PARTTYPE_GAS + 1; type < PARTTYPE_COUNTER; type++) {
+            _offsets[type] = _offsets[type - 1] + _sizes[type - 1];
         }
     }
 
@@ -153,15 +149,15 @@ public:
      *
      * @param size New size for the dark matter particle list
      */
-    void resizedm(unsigned int size){
+    void resizedm(unsigned int size) {
         _sizes[PARTTYPE_DM] = size;
         _sizes[PARTTYPE_COUNTER] = 0;
-        for(int type = 0; type < PARTTYPE_COUNTER; type++){
+        for(int type = 0; type < PARTTYPE_COUNTER; type++) {
             _sizes[PARTTYPE_COUNTER] += _sizes[type];
         }
         _particles.resize(_sizes[PARTTYPE_COUNTER]);
-        for(int type = PARTTYPE_DM+1; type < PARTTYPE_COUNTER; type++){
-            _offsets[type] = _offsets[type-1] + _sizes[type-1];
+        for(int type = PARTTYPE_DM + 1; type < PARTTYPE_COUNTER; type++) {
+            _offsets[type] = _offsets[type - 1] + _sizes[type - 1];
         }
     }
 
@@ -171,8 +167,8 @@ public:
      * @param i unsigned integer index of the requested gas particle in the list
      * @return Reference to the ith gas particle in the list
      */
-    GasParticle*& gas(unsigned int i){
-        return (GasParticle*&)_particles[_offsets[PARTTYPE_GAS]+i];
+    GasParticle*& gas(unsigned int i) {
+        return (GasParticle*&)_particles[_offsets[PARTTYPE_GAS] + i];
     }
 
     /**
@@ -182,8 +178,8 @@ public:
      * the list
      * @return Reference to the ith dark matter particle in the list
      */
-    DMParticle*& dm(unsigned int i){
-        return (DMParticle*&)_particles[_offsets[PARTTYPE_DM]+i];
+    DMParticle*& dm(unsigned int i) {
+        return (DMParticle*&)_particles[_offsets[PARTTYPE_DM] + i];
     }
 
     /**
@@ -191,18 +187,16 @@ public:
      *
      * @return Refernce to the Tree
      */
-    Tree& get_tree(){
-        return _tree;
-    }
+    Tree& get_tree() { return _tree; }
 
     /**
      * @brief Get a reference to the last gas particle in the list
      *
      * @return Reference to the last gas particle in the list
      */
-    GasParticle*& gasback(){
-        return (GasParticle*&)_particles[_offsets[PARTTYPE_GAS]+
-                _sizes[PARTTYPE_GAS]-1];
+    GasParticle*& gasback() {
+        return (GasParticle*&)
+                _particles[_offsets[PARTTYPE_GAS] + _sizes[PARTTYPE_GAS] - 1];
     }
 
     /**
@@ -210,9 +204,9 @@ public:
      *
      * @return Reference to the last dark matter particle in the list
      */
-    DMParticle*& dmback(){
-        return (DMParticle*&)_particles[_offsets[PARTTYPE_DM]+
-                _sizes[PARTTYPE_DM]-1];
+    DMParticle*& dmback() {
+        return (DMParticle*&)
+                _particles[_offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM] - 1];
     }
 
     /**
@@ -220,18 +214,14 @@ public:
      *
      * @return DelCont used for the Voronoi grid construction
      */
-    DelCont& get_container(){
-        return _container;
-    }
+    DelCont& get_container() { return _container; }
 
     /**
      * @brief Check if we use a global timestep or individual timesteps
      *
      * @return True if we use a global timestep, false otherwise
      */
-    bool global_timestep(){
-        return _header.global_timestep();
-    }
+    bool global_timestep() { return _header.global_timestep(); }
 
     void print_local_particles(std::string filename);
 
@@ -242,17 +232,15 @@ public:
      *
      * @return Reference to the Header
      */
-    Header& get_local_header(){
-        return _header;
-    }
+    Header& get_local_header() { return _header; }
 
     void set_numactive(unsigned int numactive);
     unsigned int get_numactive();
 
-    void dump(RestartFile &rfile);
-    ParticleVector(RestartFile &rfile, RectangularBox &box,
+    void dump(RestartFile& rfile);
+    ParticleVector(RestartFile& rfile, RectangularBox& box,
                    bool periodic = false, bool do_ewald = false,
                    double alpha = 2., unsigned int size = 64);
 };
 
-#endif // PARTICLEVECTOR_HPP
+#endif  // PARTICLEVECTOR_HPP

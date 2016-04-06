@@ -26,10 +26,10 @@
 #ifndef TIMESTEPWALKER_HPP
 #define TIMESTEPWALKER_HPP
 
-#include "utilities/TreeWalker.hpp"
-#include "utilities/GasParticle.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
+#include "utilities/GasParticle.hpp"
+#include "utilities/TreeWalker.hpp"
 
 class DMParticle;
 
@@ -37,8 +37,8 @@ class DMParticle;
  * @brief TreeWalker implemtentation used to calculate the hydrodynamical
  * timestep as discussed in Springel 2010
  */
-class TimeStepWalker : public TreeWalker{
-private:
+class TimeStepWalker : public TreeWalker {
+  private:
     /*! \brief GasParticle for which the timestep is being calculated */
     GasParticle* _p;
 
@@ -61,13 +61,13 @@ private:
      *  resides on the local MPI process */
     bool _local;
 
-public:
+  public:
     /**
      * @brief Auxiliary class used to commmunicate particle information between
      * MPI processes
      */
-    class Export{
-    private:
+    class Export {
+      private:
         /*! \brief GasParticle for which the timestep is being calculated */
         GasParticle* _p;
         /*! \brief Fluid velocity of the particle (exported) */
@@ -81,7 +81,7 @@ public:
         /*! \brief Current value of the timestep (exported) */
         double _t;
 
-    public:
+      public:
         /**
          * @brief Constructor
          *
@@ -93,8 +93,7 @@ public:
          * @param t Current value of the timestep
          */
         Export(GasParticle* p, Vec v, Vec pos, double vi, double ci, double t)
-            : _p(p), _v(v), _pos(pos), _vi(vi), _ci(ci), _t(t) {
-        }
+                : _p(p), _v(v), _pos(pos), _vi(vi), _ci(ci), _t(t) {}
 
         /**
          * @brief Add data to the given MPI buffer for export
@@ -103,7 +102,7 @@ public:
          * @param bufsize Buffer size
          * @param position Current position in the buffer (is updated)
          */
-        void pack_data(void *buffer, int bufsize, int *position){
+        void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_v[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
             MyMPI_Pack(&_pos[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
             MyMPI_Pack(&_vi, 1, MPI_DOUBLE, buffer, bufsize, position);
@@ -119,7 +118,7 @@ public:
          * @param bufsize Buffer size
          * @param position Current position in the buffer (is updated)
          */
-        void unpack_data(void *buffer, int bufsize, int *position){
+        void unpack_data(void* buffer, int bufsize, int* position) {
             double t;
             MyMPI_Unpack(buffer, bufsize, position, &t, 1, MPI_DOUBLE);
             // since the particle can be exported to multiple processes,
@@ -132,8 +131,8 @@ public:
      * @brief Auxiliary class to communicate particle information between MPI
      * processes
      */
-    class Import{
-    private:
+    class Import {
+      private:
         /*! \brief Fluid velocity of the particle */
         Vec _v;
         /*! \brief Position of the particle */
@@ -145,7 +144,7 @@ public:
         /*! \brief Current value of the timestep (exported) */
         double _t;
 
-    public:
+      public:
         /**
          * @brief Constructor
          *
@@ -153,10 +152,10 @@ public:
          * @param bufsize Buffer size
          * @param position Current position in the buffer (is updated)
          */
-        Import(void* buffer, int bufsize, int* position){
+        Import(void* buffer, int bufsize, int* position) {
             MyMPI_Unpack(buffer, bufsize, position, &_v[0], ndim_, MPI_DOUBLE);
             MyMPI_Unpack(buffer, bufsize, position, &_pos[0], ndim_,
-                    MPI_DOUBLE);
+                         MPI_DOUBLE);
             MyMPI_Unpack(buffer, bufsize, position, &_vi, 1, MPI_DOUBLE);
             MyMPI_Unpack(buffer, bufsize, position, &_ci, 1, MPI_DOUBLE);
             MyMPI_Unpack(buffer, bufsize, position, &_t, 1, MPI_DOUBLE);
@@ -167,54 +166,42 @@ public:
          *
          * @return Fluid velocity of the particle
          */
-        Vec get_v(){
-            return _v;
-        }
+        Vec get_v() { return _v; }
 
         /**
          * @brief Get the position of the particle
          *
          * @return Position of the particle
          */
-        Vec get_position(){
-            return _pos;
-        }
+        Vec get_position() { return _pos; }
 
         /**
          * @brief Get the magnitude of the fluid velocity of the particle
          *
          * @return Magnitude of the fluid velocity of the particle
          */
-        double get_vi(){
-            return _vi;
-        }
+        double get_vi() { return _vi; }
 
         /**
          * @brief Get the soundspeed of the particle
          *
          * @return Soundspeed of the particle
          */
-        double get_ci(){
-            return _ci;
-        }
+        double get_ci() { return _ci; }
 
         /**
          * @brief Get the current value of the timestep
          *
          * @return Current value of the timestep
          */
-        double get_t(){
-            return _t;
-        }
+        double get_t() { return _t; }
 
         /**
          * @brief Set the current value of the timestep
          *
          * @param t Current value of the timestep
          */
-        void set_t(double t){
-            _t = t;
-        }
+        void set_t(double t) { _t = t; }
 
         /**
          * @brief Add data to the given MPI buffer for export to the original
@@ -224,7 +211,7 @@ public:
          * @param bufsize Buffer size
          * @param position Current position in the buffer (is updated)
          */
-        void pack_data(void *buffer, int bufsize, int *position){
+        void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_t, 1, MPI_DOUBLE, buffer, bufsize, position);
         }
     };
@@ -241,7 +228,7 @@ public:
      * @param p DMParticle that compiler-wise could be passed on to the
      * constructor
      */
-    TimeStepWalker(DMParticle* p){}
+    TimeStepWalker(DMParticle* p) {}
 
     TimeStepWalker(Import& import);
 
@@ -250,11 +237,11 @@ public:
 
     double get_timestep();
 
-    bool splitnode(TreeNode *node);
-    void leafaction(Leaf *leaf);
-    void pseudonodeaction(PseudoNode *pseudonode);
+    bool splitnode(TreeNode* node);
+    void leafaction(Leaf* leaf);
+    void pseudonodeaction(PseudoNode* pseudonode);
 
-    bool export_to_pseudonode(PseudoNode *pseudonode);
+    bool export_to_pseudonode(PseudoNode* pseudonode);
 
     void after_walk();
 
@@ -263,4 +250,4 @@ public:
     Export get_export();
 };
 
-#endif // TIMESTEPWALKER_HPP
+#endif  // TIMESTEPWALKER_HPP

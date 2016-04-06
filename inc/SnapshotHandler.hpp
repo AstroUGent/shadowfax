@@ -26,13 +26,13 @@
 #ifndef SNAPSHOTHANDLER_HPP
 #define SNAPSHOTHANDLER_HPP
 
-#include <vector>
-#include <string>
-#include <ostream>
-#include "utilities/Timer.hpp"
-#include "RestartFile.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
+#include "RestartFile.hpp"
+#include "utilities/Timer.hpp"
+#include <ostream>
+#include <string>
+#include <vector>
 
 class UnitSet;
 class ParticleVector;
@@ -44,8 +44,8 @@ class Header;
  * Stores the name of the snapshot (or the basic name for snapshot writers) and
  * a reference to the internal UnitSet.
  */
-class SnapshotHandler{
-protected:
+class SnapshotHandler {
+  protected:
     /*! \brief Name of the snapshot. Can be either a generic name for snapshot
      *  writers or an actual filename for snapshot readers */
     std::string _name;
@@ -55,12 +55,12 @@ protected:
 
     std::string get_snapshot_name(unsigned int nr, int rank = -1, int size = 1);
 
-public:
+  public:
     SnapshotHandler(std::string name, UnitSet& units);
-    virtual ~SnapshotHandler(){}
+    virtual ~SnapshotHandler() {}
 
-    void dump(RestartFile &rfile);
-    SnapshotHandler(RestartFile &rfile, UnitSet &units);
+    void dump(RestartFile& rfile);
+    SnapshotHandler(RestartFile& rfile, UnitSet& units);
 };
 
 /**
@@ -72,8 +72,8 @@ public:
  * Actually writing the snapshot should be done in child classes that implement
  * this interface.
  */
-class SnapshotWriter : public SnapshotHandler{
-protected:
+class SnapshotWriter : public SnapshotHandler {
+  protected:
     /*! \brief UnitSet to be used in the output file */
     UnitSet& _output_units;
 
@@ -84,7 +84,7 @@ protected:
      *  different nodes (necessary when e.g. running OpenMPI over SSH) */
     bool _per_node_output;
 
-public:
+  public:
     /**
      * @brief Constructor
      *
@@ -104,25 +104,25 @@ public:
      */
     SnapshotWriter(std::string basename, UnitSet& units, UnitSet& output_units,
                    int lastsnap = 0, bool per_node_output = false)
-        : SnapshotHandler(basename, units), _output_units(output_units),
-          _lastsnap(lastsnap), _per_node_output(per_node_output) {
+            : SnapshotHandler(basename, units), _output_units(output_units),
+              _lastsnap(lastsnap), _per_node_output(per_node_output) {
         // check if we have different nodes
-        if(!_per_node_output){
-            if(MPIGlobal::local_size < MPIGlobal::size){
+        if(!_per_node_output) {
+            if(MPIGlobal::local_size < MPIGlobal::size) {
                 // check if all nodes write to the same filesystem
                 string testname = basename + ".tmp";
-                if(!MPIGlobal::rank){
+                if(!MPIGlobal::rank) {
                     ofstream testfile(testname);
                     testfile << "Written by process with rank 0\n";
                 }
                 MyMPI_Barrier();
-                if(MPIGlobal::rank && !MPIGlobal::local_rank){
+                if(MPIGlobal::rank && !MPIGlobal::local_rank) {
                     ifstream testfile(testname);
-                    if(!testfile){
+                    if(!testfile) {
                         _per_node_output = true;
                     }
                 }
-                if(!MPIGlobal::rank){
+                if(!MPIGlobal::rank) {
                     remove(testname.c_str());
                 }
 
@@ -136,21 +136,21 @@ public:
                 int msg_send = _per_node_output;
                 int msg_recv;
                 MyMPI_Allreduce(&msg_send, &msg_recv, 1, MPI_INT, MPI_SUM);
-                if(msg_recv){
+                if(msg_recv) {
                     _per_node_output = true;
                 }
             }
         }
     }
 
-    virtual ~SnapshotWriter(){}
+    virtual ~SnapshotWriter() {}
 
     /**
      * @brief Get a tag discriminating different implementations
      *
      * @return A std::string tag that is unique for every implementation
      */
-    virtual std::string get_tag()=0;
+    virtual std::string get_tag() = 0;
 
     /**
      * @brief Write a snapshot file with the given ParticleVector a the given
@@ -159,23 +159,21 @@ public:
      * @param t Current time of the simulation
      * @param particles ParticleVector to write out
      */
-    virtual void write_snapshot(double t, ParticleVector& particles)=0;
+    virtual void write_snapshot(double t, ParticleVector& particles) = 0;
 
     /**
      * @brief Get the current value of the snapshot counter
      *
      * @return The snapshot counter
      */
-    unsigned int get_lastsnap(){
-        return _lastsnap;
-    }
+    unsigned int get_lastsnap() { return _lastsnap; }
 
     /**
      * @brief Dump the snapshot writer to the given RestartFile
      *
      * @param rfile RestartFile to write to
      */
-    virtual void dump(RestartFile &rfile){
+    virtual void dump(RestartFile& rfile) {
         SnapshotHandler::dump(rfile);
         rfile.write(_lastsnap);
         rfile.write(_per_node_output);
@@ -189,8 +187,8 @@ public:
      * @param units Internal simulation UnitSet
      * @param output_units UnitSet used in the output file
      */
-    SnapshotWriter(RestartFile &rfile, UnitSet &units, UnitSet &output_units)
-        : SnapshotHandler(rfile, units), _output_units(output_units) {
+    SnapshotWriter(RestartFile& rfile, UnitSet& units, UnitSet& output_units)
+            : SnapshotHandler(rfile, units), _output_units(output_units) {
         rfile.read(_lastsnap);
         rfile.read(_per_node_output);
     }
@@ -202,8 +200,8 @@ public:
  * This interface does nothing in itself but defines the read_snapshot function
  * that should be implemented by child classes.
  */
-class SnapshotReader : public SnapshotHandler{
-public:
+class SnapshotReader : public SnapshotHandler {
+  public:
     /**
      * @brief Constructor
      *
@@ -211,7 +209,7 @@ public:
      * @param units Internal simulation UnitSet
      */
     SnapshotReader(std::string name, UnitSet& units)
-        : SnapshotHandler(name, units) {}
+            : SnapshotHandler(name, units) {}
 
     /**
      * @brief Read the snapshot and store its contents in the given
@@ -220,7 +218,7 @@ public:
      * @param particles ParticleVector to fill
      * @return Header containing general information about the snapshot
      */
-    virtual Header read_snapshot(ParticleVector& particles)=0;
+    virtual Header read_snapshot(ParticleVector& particles) = 0;
 };
 
-#endif // SNAPSHOTHANDLER_HPP
+#endif  // SNAPSHOTHANDLER_HPP

@@ -36,7 +36,7 @@ using namespace std;
   * @param type UnitType specifying the predefined set, currently only
   * UNITS_DEFAULT
   */
-UnitSet::UnitSet(UnitType type){
+UnitSet::UnitSet(UnitType type) {
     _unit_position = Unit("length", "m", 1.);
     _unit_velocity = Unit("length/time", "m/s", 1.);
     _unit_density = Unit("mass/length/length/length", "kg/m^3", 1.);
@@ -55,11 +55,11 @@ UnitSet::UnitSet(UnitType type){
   * @param unit_mass Mass Unit
   * @param unit_time Time Unit
   */
-UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time){
+UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time) {
     _unit_position = unit_length;
-    _unit_velocity = unit_length/unit_time;
-    _unit_density = unit_mass/unit_length/unit_length/unit_length;
-    _unit_pressure = unit_mass/unit_length/unit_time/unit_time;
+    _unit_velocity = unit_length / unit_time;
+    _unit_density = unit_mass / unit_length / unit_length / unit_length;
+    _unit_pressure = unit_mass / unit_length / unit_time / unit_time;
     _unit_time = unit_time;
     _unit_mass = unit_mass;
 }
@@ -69,54 +69,42 @@ UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time){
   *
   * @returns The length Unit
   */
-Unit UnitSet::get_length_unit(){
-    return _unit_position;
-}
+Unit UnitSet::get_length_unit() { return _unit_position; }
 
 /**
   * @brief Get the density unit
   *
   * @returns The density Unit
   */
-Unit UnitSet::get_density_unit(){
-    return _unit_density;
-}
+Unit UnitSet::get_density_unit() { return _unit_density; }
 
 /**
   * @brief Get the velocity unit
   *
   * @returns The velocity Unit
   */
-Unit UnitSet::get_velocity_unit(){
-    return _unit_velocity;
-}
+Unit UnitSet::get_velocity_unit() { return _unit_velocity; }
 
 /**
   * @brief Get the pressure unit
   *
   * @returns The pressure Unit
   */
-Unit UnitSet::get_pressure_unit(){
-    return _unit_pressure;
-}
+Unit UnitSet::get_pressure_unit() { return _unit_pressure; }
 
 /**
   * @brief Get the time unit
   *
   * @returns The time Unit
   */
-Unit UnitSet::get_time_unit(){
-    return _unit_time;
-}
+Unit UnitSet::get_time_unit() { return _unit_time; }
 
 /**
   * @brief Get the mass unit
   *
   * @returns The mass Unit
   */
-Unit UnitSet::get_mass_unit(){
-    return _unit_mass;
-}
+Unit UnitSet::get_mass_unit() { return _unit_mass; }
 
 /**
   * @brief Get the unit for the given quantity
@@ -130,29 +118,29 @@ Unit UnitSet::get_mass_unit(){
   * @returns The Unit of the given quantity in the system of units specified by
   * this UnitSet
   */
-Unit UnitSet::get_unit(string quantity){
+Unit UnitSet::get_unit(string quantity) {
     unsigned int pos = 0;
     string names[3] = {"length", "mass", "time"};
     Unit units[3] = {_unit_position, _unit_mass, _unit_time};
     Unit unit;
     bool multiply = true;
-    while(pos < quantity.length()){
+    while(pos < quantity.length()) {
         unsigned int i = 0;
-        while(i < 3 && quantity.find(names[i], pos) > pos){
+        while(i < 3 && quantity.find(names[i], pos) > pos) {
             i++;
         }
-        if(i == 3){
-            if(quantity.find("*", pos) == pos){
+        if(i == 3) {
+            if(quantity.find("*", pos) == pos) {
                 multiply = true;
             } else {
                 multiply = false;
             }
             pos += 1;
         } else {
-            if(unit.get_name() == "dimensionless"){
+            if(unit.get_name() == "dimensionless") {
                 unit = units[i];
             } else {
-                if(multiply){
+                if(multiply) {
                     unit *= units[i];
                 } else {
                     unit /= units[i];
@@ -169,7 +157,7 @@ Unit UnitSet::get_unit(string quantity){
  *
  * @param rfile RestartFile to write to
  */
-void UnitSet::dump(RestartFile &rfile){
+void UnitSet::dump(RestartFile& rfile) {
     _unit_position.dump(rfile);
     _unit_density.dump(rfile);
     _unit_velocity.dump(rfile);
@@ -184,6 +172,6 @@ void UnitSet::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-UnitSet::UnitSet(RestartFile &rfile)
-    : _unit_position(rfile), _unit_density(rfile), _unit_velocity(rfile),
-      _unit_pressure(rfile), _unit_time(rfile), _unit_mass(rfile) {}
+UnitSet::UnitSet(RestartFile& rfile)
+        : _unit_position(rfile), _unit_density(rfile), _unit_velocity(rfile),
+          _unit_pressure(rfile), _unit_time(rfile), _unit_mass(rfile) {}

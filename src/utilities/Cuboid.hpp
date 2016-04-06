@@ -27,8 +27,8 @@
 #ifndef CUBOID_HPP
 #define CUBOID_HPP
 
-#include "Vec.hpp"
 #include "RestartFile.hpp"
+#include "Vec.hpp"
 
 /**
  * @brief Representation of a 2D or 3D cuboid
@@ -37,15 +37,15 @@
  * cuboid with the lowest coordinates and a side Vec with the lengths of
  * the 2 or 3 sides.
  */
-class Cuboid{
-private:
+class Cuboid {
+  private:
     /*! \brief Bottom left (front) corner of the box */
     Vec _anchor;
 
     /*! \brief Sides of the box */
     Vec _sides;
 
-public:
+  public:
     inline Cuboid() {}
 
     /**
@@ -62,7 +62,7 @@ public:
      * @param anchor Bottom left (front) corner of the box
      * @param sides Sides of the box
      */
-    inline void set(Vec anchor, Vec sides){
+    inline void set(Vec anchor, Vec sides) {
         _anchor = anchor;
         _sides = sides;
     }
@@ -71,24 +71,20 @@ public:
      * @brief Get the bottom left (front) corner of the box
      * @return Bottom left (front) corner of the box
      */
-    inline Vec get_anchor(){
-        return _anchor;
-    }
+    inline Vec get_anchor() { return _anchor; }
 
     /**
      * @brief Get the sides of the box
      * @return Sides of the box
      */
-    inline Vec get_sides(){
-        return _sides;
-    }
+    inline Vec get_sides() { return _sides; }
 
     /**
      * @brief Dump the box to the given RestartFile
      *
      * @param rfile RestartFile to write to
      */
-    inline void dump(RestartFile &rfile){
+    inline void dump(RestartFile& rfile) {
         rfile.write(_anchor);
         rfile.write(_sides);
     }
@@ -99,10 +95,10 @@ public:
      *
      * @param rfile RestartFile to read from
      */
-    inline Cuboid(RestartFile &rfile){
+    inline Cuboid(RestartFile& rfile) {
         rfile.read(_anchor);
         rfile.read(_sides);
     }
 };
 
-#endif // CUBOID_HPP
+#endif  // CUBOID_HPP

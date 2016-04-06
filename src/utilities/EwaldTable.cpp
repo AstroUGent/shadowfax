@@ -42,24 +42,24 @@ using namespace std;
   * @param size The integer size of one row in the multidimensional table. The
   * actual size is size+1, since both lower and upper limit are inclusive.
   */
-EwaldTable::EwaldTable(double alpha, unsigned int size){
+EwaldTable::EwaldTable(double alpha, unsigned int size) {
     _size = size;
     _alpha = alpha;
-#if ndim_==3
-    _f = new Vec**[size+1];
-    for(unsigned int i = 0; i < size+1; i++){
-        _f[i] = new Vec*[size+1];
-        for(unsigned int j = 0; j < size+1; j++){
-            _f[i][j] = new Vec[size+1];
+#if ndim_ == 3
+    _f = new Vec**[size + 1];
+    for(unsigned int i = 0; i < size + 1; i++) {
+        _f[i] = new Vec*[size + 1];
+        for(unsigned int j = 0; j < size + 1; j++) {
+            _f[i][j] = new Vec[size + 1];
         }
     }
 #else
-    _f = new Vec*[size+1];
-    for(unsigned int i = 0; i < size+1; i++){
-        _f[i] = new Vec[size+1];
+    _f = new Vec*[size + 1];
+    for(unsigned int i = 0; i < size + 1; i++) {
+        _f[i] = new Vec[size + 1];
     }
 #endif
-    if(!read_table()){
+    if(!read_table()) {
         // Show some information to the user. This way, the user does not think
         // the program crashed or hangs.
         // We're not the Belgian railway company, you know...
@@ -68,26 +68,26 @@ EwaldTable::EwaldTable(double alpha, unsigned int size){
         cout << "This can take some time (~1 min)" << endl;
         construct();
     }
-    _ewald_intp_fac = 2.*_size;
+    _ewald_intp_fac = 2. * _size;
 }
 
 /**
   * @brief Garbage collection. Free memory associated with the internal table.
   */
-EwaldTable::~EwaldTable(){
-#if ndim_==3
-    for(unsigned int i = 0; i < _size+1; i++){
-        for(unsigned int j = 0; j < _size+1; j++){
-            delete [] _f[i][j];
+EwaldTable::~EwaldTable() {
+#if ndim_ == 3
+    for(unsigned int i = 0; i < _size + 1; i++) {
+        for(unsigned int j = 0; j < _size + 1; j++) {
+            delete[] _f[i][j];
         }
-        delete [] _f[i];
+        delete[] _f[i];
     }
-    delete [] _f;
+    delete[] _f;
 #else
-    for(unsigned int i = 0; i < _size+1; i++){
-        delete [] _f[i];
+    for(unsigned int i = 0; i < _size + 1; i++) {
+        delete[] _f[i];
     }
-    delete [] _f;
+    delete[] _f;
 #endif
 }
 
@@ -99,23 +99,23 @@ EwaldTable::~EwaldTable(){
   *
   * @param L The side of the periodic box.
   */
-void EwaldTable::set_boxsize(double L){
+void EwaldTable::set_boxsize(double L) {
     _ewald_intp_fac /= L;
-#if ndim_==3
-    for(unsigned int i = _size+1; i--;){
-        for(unsigned int j = _size+1; j--;){
-            for(unsigned int k = _size+1; k--;){
-                for(unsigned int n = 3; n--;){
-                    _f[i][j][k][n] /= (L*L);
+#if ndim_ == 3
+    for(unsigned int i = _size + 1; i--;) {
+        for(unsigned int j = _size + 1; j--;) {
+            for(unsigned int k = _size + 1; k--;) {
+                for(unsigned int n = 3; n--;) {
+                    _f[i][j][k][n] /= (L * L);
                 }
             }
         }
     }
 #else
-    for(unsigned int i = _size+1; i--;){
-        for(unsigned int j = _size+1; j--;){
-            for(unsigned int n = 2; n--;){
-                _f[i][j][n] /= (L*L);
+    for(unsigned int i = _size + 1; i--;) {
+        for(unsigned int j = _size + 1; j--;) {
+            for(unsigned int n = 2; n--;) {
+                _f[i][j][n] /= (L * L);
             }
         }
     }
@@ -128,19 +128,19 @@ void EwaldTable::set_boxsize(double L){
   * @return True if the dump exists and the Ewald table was succesfully filled,
   * false otherwise
   */
-bool EwaldTable::read_table(){
-#if ndim_==3
-    ifstream file("ewaldtable3d.dat", ios::in|ios::binary);
-    if(file){
-        for(unsigned int i = _size+1; i--;){
-            for(unsigned int j = _size+1; j--;){
-                for(unsigned int k = _size+1; k--;){
+bool EwaldTable::read_table() {
+#if ndim_ == 3
+    ifstream file("ewaldtable3d.dat", ios::in | ios::binary);
+    if(file) {
+        for(unsigned int i = _size + 1; i--;) {
+            for(unsigned int j = _size + 1; j--;) {
+                for(unsigned int k = _size + 1; k--;) {
                     file.read(reinterpret_cast<char*>(&_f[i][j][k][0]),
-                            sizeof(_f[i][j][k][0]));
+                              sizeof(_f[i][j][k][0]));
                     file.read(reinterpret_cast<char*>(&_f[i][j][k][1]),
-                            sizeof(_f[i][j][k][1]));
+                              sizeof(_f[i][j][k][1]));
                     file.read(reinterpret_cast<char*>(&_f[i][j][k][2]),
-                            sizeof(_f[i][j][k][2]));
+                              sizeof(_f[i][j][k][2]));
                 }
             }
         }
@@ -149,15 +149,15 @@ bool EwaldTable::read_table(){
         return false;
     }
 #else
-    ifstream file("ewaldtable2d.dat", ios::in|ios::binary);
-    if(file){
-        for(unsigned int i = _size+1; i--;){
-            for(unsigned int j = _size+1; j--;){
+    ifstream file("ewaldtable2d.dat", ios::in | ios::binary);
+    if(file) {
+        for(unsigned int i = _size + 1; i--;) {
+            for(unsigned int j = _size + 1; j--;) {
                 file.read(reinterpret_cast<char*>(&_f[i][j][0]),
-                        sizeof(_f[i][j][0]));
+                          sizeof(_f[i][j][0]));
                 file.read(reinterpret_cast<char*>(&_f[i][j][1]),
-                        sizeof(_f[i][j][1]));
-             }
+                          sizeof(_f[i][j][1]));
+            }
         }
         return true;
     } else {
@@ -176,41 +176,43 @@ bool EwaldTable::read_table(){
   * The resulting force corrections are dumped in a file so they may be used
   * again in a future run.
   */
-void EwaldTable::construct(){
-#if ndim_==3
+void EwaldTable::construct() {
+#if ndim_ == 3
     Vec n;
     Vec h;
-    for(unsigned int i = _size+1; i--;){
-        for(unsigned int j = _size+1; j--;){
-            for(unsigned int k = _size+1; k--;){
-                if(!i && !j && !k){
+    for(unsigned int i = _size + 1; i--;) {
+        for(unsigned int j = _size + 1; j--;) {
+            for(unsigned int k = _size + 1; k--;) {
+                if(!i && !j && !k) {
                     // all forces are initialized to zero vectors, no need to do
                     // it here
                     continue;
                 }
-                Vec pos(0.5*i/(double)_size, 0.5*j/(double)_size,
-                        0.5*k/(double)_size);
-                _f[i][j][k] = pos / (pos.norm()*pos.norm2());
-                for(n[0] = -4.; n[0] <= 4.; n[0]++){
-                    for(n[1] = -4.; n[1] <= 4.; n[1]++){
-                        for(n[2] = -4.; n[2] <= 4.; n[2]++){
+                Vec pos(0.5 * i / (double)_size, 0.5 * j / (double)_size,
+                        0.5 * k / (double)_size);
+                _f[i][j][k] = pos / (pos.norm() * pos.norm2());
+                for(n[0] = -4.; n[0] <= 4.; n[0]++) {
+                    for(n[1] = -4.; n[1] <= 4.; n[1]++) {
+                        for(n[2] = -4.; n[2] <= 4.; n[2]++) {
                             Vec dx = pos - n;
                             double r = dx.norm();
                             double r2 = dx.norm2();
-                            _f[i][j][k] -= dx/(r*r2)*(erfc(_alpha*r)+
-                                                      2.*_alpha*r/sqrt(M_PI)*
-                                                      exp(-_alpha*_alpha*r2));
+                            _f[i][j][k] -= dx / (r * r2) *
+                                           (erfc(_alpha * r) +
+                                            2. * _alpha * r / sqrt(M_PI) *
+                                                    exp(-_alpha * _alpha * r2));
                         }
                     }
                 }
-                for(h[0] = -4.; h[0] <= 4.; h[0]++){
-                    for(h[1] = -4.; h[1] <= 4.; h[1]++){
-                        for(h[2] = -4.; h[2] <= 4.; h[2]++){
+                for(h[0] = -4.; h[0] <= 4.; h[0]++) {
+                    for(h[1] = -4.; h[1] <= 4.; h[1]++) {
+                        for(h[2] = -4.; h[2] <= 4.; h[2]++) {
                             double h2 = h.norm2();
-                            if(h2){
-                                _f[i][j][k] -= 2.*h/h2*
-                                        exp(-M_PI*M_PI*h2/(_alpha*_alpha))*
-                                        sin(2.*M_PI*Vec::dot(h,pos));
+                            if(h2) {
+                                _f[i][j][k] -=
+                                        2. * h / h2 * exp(-M_PI * M_PI * h2 /
+                                                          (_alpha * _alpha)) *
+                                        sin(2. * M_PI * Vec::dot(h, pos));
                             }
                         }
                     }
@@ -218,60 +220,61 @@ void EwaldTable::construct(){
             }
         }
     }
-    ofstream file("ewaldtable3d.dat", ios::out|ios::binary);
-    for(unsigned int i = _size+1; i--;){
-        for(unsigned int j = _size+1; j--;){
-            for(unsigned int k = _size+1; k--;){
+    ofstream file("ewaldtable3d.dat", ios::out | ios::binary);
+    for(unsigned int i = _size + 1; i--;) {
+        for(unsigned int j = _size + 1; j--;) {
+            for(unsigned int k = _size + 1; k--;) {
                 file.write(reinterpret_cast<char*>(&_f[i][j][k][0]),
-                        sizeof(_f[i][j][k][0]));
+                           sizeof(_f[i][j][k][0]));
                 file.write(reinterpret_cast<char*>(&_f[i][j][k][1]),
-                        sizeof(_f[i][j][k][1]));
+                           sizeof(_f[i][j][k][1]));
                 file.write(reinterpret_cast<char*>(&_f[i][j][k][2]),
-                        sizeof(_f[i][j][k][2]));
+                           sizeof(_f[i][j][k][2]));
             }
         }
     }
 #else
     Vec n;
     Vec h;
-    for(unsigned int i = _size+1; i--;){
-        for(unsigned int j = _size+1; j--;){
-            if(!i && !j){
+    for(unsigned int i = _size + 1; i--;) {
+        for(unsigned int j = _size + 1; j--;) {
+            if(!i && !j) {
                 // all forces are initialized to zero vectors, no need to do it
                 // here
                 continue;
             }
-            Vec pos(0.5*i/(double)_size, 0.5*j/(double)_size);
-            _f[i][j] = pos / (pos.norm()*pos.norm2());
-            for(n[0] = -4.; n[0] <= 4.; n[0]++){
-                for(n[1] = -4.; n[1] <= 4.; n[1]++){
+            Vec pos(0.5 * i / (double)_size, 0.5 * j / (double)_size);
+            _f[i][j] = pos / (pos.norm() * pos.norm2());
+            for(n[0] = -4.; n[0] <= 4.; n[0]++) {
+                for(n[1] = -4.; n[1] <= 4.; n[1]++) {
                     Vec dx = pos - n;
                     double r = dx.norm();
                     double r2 = dx.norm2();
-                    _f[i][j] -= dx/(r*r2)*(erfc(_alpha*r)+
-                                           2.*_alpha*r/sqrt(M_PI)*
-                                           exp(-_alpha*_alpha*r2));
+                    _f[i][j] -= dx / (r * r2) *
+                                (erfc(_alpha * r) +
+                                 2. * _alpha * r / sqrt(M_PI) *
+                                         exp(-_alpha * _alpha * r2));
                 }
             }
-            for(h[0] = -4.; h[0] <= 4.; h[0]++){
-                for(h[1] = -4.; h[1] <= 4.; h[1]++){
+            for(h[0] = -4.; h[0] <= 4.; h[0]++) {
+                for(h[1] = -4.; h[1] <= 4.; h[1]++) {
                     double h2 = h.norm2();
-                    if(h2){
-                        _f[i][j] -= 2.*h/h2*
-                                exp(-M_PI*M_PI*h2/(_alpha*_alpha))*
-                                sin(2.*M_PI*Vec::dot(h,pos));
+                    if(h2) {
+                        _f[i][j] -= 2. * h / h2 *
+                                    exp(-M_PI * M_PI * h2 / (_alpha * _alpha)) *
+                                    sin(2. * M_PI * Vec::dot(h, pos));
                     }
                 }
             }
         }
     }
-    ofstream file("ewaldtable2d.dat", ios::out|ios::binary);
-    for(unsigned int i = _size+1; i--;){
-        for(unsigned int j = _size+1; j--;){
+    ofstream file("ewaldtable2d.dat", ios::out | ios::binary);
+    for(unsigned int i = _size + 1; i--;) {
+        for(unsigned int j = _size + 1; j--;) {
             file.write(reinterpret_cast<char*>(&_f[i][j][0]),
-                    sizeof(_f[i][j][0]));
+                       sizeof(_f[i][j][0]));
             file.write(reinterpret_cast<char*>(&_f[i][j][1]),
-                    sizeof(_f[i][j][1]));
+                       sizeof(_f[i][j][1]));
         }
     }
 #endif
@@ -287,56 +290,56 @@ void EwaldTable::construct(){
   * @return A Vec containing the force correction due to periodic copies of the
   * particles in the box
   */
-Vec EwaldTable::get_correction(Vec &position){
+Vec EwaldTable::get_correction(Vec& position) {
     Vec correction;
     Vec sign;
-    for(unsigned int i = ndim_; i--;){
-        if(position[i] < 0){
+    for(unsigned int i = ndim_; i--;) {
+        if(position[i] < 0) {
             position[i] = -position[i];
             sign[i] = 1.;
         } else {
             sign[i] = -1.;
         }
     }
-    Vec u = position*_ewald_intp_fac;
+    Vec u = position * _ewald_intp_fac;
     int integers[ndim_] = {0};
-    for(unsigned int i = ndim_; i--;){
-        integers[i] = (int) u[i];
-        if(integers[i] >= static_cast<int>(_size)){
+    for(unsigned int i = ndim_; i--;) {
+        integers[i] = (int)u[i];
+        if(integers[i] >= static_cast<int>(_size)) {
             integers[i] = _size - 1;
         }
         u[i] -= integers[i];
     }
-#if ndim_==3
+#if ndim_ == 3
     double f[8] = {0.};
-    f[0] = (1.-u[0]) * (1.-u[1]) * (1.-u[2]);
-    f[1] = (1.-u[0]) * (1.-u[1]) * u[2];
-    f[2] = (1.-u[0]) * u[1] * (1.-u[2]);
-    f[3] = (1.-u[0]) * u[1] * u[2];
-    f[4] = u[0] * (1.-u[1]) * (1.-u[2]);
-    f[5] = u[0] * (1.-u[1]) * u[2];
-    f[6] = u[0] * u[1] * (1.-u[2]);
+    f[0] = (1. - u[0]) * (1. - u[1]) * (1. - u[2]);
+    f[1] = (1. - u[0]) * (1. - u[1]) * u[2];
+    f[2] = (1. - u[0]) * u[1] * (1. - u[2]);
+    f[3] = (1. - u[0]) * u[1] * u[2];
+    f[4] = u[0] * (1. - u[1]) * (1. - u[2]);
+    f[5] = u[0] * (1. - u[1]) * u[2];
+    f[6] = u[0] * u[1] * (1. - u[2]);
     f[7] = u[0] * u[1] * u[2];
-    correction = _f[integers[0]][integers[1]][integers[2]]*f[0] +
-                 _f[integers[0]][integers[1]][integers[2]+1]*f[1] +
-                 _f[integers[0]][integers[1]+1][integers[2]]*f[2] +
-                 _f[integers[0]][integers[1]+1][integers[2]+1]*f[3] +
-                 _f[integers[0]+1][integers[1]][integers[2]]*f[4] +
-                 _f[integers[0]+1][integers[1]][integers[2]+1]*f[5] +
-                 _f[integers[0]+1][integers[1]+1][integers[2]]*f[6] +
-                 _f[integers[0]+1][integers[1]+1][integers[2]+1]*f[7];
+    correction = _f[integers[0]][integers[1]][integers[2]] * f[0] +
+                 _f[integers[0]][integers[1]][integers[2] + 1] * f[1] +
+                 _f[integers[0]][integers[1] + 1][integers[2]] * f[2] +
+                 _f[integers[0]][integers[1] + 1][integers[2] + 1] * f[3] +
+                 _f[integers[0] + 1][integers[1]][integers[2]] * f[4] +
+                 _f[integers[0] + 1][integers[1]][integers[2] + 1] * f[5] +
+                 _f[integers[0] + 1][integers[1] + 1][integers[2]] * f[6] +
+                 _f[integers[0] + 1][integers[1] + 1][integers[2] + 1] * f[7];
 #else
     double f[4] = {0.};
-    f[0] = (1.-u[0]) * (1.-u[1]);
-    f[1] = (1.-u[0]) * u[1];
-    f[2] = u[0] * (1.-u[1]);
+    f[0] = (1. - u[0]) * (1. - u[1]);
+    f[1] = (1. - u[0]) * u[1];
+    f[2] = u[0] * (1. - u[1]);
     f[3] = u[0] * u[1];
-    correction = _f[integers[0]][integers[1]]*f[0] +
-                 _f[integers[0]][integers[1]+1]*f[1] +
-                 _f[integers[0]+1][integers[1]]*f[2] +
-                 _f[integers[0]+1][integers[1]+1]*f[3];
+    correction = _f[integers[0]][integers[1]] * f[0] +
+                 _f[integers[0]][integers[1] + 1] * f[1] +
+                 _f[integers[0] + 1][integers[1]] * f[2] +
+                 _f[integers[0] + 1][integers[1] + 1] * f[3];
 #endif
-    for(unsigned int i = ndim_; i--;){
+    for(unsigned int i = ndim_; i--;) {
         correction[i] *= sign[i];
     }
     return correction;

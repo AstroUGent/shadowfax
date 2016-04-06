@@ -26,19 +26,19 @@
 #ifndef RIEMANNSOLVER_HPP
 #define RIEMANNSOLVER_HPP
 
-#include "StateVector.hpp"
 #include "../src/utilities/Timer.hpp"
+#include "StateVector.hpp"
 
 class RestartFile;
 
 /**
  * @brief General interface for Riemann solvers
  */
-class RiemannSolver{
-public:
+class RiemannSolver {
+  public:
     // if we would not declare this destructor, it would not be virtual
     // and the destructors of deriving classes would not be called
-    virtual ~RiemannSolver(){}
+    virtual ~RiemannSolver() {}
 
     /**
      * @brief Get a std::string describing the specific implementation of
@@ -46,7 +46,7 @@ public:
      *
      * @return An implementation specific identifying tag for the Solver
      */
-    virtual std::string tag()=0;
+    virtual std::string tag() = 0;
 
     /**
      * @brief Solve the Riemann problem with given left and right states
@@ -60,7 +60,7 @@ public:
      * @return Solution of the Riemann problem
      */
     virtual StateVector solve(StateVector& WL, StateVector& WR, Vec& n,
-                              double& mach, bool reflective = false)=0;
+                              double& mach, bool reflective = false) = 0;
 
     /**
      * @brief Get the hydrodynamical soundspeed for the given StateVector
@@ -68,12 +68,12 @@ public:
      * @param W Given StateVector
      * @return Soundspeed of the fluid with the given state
      */
-    virtual double get_soundspeed(const StateVector& W)=0;
+    virtual double get_soundspeed(const StateVector& W) = 0;
 
     /**
      * @brief Test the Riemann solver on a set of problems with known solutions
      */
-    virtual void test()=0;
+    virtual void test() = 0;
 
     /**
      * @brief Calculate conserved quantities from the given primitive variables
@@ -83,7 +83,7 @@ public:
      * @param W StateVector in a cell
      * @return Conserved quantities StateVector
      */
-    virtual StateVector get_Q(double volume, const StateVector& W)=0;
+    virtual StateVector get_Q(double volume, const StateVector& W) = 0;
 
     /**
      * @brief Calculate primitive variables from the given conserved variables
@@ -96,7 +96,7 @@ public:
      * @return Primitive variables StateVector
      */
     virtual StateVector get_W(double volume, StateVector& Q,
-                              bool use_energy = true)=0;
+                              bool use_energy = true) = 0;
 
     /**
      * @brief Get the given component of the flux matrix for the given state and
@@ -108,36 +108,36 @@ public:
      * @return StateVector of fluxes through the interface
      */
     virtual StateVector get_flux(const Vec& v, unsigned int index,
-                                 const StateVector& W)=0;
+                                 const StateVector& W) = 0;
 
     /**
      * @brief Get the adiabatic index used in this Solver
      *
      * @return The adiabatic index
      */
-    virtual double get_gamma()=0;
+    virtual double get_gamma() = 0;
 
     /**
      * @brief Dump the Solver to the given RestartFile
      *
      * @param rfile RestartFile to write to
      */
-    virtual void dump(RestartFile &rfile)=0;
+    virtual void dump(RestartFile& rfile) = 0;
 
     /**
      * @brief Get the number of Riemann solver evaluations
      *
      * @return Number of Riemann solver evaluations
      */
-    virtual unsigned long get_neval()=0;
+    virtual unsigned long get_neval() = 0;
 };
 
 /**
  * @brief Exception thrown when something goes wrong during the update of the
  * primitive variables
  */
-class PrimitiveVariablesException : public std::exception{
-private:
+class PrimitiveVariablesException : public std::exception {
+  private:
     /*! \brief Derived primitive variables */
     StateVector _W;
 
@@ -147,7 +147,7 @@ private:
     /*! \brief Volume */
     double _V;
 
-public:
+  public:
     PrimitiveVariablesException(StateVector W, StateVector Q, double V);
 
     virtual const char* what() const throw();
@@ -157,8 +157,8 @@ public:
  * @brief Exception thrown when something goes wrong during the conversion of
  * primitive variables to convserved variables
  */
-class ConservedVariablesException : public std::exception{
-private:
+class ConservedVariablesException : public std::exception {
+  private:
     /*! \brief Primitive variables */
     StateVector _W;
 
@@ -168,7 +168,7 @@ private:
     /*! \brief Volume */
     double _V;
 
-public:
+  public:
     ConservedVariablesException(StateVector W, StateVector Q, double V);
 
     virtual const char* what() const throw();
@@ -177,8 +177,8 @@ public:
 /**
  * @brief Exception thrown when the RiemannSolver outputs unphysical results
  */
-class RiemannSolverException : public std::exception{
-private:
+class RiemannSolverException : public std::exception {
+  private:
     /*! \brief Left StateVector */
     StateVector _WL;
 
@@ -188,10 +188,10 @@ private:
     /*! \brief Riemann solver solution */
     StateVector _Wstar;
 
-public:
+  public:
     RiemannSolverException(StateVector WL, StateVector WR, StateVector Wstar);
 
     virtual const char* what() const throw();
 };
 
-#endif // RIEMANNSOLVER_HPP
+#endif  // RIEMANNSOLVER_HPP

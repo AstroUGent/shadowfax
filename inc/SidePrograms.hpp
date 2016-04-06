@@ -27,8 +27,8 @@
 #ifndef SIDEPROGRAMS_HPP
 #define SIDEPROGRAMS_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
 class ParticleVector;
 
@@ -37,10 +37,10 @@ class ParticleVector;
  *
  * Contains a helper function to load ASCII-files
  */
-class SidePrograms{
-public:
-    SidePrograms(){}
-    ~SidePrograms(){}
+class SidePrograms {
+  public:
+    SidePrograms() {}
+    ~SidePrograms() {}
     void load_ascii(ParticleVector& cells, double* cube_boundaries,
                     std::string name);
 };
@@ -53,10 +53,10 @@ public:
  * output, in the same order as the input coordinates.
  * Only works in 2D.
  */
-class AreaCalculator : public SidePrograms{
-public:
+class AreaCalculator : public SidePrograms {
+  public:
     AreaCalculator(int argc, char** argv);
-    ~AreaCalculator(){}
+    ~AreaCalculator() {}
 };
 
 /**
@@ -72,10 +72,10 @@ public:
  * the densest coordinates to the standard output.
  * Only works for 3D.
  */
-class DensityCalculator : public SidePrograms{
-public:
+class DensityCalculator : public SidePrograms {
+  public:
     DensityCalculator(int argc, char** argv);
-    ~DensityCalculator(){}
+    ~DensityCalculator() {}
 };
 
 /**
@@ -87,8 +87,8 @@ public:
  * The output file has the same name as the input file, but with _sorted added
  * to it.
  */
-class HilbertSorter : public SidePrograms{
-public:
+class HilbertSorter : public SidePrograms {
+  public:
     HilbertSorter(int argc, char** argv);
 };
 
@@ -100,8 +100,8 @@ public:
  * which are then written to an ASCII-file. The output file has the same name as
  * the input file, but with the extension .mass.
  */
-class MassCalculator : public SidePrograms{
-public:
+class MassCalculator : public SidePrograms {
+  public:
     MassCalculator(int argc, char** argv);
 };
 
@@ -115,9 +115,9 @@ public:
  * The gravitational potential energies are written to an ASCII-file with the
  * same name as the given snapshot, but with the extension .epot.
  */
-class PotentialCalculator : public SidePrograms{
-public:
+class PotentialCalculator : public SidePrograms {
+  public:
     PotentialCalculator(int argc, char** argv);
 };
 
-#endif // SIDEPROGRAMS_HPP
+#endif  // SIDEPROGRAMS_HPP

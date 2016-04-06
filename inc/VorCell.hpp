@@ -30,12 +30,12 @@
 #ifndef HEAD_VORCELL
 #define HEAD_VORCELL
 
-#include "Vec.hpp"
-#include <vector>
-#include <ostream>
-#include <map>
 #include "Image.hpp"
 #include "StateVector.hpp"
+#include "Vec.hpp"
+#include <map>
+#include <ostream>
+#include <vector>
 
 class Simplex;
 class VorFace;
@@ -49,8 +49,8 @@ class GasParticle;
  * centroid calculations as well as the gradient estimation and generator
  * velocity computation.
  */
-class VorCell{
-private:
+class VorCell {
+  private:
     /*! \brief Faces that border the cell */
     std::vector<VorFace*> _faces;
     /*! \brief Neighbouring points of this cell */
@@ -70,22 +70,22 @@ private:
     /*! \brief Total area of the faces of the cell */
     double _total_area;
 
-public:
+  public:
     VorCell(VorGen* point);
     ~VorCell();
 
-    void print(std::ostream &stream);
-    void print_gnuplot(std::ostream &stream, unsigned int id = 0);
-    void print_pov(std::ostream &stream);
+    void print(std::ostream& stream);
+    void print_gnuplot(std::ostream& stream, unsigned int id = 0);
+    void print_pov(std::ostream& stream);
 #ifndef ICMAKER
-    void print_leaflet(std::ostream &vstream, int ox, int oy,
+    void print_leaflet(std::ostream& vstream, int ox, int oy,
                        ColorMap* colormap, StateVector maxW, StateVector minW);
 #endif
     bool overlap(double* box);
-    void print_vtk(std::ostream &vstream, unsigned int &numv,
-                   std::ostream &pstream, unsigned int &nump,
-                   unsigned int &numc, std::ostream &dstream);
-    void print_fastvor(std::ostream& stream, unsigned int &numghost,
+    void print_vtk(std::ostream& vstream, unsigned int& numv,
+                   std::ostream& pstream, unsigned int& nump,
+                   unsigned int& numc, std::ostream& dstream);
+    void print_fastvor(std::ostream& stream, unsigned int& numghost,
                        bool periodic, bool binary = true);
 
     Vec& get_centroid();

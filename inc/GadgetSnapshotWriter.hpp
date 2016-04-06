@@ -34,13 +34,13 @@
  * This type of snapshots is the same as Gadget2 snapshot type 3 and the same
  * used for Gadget2, SWIFT, GIZMO...
  */
-class GadgetSnapshotWriter : public SnapshotWriter{
-public:
+class GadgetSnapshotWriter : public SnapshotWriter {
+  public:
     GadgetSnapshotWriter(std::string basename, UnitSet& units,
                          UnitSet& output_units, int lastsnap = 0,
                          bool per_node_output = false);
 
-    virtual ~GadgetSnapshotWriter(){}
+    virtual ~GadgetSnapshotWriter() {}
 
     /**
      * @brief Get the std::string tag that distinguishes this SnapshotWriter
@@ -48,15 +48,13 @@ public:
      *
      * @return "GADG", because this is GadgetSnapshotWriter
      */
-    virtual std::string get_tag(){
-        return "GADG";
-    }
+    virtual std::string get_tag() { return "GADG"; }
 
     virtual void write_snapshot(double t, ParticleVector& particles);
 
-    virtual void dump(RestartFile &rfile);
-    GadgetSnapshotWriter(RestartFile &rfile, UnitSet &units,
-                         UnitSet &output_units);
+    virtual void dump(RestartFile& rfile);
+    GadgetSnapshotWriter(RestartFile& rfile, UnitSet& units,
+                         UnitSet& output_units);
 };
 
-#endif // GADGETSNAPSHOTWRITER_HPP
+#endif  // GADGETSNAPSHOTWRITER_HPP

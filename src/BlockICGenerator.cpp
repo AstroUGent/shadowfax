@@ -24,20 +24,20 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
+#include "DelCont.hpp"
+#include "Error.hpp"
 #include "ICGenerator.hpp"
 #include "ICRegion.hpp"
-#include "VorTessManager.hpp"
-#include "DelCont.hpp"
 #include "VorCell.hpp"
-#include "Error.hpp"
+#include "VorTessManager.hpp"
 #include "utilities/DMParticle.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"
 #include "utilities/Tree.hpp"
+#include <boost/algorithm/string.hpp>
+#include <boost/optional/optional.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/optional/optional.hpp>
-#include <boost/algorithm/string.hpp>
 using namespace std;
 
 /**
@@ -60,7 +60,7 @@ using namespace std;
   * @param gamma Adiabatic index of the gas in the initial condition
   */
 BlockICGenerator::BlockICGenerator(unsigned int npart, unsigned int mode,
-                                   unsigned int seed, double gamma){
+                                   unsigned int seed, double gamma) {
     _ngas = npart;
     _ndark = npart;
     _mode = mode;
@@ -76,8 +76,8 @@ BlockICGenerator::BlockICGenerator(unsigned int npart, unsigned int mode,
 /**
  * @brief Destructor. Free the IC-regions
  */
-BlockICGenerator::~BlockICGenerator(){
-    for(unsigned int i = 0; i < _regions.size(); i++){
+BlockICGenerator::~BlockICGenerator() {
+    for(unsigned int i = 0; i < _regions.size(); i++) {
         delete _regions[i];
     }
     delete _container;
@@ -125,9 +125,9 @@ BlockICGenerator::~BlockICGenerator(){
   *
   * @param filename std::string specifying the valid name of an xml file
   */
-void BlockICGenerator::read_xml(string filename){
+void BlockICGenerator::read_xml(string filename) {
     ifstream file(filename.c_str());
-    if(!file){
+    if(!file) {
         cerr << "Cannot open XML-file \"" << filename << "\"!" << endl;
         my_exit();
     }
@@ -137,32 +137,32 @@ void BlockICGenerator::read_xml(string filename){
     Vec origin;
     origin[0] = pt.get<double>("box.origin.x");
     origin[1] = pt.get<double>("box.origin.y");
-#if ndim_==3
+#if ndim_ == 3
     origin[2] = pt.get<double>("box.origin.z");
 #endif
     Vec width;
     width[0] = pt.get<double>("box.height");
     width[1] = pt.get<double>("box.width");
-#if ndim_==3
+#if ndim_ == 3
     width[2] = pt.get<double>("box.depth");
 #endif
     string boundary;
     boundary = pt.get<string>("box.boundary", "reflective");
     boost::algorithm::trim(boundary);
     _periodic = (boundary == "periodic");
-    if(_periodic){
+    if(_periodic) {
         cout << "periodic boundaries" << endl;
     } else {
         cout << "reflective boundaries" << endl;
     }
     cout << "origin: " << origin[0] << "\t" << origin[1];
-#if ndim_==3
+#if ndim_ == 3
     cout << "\t" << origin[2];
 #endif
     cout << endl;
     cout << "height: " << width[0] << endl;
     cout << "width: " << width[1] << endl;
-#if ndim_==3
+#if ndim_ == 3
     cout << "depth: " << width[2] << endl;
 #endif
     _container = new RectangularBox(origin, width);
@@ -170,16 +170,17 @@ void BlockICGenerator::read_xml(string filename){
     boost::property_tree::ptree::const_iterator end =
             pt.get_child("box.regions").end();
     for(boost::property_tree::ptree::const_iterator it =
-        pt.get_child("box.regions").begin(); it != end; it++){
+                pt.get_child("box.regions").begin();
+        it != end; it++) {
         cout << "region:" << endl;
         Vec regorigin;
         regorigin[0] = it->second.get("origin.x", origin[0]);
         regorigin[1] = it->second.get("origin.y", origin[1]);
-#if ndim_==3
+#if ndim_ == 3
         regorigin[2] = it->second.get("origin.z", origin[2]);
 #endif
         cout << "origin: " << regorigin[0] << "\t" << regorigin[1];
-#if ndim_==3
+#if ndim_ == 3
         cout << "\t" << regorigin[2];
 #endif
         cout << endl;
@@ -188,7 +189,7 @@ void BlockICGenerator::read_xml(string filename){
         cout << "height: " << regside[0] << endl;
         regside[1] = it->second.get("width", width[1]);
         cout << "width: " << regside[1] << endl;
-#if ndim_==3
+#if ndim_ == 3
         regside[2] = it->second.get("depth", width[2]);
         cout << "depth: " << regside[2] << endl;
 #endif
@@ -196,9 +197,9 @@ void BlockICGenerator::read_xml(string filename){
         cout << "exponent: " << exponent << endl;
         vector<string> hydrofunctions;
         vector<string> dmfunction;
-        boost::optional<const boost::property_tree::ptree& > hydro =
+        boost::optional<const boost::property_tree::ptree&> hydro =
                 it->second.get_child_optional("hydro");
-        if(hydro){
+        if(hydro) {
             _has_gas = true;
             cout << "hydro functions found:" << endl;
             hydrofunctions.push_back(it->second.get<string>("hydro.rho"));
@@ -207,16 +208,16 @@ void BlockICGenerator::read_xml(string filename){
             cout << "vx: " << hydrofunctions.back() << endl;
             hydrofunctions.push_back(it->second.get<string>("hydro.vy"));
             cout << "vy: " << hydrofunctions.back() << endl;
-#if ndim_==3
+#if ndim_ == 3
             hydrofunctions.push_back(it->second.get<string>("hydro.vz"));
             cout << "vz: " << hydrofunctions.back() << endl;
 #endif
             hydrofunctions.push_back(it->second.get<string>("hydro.p"));
             cout << "p: " << hydrofunctions.back() << endl;
         }
-        boost::optional<const boost::property_tree::ptree& > dm =
+        boost::optional<const boost::property_tree::ptree&> dm =
                 it->second.get_child_optional("dm");
-        if(dm){
+        if(dm) {
             _has_dm = true;
             cout << "DM function found:" << endl;
             dmfunction.push_back(it->second.get<string>("dm.rho"));
@@ -243,13 +244,13 @@ void BlockICGenerator::read_xml(string filename){
   * @param grid A ParticleVector containing cells that lie inside the simulation
   * box
   */
-void BlockICGenerator::apply_regions(ParticleVector &grid){
-    for(unsigned int i = grid.gassize(); i--;){
+void BlockICGenerator::apply_regions(ParticleVector& grid) {
+    for(unsigned int i = grid.gassize(); i--;) {
         Vec& pos = grid.gas(i)->get_position();
         // order is important here: the last region that contains the
         // coordinates sets its actual hydro
-        for(unsigned int j = 0; j < _regions.size(); j++){
-            if(_regions[j]->inside(pos)){
+        for(unsigned int j = 0; j < _regions.size(); j++) {
+            if(_regions[j]->inside(pos)) {
                 grid.gas(i)->set_W(_regions[j]->get_hydro(pos));
             }
         }
@@ -266,10 +267,10 @@ void BlockICGenerator::apply_regions(ParticleVector &grid){
   * @return A ParticleVector suitable as initial condition for a hydrodynamical
   * simulation
   */
-ParticleVector BlockICGenerator::generate(){
+ParticleVector BlockICGenerator::generate() {
     ParticleVector particles(false, *((RectangularBox*)_container), _periodic);
-    if(_has_gas){
-        if(_mode == IC_CART){
+    if(_has_gas) {
+        if(_mode == IC_CART) {
             make_cartesian_grid(particles);
         } else {
             make_random_grid(particles);
@@ -277,7 +278,7 @@ ParticleVector BlockICGenerator::generate(){
         }
         apply_regions(particles);
     }
-    if(_has_dm){
+    if(_has_dm) {
         add_DM(particles);
     }
     particles.finalize();
@@ -290,46 +291,47 @@ ParticleVector BlockICGenerator::generate(){
   *
   * @param plist Reference to an empty ParticleVector that will be filled
   */
-void BlockICGenerator::make_cartesian_grid(ParticleVector& plist){
-    double box[ndim_+ndim_] = {0.};
+void BlockICGenerator::make_cartesian_grid(ParticleVector& plist) {
+    double box[ndim_ + ndim_] = {0.};
     _container->get_bounding_box(box);
-#if ndim_==3
+#if ndim_ == 3
     unsigned int cartnum[3];
-    double C = cbrt((box[4]/box[3])*_ngas);
-    double B = (box[4]/box[3])*_ngas/(C*C);
+    double C = cbrt((box[4] / box[3]) * _ngas);
+    double B = (box[4] / box[3]) * _ngas / (C * C);
     // we have to use round instead of int, since the latter sometimes rounds
     // down unexpectedly
-    cartnum[0] = round(_ngas/B/C);
+    cartnum[0] = round(_ngas / B / C);
     cartnum[1] = round(B);
     cartnum[2] = round(C);
-    _ngas = cartnum[0]*cartnum[1]*cartnum[2];
+    _ngas = cartnum[0] * cartnum[1] * cartnum[2];
 
     // divide the particles over the processes
-    unsigned int numpart = _ngas/MPIGlobal::size +
-            ((_ngas%MPIGlobal::size) > 0);
+    unsigned int numpart =
+            _ngas / MPIGlobal::size + ((_ngas % MPIGlobal::size) > 0);
     // make sure the process with the highest rank does not generate too many
     // particles
-    unsigned int nother = MPIGlobal::rank*numpart;
-    while(nother + numpart > _ngas){
+    unsigned int nother = MPIGlobal::rank * numpart;
+    while(nother + numpart > _ngas) {
         numpart--;
     }
 
     // 3D cartesian grid
     cout << "setting up cartesian grid of " << cartnum[0] << "x" << cartnum[1]
          << "x" << cartnum[2] << " cells" << endl;
-    double cartwidth[3] = {box[3]/cartnum[0], box[4]/cartnum[1],
-                           box[5]/cartnum[2]};
-    for(unsigned int i = cartnum[0]; i--;){
-        for(unsigned int j = cartnum[1]; j--;){
-            for(unsigned int k = cartnum[2]; k--;){
-                unsigned int id = i*cartnum[0]*cartnum[0]+j*cartnum[1]+k;
+    double cartwidth[3] = {box[3] / cartnum[0], box[4] / cartnum[1],
+                           box[5] / cartnum[2]};
+    for(unsigned int i = cartnum[0]; i--;) {
+        for(unsigned int j = cartnum[1]; j--;) {
+            for(unsigned int k = cartnum[2]; k--;) {
+                unsigned int id =
+                        i * cartnum[0] * cartnum[0] + j * cartnum[1] + k;
                 // we only generate the particles assigned to this process
-                if(id < nother || id >= nother+numpart){
+                if(id < nother || id >= nother + numpart) {
                     continue;
                 }
-                Vec coords(cartwidth[0]*(i+0.5)+box[0],
-                           cartwidth[1]*(j+0.5)+box[1],
-                           cartwidth[2]*(k+0.5)+box[2]);
+                Vec coords(cartwidth[0] * (i + 0.5) + box[0],
+                           cartwidth[1] * (j + 0.5) + box[1],
+                           cartwidth[2] * (k + 0.5) + box[2]);
                 plist.add_gas_particle(new GasParticle(coords));
                 plist.gasback()->set_id(id);
             }
@@ -337,34 +339,34 @@ void BlockICGenerator::make_cartesian_grid(ParticleVector& plist){
     }
 #else
     unsigned int cartnum[2];
-    double B = sqrt((box[2]/box[3])*_ngas);
-    cartnum[1] = round(_ngas/B);
+    double B = sqrt((box[2] / box[3]) * _ngas);
+    cartnum[1] = round(_ngas / B);
     cartnum[0] = round(B);
-    _ngas = cartnum[0]*cartnum[1];
+    _ngas = cartnum[0] * cartnum[1];
 
     // divide the particles over the processes
-    unsigned int numpart = _ngas/MPIGlobal::size +
-            ((_ngas%MPIGlobal::size) > 0);
+    unsigned int numpart =
+            _ngas / MPIGlobal::size + ((_ngas % MPIGlobal::size) > 0);
     // make sure the process with the highest rank does not generate too many
     // particles
-    unsigned int nother = MPIGlobal::rank*numpart;
-    while(nother + numpart > _ngas){
+    unsigned int nother = MPIGlobal::rank * numpart;
+    while(nother + numpart > _ngas) {
         numpart--;
     }
 
     // 2D cartesian grid
     cout << "setting up cartesian grid of " << cartnum[0] << "x" << cartnum[1]
          << " cells" << endl;
-    double cartwidth[2] = {box[2]/cartnum[0], box[3]/cartnum[1]};
-    for(unsigned int i = cartnum[0]; i--;){
-        for(unsigned int j = cartnum[1]; j--;){
-            unsigned int id = i*cartnum[0]+j;
+    double cartwidth[2] = {box[2] / cartnum[0], box[3] / cartnum[1]};
+    for(unsigned int i = cartnum[0]; i--;) {
+        for(unsigned int j = cartnum[1]; j--;) {
+            unsigned int id = i * cartnum[0] + j;
             // we only generate the particles assigned to this process
-            if(id < nother || id >= nother+numpart){
+            if(id < nother || id >= nother + numpart) {
                 continue;
             }
-            Vec coords(cartwidth[0]*(i+0.5)+box[0],
-                    cartwidth[1]*(j+0.5)+box[1]);
+            Vec coords(cartwidth[0] * (i + 0.5) + box[0],
+                       cartwidth[1] * (j + 0.5) + box[1]);
             plist.add_gas_particle(new GasParticle(coords));
             plist.gasback()->set_id(id);
         }
@@ -377,39 +379,41 @@ void BlockICGenerator::make_cartesian_grid(ParticleVector& plist){
   *
   * @param plist Reference to an empty ParticleVector that will be filled
   */
-void BlockICGenerator::make_random_grid(ParticleVector& plist){
+void BlockICGenerator::make_random_grid(ParticleVector& plist) {
     _rejection_fac.resize(_regions.size());
     _maxdens = 0.;
-    for(unsigned int i = _regions.size(); i--;){
+    for(unsigned int i = _regions.size(); i--;) {
         ICRegion* next = NULL;
-        if(i < _regions.size()-2){
-            next = _regions[i+1];
+        if(i < _regions.size() - 2) {
+            next = _regions[i + 1];
         }
         _rejection_fac[i] = _regions[i]->get_max_value_hydro(next);
         _maxdens = std::max(_maxdens, _rejection_fac[i]);
     }
-    for(unsigned int i = 0; i < _regions.size(); i++){
+    for(unsigned int i = 0; i < _regions.size(); i++) {
         _rejection_fac[i] /= _maxdens;
     }
-    double box[ndim_+ndim_] = {0.};
+    double box[ndim_ + ndim_] = {0.};
     _container->get_bounding_box(box);
     // divide the particles over the processes
-    unsigned int numpart = _ngas/MPIGlobal::size +
-            ((_ngas%MPIGlobal::size) > 0);
+    unsigned int numpart =
+            _ngas / MPIGlobal::size + ((_ngas % MPIGlobal::size) > 0);
     // make sure the process with the highest rank does not generate too many
     // particles
-    unsigned int nother = MPIGlobal::rank*numpart;
-    while(nother + numpart > _ngas){
+    unsigned int nother = MPIGlobal::rank * numpart;
+    while(nother + numpart > _ngas) {
         numpart--;
     }
-    for(unsigned int i = 0; i < numpart; i++){
+    for(unsigned int i = 0; i < numpart; i++) {
         Vec x;
-        for(unsigned int j = ndim_; j--;){
-            x[j] = box[ndim_+j]*(double)rand()/((double)RAND_MAX)+box[j];
+        for(unsigned int j = ndim_; j--;) {
+            x[j] = box[ndim_ + j] * (double)rand() / ((double)RAND_MAX) +
+                   box[j];
         }
-        while(!regions_accepted(x)){
-            for(unsigned int j = ndim_; j--;){
-                x[j] = box[ndim_+j]*(double)rand()/((double)RAND_MAX)+box[j];
+        while(!regions_accepted(x)) {
+            for(unsigned int j = ndim_; j--;) {
+                x[j] = box[ndim_ + j] * (double)rand() / ((double)RAND_MAX) +
+                       box[j];
             }
         }
         plist.add_gas_particle(new GasParticle(x));
@@ -429,13 +433,13 @@ void BlockICGenerator::make_random_grid(ParticleVector& plist){
   * @return true if p is accepted by the geometrical block that contains p,
   * false if it is rejected
   */
-bool BlockICGenerator::regions_accepted(Vec &p){
-    unsigned int lastregion = _regions.size()-1;
-    while(!_regions[lastregion]->inside(p)){
+bool BlockICGenerator::regions_accepted(Vec& p) {
+    unsigned int lastregion = _regions.size() - 1;
+    while(!_regions[lastregion]->inside(p)) {
         lastregion--;
     }
-    if(_rejection_fac[lastregion] < 1.){
-        if((double)rand()/((double)RAND_MAX) < _rejection_fac[lastregion]){
+    if(_rejection_fac[lastregion] < 1.) {
+        if((double)rand() / ((double)RAND_MAX) < _rejection_fac[lastregion]) {
             return _regions[lastregion]->accept_hydro(p);
         } else {
             return false;
@@ -452,13 +456,14 @@ bool BlockICGenerator::regions_accepted(Vec &p){
  * @param p Vec specifying a valid coordinate vector inside the simulation box
  * @return True if p is accepted, false if it is rejected
  */
-bool BlockICGenerator::regions_accepted_dm(Vec &p){
-    unsigned int lastregion = _regions.size()-1;
-    while(!_regions[lastregion]->inside(p)){
+bool BlockICGenerator::regions_accepted_dm(Vec& p) {
+    unsigned int lastregion = _regions.size() - 1;
+    while(!_regions[lastregion]->inside(p)) {
         lastregion--;
     }
-    if(_rejection_fac_dm[lastregion] < 1.){
-        if((double)rand()/((double)RAND_MAX) < _rejection_fac_dm[lastregion]){
+    if(_rejection_fac_dm[lastregion] < 1.) {
+        if((double)rand() / ((double)RAND_MAX) <
+           _rejection_fac_dm[lastregion]) {
             return _regions[lastregion]->accept_dm(p);
         } else {
             return false;
@@ -482,20 +487,20 @@ bool BlockICGenerator::regions_accepted_dm(Vec &p){
   * @param grid A reference to a non-empty ParticleVector containing a randomly
   * sampled, noisy grid
   */
-void BlockICGenerator::relax_grid(ParticleVector &grid){
+void BlockICGenerator::relax_grid(ParticleVector& grid) {
     grid.sort();
     VorTessManager voronoi(grid, _periodic);
-    double treebox[ndim_+ndim_];
+    double treebox[ndim_ + ndim_];
     grid.get_container().get_bounding_box(treebox);
 
     unsigned int numlloyd = 10;
-    for(unsigned int i = numlloyd; i--;){
-        cout << "Lloyd iteration " << (numlloyd-i) << endl;
-        for(unsigned int j = grid.gassize(); j--;){
+    for(unsigned int i = numlloyd; i--;) {
+        cout << "Lloyd iteration " << (numlloyd - i) << endl;
+        for(unsigned int j = grid.gassize(); j--;) {
             Vec centroid = voronoi.get_centroid(j);
             grid.gas(j)->set_x(centroid[0]);
             grid.gas(j)->set_y(centroid[1]);
-#if ndim_==3
+#if ndim_ == 3
             grid.gas(j)->set_z(centroid[2]);
 #endif
             grid.gas(j)->set_vorgen(NULL);
@@ -521,41 +526,43 @@ void BlockICGenerator::relax_grid(ParticleVector &grid){
  *
  * @param plist ParticleVector to fill
  */
-void BlockICGenerator::add_DM(ParticleVector &plist){
+void BlockICGenerator::add_DM(ParticleVector& plist) {
     _rejection_fac_dm.resize(_regions.size());
     _maxdens_dm = 0.;
-    for(unsigned int i = _regions.size(); i--;){
+    for(unsigned int i = _regions.size(); i--;) {
         ICRegion* next = NULL;
-        if(i < _regions.size()-2){
-            next = _regions[i+1];
+        if(i < _regions.size() - 2) {
+            next = _regions[i + 1];
         }
         _rejection_fac_dm[i] = _regions[i]->get_max_value_dm(next);
         _maxdens_dm = std::max(_maxdens_dm, _rejection_fac_dm[i]);
     }
-    for(unsigned int i = 0; i < _regions.size(); i++){
+    for(unsigned int i = 0; i < _regions.size(); i++) {
         _rejection_fac_dm[i] /= _maxdens_dm;
     }
-    double box[ndim_+ndim_] = {0.};
+    double box[ndim_ + ndim_] = {0.};
     _container->get_bounding_box(box);
     // make sure every process has a different random seed
     srand(MPIGlobal::rank + 42);
     // divide the particles over the processes
-    unsigned int numpart = _ndark/MPIGlobal::size +
-            ((_ndark%MPIGlobal::size) > 0);
+    unsigned int numpart =
+            _ndark / MPIGlobal::size + ((_ndark % MPIGlobal::size) > 0);
     // make sure the process with the highest rank does not generate too many
     // particles
-    unsigned int nother = MPIGlobal::rank*numpart;
-    while(nother + numpart > _ndark){
+    unsigned int nother = MPIGlobal::rank * numpart;
+    while(nother + numpart > _ndark) {
         numpart--;
     }
-    for(unsigned int i = 0; i < numpart; i++){
+    for(unsigned int i = 0; i < numpart; i++) {
         Vec x;
-        for(unsigned int j = ndim_; j--;){
-            x[j] = box[ndim_+j]*(double)rand()/((double)RAND_MAX)+box[j];
+        for(unsigned int j = ndim_; j--;) {
+            x[j] = box[ndim_ + j] * (double)rand() / ((double)RAND_MAX) +
+                   box[j];
         }
-        while(!regions_accepted_dm(x)){
-            for(unsigned int j = ndim_; j--;){
-                x[j] = box[ndim_+j]*(double)rand()/((double)RAND_MAX)+box[j];
+        while(!regions_accepted_dm(x)) {
+            for(unsigned int j = ndim_; j--;) {
+                x[j] = box[ndim_ + j] * (double)rand() / ((double)RAND_MAX) +
+                       box[j];
             }
         }
         plist.add_DM_particle(new DMParticle(x));

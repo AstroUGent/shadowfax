@@ -24,18 +24,18 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorTessManager.hpp"
-#include "VorTess.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/GasParticle.hpp"
+#include "Error.hpp"
+#include "FixedGrid.hpp"
+#include "MPIMethods.hpp"
+#include "ProgramLog.hpp"
 #include "VorCell.hpp"
 #include "VorFace.hpp"
-#include "Error.hpp"
-#include "MPIMethods.hpp"
+#include "VorTess.hpp"
+#include "utilities/GasParticle.hpp"
+#include "utilities/ParticleVector.hpp"
 #include "utilities/Timer.hpp"
 #include <fstream>
 #include <sstream>
-#include "FixedGrid.hpp"
-#include "ProgramLog.hpp"
 using namespace std;
 
 //#define FIXED_GRID
@@ -55,14 +55,14 @@ using namespace std;
  * reconstructed for every timestep (currently ignored; grid is always
  * reconstructed)
  */
-VorTessManager::VorTessManager(ParticleVector &particles, bool periodic,
+VorTessManager::VorTessManager(ParticleVector& particles, bool periodic,
                                double tolerance, bool evolve)
-    : _particles(particles), _periodic(periodic), _tolerance(tolerance) {
+        : _particles(particles), _periodic(periodic), _tolerance(tolerance) {
     _gridtimer.start();
     _tesselation = new VorTess(&particles.get_container(), particles.gassize(),
                                periodic, tolerance);
     LOGS("Start adding points to VorTess");
-    for(unsigned int i = 0; i < _particles.gassize(); i++){
+    for(unsigned int i = 0; i < _particles.gassize(); i++) {
         _tesselation->add_point(_particles.gas(i),
                                 _particles.gas(i)->get_local_id());
         _particles.gas(i)->reset_copies();
@@ -81,7 +81,7 @@ VorTessManager::VorTessManager(ParticleVector &particles, bool periodic,
  *
  * Clean up. Print the timers to the stdout.
  */
-VorTessManager::~VorTessManager(){
+VorTessManager::~VorTessManager() {
     delete _tesselation;
     cout << "Spent " << _gridtimer.value() << "s in grid construction" << endl;
     cout << "Spent " << _hydrotimer.value() << "s in hydro related functions"
@@ -101,7 +101,7 @@ VorTessManager::~VorTessManager(){
  * floating point arithmetics and arbitrary precision arithmetics in geometry
  * tests
  */
-void VorTessManager::reset(DelCont* cont, bool periodic, double tolerance){
+void VorTessManager::reset(DelCont* cont, bool periodic, double tolerance) {
     delete _tesselation;
     _tesselation = new VorTess(cont, _particles.gassize(), periodic, tolerance);
 }
@@ -115,11 +115,11 @@ void VorTessManager::reset(DelCont* cont, bool periodic, double tolerance){
  * @param currentTime Current integer system time
  * @return Number of active cells in the tesselation
  */
-unsigned int VorTessManager::update(unsigned long currentTime){
+unsigned int VorTessManager::update(unsigned long currentTime) {
     _gridtimer.start();
     unsigned int count = 0;
-    for(unsigned int i = 0; i < _particles.gassize(); i++){
-        if(_particles.gas(i)->get_endtime() == currentTime){
+    for(unsigned int i = 0; i < _particles.gassize(); i++) {
+        if(_particles.gas(i)->get_endtime() == currentTime) {
             _tesselation->add_point(_particles.gas(i),
                                     _particles.gas(i)->get_local_id());
             count++;
@@ -138,9 +138,7 @@ unsigned int VorTessManager::update(unsigned long currentTime){
  *
  * Currently only done for the old algorithm.
  */
-void VorTessManager::update_Ws(){
-    _tesselation->update_Ws();
-}
+void VorTessManager::update_Ws() { _tesselation->update_Ws(); }
 
 /**
  * @brief Calculate characteristic lengths for the active cells of the
@@ -151,9 +149,9 @@ void VorTessManager::update_Ws(){
  *
  * @param currentTime Current integer system time
  */
-void VorTessManager::set_hs(unsigned long currentTime){
-    for(unsigned int i = 0; i < _particles.gassize(); i++){
-        if(_particles.gas(i)->get_endtime() == currentTime){
+void VorTessManager::set_hs(unsigned long currentTime) {
+    for(unsigned int i = 0; i < _particles.gassize(); i++) {
+        if(_particles.gas(i)->get_endtime() == currentTime) {
             double h = _particles.gas(i)->get_cell()->get_h();
             _particles.gas(i)->set_h(h);
         }
@@ -165,9 +163,7 @@ void VorTessManager::set_hs(unsigned long currentTime){
  *
  * Currently only done for the old algorithm.
  */
-void VorTessManager::update_gradients(){
-    _tesselation->update_gradients();
-}
+void VorTessManager::update_gradients() { _tesselation->update_gradients(); }
 
 /**
  * @brief Communicate timesteps between MPI processes
@@ -176,7 +172,7 @@ void VorTessManager::update_gradients(){
  *
  * @param currentTime Current integer system time
  */
-void VorTessManager::update_dts(unsigned long currentTime){
+void VorTessManager::update_dts(unsigned long currentTime) {
     _tesselation->update_dts(currentTime);
 }
 
@@ -185,7 +181,7 @@ void VorTessManager::update_dts(unsigned long currentTime){
  *
  * Currently only done for the old algorithm.
  */
-void VorTessManager::update_gravitational_corrections(){
+void VorTessManager::update_gravitational_corrections() {
     _tesselation->update_gravitational_corrections();
 }
 
@@ -198,13 +194,13 @@ void VorTessManager::update_gravitational_corrections(){
  * @param particles ParticleVector containing the particles of the simulation
  */
 void VorTessManager::hydro(TimeLine& timeline, RiemannSolver& solver,
-                           ParticleVector& particles){
+                           ParticleVector& particles) {
     _gridtimer.start();
     vector<VorFace*>& faces = _tesselation->get_faces();
     cout << "Faces size: " << faces.size() << endl;
     _gridtimer.stop();
     _hydrotimer.start();
-    for(unsigned int i = 0; i < faces.size(); i++){
+    for(unsigned int i = 0; i < faces.size(); i++) {
         faces[i]->set_v(_particles);
 #ifndef ICMAKER
         faces[i]->calculate_flux(timeline, solver);
@@ -218,9 +214,7 @@ void VorTessManager::hydro(TimeLine& timeline, RiemannSolver& solver,
  *
  * Currently only done for the old algorithm.
  */
-void VorTessManager::update_dQs(){
-    _tesselation->update_dQs();
-}
+void VorTessManager::update_dQs() { _tesselation->update_dQs(); }
 
 /**
  * @brief Print the tesselation to the given stream in a format that can be
@@ -228,7 +222,7 @@ void VorTessManager::update_dQs(){
  *
  * @param stream std::ostream to write to
  */
-void VorTessManager::print_tesselation_gnuplot(ostream &stream){
+void VorTessManager::print_tesselation_gnuplot(ostream& stream) {
     _tesselation->print_tesselation_gnuplot(stream);
 }
 
@@ -237,7 +231,7 @@ void VorTessManager::print_tesselation_gnuplot(ostream &stream){
  *
  * @param rfile RestartFile to write to
  */
-void VorTessManager::dump(RestartFile &rfile){
+void VorTessManager::dump(RestartFile& rfile) {
     _gridtimer.dump(rfile);
     _hydrotimer.dump(rfile);
     rfile.write(_periodic);
@@ -254,13 +248,13 @@ void VorTessManager::dump(RestartFile &rfile){
  * @param rfile RestartFile to read from
  * @param particles ParticleVector containing the particles of the simulation
  */
-VorTessManager::VorTessManager(RestartFile &rfile, ParticleVector &particles)
-    : _particles(particles), _gridtimer(rfile), _hydrotimer(rfile){
+VorTessManager::VorTessManager(RestartFile& rfile, ParticleVector& particles)
+        : _particles(particles), _gridtimer(rfile), _hydrotimer(rfile) {
     rfile.read(_periodic);
     rfile.read(_tolerance);
     _tesselation = new VorTess(&particles.get_container(), particles.gassize(),
                                _periodic, _tolerance);
-    for(unsigned int i = 0; i < _particles.gassize(); i++){
+    for(unsigned int i = 0; i < _particles.gassize(); i++) {
         _tesselation->add_point(_particles.gas(i),
                                 _particles.gas(i)->get_local_id());
         _particles.gas(i)->reset_copies();
@@ -277,7 +271,7 @@ VorTessManager::VorTessManager(RestartFile &rfile, ParticleVector &particles)
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return The velocity of the cell corresponding to the given particle
  */
-Vec VorTessManager::get_velocity(unsigned int index){
+Vec VorTessManager::get_velocity(unsigned int index) {
     VorCell* cell = _particles.gas(index)->get_cell();
     return cell->get_velocity();
 }
@@ -289,7 +283,8 @@ Vec VorTessManager::get_velocity(unsigned int index){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @param delta Array to store the resulting gradients in
  */
-void VorTessManager::estimate_gradients(unsigned int index, StateVector *delta){
+void VorTessManager::estimate_gradients(unsigned int index,
+                                        StateVector* delta) {
     _hydrotimer.start();
     VorCell* cell = _particles.gas(index)->get_cell();
     cell->estimate_gradient(delta);
@@ -303,7 +298,7 @@ void VorTessManager::estimate_gradients(unsigned int index, StateVector *delta){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return Volume of the cell corresponding to the given particle
  */
-double VorTessManager::get_volume(unsigned int index){
+double VorTessManager::get_volume(unsigned int index) {
     VorCell* cell = _particles.gas(index)->get_cell();
     return cell->get_volume();
 }
@@ -315,7 +310,7 @@ double VorTessManager::get_volume(unsigned int index){
  * @return Total surface area of the Voronoi cell corresponding to the given
  * particle
  */
-double VorTessManager::get_total_area(unsigned int index){
+double VorTessManager::get_total_area(unsigned int index) {
     VorCell* cell = _particles.gas(index)->get_cell();
     return cell->get_total_area();
 }
@@ -327,7 +322,7 @@ double VorTessManager::get_total_area(unsigned int index){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return Centroid of the cell corresponding to the given particle
  */
-Vec VorTessManager::get_centroid(unsigned int index){
+Vec VorTessManager::get_centroid(unsigned int index) {
     VorCell* cell = _particles.gas(index)->get_cell();
     return cell->get_centroid();
 }
@@ -342,10 +337,10 @@ Vec VorTessManager::get_centroid(unsigned int index){
  * @param periodic Flag indicating if the simulation box is periodic (true) or
  * reflective
  */
-void VorTessManager::update_positions(bool periodic){
+void VorTessManager::update_positions(bool periodic) {
     _gridtimer.start();
-    if(periodic){
-        for(unsigned int i = 0; i < _particles.gassize(); i++){
+    if(periodic) {
+        for(unsigned int i = 0; i < _particles.gassize(); i++) {
             // make sure the particle stays inside the periodic box
             _particles.get_container().keep_inside(_particles.gas(i));
         }
@@ -360,7 +355,7 @@ void VorTessManager::update_positions(bool periodic){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return Correction to the acceleration
  */
-Vec VorTessManager::get_gravitational_correction(unsigned int index){
+Vec VorTessManager::get_gravitational_correction(unsigned int index) {
     VorCell* cell = _particles.gas(index)->get_cell();
     return cell->get_gravitational_correction();
 }
@@ -374,24 +369,24 @@ Vec VorTessManager::get_gravitational_correction(unsigned int index){
  * @param stream std::ostream to write to
  * @param currentTime Current integer system time
  */
-void VorTessManager::dump_connectivity(ostream &stream,
-                                       unsigned long currentTime){
-    for(unsigned int i = 0; i < 3*_particles.gassize(); i++){
+void VorTessManager::dump_connectivity(ostream& stream,
+                                       unsigned long currentTime) {
+    for(unsigned int i = 0; i < 3 * _particles.gassize(); i++) {
         unsigned int j = 0;
-        while(j < _particles.gassize() && _particles.gas(j)->id() != i){
+        while(j < _particles.gassize() && _particles.gas(j)->id() != i) {
             j++;
         }
-        if(j == _particles.gassize()){
+        if(j == _particles.gassize()) {
             continue;
         }
-        if(_particles.gas(j)->get_endtime() == currentTime){
+        if(_particles.gas(j)->get_endtime() == currentTime) {
             unsigned long id = _particles.gas(j)->id();
             char c = 'c';
             stream.write(&c, 1);
             stream.write(reinterpret_cast<char*>(&id), sizeof(unsigned long));
             vector<unsigned long> ids =
                     _tesselation->get_ngb_ids(_particles.gas(j)->get_cell());
-            for(unsigned int k = 0; k < ids.size(); k++){
+            for(unsigned int k = 0; k < ids.size(); k++) {
                 stream.write(reinterpret_cast<char*>(&ids[k]),
                              sizeof(unsigned long));
             }
@@ -399,7 +394,7 @@ void VorTessManager::dump_connectivity(ostream &stream,
     }
 }
 
-#else // FIXED_GRID
+#else  // FIXED_GRID
 
 /**
  * @brief Constructor
@@ -416,7 +411,7 @@ void VorTessManager::dump_connectivity(ostream &stream,
  */
 VorTessManager::VorTessManager(ParticleVector& particles, bool periodic,
                                double tolerance, bool evolve)
-    : _particles(particles) {
+        : _particles(particles) {
     _fixedgrid = new FixedGrid(particles, periodic);
 }
 
@@ -425,9 +420,7 @@ VorTessManager::VorTessManager(ParticleVector& particles, bool periodic,
  *
  * Clean up the FixedGrid.
  */
-VorTessManager::~VorTessManager(){
-    delete _fixedgrid;
-}
+VorTessManager::~VorTessManager() { delete _fixedgrid; }
 
 /**
  * @brief Reset the tesselation
@@ -441,7 +434,7 @@ VorTessManager::~VorTessManager(){
  * floating point arithmetics and arbitrary precision arithmetics in geometry
  * tests
  */
-void VorTessManager::reset(DelCont* cont, bool periodic, double tolerance){
+void VorTessManager::reset(DelCont* cont, bool periodic, double tolerance) {
     // nothing needs to happen, because the grid is fixed
 }
 
@@ -453,7 +446,7 @@ void VorTessManager::reset(DelCont* cont, bool periodic, double tolerance){
  * @param currentTime Current integer system time
  * @return 0, because nothing changes
  */
-unsigned int VorTessManager::update(unsigned long currentTime){
+unsigned int VorTessManager::update(unsigned long currentTime) {
     // nothing happens, the grid is fixed
     return 0;
 }
@@ -463,7 +456,7 @@ unsigned int VorTessManager::update(unsigned long currentTime){
  *
  * @warning Not implemented for fixed grid!
  */
-void VorTessManager::update_Ws(){
+void VorTessManager::update_Ws() {
     // do communication
 }
 
@@ -476,9 +469,9 @@ void VorTessManager::update_Ws(){
  *
  * @param currentTime Current integer system time
  */
-void VorTessManager::set_hs(unsigned long currentTime){
-    for(unsigned int i = 0; i < _particles.gassize(); i++){
-        if(_particles.gas(i)->get_endtime() == currentTime){
+void VorTessManager::set_hs(unsigned long currentTime) {
+    for(unsigned int i = 0; i < _particles.gassize(); i++) {
+        if(_particles.gas(i)->get_endtime() == currentTime) {
             double h = _fixedgrid->get_h();
             _particles.gas(i)->set_h(h);
         }
@@ -490,7 +483,7 @@ void VorTessManager::set_hs(unsigned long currentTime){
  *
  * @warning Not implemented for fixed grid!
  */
-void VorTessManager::update_gradients(){
+void VorTessManager::update_gradients() {
     // do communication
 }
 
@@ -501,7 +494,7 @@ void VorTessManager::update_gradients(){
  *
  * @param currentTime Current integer system time
  */
-void VorTessManager::update_dts(unsigned long currentTime){
+void VorTessManager::update_dts(unsigned long currentTime) {
     // do communication
 }
 
@@ -514,7 +507,7 @@ void VorTessManager::update_dts(unsigned long currentTime){
  * @param particles ParticleVector containing the particles of the simulation
  */
 void VorTessManager::hydro(TimeLine& timeline, RiemannSolver& solver,
-                           ParticleVector &particles){
+                           ParticleVector& particles) {
     _fixedgrid->hydro(timeline, solver);
 }
 
@@ -523,7 +516,7 @@ void VorTessManager::hydro(TimeLine& timeline, RiemannSolver& solver,
  *
  * @warning Not implemented for fixed grid!
  */
-void VorTessManager::update_dQs(){
+void VorTessManager::update_dQs() {
     // do communication
 }
 
@@ -535,7 +528,7 @@ void VorTessManager::update_dQs(){
  *
  * @param stream std::ostream to write to
  */
-void VorTessManager::print_tesselation_gnuplot(std::ostream &stream){
+void VorTessManager::print_tesselation_gnuplot(std::ostream& stream) {
     // do printing
 }
 
@@ -546,7 +539,7 @@ void VorTessManager::print_tesselation_gnuplot(std::ostream &stream){
  *
  * @param rfile RestartFile to write to
  */
-void VorTessManager::dump(RestartFile &rfile){
+void VorTessManager::dump(RestartFile& rfile) {
     // do dumping
 }
 
@@ -559,8 +552,8 @@ void VorTessManager::dump(RestartFile &rfile){
  * @param rfile RestartFile to write to
  * @param particles ParticleVector containing the particles of the simulation
  */
-VorTessManager::VorTessManager(RestartFile &rfile, ParticleVector &particles)
-    : _particles(particles) {
+VorTessManager::VorTessManager(RestartFile& rfile, ParticleVector& particles)
+        : _particles(particles) {
     // do restart initialization
 }
 
@@ -571,7 +564,7 @@ VorTessManager::VorTessManager(RestartFile &rfile, ParticleVector &particles)
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return A zero velocity, because the grid is fixed
  */
-Vec VorTessManager::get_velocity(unsigned int index){
+Vec VorTessManager::get_velocity(unsigned int index) {
     // return zero velocity; the grid is fixed
     return Vec();
 }
@@ -583,7 +576,8 @@ Vec VorTessManager::get_velocity(unsigned int index){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @param delta Array to store the resulting gradients in
  */
-void VorTessManager::estimate_gradients(unsigned int index, StateVector* delta){
+void VorTessManager::estimate_gradients(unsigned int index,
+                                        StateVector* delta) {
     _fixedgrid->get_gradients(index, delta);
 }
 
@@ -594,7 +588,7 @@ void VorTessManager::estimate_gradients(unsigned int index, StateVector* delta){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return Volume of the cell corresponding to the given particle
  */
-double VorTessManager::get_volume(unsigned int index){
+double VorTessManager::get_volume(unsigned int index) {
     return _fixedgrid->get_volume();
 }
 
@@ -605,7 +599,7 @@ double VorTessManager::get_volume(unsigned int index){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return Centroid of the cell corresponding to the given particle
  */
-Vec VorTessManager::get_centroid(unsigned int index){
+Vec VorTessManager::get_centroid(unsigned int index) {
     // the centroid is the actual position of the particle
     Vec centroid = _particles.gas(index)->get_position();
     return centroid;
@@ -620,7 +614,7 @@ Vec VorTessManager::get_centroid(unsigned int index){
  * @param periodic Flag indicating if the simulation box is periodic (true) or
  * reflective
  */
-void VorTessManager::update_positions(bool periodic){
+void VorTessManager::update_positions(bool periodic) {
     // do nothing
 }
 
@@ -633,7 +627,7 @@ void VorTessManager::update_positions(bool periodic){
  * @param index Index of a GasParticle in the simulation ParticleVector
  * @return Correction to the acceleration
  */
-Vec VorTessManager::get_gravitational_correction(unsigned int index){
+Vec VorTessManager::get_gravitational_correction(unsigned int index) {
     // currently not used
     return Vec();
 }
@@ -647,8 +641,8 @@ Vec VorTessManager::get_gravitational_correction(unsigned int index){
  * @param currentTime Current integer system time
  */
 void VorTessManager::dump_connectivity(std::ostream& stream,
-                                       unsigned long currentTime){
+                                       unsigned long currentTime) {
     // not used
 }
 
-#endif // FIXED_GRID
+#endif  // FIXED_GRID

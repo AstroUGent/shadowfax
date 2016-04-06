@@ -34,25 +34,23 @@
   * A dark matter particle extends Particle with a mass and only interacts
   * through gravity
   */
-class DMParticle : public Particle{
-private:
+class DMParticle : public Particle {
+  private:
     /*! \brief Mass of the dark matter particle */
     double _mass;
 
-public:
+  public:
     DMParticle();
     DMParticle(Vec pos);
     DMParticle(void* buffer, int bufsize, int* position);
-    virtual ~DMParticle(){}
+    virtual ~DMParticle() {}
 
     /**
       * \brief Mark this Particle as a dark matter particle
       *
       * @return PARTTYPE_DM
       */
-    ParticleType type(){
-        return PARTTYPE_DM;
-    }
+    ParticleType type() { return PARTTYPE_DM; }
 
     void set_mass(double mass);
 
@@ -61,9 +59,7 @@ public:
       *
       * @return The mass of the dark matter particle
       */
-    inline double get_mass(){
-        return _mass;
-    }
+    inline double get_mass() { return _mass; }
 
     // NOTE: the "virtual" is really important here
     // it's the thing that makes sure that this particular version of pack_data
@@ -72,10 +68,10 @@ public:
     // probably not what you want
     virtual void pack_data(void* buffer, int bufsize, int* position);
 
-    virtual void dump(RestartFile &rfile);
-    DMParticle(RestartFile &rfile);
+    virtual void dump(RestartFile& rfile);
+    DMParticle(RestartFile& rfile);
 
     void dump_ascii(std::ostream& stream);
 };
 
-#endif // DMPARTICLE_HPP
+#endif  // DMPARTICLE_HPP

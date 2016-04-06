@@ -24,11 +24,11 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Header.hpp"
-#include "StateVector.hpp"
+#include "Error.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
 #include "RestartFile.hpp"
-#include "Error.hpp"
+#include "StateVector.hpp"
 #include <iostream>
 using namespace std;
 
@@ -40,12 +40,12 @@ using namespace std;
  * The simulation box is set to a point in the origin of the coordinate system
  * (so only 0's).
  */
-Header::Header(){
+Header::Header() {
     _npart = 0;
     _npartspec[0] = 0;
     _npartspec[1] = 0;
     _ndim = ndim_;
-    for(unsigned int i = ndim_+ndim_; i--;){
+    for(unsigned int i = ndim_ + ndim_; i--;) {
         _box[i] = 0.;
     }
     _time = 0.;
@@ -71,7 +71,7 @@ Header::Header(){
   *
   * @param npart The number of gas particles in the simulation
   */
-void Header::set_ngaspart(unsigned int npart){
+void Header::set_ngaspart(unsigned int npart) {
     _npartspec[0] = npart;
     _npart += npart;
 }
@@ -81,7 +81,7 @@ void Header::set_ngaspart(unsigned int npart){
   *
   * @param npart The number of DM particles in the simulation
   */
-void Header::set_ndmpart(unsigned int npart){
+void Header::set_ndmpart(unsigned int npart) {
     _npartspec[1] = npart;
     _npart += npart;
 }
@@ -95,8 +95,8 @@ void Header::set_ndmpart(unsigned int npart){
   * @param box A 3- or 4-element array specifying the origin and side of the
   * simulation box
   */
-void Header::set_box(double *box){
-    for(unsigned int i = ndim_+ndim_; i--;){
+void Header::set_box(double* box) {
+    for(unsigned int i = ndim_ + ndim_; i--;) {
         _box[i] = box[i];
     }
 }
@@ -106,9 +106,7 @@ void Header::set_box(double *box){
   *
   * @param time The current time of the simulation
   */
-void Header::set_time(double time){
-    _time = time;
-}
+void Header::set_time(double time) { _time = time; }
 
 /**
   * @brief Set the global timestep flag
@@ -116,7 +114,7 @@ void Header::set_time(double time){
   * @param global_timestep Boolean specifying if individual timesteps (0) or a
   * global timestep (1) is used
   */
-void Header::set_global_timestep(bool global_timestep){
+void Header::set_global_timestep(bool global_timestep) {
     _global_timestep = global_timestep;
 }
 
@@ -126,18 +124,14 @@ void Header::set_global_timestep(bool global_timestep){
  * @param periodic Boolean specifying if the simulation box is periodic (true)
  * or reflective (false)
  */
-void Header::set_periodic(bool periodic){
-    _periodic = periodic;
-}
+void Header::set_periodic(bool periodic) { _periodic = periodic; }
 
 /**
  * @brief Set the gravity flag
  *
  * @param gravity Boolean indicating whether we use gravity or not
  */
-void Header::set_gravity(bool gravity){
-    _gravity = gravity;
-}
+void Header::set_gravity(bool gravity) { _gravity = gravity; }
 
 /**
  * @brief Set the global softening length
@@ -145,9 +139,7 @@ void Header::set_gravity(bool gravity){
  * @param hsoft Softening length used if no individual softening lenght is
  * specified for a Particle
  */
-void Header::set_hsoft(double hsoft){
-    _hsoft = hsoft;
-}
+void Header::set_hsoft(double hsoft) { _hsoft = hsoft; }
 
 /**
   * @brief Get a pointer to buffer containing the number of particles per type,
@@ -156,9 +148,7 @@ void Header::set_hsoft(double hsoft){
   * @return A pointer to the memory location holding the number of particles per
   * type
   */
-void* Header::get_npartspec(){
-    return &_npartspec;
-}
+void* Header::get_npartspec() { return &_npartspec; }
 
 /**
   * @brief Get a pointer to buffer containing the number of dimensions, as used
@@ -166,9 +156,7 @@ void* Header::get_npartspec(){
   *
   * @return A pointer to the memory location holding the number of dimensions
   */
-void* Header::get_ndim(){
-    return &_ndim;
-}
+void* Header::get_ndim() { return &_ndim; }
 
 /**
   * @brief Get a pointer to buffer containing the simulation box, as used by
@@ -176,9 +164,7 @@ void* Header::get_ndim(){
   *
   * @return A pointer to the memory location holding the simulation box
   */
-void* Header::get_box(){
-    return _box;
-}
+void* Header::get_box() { return _box; }
 
 /**
   * @brief Get a pointer to buffer containing the simulation time, as used by
@@ -186,9 +172,7 @@ void* Header::get_box(){
   *
   * @return A pointer to the memory location holding the simulation time
   */
-void* Header::get_time(){
-    return &_time;
-}
+void* Header::get_time() { return &_time; }
 
 /**
   * @brief Get a pointer to buffer containing the periodic boundary flag, as
@@ -196,9 +180,7 @@ void* Header::get_time(){
   *
   * @return A pointer to the memory location holding the periodic boundary flag
   */
-void* Header::get_periodic(){
-    return &_periodic;
-}
+void* Header::get_periodic() { return &_periodic; }
 
 /**
   * @brief Get a pointer to buffer containing the second order flag, as used by
@@ -206,9 +188,7 @@ void* Header::get_periodic(){
   *
   * @return A pointer to the memory location holding the second order flag
   */
-void* Header::get_second_order(){
-    return &_second_order;
-}
+void* Header::get_second_order() { return &_second_order; }
 
 /**
   * @brief Get a pointer to buffer containing the static flag, as used by
@@ -216,9 +196,7 @@ void* Header::get_second_order(){
   *
   * @return A pointer to the memory location holding the static flag
   */
-void* Header::get_static(){
-    return &_static;
-}
+void* Header::get_static() { return &_static; }
 
 /**
   * @brief Get a pointer to buffer containing the global timestep flag, as used
@@ -226,9 +204,7 @@ void* Header::get_static(){
   *
   * @return A pointer to the memory location holding the global timestep flag
   */
-void* Header::get_global_timestep(){
-    return &_global_timestep;
-}
+void* Header::get_global_timestep() { return &_global_timestep; }
 
 /**
   * @brief Get a pointer to buffer containing the adiabatic index, as used by
@@ -236,9 +212,7 @@ void* Header::get_global_timestep(){
   *
   * @return A pointer to the memory location holding the adiabatic index
   */
-void* Header::get_gamma(){
-    return &_gamma;
-}
+void* Header::get_gamma() { return &_gamma; }
 
 /**
  * @brief Get a pointer to buffer containing the gravity flag, as used by
@@ -246,9 +220,7 @@ void* Header::get_gamma(){
  *
  * @return A pointer to the memory location holding the gravity flag
  */
-void* Header::get_gravity(){
-    return &_gravity;
-}
+void* Header::get_gravity() { return &_gravity; }
 
 /**
  * @brief Get a pointer to buffer containing the softening length, as used by
@@ -256,9 +228,7 @@ void* Header::get_gravity(){
  *
  * @return A pointer to the memory location holding the softening length
  */
-void* Header::get_hsoft(){
-    return &_hsoft;
-}
+void* Header::get_hsoft() { return &_hsoft; }
 
 /**
   * @brief Check if the compile flag options and the Header variables are
@@ -266,38 +236,46 @@ void* Header::get_hsoft(){
   *
   * If not, issue warnings or errors and in some cases crash.
   */
-void Header::check_makeflags(){
-    if(_ndim != ndim_){
+void Header::check_makeflags() {
+    if(_ndim != ndim_) {
         cerr << "Error: dimensions of code and snapshot don't match (code was "
-                "compiled with ndim_=" << ndim_ << ", while snapshot contains "
-                "ndim=" << _ndim << ")!" << endl;
+                "compiled with ndim_="
+             << ndim_ << ", while snapshot contains "
+                         "ndim="
+             << _ndim << ")!" << endl;
         my_exit();
     }
 #ifdef NOMUSCL
-    if(_second_order){
+    if(_second_order) {
         cerr << "Warning: code compiled with first order accuracy, snapshot "
-                "has second order accuracy" << endl;
+                "has second order accuracy"
+             << endl;
     }
 #else
-    if(!_second_order){
+    if(!_second_order) {
         cerr << "Warning: code compiled with second order accuracy, snapshot "
-                "has only first order accuracy" << endl;
+                "has only first order accuracy"
+             << endl;
     }
 #endif
 #ifdef STATIC
-    if(!_static){
+    if(!_static) {
         cerr << "Warning: code compiled with static mesh, snapshot contains "
-                "moving mesh" << endl;
+                "moving mesh"
+             << endl;
     }
 #else
-    if(_static){
+    if(_static) {
         cerr << "Warning: code compiled with moving mesh, snapshot contains "
-                "static mesh" << endl;
+                "static mesh"
+             << endl;
     }
 #endif
-    if(_gamma != GAMMA){
-        cerr << "Error: code compiled with gamma=" << GAMMA << ", while the "
-                "snapshot contains gamma=" << _gamma << "!" << endl;
+    if(_gamma != GAMMA) {
+        cerr << "Error: code compiled with gamma=" << GAMMA
+             << ", while the "
+                "snapshot contains gamma="
+             << _gamma << "!" << endl;
         my_exit();
     }
 }
@@ -307,8 +285,8 @@ void Header::check_makeflags(){
   *
   * @return The number of particles in the simulation
   */
-unsigned int Header::npart(){
-    if(!_npart){
+unsigned int Header::npart() {
+    if(!_npart) {
         _npart = _npartspec[0] + _npartspec[1];
     }
     return _npart;
@@ -319,26 +297,22 @@ unsigned int Header::npart(){
   *
   * @return The number of gas particles in the simulation
   */
-unsigned int Header::ngaspart(){
-    return _npartspec[0];
-}
+unsigned int Header::ngaspart() { return _npartspec[0]; }
 
 /**
   * @brief Get the number of DM particles
   *
   * @return The number of DM particles in the simulation
   */
-unsigned int Header::ndmpart(){
-    return _npartspec[1];
-}
+unsigned int Header::ndmpart() { return _npartspec[1]; }
 
 /**
   * @brief Get the simulation box
   *
   * @param box A 4- or 3-element array to fill
   */
-void Header::box(double *box){
-    for(unsigned int i = ndim_+ndim_; i--;){
+void Header::box(double* box) {
+    for(unsigned int i = ndim_ + ndim_; i--;) {
         box[i] = _box[i];
     }
 }
@@ -348,9 +322,7 @@ void Header::box(double *box){
   *
   * @return The simulation time
   */
-double Header::time(){
-    return _time;
-}
+double Header::time() { return _time; }
 
 /**
   * @brief Get the global timestep flag
@@ -358,27 +330,21 @@ double Header::time(){
   * @return true if a global timestep is used, false if individual timesteps are
   * desired
   */
-bool Header::global_timestep(){
-    return _global_timestep & 1;
-}
+bool Header::global_timestep() { return _global_timestep & 1; }
 
 /**
  * @brief Get the periodic simulation box flag
  *
  * @return true if the simulation box is periodic, false if it is reflective
  */
-bool Header::periodic(){
-    return _periodic & 1;
-}
+bool Header::periodic() { return _periodic & 1; }
 
 /**
  * @brief Get the gravity flag
  *
  * @return true if gravity is used, false otherwise
  */
-bool Header::gravity(){
-    return _gravity;
-}
+bool Header::gravity() { return _gravity; }
 
 /**
  * @brief Get the general softening length
@@ -386,9 +352,7 @@ bool Header::gravity(){
  * @return The general softening length used for particles that do not have an
  * individual softening length
  */
-double Header::hsoft(){
-    return _hsoft;
-}
+double Header::hsoft() { return _hsoft; }
 
 /**
  * @brief Pack data to MPI buffer for communication
@@ -397,11 +361,11 @@ double Header::hsoft(){
  * @param bufsize Buffer size
  * @param position Position in the buffer (is updated)
  */
-void Header::pack_data(void *buffer, int bufsize, int *position){
+void Header::pack_data(void* buffer, int bufsize, int* position) {
     MyMPI_Pack(&_npart, 1, MPI_UNSIGNED, buffer, bufsize, position);
     MyMPI_Pack(&_npartspec[0], 2, MPI_UNSIGNED, buffer, bufsize, position);
     MyMPI_Pack(&_ndim, 1, MPI_UNSIGNED, buffer, bufsize, position);
-    MyMPI_Pack(&_box[0], ndim_+ndim_, MPI_DOUBLE, buffer, bufsize, position);
+    MyMPI_Pack(&_box[0], ndim_ + ndim_, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_time, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_periodic, 1, MPI_UNSIGNED, buffer, bufsize, position);
     MyMPI_Pack(&_second_order, 1, MPI_UNSIGNED, buffer, bufsize, position);
@@ -419,11 +383,12 @@ void Header::pack_data(void *buffer, int bufsize, int *position){
  * @param bufsize Buffer size
  * @param position Position in buffer (is updated)
  */
-Header::Header(void *buffer, int bufsize, int *position){
+Header::Header(void* buffer, int bufsize, int* position) {
     MyMPI_Unpack(buffer, bufsize, position, &_npart, 1, MPI_UNSIGNED);
     MyMPI_Unpack(buffer, bufsize, position, &_npartspec[0], 2, MPI_UNSIGNED);
     MyMPI_Unpack(buffer, bufsize, position, &_ndim, 1, MPI_UNSIGNED);
-    MyMPI_Unpack(buffer, bufsize, position, &_box[0], ndim_+ndim_, MPI_DOUBLE);
+    MyMPI_Unpack(buffer, bufsize, position, &_box[0], ndim_ + ndim_,
+                 MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_time, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_periodic, 1, MPI_UNSIGNED);
     MyMPI_Unpack(buffer, bufsize, position, &_second_order, 1, MPI_UNSIGNED);
@@ -439,11 +404,11 @@ Header::Header(void *buffer, int bufsize, int *position){
  *
  * @param rfile RestartFile to write to
  */
-void Header::dump(RestartFile &rfile){
+void Header::dump(RestartFile& rfile) {
     rfile.write(_npart);
     rfile.write(_npartspec, 2);
     rfile.write(_ndim);
-    rfile.write(_box, ndim_+ndim_);
+    rfile.write(_box, ndim_ + ndim_);
     rfile.write(_time);
     rfile.write(_periodic);
     rfile.write(_second_order);
@@ -459,11 +424,11 @@ void Header::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-Header::Header(RestartFile &rfile){
+Header::Header(RestartFile& rfile) {
     rfile.read(_npart);
     rfile.read(_npartspec, 2);
     rfile.read(_ndim);
-    rfile.read(_box, ndim_+ndim_);
+    rfile.read(_box, ndim_ + ndim_);
     rfile.read(_time);
     rfile.read(_periodic);
     rfile.read(_second_order);

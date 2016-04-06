@@ -26,10 +26,10 @@
 #include "ExArith.h"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/Timer.hpp"
-#include <iostream>
-#include <cmath>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <cmath>
+#include <iostream>
 // if you want to use this, you have to link to the GMP library, which is not
 // done in the basic CMake setup
 //#include <boost/multiprecision/gmp.hpp>
@@ -46,7 +46,7 @@ using namespace std;
 typedef boost::multiprecision::int256_t int_orient3d;
 // tests indicate that using boost::multiprecision::int256_t is more than 3
 // times faster than using an unlimited mpz_int
-//typedef boost::multiprecision::mpz_int int_orient3d;
+// typedef boost::multiprecision::mpz_int int_orient3d;
 
 /**
  * \brief Big integer used for the exact insphere test
@@ -54,12 +54,10 @@ typedef boost::multiprecision::int256_t int_orient3d;
  * Breakdown in bits is done in the function itself. 277 is a safe upper bound.
  * 512 is too slow, so we define a custom type.
  */
-typedef boost::multiprecision::number<
-            boost::multiprecision::cpp_int_backend<
-                278, 278, boost::multiprecision::signed_magnitude,
-                boost::multiprecision::unchecked, void
-            >
-        > int_insphere;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+        278, 278, boost::multiprecision::signed_magnitude,
+        boost::multiprecision::unchecked, void> >
+        int_insphere;
 
 /**
  * \brief Big integer used for exact orient2D test
@@ -82,7 +80,7 @@ typedef boost::multiprecision::int128_t int_orient2d;
  */
 typedef boost::multiprecision::int256_t int_incircle;
 
-#if ndim_==3
+#if ndim_ == 3
 /**
  * @brief Quick 3D orientation test
  *
@@ -104,14 +102,14 @@ typedef boost::multiprecision::int256_t int_incircle;
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::orient3d_quick(Vec &a, Vec &b, Vec &c, Vec &d){
+double ExactArithmetic::orient3d_quick(Vec& a, Vec& b, Vec& c, Vec& d) {
     Vec ad = a - d;
     Vec bd = b - d;
     Vec cd = c - d;
 
-    return ad.z() * (bd.x() * cd.y() - cd.x() * bd.y())
-            + bd.z() * (cd.x() * ad.y() - ad.x() * cd.y())
-            + cd.z() * (ad.x() * bd.y() - bd.x() * ad.y());
+    return ad.z() * (bd.x() * cd.y() - cd.x() * bd.y()) +
+           bd.z() * (cd.x() * ad.y() - ad.x() * cd.y()) +
+           cd.z() * (ad.x() * bd.y() - bd.x() * ad.y());
 }
 
 /**
@@ -135,7 +133,7 @@ double ExactArithmetic::orient3d_quick(Vec &a, Vec &b, Vec &c, Vec &d){
  * @param d Coordinates of the fourth point, have to be in the interval [1,2]
  * @return 1, -1 or 0, depending on the outcome of the test
  */
-double ExactArithmetic::orient3d_exact(Vec &a, Vec &b, Vec &c, Vec &d){
+double ExactArithmetic::orient3d_exact(Vec& a, Vec& b, Vec& c, Vec& d) {
     // 53-bit numbers
     int_orient3d axp = get_mantissa(a.x());
     int_orient3d ayp = get_mantissa(a.y());
@@ -179,9 +177,8 @@ double ExactArithmetic::orient3d_exact(Vec &a, Vec &b, Vec &c, Vec &d){
     // the factors between brackets are at most 109 bits
     // the terms are at most 163 bits
     // the total sum is at most 165 bits
-    int_orient3d result = adz * (bdxcdy - cdxbdy)
-            + bdz * (cdxady - adxcdy)
-            + cdz * (adxbdy - bdxady);
+    int_orient3d result = adz * (bdxcdy - cdxbdy) + bdz * (cdxady - adxcdy) +
+                          cdz * (adxbdy - bdxady);
 
     return HelperFunctions::sign(result);
 }
@@ -210,7 +207,7 @@ double ExactArithmetic::orient3d_exact(Vec &a, Vec &b, Vec &c, Vec &d){
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::orient3d_adaptive(Vec &a, Vec &b, Vec &c, Vec &d){
+double ExactArithmetic::orient3d_adaptive(Vec& a, Vec& b, Vec& c, Vec& d) {
     Vec ad = a - d;
     Vec bd = b - d;
     Vec cd = c - d;
@@ -224,17 +221,16 @@ double ExactArithmetic::orient3d_adaptive(Vec &a, Vec &b, Vec &c, Vec &d){
     double adxbdy = ad.x() * bd.y();
     double bdxady = bd.x() * ad.y();
 
-    double errbound = (fabs(bdxcdy) + fabs(cdxbdy)) * fabs(ad.z())
-            + (fabs(cdxady) + fabs(adxcdy)) * fabs(bd.z())
-            + (fabs(adxbdy) + fabs(bdxady)) * fabs(cd.z());
+    double errbound = (fabs(bdxcdy) + fabs(cdxbdy)) * fabs(ad.z()) +
+                      (fabs(cdxady) + fabs(adxcdy)) * fabs(bd.z()) +
+                      (fabs(adxbdy) + fabs(bdxady)) * fabs(cd.z());
     // not really the right factor (which is 7.77156e-16 on my local machine),
     // but this will do
     errbound *= 1.e-10;
 
-    double result = ad.z() * (bdxcdy - cdxbdy)
-            + bd.z() * (cdxady - adxcdy)
-            + cd.z() * (adxbdy - bdxady);
-    if(result < -errbound || result > errbound){
+    double result = ad.z() * (bdxcdy - cdxbdy) + bd.z() * (cdxady - adxcdy) +
+                    cd.z() * (adxbdy - bdxady);
+    if(result < -errbound || result > errbound) {
         return result;
     }
 
@@ -266,7 +262,7 @@ double ExactArithmetic::orient3d_adaptive(Vec &a, Vec &b, Vec &c, Vec &d){
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::insphere_quick(Vec &a, Vec &b, Vec &c, Vec &d, Vec &e){
+double ExactArithmetic::insphere_quick(Vec& a, Vec& b, Vec& c, Vec& d, Vec& e) {
     Vec ae = a - e;
     Vec be = b - e;
     Vec ce = c - e;
@@ -284,8 +280,8 @@ double ExactArithmetic::insphere_quick(Vec &a, Vec &b, Vec &c, Vec &d, Vec &e){
     double cda = ce.z() * da + de.z() * ac + ae.z() * cd;
     double dab = de.z() * ab + ae.z() * bd + be.z() * da;
 
-    return (de.norm2() * abc - ce.norm2() * dab)
-            + (be.norm2() * cda - ae.norm2() * bcd);
+    return (de.norm2() * abc - ce.norm2() * dab) +
+           (be.norm2() * cda - ae.norm2() * bcd);
 }
 
 /**
@@ -313,7 +309,7 @@ double ExactArithmetic::insphere_quick(Vec &a, Vec &b, Vec &c, Vec &d, Vec &e){
  * @param e Coordinates of the fifth point, have to be in the interval [1,2]
  * @return 1, -1 or 0 value, depending on the outcome of the test
  */
-double ExactArithmetic::insphere_exact(Vec &a, Vec &b, Vec &c, Vec &d, Vec &e){
+double ExactArithmetic::insphere_exact(Vec& a, Vec& b, Vec& c, Vec& d, Vec& e) {
     // 53-bit numbers
     int_insphere axp = get_mantissa(a.x());
     int_insphere ayp = get_mantissa(a.y());
@@ -374,8 +370,8 @@ double ExactArithmetic::insphere_exact(Vec &a, Vec &b, Vec &c, Vec &d, Vec &e){
 
     // every term has at most 275 significant bits
     // the total sum has at most 277 significant bits
-    int_insphere result = (denrm2 * abc - cenrm2 * dab)
-            + (benrm2 * cda - aenrm2 * bcd);
+    int_insphere result =
+            (denrm2 * abc - cenrm2 * dab) + (benrm2 * cda - aenrm2 * bcd);
 
     return HelperFunctions::sign(result);
 }
@@ -408,8 +404,8 @@ double ExactArithmetic::insphere_exact(Vec &a, Vec &b, Vec &c, Vec &d, Vec &e){
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::insphere_adaptive(Vec &a, Vec &b, Vec &c, Vec &d,
-                                          Vec &e){
+double ExactArithmetic::insphere_adaptive(Vec& a, Vec& b, Vec& c, Vec& d,
+                                          Vec& e) {
     Vec ae = a - e;
     Vec be = b - e;
     Vec ce = c - e;
@@ -460,31 +456,30 @@ double ExactArithmetic::insphere_adaptive(Vec &a, Vec &b, Vec &c, Vec &d,
     double cexaeyplus = fabs(cexaey);
     double bexdeyplus = fabs(bexdey);
     double dexbeyplus = fabs(dexbey);
-    double errbound =
-            ((cexdeyplus + dexceyplus) * bezplus
-             + (dexbeyplus + bexdeyplus) * cezplus
-             + (bexceyplus + cexbeyplus) * dezplus)
-            * aenrm2
-            + ((dexaeyplus + aexdeyplus) * cezplus
-               + (aexceyplus + cexaeyplus) * dezplus
-               + (cexdeyplus + dexceyplus) * aezplus)
-            * benrm2
-            + ((aexbeyplus + bexaeyplus) * dezplus
-               + (bexdeyplus + dexbeyplus) * aezplus
-               + (dexaeyplus + aexdeyplus) * bezplus)
-            * cenrm2
-            + ((bexceyplus + cexbeyplus) * aezplus
-               + (cexaeyplus + aexceyplus) * bezplus
-               + (aexbeyplus + bexaeyplus) * cezplus)
-            * denrm2;
+    double errbound = ((cexdeyplus + dexceyplus) * bezplus +
+                       (dexbeyplus + bexdeyplus) * cezplus +
+                       (bexceyplus + cexbeyplus) * dezplus) *
+                              aenrm2 +
+                      ((dexaeyplus + aexdeyplus) * cezplus +
+                       (aexceyplus + cexaeyplus) * dezplus +
+                       (cexdeyplus + dexceyplus) * aezplus) *
+                              benrm2 +
+                      ((aexbeyplus + bexaeyplus) * dezplus +
+                       (bexdeyplus + dexbeyplus) * aezplus +
+                       (dexaeyplus + aexdeyplus) * bezplus) *
+                              cenrm2 +
+                      ((bexceyplus + cexbeyplus) * aezplus +
+                       (cexaeyplus + aexceyplus) * bezplus +
+                       (aexbeyplus + bexaeyplus) * cezplus) *
+                              denrm2;
     // not really the right factor (which is 1.77636e-15 on my local machine),
     // but this will do
     errbound *= 1.e-10;
 
-    double result = (denrm2 * abc - cenrm2 * dab)
-            + (benrm2 * cda - aenrm2 * bcd);
+    double result =
+            (denrm2 * abc - cenrm2 * dab) + (benrm2 * cda - aenrm2 * bcd);
 
-    if(result < -errbound || result > errbound){
+    if(result < -errbound || result > errbound) {
         return result;
     }
 
@@ -492,7 +487,7 @@ double ExactArithmetic::insphere_adaptive(Vec &a, Vec &b, Vec &c, Vec &d,
 }
 #endif
 
-#if ndim_==2
+#if ndim_ == 2
 /**
  * @brief Quick 2D orientation test
  *
@@ -511,9 +506,9 @@ double ExactArithmetic::insphere_adaptive(Vec &a, Vec &b, Vec &c, Vec &d,
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::orient2d_quick(Vec &a, Vec &b, Vec &c){
-    return (a.x() - c.x()) * (b.y() - c.y())
-            - (a.y() - c.y()) * (b.x() - c.x());
+double ExactArithmetic::orient2d_quick(Vec& a, Vec& b, Vec& c) {
+    return (a.x() - c.x()) * (b.y() - c.y()) -
+           (a.y() - c.y()) * (b.x() - c.x());
 }
 
 /**
@@ -534,7 +529,7 @@ double ExactArithmetic::orient2d_quick(Vec &a, Vec &b, Vec &c){
  * @param c Coordinates of the third point, have to be in the interval [1,2]
  * @return 1, -1 or 0, depending on the outcome of the test
  */
-double ExactArithmetic::orient2d_exact(Vec &a, Vec &b, Vec &c){
+double ExactArithmetic::orient2d_exact(Vec& a, Vec& b, Vec& c) {
     // 53-bit numbers
     int_orient2d axp = get_mantissa(a.x());
     int_orient2d ayp = get_mantissa(a.y());
@@ -548,8 +543,7 @@ double ExactArithmetic::orient2d_exact(Vec &a, Vec &b, Vec &c){
     // every factor between brackets is at most 54 bits
     // every term is at most 108 bits
     // the difference is at most 109 bits
-    int_orient2d result = (axp - cxp) * (byp - cyp)
-            - (ayp - cyp) * (bxp - cxp);
+    int_orient2d result = (axp - cxp) * (byp - cyp) - (ayp - cyp) * (bxp - cxp);
 
     return HelperFunctions::sign(result);
 }
@@ -575,21 +569,21 @@ double ExactArithmetic::orient2d_exact(Vec &a, Vec &b, Vec &c){
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::orient2d_adaptive(Vec &a, Vec &b, Vec &c){
+double ExactArithmetic::orient2d_adaptive(Vec& a, Vec& b, Vec& c) {
     double detleft = (a.x() - c.x()) * (b.y() - c.y());
     double detright = (a.y() - c.y()) * (b.x() - c.x());
 
     double errbound = 0.;
     double result = detleft - detright;
 
-    if (detleft > 0.0) {
-        if (detright <= 0.0) {
+    if(detleft > 0.0) {
+        if(detright <= 0.0) {
             return result;
         } else {
             errbound = detleft + detright;
         }
-    } else if (detleft < 0.0) {
-        if (detright >= 0.0) {
+    } else if(detleft < 0.0) {
+        if(detright >= 0.0) {
             return result;
         } else {
             errbound = -detleft - detright;
@@ -601,7 +595,7 @@ double ExactArithmetic::orient2d_adaptive(Vec &a, Vec &b, Vec &c){
     // actual value is smaller (3.33067e-16 on my machine), but this will do
     errbound *= 1.e-10;
 
-    if ((result >= errbound) || (-result >= errbound)) {
+    if((result >= errbound) || (-result >= errbound)) {
         return result;
     }
 
@@ -632,7 +626,7 @@ double ExactArithmetic::orient2d_adaptive(Vec &a, Vec &b, Vec &c){
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::incircle_quick(Vec &a, Vec &b, Vec &c, Vec &d){
+double ExactArithmetic::incircle_quick(Vec& a, Vec& b, Vec& c, Vec& d) {
     Vec ad = a - d;
     Vec bd = b - d;
     Vec cd = c - d;
@@ -649,9 +643,8 @@ double ExactArithmetic::incircle_quick(Vec &a, Vec &b, Vec &c, Vec &d){
     double bdxady = bd.x() * ad.y();
     double cdnrm2 = cd.norm2();
 
-    double result = adnrm2 * (bdxcdy - cdxbdy)
-            + bdnrm2 * (cdxady - adxcdy)
-            + cdnrm2 * (adxbdy - bdxady);
+    double result = adnrm2 * (bdxcdy - cdxbdy) + bdnrm2 * (cdxady - adxcdy) +
+                    cdnrm2 * (adxbdy - bdxady);
 
     return result;
 }
@@ -680,7 +673,7 @@ double ExactArithmetic::incircle_quick(Vec &a, Vec &b, Vec &c, Vec &d){
  * @param d Coordinates of the fourth point, have to be in the interval [1,2]
  * @return 1, -1 or 0, depending on the outcome of the test
  */
-double ExactArithmetic::incircle_exact(Vec &a, Vec &b, Vec &c, Vec &d){
+double ExactArithmetic::incircle_exact(Vec& a, Vec& b, Vec& c, Vec& d) {
     // 53-bit numbers
     int_incircle axp = get_mantissa(a.x());
     int_incircle ayp = get_mantissa(a.y());
@@ -720,9 +713,9 @@ double ExactArithmetic::incircle_exact(Vec &a, Vec &b, Vec &c, Vec &d){
     // the factors between brackets are at most 109 bits
     // the terms are at most 218 bits
     // the total sum is at most 220 bits
-    int_incircle result = adnrm2 * (bdxcdy - cdxbdy)
-            + bdnrm2 * (cdxady - adxcdy)
-            + cdnrm2 * (adxbdy - bdxady);
+    int_incircle result = adnrm2 * (bdxcdy - cdxbdy) +
+                          bdnrm2 * (cdxady - adxcdy) +
+                          cdnrm2 * (adxbdy - bdxady);
 
     return HelperFunctions::sign(result);
 }
@@ -754,7 +747,7 @@ double ExactArithmetic::incircle_exact(Vec &a, Vec &b, Vec &c, Vec &d){
  * @return A positive, negative or zero value, depending on the outcome of the
  * test
  */
-double ExactArithmetic::incircle_adaptive(Vec &a, Vec &b, Vec &c, Vec &d){
+double ExactArithmetic::incircle_adaptive(Vec& a, Vec& b, Vec& c, Vec& d) {
     Vec ad = a - d;
     Vec bd = b - d;
     Vec cd = c - d;
@@ -771,19 +764,18 @@ double ExactArithmetic::incircle_adaptive(Vec &a, Vec &b, Vec &c, Vec &d){
     double bdxady = bd.x() * ad.y();
     double cdnrm2 = cd.norm2();
 
-    double result = adnrm2 * (bdxcdy - cdxbdy)
-            + bdnrm2 * (cdxady - adxcdy)
-            + cdnrm2 * (adxbdy - bdxady);
+    double result = adnrm2 * (bdxcdy - cdxbdy) + bdnrm2 * (cdxady - adxcdy) +
+                    cdnrm2 * (adxbdy - bdxady);
 
-    double errbound = (fabs(bdxcdy) + fabs(cdxbdy)) * adnrm2
-            + (fabs(cdxady) + fabs(adxcdy)) * bdnrm2
-            + (fabs(adxbdy) + fabs(bdxady)) * cdnrm2;
+    double errbound = (fabs(bdxcdy) + fabs(cdxbdy)) * adnrm2 +
+                      (fabs(cdxady) + fabs(adxcdy)) * bdnrm2 +
+                      (fabs(adxbdy) + fabs(bdxady)) * cdnrm2;
 
     // actual value is smaller (1.11022e-15 on my local machine), but this will
     // do
     errbound *= 1.e-10;
     if(result < -errbound || result > errbound) {
-      return result;
+        return result;
     }
 
     return incircle_exact(a, b, c, d);
@@ -793,8 +785,8 @@ double ExactArithmetic::incircle_adaptive(Vec &a, Vec &b, Vec &c, Vec &d){
 /**
  * @brief Test the geometrical routines
  */
-void ExactArithmetic::test_predicates(){
-#if ndim_==3
+void ExactArithmetic::test_predicates() {
+#if ndim_ == 3
     cout << "###### Orient3d test ######" << endl;
     // Test 1: should return 1
     {
@@ -834,17 +826,13 @@ void ExactArithmetic::test_predicates(){
         // produce the wrong sign
         // I checked that this case indeed fails with the Intel compilers on the
         // UGent HPC when using Schewchuk's predicates
-        Vec a(get_value(0x3ff4427c75c7d120),
-              get_value(0x3ff31624fd618368),
+        Vec a(get_value(0x3ff4427c75c7d120), get_value(0x3ff31624fd618368),
               get_value(0x3ff7f481c6bbdc8e));
-        Vec b(get_value(0x3ff436fe3c83adae),
-              get_value(0x3ff30aa6c41d5ff6),
+        Vec b(get_value(0x3ff436fe3c83adae), get_value(0x3ff30aa6c41d5ff6),
               get_value(0x3ff7f481c6bbdc8e));
-        Vec c(get_value(0x3ff44dfaaf0bf493),
-              get_value(0x3ff321a336a5a6da),
+        Vec c(get_value(0x3ff44dfaaf0bf493), get_value(0x3ff321a336a5a6da),
               get_value(0x3ff7f481c6bbdc8e));
-        Vec d(get_value(0x3ff0000a7c4d0614),
-              get_value(0x3ff0000a7c4d0614),
+        Vec d(get_value(0x3ff0000a7c4d0614), get_value(0x3ff0000a7c4d0614),
               get_value(0x3ffffff583b2f9ed));
         cout << "orient3d_quick: ";
         cout << orient3d_quick(a, b, c, d) << endl;
@@ -860,19 +848,19 @@ void ExactArithmetic::test_predicates(){
         Timer timerA;
         double sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(orient3d_quick(a, b, c, d));
         }
         cout << "orient3d_quick took " << timerA.stop() << "s" << endl;
@@ -881,19 +869,19 @@ void ExactArithmetic::test_predicates(){
         Timer timerB;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(orient3d_exact(a, b, c, d));
         }
         cout << "orient3d_exact took " << timerB.stop() << "s" << endl;
@@ -902,19 +890,19 @@ void ExactArithmetic::test_predicates(){
         Timer timerC;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(orient3d_adaptive(a, b, c, d));
         }
         cout << "orient3d_adaptive took " << timerC.stop() << "s" << endl;
@@ -955,20 +943,15 @@ void ExactArithmetic::test_predicates(){
     // Test 3: borderline case
     {
         cout << "## Borderline case ##" << endl;
-        Vec a(get_value(0x3ff5175d9c6aad1d),
-              get_value(0x3ff378315baa5e27),
+        Vec a(get_value(0x3ff5175d9c6aad1d), get_value(0x3ff378315baa5e27),
               get_value(0x3ff884188b736f90));
-        Vec b(get_value(0x3ff51891c1b81df8),
-              get_value(0x3ff30d426295616f),
+        Vec b(get_value(0x3ff51891c1b81df8), get_value(0x3ff30d426295616f),
               get_value(0x3ff88648dfb41982));
-        Vec c(get_value(0x3ff0000a7c4d0614),
-              get_value(0x3ff0000a7c4d0614),
+        Vec c(get_value(0x3ff0000a7c4d0614), get_value(0x3ff0000a7c4d0614),
               get_value(0x3ffffff583b2f9ed));
-        Vec d(get_value(0x3ff516d995fe14ae),
-              get_value(0x3ff378315baa5e27),
+        Vec d(get_value(0x3ff516d995fe14ae), get_value(0x3ff378315baa5e27),
               get_value(0x3ff884188b736f90));
-        Vec e(get_value(0x3ff515a570b0a3d4),
-              get_value(0x3ff30d426295616f),
+        Vec e(get_value(0x3ff515a570b0a3d4), get_value(0x3ff30d426295616f),
               get_value(0x3ff88648dfb41982));
         cout << "insphere_quick: ";
         cout << insphere_quick(a, b, c, d, e) << endl;
@@ -984,22 +967,22 @@ void ExactArithmetic::test_predicates(){
         Timer timerA;
         double sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec e(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec e(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(insphere_quick(a, b, c, d, e));
         }
         cout << "insphere_quick took " << timerA.stop() << "s" << endl;
@@ -1008,22 +991,22 @@ void ExactArithmetic::test_predicates(){
         Timer timerB;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec e(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec e(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(insphere_exact(a, b, c, d, e));
         }
         cout << "insphere_exact took " << timerB.stop() << "s" << endl;
@@ -1032,22 +1015,22 @@ void ExactArithmetic::test_predicates(){
         Timer timerC;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec e(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec e(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(insphere_adaptive(a, b, c, d, e));
         }
         cout << "insphere_adaptive took " << timerC.stop() << "s" << endl;
@@ -1084,12 +1067,9 @@ void ExactArithmetic::test_predicates(){
     // Test 3: borderline case
     {
         cout << "## Borderline case ##" << endl;
-        Vec a(get_value(0x3ff7c3626efe9827),
-              get_value(0x3ff3d7dcd7a686dc));
-        Vec b(get_value(0x3ff7c098fb743b1b),
-              get_value(0x3ff3d6781de15856));
-        Vec c(get_value(0x3ff85184738f21ba),
-              get_value(0x3ff41eedd9eecba6));
+        Vec a(get_value(0x3ff7c3626efe9827), get_value(0x3ff3d7dcd7a686dc));
+        Vec b(get_value(0x3ff7c098fb743b1b), get_value(0x3ff3d6781de15856));
+        Vec c(get_value(0x3ff85184738f21ba), get_value(0x3ff41eedd9eecba6));
         cout << "orient2d_quick: ";
         cout << orient2d_quick(a, b, c) << endl;
         cout << "orient2d_exact: ";
@@ -1104,13 +1084,13 @@ void ExactArithmetic::test_predicates(){
         Timer timerA;
         double sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(orient2d_quick(a, b, c));
         }
         cout << "orient2d_quick took " << timerA.stop() << "s" << endl;
@@ -1119,13 +1099,13 @@ void ExactArithmetic::test_predicates(){
         Timer timerB;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(orient2d_exact(a, b, c));
         }
         cout << "orient2d_exact took " << timerB.stop() << "s" << endl;
@@ -1134,13 +1114,13 @@ void ExactArithmetic::test_predicates(){
         Timer timerC;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(orient2d_adaptive(a, b, c));
         }
         cout << "orient2d_adaptive took " << timerC.stop() << "s" << endl;
@@ -1179,14 +1159,10 @@ void ExactArithmetic::test_predicates(){
     // Test 3: borderline case
     {
         cout << "## Borderline case ##" << endl;
-        Vec a(get_value(0x3ff894674887daee),
-              get_value(0x3ff3fd7c6f726f0b));
-        Vec b(get_value(0x3ff8666b561cdb9a),
-              get_value(0x3ff42b7861dd6e60));
-        Vec c(get_value(0x3ff890391b384f5c),
-              get_value(0x3ff3fd7c6f726f0b));
-        Vec d(get_value(0x3ff8666b561cdb9a),
-              get_value(0x3ff4274a348de2cc));
+        Vec a(get_value(0x3ff894674887daee), get_value(0x3ff3fd7c6f726f0b));
+        Vec b(get_value(0x3ff8666b561cdb9a), get_value(0x3ff42b7861dd6e60));
+        Vec c(get_value(0x3ff890391b384f5c), get_value(0x3ff3fd7c6f726f0b));
+        Vec d(get_value(0x3ff8666b561cdb9a), get_value(0x3ff4274a348de2cc));
         cout << "incircle_quick: ";
         cout << incircle_quick(a, b, c, d) << endl;
         cout << "incircle_exact: ";
@@ -1201,15 +1177,15 @@ void ExactArithmetic::test_predicates(){
         Timer timerA;
         double sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(incircle_quick(a, b, c, d));
         }
         cout << "incircle_quick took " << timerA.stop() << "s" << endl;
@@ -1218,15 +1194,15 @@ void ExactArithmetic::test_predicates(){
         Timer timerB;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(incircle_exact(a, b, c, d));
         }
         cout << "incircle_exact took " << timerB.stop() << "s" << endl;
@@ -1235,15 +1211,15 @@ void ExactArithmetic::test_predicates(){
         Timer timerC;
         sum = 0.;
         srand(42);
-        for(unsigned int i = 0; i < 1000000; i++){
-            Vec a(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec b(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec c(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
-            Vec d(1.+HelperFunctions::rand_double(),
-                  1.+HelperFunctions::rand_double());
+        for(unsigned int i = 0; i < 1000000; i++) {
+            Vec a(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec b(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec c(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
+            Vec d(1. + HelperFunctions::rand_double(),
+                  1. + HelperFunctions::rand_double());
             sum += HelperFunctions::sign(incircle_adaptive(a, b, c, d));
         }
         cout << "incircle_adaptive took " << timerC.stop() << "s" << endl;
@@ -1258,7 +1234,7 @@ void ExactArithmetic::test_predicates(){
  * @param str Label for the printed value
  * @param val Double precision value to print
  */
-void ExactArithmetic::print_value(const char *str, double val){
+void ExactArithmetic::print_value(const char* str, double val) {
     binaryDouble cval;
     cval.dval = val;
     cout << str << ": " << std::hex << cval.bval << endl;
@@ -1272,7 +1248,7 @@ void ExactArithmetic::print_value(const char *str, double val){
  * @param bval 64-bit binary representation of a floating point value
  * @return Double precision floating point value that is being represented
  */
-double ExactArithmetic::get_value(unsigned long bval){
+double ExactArithmetic::get_value(unsigned long bval) {
     binaryDouble cval;
     cval.bval = bval;
     return cval.dval;

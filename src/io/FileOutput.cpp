@@ -25,16 +25,16 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Output.hpp"
 #include "Block.hpp"
-#include "Header.hpp"
 #include "HDF5tools.hpp"
-#include <vector>
-#include <iostream>
-#include <sstream>
+#include "Header.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
+#include "Output.hpp"
 #include <hdf5.h>
+#include <iostream>
+#include <sstream>
+#include <vector>
 using namespace std;
 
 /**
@@ -45,17 +45,17 @@ using namespace std;
   *
   * @param filename Name of the file (should end with .hdf5)
   */
-FileOutput::FileOutput(string filename){
+FileOutput::FileOutput(string filename) {
     int rank = MPIGlobal::local_rank;
     // check if we can open the file (and immediately overwrite it if it already
     // exists)
-    if(!rank){
+    if(!rank) {
         hid_t file = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT,
                                H5P_DEFAULT);
         herr_t status;
         status = H5Fclose(file);
 
-        if(status < 0){
+        if(status < 0) {
             std::cerr << "ERROR!" << std::endl;
         }
     }
@@ -72,28 +72,28 @@ FileOutput::FileOutput(string filename){
   *
   * @param block The Block the write to the file
   */
-void FileOutput::write(Block& block){
+void FileOutput::write(Block& block) {
     unsigned int blocksize = block.get_size();
     int rank = MPIGlobal::rank;
     int size = MPIGlobal::size;
     int lrank = MPIGlobal::local_rank;
     vector<unsigned int> blocksizes(size);
     MyMPI_Allgather(&blocksize, 1, MPI_UNSIGNED, &blocksizes[0], 1,
-            MPI_UNSIGNED);
-    for(int i = 0; i < size; i++){
-        if(i == lrank){
-            if(!lrank){
+                    MPI_UNSIGNED);
+    for(int i = 0; i < size; i++) {
+        if(i == lrank) {
+            if(!lrank) {
                 blocksize = 0;
-                for(unsigned int j = size; j--;){
+                for(unsigned int j = size; j--;) {
                     blocksize += blocksizes[j];
                 }
-                hid_t file = H5Fopen(_filename.c_str(), H5F_ACC_RDWR,
-                                     H5P_DEFAULT);
+                hid_t file =
+                        H5Fopen(_filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
                 herr_t status;
                 hid_t group = H5Gcreate(file, block.get_name().c_str(), -1);
-                for(unsigned int k = 0; k < block.get_headers().size(); k++){
+                for(unsigned int k = 0; k < block.get_headers().size(); k++) {
                     unsigned int rank = 1;
-                    if(block.get_dimensions()[k] > 1){
+                    if(block.get_dimensions()[k] > 1) {
                         rank = 2;
                     }
                     hsize_t dims[2] = {blocksize, block.get_dimensions()[k]};
@@ -131,21 +131,21 @@ void FileOutput::write(Block& block){
                 status = H5Gclose(group);
                 status = H5Fclose(file);
 
-                if(status < 0){
+                if(status < 0) {
                     std::cerr << "ERROR!" << std::endl;
                 }
             } else {
-                hid_t file = H5Fopen(_filename.c_str(), H5F_ACC_RDWR,
-                                     H5P_DEFAULT);
+                hid_t file =
+                        H5Fopen(_filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
                 herr_t status;
                 hid_t group = H5Gopen(file, block.get_name().c_str());
                 blocksize = 0;
-                for(unsigned int j = rank; j--;){
+                for(unsigned int j = rank; j--;) {
                     blocksize += blocksizes[j];
                 }
-                for(unsigned int k = 0; k < block.get_headers().size(); k++){
+                for(unsigned int k = 0; k < block.get_headers().size(); k++) {
                     unsigned int rank = 1;
-                    if(block.get_dimensions()[k] > 1){
+                    if(block.get_dimensions()[k] > 1) {
                         rank = 2;
                     }
                     stringstream name;
@@ -170,7 +170,7 @@ void FileOutput::write(Block& block){
                 status = H5Gclose(group);
                 status = H5Fclose(file);
 
-                if(status < 0){
+                if(status < 0) {
                     std::cerr << "ERROR!" << std::endl;
                 }
             }
@@ -188,10 +188,10 @@ void FileOutput::write(Block& block){
   *
   * @param header The Header to write to the file
   */
-void FileOutput::write_header(Header &header){
+void FileOutput::write_header(Header& header) {
     int rank = MPIGlobal::local_rank;
     // only process 0 writes the header
-    if(!rank){
+    if(!rank) {
         hid_t file = H5Fopen(_filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
         herr_t status;
         hid_t group = H5Gcreate(file, "Header", -1);
@@ -200,7 +200,7 @@ void FileOutput::write_header(Header &header){
                                          header.get_npartspec());
         HDF5tools::write_attribute_scalar(group, "ndim", HDF5types::UINT,
                                           header.get_ndim());
-        HDF5tools::write_attribute_array(group, ndim_+ndim_, "box",
+        HDF5tools::write_attribute_array(group, ndim_ + ndim_, "box",
                                          HDF5types::DOUBLE, header.get_box());
         HDF5tools::write_attribute_scalar(group, "time", HDF5types::DOUBLE,
                                           header.get_time());
@@ -219,7 +219,7 @@ void FileOutput::write_header(Header &header){
                                           header.get_gamma());
         HDF5tools::write_attribute_scalar(group, "gravity", HDF5types::BOOL,
                                           header.get_gravity());
-        if(header.ndmpart() && header.gravity()){
+        if(header.ndmpart() && header.gravity()) {
             HDF5tools::write_attribute_scalar(group, "hsoft", HDF5types::DOUBLE,
                                               header.get_hsoft());
         }
@@ -227,7 +227,7 @@ void FileOutput::write_header(Header &header){
         status = H5Gclose(group);
         status = H5Fclose(file);
 
-        if(status < 0){
+        if(status < 0) {
             std::cerr << "ERROR!" << std::endl;
         }
     }

@@ -23,9 +23,9 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Output.hpp"
 #include "Block.hpp"
 #include "Header.hpp"
+#include "Output.hpp"
 using namespace std;
 
 /**
@@ -34,9 +34,7 @@ using namespace std;
   * @param filename Name of the file to write. The file is overwritten if it
   * already exists
   */
-AsciiOutput::AsciiOutput(string filename){
-    _filename = filename;
-}
+AsciiOutput::AsciiOutput(string filename) { _filename = filename; }
 
 /**
   * \brief Destructor. Does the actual writing of the file
@@ -44,13 +42,13 @@ AsciiOutput::AsciiOutput(string filename){
   * We first write the column names to a comment line and then we write the
   * data.
   */
-AsciiOutput::~AsciiOutput(){
+AsciiOutput::~AsciiOutput() {
     ofstream file(_filename.c_str());
     write_column_names(file);
-    for(unsigned int i = 0; i < _data.size(); i++){
-        for(unsigned int j = 0; j < _data[i].size(); j++){
+    for(unsigned int i = 0; i < _data.size(); i++) {
+        for(unsigned int j = 0; j < _data[i].size(); j++) {
             file << _data[i][j];
-            if(j < _data[i].size()-1){
+            if(j < _data[i].size() - 1) {
                 file << "\t";
             } else {
                 file << "\n";
@@ -66,11 +64,11 @@ AsciiOutput::~AsciiOutput(){
   *
   * @param file ofstream to write to
   */
-void AsciiOutput::write_column_names(ofstream& file){
+void AsciiOutput::write_column_names(ofstream& file) {
     file << "# ";
-    for(unsigned int i = 0; i < _column_names.size(); i++){
+    for(unsigned int i = 0; i < _column_names.size(); i++) {
         file << _column_names[i];
-        if(i < _column_names.size()-1){
+        if(i < _column_names.size() - 1) {
             file << "\t";
         } else {
             file << "\n";
@@ -86,7 +84,7 @@ void AsciiOutput::write_column_names(ofstream& file){
   *
   * @param header Header to write to the file
   */
-void AsciiOutput::write_header(Header &header){
+void AsciiOutput::write_header(Header& header) {
     // do nothing, since an ascii-file does not contain a header (yet?)
 }
 
@@ -100,17 +98,17 @@ void AsciiOutput::write_header(Header &header){
   *
   * @param block Block to write to the file
   */
-void AsciiOutput::write(Block &block){
+void AsciiOutput::write(Block& block) {
     vector<string> headers = block.get_headers();
-    for(unsigned int i = 0; i < headers.size(); i++){
+    for(unsigned int i = 0; i < headers.size(); i++) {
         _column_names.push_back(headers[i]);
     }
-    if(_data.size() < block.number_of_lines()){
+    if(_data.size() < block.number_of_lines()) {
         _data.resize(block.number_of_lines());
     }
-    for(unsigned int i = 0; i < block.number_of_lines(); i++){
+    for(unsigned int i = 0; i < block.number_of_lines(); i++) {
         vector<double> line = block.get_line(i);
-        for(unsigned int j = 0; j < line.size(); j++){
+        for(unsigned int j = 0; j < line.size(); j++) {
             _data[i].push_back(line[j]);
         }
     }

@@ -24,14 +24,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ParameterFile.hpp"
-#include "RestartFile.hpp"
 #include "Error.hpp"
+#include "RestartFile.hpp"
 #include "utilities/HelperFunctions.hpp"
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 using namespace std;
 
 // if you want to add a parameter:
@@ -45,17 +45,17 @@ using namespace std;
  * @brief Print the contents of the parameter file in human readable format to
  * the stdout
  */
-void ParameterFile::print_contents(){
+void ParameterFile::print_contents() {
     cout << "### time options ###" << endl;
     cout << "maxtime: " << _maxtime << endl;
-    if(_global_timestep){
+    if(_global_timestep) {
         cout << "using a global timestep" << endl;
     } else {
         cout << "using individual timesteps" << endl;
     }
     cout << "maximal timestep: " << _max_timestep << endl;
     cout << "minimal timestep: " << _min_timestep << endl;
-    if(_treetime){
+    if(_treetime) {
         cout << "using the treewalk timestep criterion" << endl;
     } else {
         cout << "using the per particle timestep criterion" << endl;
@@ -68,7 +68,7 @@ void ParameterFile::print_contents(){
     cout << "first snapshot: " << _firstsnap << endl;
     cout << "output directory: " << _outputdir << endl;
     cout << "snapshot type: " << _snapshot_type << endl;
-    if(_per_node_output){
+    if(_per_node_output) {
         cout << "using separate output for every node" << endl;
     } else {
         cout << "using one output file for all nodes (if possible)" << endl;
@@ -92,7 +92,7 @@ void ParameterFile::print_contents(){
     cout << endl;
 
     cout << "### gravity options ###" << endl;
-    if(_gravity){
+    if(_gravity) {
         cout << "Gravity enabled" << endl;
     } else {
         cout << "No gravity" << endl;
@@ -126,7 +126,7 @@ void ParameterFile::print_contents(){
     cout << endl;
 
     cout << "### physics ###" << endl;
-    if(_real_physics){
+    if(_real_physics) {
         cout << "Using real physical values for physical constants" << endl;
     } else {
         cout << "Using idealized values for physical constants" << endl;
@@ -147,9 +147,9 @@ void ParameterFile::print_contents(){
  *
  * @param name Filename of the parameter file
  */
-ParameterFile::ParameterFile(std::string name){
+ParameterFile::ParameterFile(std::string name) {
     ifstream file(name.c_str());
-    if(!file){
+    if(!file) {
         cerr << "Cannot read parameterfile \"" << name << "\"!" << endl;
         my_exit();
     }
@@ -169,11 +169,11 @@ ParameterFile::ParameterFile(std::string name){
 
     // snapshot options
     _basename = pt.get<string>("Snapshots.BaseName", "snapshot");
-    _snaptime = pt.get<double>("Snapshots.SnapTime", _maxtime*0.1);
+    _snaptime = pt.get<double>("Snapshots.SnapTime", _maxtime * 0.1);
     _firstsnap = pt.get<unsigned int>("Snapshots.FirstSnap", 0);
     _outputdir = pt.get<string>("Snapshots.OutputDir", ".");
     // translate relative paths to absolute paths
-    char *result = realpath(_outputdir.c_str(), NULL);
+    char* result = realpath(_outputdir.c_str(), NULL);
     _outputdir = string(result);
     // memory allocation is done using alloc, so we have to call free and not
     // delete
@@ -203,7 +203,7 @@ ParameterFile::ParameterFile(std::string name){
     // Gravity options
     _gravity = pt.get<bool>("Gravity.Gravity", true);
     _hsoft = pt.get<double>("Gravity.Softening", 0.03);
-    _grav_eta = pt.get<double>("Gravity.Eta", 0.05/2.8);
+    _grav_eta = pt.get<double>("Gravity.Eta", 0.05 / 2.8);
     _grav_alpha = pt.get<double>("Gravity.Alpha", 0.005);
 
     // Voronoi options
@@ -235,45 +235,35 @@ ParameterFile::ParameterFile(std::string name){
  *
  * @return Total simulation time
  */
-double ParameterFile::get_maxtime(){
-    return _maxtime;
-}
+double ParameterFile::get_maxtime() { return _maxtime; }
 
 /**
  * @brief Check if we use a global timestep or individual timesteps
  *
  * @return True if we use a global timestep, false otherwise
  */
-bool ParameterFile::get_global_timestep(){
-    return _global_timestep;
-}
+bool ParameterFile::get_global_timestep() { return _global_timestep; }
 
 /**
  * @brief Get the maximal Particle timestep in internal units
  *
  * @return Maximal Particle timestep
  */
-double ParameterFile::get_max_timestep(){
-    return _max_timestep;
-}
+double ParameterFile::get_max_timestep() { return _max_timestep; }
 
 /**
  * @brief Get the minimal Particle timestep in internal units
  *
  * @return Minimal Particle timestep
  */
-double ParameterFile::get_min_timestep(){
-    return _min_timestep;
-}
+double ParameterFile::get_min_timestep() { return _min_timestep; }
 
 /**
  * @brief Check if we use the expensive treewalk timestep criterion
  *
  * @return True if we use the treewalk criterion, false otherwise
  */
-bool ParameterFile::has_treetime(){
-    return _treetime;
-}
+bool ParameterFile::has_treetime() { return _treetime; }
 
 /**
  * @brief Get the basic name of the snapshots
@@ -282,9 +272,7 @@ bool ParameterFile::has_treetime(){
  *
  * @return The basic name of the snapshots
  */
-string ParameterFile::get_basename(){
-    return _basename;
-}
+string ParameterFile::get_basename() { return _basename; }
 
 /**
  * @brief Get the time interval in between successive snapshots, in internal
@@ -292,9 +280,7 @@ string ParameterFile::get_basename(){
  *
  * @return Time interval in between successive snapshots
  */
-double ParameterFile::get_snaptime(){
-    return _snaptime;
-}
+double ParameterFile::get_snaptime() { return _snaptime; }
 
 /**
  * @brief Get the index of the first snapshot to be written out
@@ -306,9 +292,7 @@ double ParameterFile::get_snaptime(){
  *
  * @return Index of the first snapshot
  */
-unsigned int ParameterFile::get_firstsnap(){
-    return _firstsnap;
-}
+unsigned int ParameterFile::get_firstsnap() { return _firstsnap; }
 
 /**
  * @brief Get the output directory where snapshot files and other diagnostic
@@ -318,18 +302,14 @@ unsigned int ParameterFile::get_firstsnap(){
  *
  * @return Output directory
  */
-string ParameterFile::get_outputdir(){
-    return _outputdir;
-}
+string ParameterFile::get_outputdir() { return _outputdir; }
 
 /**
  * @brief Get the snapshot type name
  *
  * @return Snapshot type name
  */
-string ParameterFile::get_snapshot_type(){
-    return _snapshot_type;
-}
+string ParameterFile::get_snapshot_type() { return _snapshot_type; }
 
 /**
  * @brief Check if every node should write a separate snapshot file, or all
@@ -337,54 +317,42 @@ string ParameterFile::get_snapshot_type(){
  *
  * @return True if nodes write separate snapshots, false otherwise
  */
-bool ParameterFile::get_per_node_output(){
-    return _per_node_output;
-}
+bool ParameterFile::get_per_node_output() { return _per_node_output; }
 
 /**
  * @brief Get the filename of the initial condition file
  *
  * @return Initial condition filename
  */
-string ParameterFile::get_icfile(){
-    return _icfile;
-}
+string ParameterFile::get_icfile() { return _icfile; }
 
 /**
  * @brief Get the type name of the initial condition file
  *
  * @return Initial condition file type
  */
-string ParameterFile::get_icfile_type(){
-    return _icfile_type;
-}
+string ParameterFile::get_icfile_type() { return _icfile_type; }
 
 /**
  * @brief Get the type of the Riemann solver used to solve the Riemann problem
  *
  * @return Riemann solver type
  */
-string ParameterFile::get_solver_type(){
-    return _solver_type;
-}
+string ParameterFile::get_solver_type() { return _solver_type; }
 
 /**
  * @brief Get the tolerance used for the Riemann solver iteration
  *
  * @return Tolerance for the Riemann solver iteration
  */
-double ParameterFile::get_tolerance(){
-    return _tolerance;
-}
+double ParameterFile::get_tolerance() { return _tolerance; }
 
 /**
  * @brief Get the cut off value for the exact Riemann solver
  *
  * @return Cut off value for the exact Riemann solver
  */
-double ParameterFile::get_cutoff(){
-    return _cutoff;
-}
+double ParameterFile::get_cutoff() { return _cutoff; }
 
 /**
  * @brief Get the Courant-Friedrich-Levy constant for hydrodynamical time
@@ -392,27 +360,21 @@ double ParameterFile::get_cutoff(){
  *
  * @return CFL constant for hydrodynamical time stepping
  */
-double ParameterFile::get_CFL(){
-    return _CFL;
-}
+double ParameterFile::get_CFL() { return _CFL; }
 
 /**
  * @brief Get the adiabatic index of the ideal gas
  *
  * @return Adiabatic index of the gas
  */
-double ParameterFile::get_gamma(){
-    return _gamma;
-}
+double ParameterFile::get_gamma() { return _gamma; }
 
 /**
  * @brief Check if we include gravity in the simulation
  *
  * @return True if gravity is enabled, false otherwise
  */
-bool ParameterFile::has_gravity(){
-    return _gravity;
-}
+bool ParameterFile::has_gravity() { return _gravity; }
 
 /**
  * @brief Get the softening length used for gravitational force softening if no
@@ -420,9 +382,7 @@ bool ParameterFile::has_gravity(){
  *
  * @return Gravitational softening length
  */
-double ParameterFile::get_hsoft(){
-    return _hsoft;
-}
+double ParameterFile::get_hsoft() { return _hsoft; }
 
 /**
  * @brief Get the gravitational \f$\eta\f$ factor
@@ -431,9 +391,7 @@ double ParameterFile::get_hsoft(){
  *
  * @return Gravitational \f$\eta\f$ factor
  */
-double ParameterFile::get_grav_eta(){
-    return _grav_eta;
-}
+double ParameterFile::get_grav_eta() { return _grav_eta; }
 
 /**
  * @brief Get the gravitational \f$\alpha\f$ factor
@@ -443,9 +401,7 @@ double ParameterFile::get_grav_eta(){
  *
  * @return Gravitational \f$\alpha\f$ factor
  */
-double ParameterFile::get_grav_alpha(){
-    return _grav_alpha;
-}
+double ParameterFile::get_grav_alpha() { return _grav_alpha; }
 
 /**
  * @brief Get the tolerance used to discriminate between exact and approximate
@@ -453,9 +409,7 @@ double ParameterFile::get_grav_alpha(){
  *
  * @return Voronoi grid construction tolerance
  */
-double ParameterFile::get_voronoi_tolerance(){
-    return _voronoi_tolerance;
-}
+double ParameterFile::get_voronoi_tolerance() { return _voronoi_tolerance; }
 
 /**
  * @brief Get the Ewald \f$\alpha\f$ factor
@@ -465,9 +419,7 @@ double ParameterFile::get_voronoi_tolerance(){
  *
  * @return Ewald \f$\alpha\f$ factor
  */
-double ParameterFile::get_ewald_alpha(){
-    return _ewald_alpha;
-}
+double ParameterFile::get_ewald_alpha() { return _ewald_alpha; }
 
 /**
  * @brief Get the size of the Ewald table
@@ -479,9 +431,7 @@ double ParameterFile::get_ewald_alpha(){
  *
  * @return Size of the Ewald table
  */
-unsigned int ParameterFile::get_ewald_size(){
-    return _ewald_size;
-}
+unsigned int ParameterFile::get_ewald_size() { return _ewald_size; }
 
 /**
  * @brief Get the maximal size of the MPI communication buffer in memory (in
@@ -489,9 +439,7 @@ unsigned int ParameterFile::get_ewald_size(){
  *
  * @return The maximal size of the MPI communication buffer
  */
-unsigned int ParameterFile::get_max_memory(){
-    return _max_memory;
-}
+unsigned int ParameterFile::get_max_memory() { return _max_memory; }
 
 /**
  * @brief Get the time interval (in CPU time) in between two successive restart
@@ -499,43 +447,35 @@ unsigned int ParameterFile::get_max_memory(){
  *
  * @return Time interval in between restart file dumps
  */
-double ParameterFile::get_restarttime(){
-    return _restarttime;
-}
+double ParameterFile::get_restarttime() { return _restarttime; }
 
 /**
  * @brief Get the name of the internal UnitSet
  *
  * @return Internal units
  */
-std::string ParameterFile::get_units_internal(){
-    return _units_internal;
-}
+std::string ParameterFile::get_units_internal() { return _units_internal; }
 
 /**
  * @brief Get the name of the ouput UnitSet
  *
  * @return Output units
  */
-std::string ParameterFile::get_units_output(){
-    return _units_output;
-}
+std::string ParameterFile::get_units_output() { return _units_output; }
 
 /**
  * @brief Check if we use physical values for physical constants
  *
  * @return True if we use physical values, false for idealized values
  */
-bool ParameterFile::has_real_physics(){
-    return _real_physics;
-}
+bool ParameterFile::has_real_physics() { return _real_physics; }
 
 /**
  * @brief Dump the parameterfile to the given RestartFile
  *
  * @param rfile RestartFile to write to
  */
-void ParameterFile::dump(RestartFile &rfile){
+void ParameterFile::dump(RestartFile& rfile) {
     // time options
     rfile.write(_maxtime);
     rfile.write(_global_timestep);
@@ -597,7 +537,7 @@ void ParameterFile::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-ParameterFile::ParameterFile(RestartFile &rfile){
+ParameterFile::ParameterFile(RestartFile& rfile) {
     // time options
     rfile.read(_maxtime);
     rfile.read(_global_timestep);

@@ -40,8 +40,8 @@ class RestartFile;
   * It also contains methods to check if header information is compatible with
   * the current version of the code.
   */
-class Header{
-private:
+class Header {
+  private:
     /*! \brief The total number of particles in the simulation */
     unsigned int _npart;
 
@@ -52,7 +52,7 @@ private:
     unsigned int _ndim;
 
     /*! \brief Origin and side of the simulation box */
-    double _box[ndim_+ndim_];
+    double _box[ndim_ + ndim_];
 
     /*! \brief The current time of the simulation */
     double _time;
@@ -84,9 +84,9 @@ private:
     /*! \brief Value of the softening length for collisionless particles */
     double _hsoft;
 
-public:
+  public:
     Header();
-    ~Header(){}
+    ~Header() {}
 
     void set_ngaspart(unsigned int npart);
     void set_ndmpart(unsigned int npart);
@@ -121,11 +121,11 @@ public:
 
     void check_makeflags();
 
-    void pack_data(void *buffer, int bufsize, int *position);
-    Header(void *buffer, int bufsize, int *position);
+    void pack_data(void* buffer, int bufsize, int* position);
+    Header(void* buffer, int bufsize, int* position);
 
-    void dump(RestartFile &rfile);
-    Header(RestartFile &rfile);
+    void dump(RestartFile& rfile);
+    Header(RestartFile& rfile);
 };
 
-#endif // HEADER_HPP
+#endif  // HEADER_HPP

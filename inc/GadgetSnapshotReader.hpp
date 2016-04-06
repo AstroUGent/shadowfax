@@ -32,8 +32,8 @@
 /**
  * @brief SnapshotReader specialization to read Gadget snapshots
  */
-class GadgetSnapshotReader : public SnapshotReader{
-private:
+class GadgetSnapshotReader : public SnapshotReader {
+  private:
     /**
      * @brief Make sure the given coordinates are inside the given box by moving
      * them by a box length
@@ -41,21 +41,21 @@ private:
      * @param position Coordinates that should be inside the box
      * @param box Origin and sides of a box in 3 dimensions
      */
-    void keep_inside(Vec& position, double* box){
-        for(unsigned int i = 0; i < ndim_; i++){
-            if(position[i] < box[i]){
-                position[i] += box[i+ndim_];
+    void keep_inside(Vec& position, double* box) {
+        for(unsigned int i = 0; i < ndim_; i++) {
+            if(position[i] < box[i]) {
+                position[i] += box[i + ndim_];
             }
-            if(position[i] > box[i]+box[i+ndim_]){
-                position[i] -= box[i+ndim_];
+            if(position[i] > box[i] + box[i + ndim_]) {
+                position[i] -= box[i + ndim_];
             }
         }
     }
 
-public:
+  public:
     GadgetSnapshotReader(std::string name, UnitSet& units);
 
-    virtual Header read_snapshot(ParticleVector &particles);
+    virtual Header read_snapshot(ParticleVector& particles);
 };
 
-#endif // GADGETSNAPSHOTREADER_HPP
+#endif  // GADGETSNAPSHOTREADER_HPP

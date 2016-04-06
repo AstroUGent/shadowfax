@@ -25,14 +25,14 @@
  * @author Robbert Verbeke (robbert.verbeke@ugent.be)
  */
 #include "ExactRiemannSolver.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "RestartFile.hpp"
-#include <cmath>
-#include <algorithm>
-#include <iostream>
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
 #include "ProgramLog.hpp"
+#include "RestartFile.hpp"
+#include "utilities/HelperFunctions.hpp"
+#include <algorithm>
+#include <cmath>
+#include <iostream>
 using namespace std;
 
 /**
@@ -47,17 +47,19 @@ using namespace std;
  * Brent's method
  */
 ExactRiemannSolver::ExactRiemannSolver(double gamma, double tolerance,
-                                       double cutoff){
+                                       double cutoff) {
     _gamma = gamma;
     // related quantities:
-    _gp1d2g = 0.5*(_gamma+1.)/_gamma; // gamma plus 1 divided by 2 gamma
-    _gm1d2g = 0.5*(_gamma-1.)/_gamma; // gamma minus 1 divided by 2 gamma
-    _gm1dgp1 = (_gamma-1.)/(_gamma+1.); // gamma minus 1 divided by gamma plus 1
-    _tdgp1 = 2./(_gamma+1.); // two divided by gamma plus 1
-    _tdgm1 = 2./(_gamma-1.); // two divided by gamma minus 1
-    _gm1d2 = 0.5*(_gamma-1.); // gamma minus 1 divided by 2
-    _tgdgm1 = 2.*_gamma/(_gamma-1.); // two times gamma divided by gamma minus 1
-    _ginv = 1./_gamma; // gamma inverse
+    _gp1d2g = 0.5 * (_gamma + 1.) / _gamma;  // gamma plus 1 divided by 2 gamma
+    _gm1d2g = 0.5 * (_gamma - 1.) / _gamma;  // gamma minus 1 divided by 2 gamma
+    _gm1dgp1 = (_gamma - 1.) /
+               (_gamma + 1.);      // gamma minus 1 divided by gamma plus 1
+    _tdgp1 = 2. / (_gamma + 1.);   // two divided by gamma plus 1
+    _tdgm1 = 2. / (_gamma - 1.);   // two divided by gamma minus 1
+    _gm1d2 = 0.5 * (_gamma - 1.);  // gamma minus 1 divided by 2
+    _tgdgm1 = 2. * _gamma /
+              (_gamma - 1.);  // two times gamma divided by gamma minus 1
+    _ginv = 1. / _gamma;      // gamma inverse
     _tolerance = tolerance;
     _cutoff = cutoff;
     _counterBrent = 0;
@@ -70,8 +72,8 @@ ExactRiemannSolver::ExactRiemannSolver(double gamma, double tolerance,
 /**
  * @brief Destructor. Print status information to the stdout
  */
-ExactRiemannSolver::~ExactRiemannSolver(){
-    if(MPIGlobal::size > 1){
+ExactRiemannSolver::~ExactRiemannSolver() {
+    if(MPIGlobal::size > 1) {
         unsigned long counterBrent, counterTotal, vacuum;
         MyMPI_Reduce(&_counterBrent, &counterBrent, 1, MPI_LONG, MPI_SUM, 0);
         MyMPI_Reduce(&_counterTotal, &counterTotal, 1, MPI_LONG, MPI_SUM, 0);
@@ -104,12 +106,12 @@ ExactRiemannSolver::~ExactRiemannSolver(){
  * reflective copy of the left state
  * @return Solution of the Riemann problem
  */
-StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
-                                      double& mach, bool reflective){
+StateVector ExactRiemannSolver::solve(StateVector& WL, StateVector& WR, Vec& n,
+                                      double& mach, bool reflective) {
     _timer.start();
     _counterTotal++;
 
-#if ndim_==3
+#if ndim_ == 3
     double vL = WL[1] * n[0] + WL[2] * n[1] + WL[3] * n[2];
     double vR = WR[1] * n[0] + WR[2] * n[1] + WR[3] * n[2];
 #else
@@ -117,7 +119,7 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
     double vR = WR[1] * n[0] + WR[2] * n[1];
 #endif
 
-    if(reflective){
+    if(reflective) {
         WR = WL;
         vR = -vL;
     }
@@ -126,7 +128,7 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
     double aR = get_soundspeed(WR);
 
     StateVector solution;
-    if(!WL.rho() || !WR.rho()){
+    if(!WL.rho() || !WR.rho()) {
         solution = solve_vacuum(WL, WR, vL, vR, aL, aR, n);
         _timer.stop();
         // a shockwave can never be adjacent to a region of vacuum (dixit Toro)
@@ -134,36 +136,37 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
         return solution;
     }
 
-    if(2.*aL/(_gamma-1.) + 2.*aR/(_gamma-1.) < fabs(vL-vR)){
+    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) < fabs(vL - vR)) {
         solution = solve_vacuum(WL, WR, vL, vR, aL, aR, n);
     } else {
         double p = 0.;
         double pguess = guess_p(WL, WR, vL, vR, aL, aR);
         double fp = f(p, WL, WR, vL, vR, aL, aR);
         double fpguess = f(pguess, WL, WR, vL, vR, aL, aR);
-        if(fp<_cutoff){
-            while(fabs(p-pguess) > _tolerance*0.5*(p+pguess)){
+        if(fp < _cutoff) {
+            while(fabs(p - pguess) > _tolerance * 0.5 * (p + pguess)) {
                 p = pguess;
-                pguess = pguess - fpguess/fprime(pguess, WL, WR, aL, aR);
-                if(pguess < 0.){
+                pguess = pguess - fpguess / fprime(pguess, WL, WR, aL, aR);
+                if(pguess < 0.) {
                     pguess = 0.;
                 }
                 fpguess = f(pguess, WL, WR, vL, vR, aL, aR);
             }
             p = pguess;
         } else {
-            if(fp*fpguess >= 0.){
+            if(fp * fpguess >= 0.) {
                 // Newton-Raphson until convergence or until usable interval is
                 // found to use Brent's method
-                while(fabs(p-pguess) > _tolerance*0.5*(p+pguess) &&
-                      fpguess < 0.){
+                while(fabs(p - pguess) > _tolerance * 0.5 * (p + pguess) &&
+                      fpguess < 0.) {
                     p = pguess;
-                    pguess = pguess - fpguess/fprime(pguess, WL, WR, aL, aR);
+                    pguess = pguess - fpguess / fprime(pguess, WL, WR, aL, aR);
                     fpguess = f(pguess, WL, WR, vL, vR, aL, aR);
                 }
             }
             // As soon as there is a usable interval: use Brent's method
-            if(fabs(p-pguess) > _tolerance*0.5*(p+pguess) && fpguess > 0.){
+            if(fabs(p - pguess) > _tolerance * 0.5 * (p + pguess) &&
+               fpguess > 0.) {
                 p = 0.;
                 _counterBrent++;
                 p = BrentsMethodSolve(p, pguess, _tolerance, WL, WR, vL, vR, aL,
@@ -173,28 +176,28 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
             }
         }
 
-        double u = 0.5*(vL+vR) + 0.5*(fb(p, WR, aR) - fb(p, WL, aL));
+        double u = 0.5 * (vL + vR) + 0.5 * (fb(p, WR, aR) - fb(p, WL, aL));
 
         // set mach number
-        if(p > WL.p()){
+        if(p > WL.p()) {
             // left shock
-            mach = std::max(mach, sqrt(_gp1d2g*p/WL.p()+_gm1d2g));
+            mach = std::max(mach, sqrt(_gp1d2g * p / WL.p() + _gm1d2g));
         }
-        if(p > WR.p()){
+        if(p > WR.p()) {
             // right shock
-            mach = std::max(mach, sqrt(_gp1d2g*p/WR.p()+_gm1d2g));
+            mach = std::max(mach, sqrt(_gp1d2g * p / WR.p() + _gm1d2g));
         }
 
         double vhalf;
-        if(u < 0){
+        if(u < 0) {
             solution = WR;
-            double pdpR = p/WR.p();
-            if(p > WR.p()){
+            double pdpR = p / WR.p();
+            if(p > WR.p()) {
                 // shockwave
-                double SR = vR + aR*sqrt(_gp1d2g*pdpR+_gm1d2g);
-                if(SR > 0){
-                    solution.set_rho(WR.rho()*(pdpR+_gm1dgp1)/
-                                     (_gm1dgp1*pdpR+1.));
+                double SR = vR + aR * sqrt(_gp1d2g * pdpR + _gm1d2g);
+                if(SR > 0) {
+                    solution.set_rho(WR.rho() * (pdpR + _gm1dgp1) /
+                                     (_gm1dgp1 * pdpR + 1.));
                     solution.set_p(p);
                     vhalf = u - vR;
                 } else {
@@ -204,16 +207,17 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
             } else {
                 // rarefaction wave
                 double SHR = vR + aR;
-                if(SHR > 0){
-                    double STR = u + aR*pow(pdpR, _gm1d2g);
-                    if(STR <= 0){
-                        solution.set_rho(WR.rho()*pow(_tdgp1 - _gm1dgp1/aR*vR,
-                                                      _tdgm1));
-                        vhalf = _tdgp1*(-aR + _gm1d2*vR) - vR;
-                        solution.set_p(WR.p()*pow(_tdgp1 - _gm1dgp1/aR*vR,
-                                                  _tgdgm1));
+                if(SHR > 0) {
+                    double STR = u + aR * pow(pdpR, _gm1d2g);
+                    if(STR <= 0) {
+                        solution.set_rho(
+                                WR.rho() *
+                                pow(_tdgp1 - _gm1dgp1 / aR * vR, _tdgm1));
+                        vhalf = _tdgp1 * (-aR + _gm1d2 * vR) - vR;
+                        solution.set_p(WR.p() * pow(_tdgp1 - _gm1dgp1 / aR * vR,
+                                                    _tgdgm1));
                     } else {
-                        solution.set_rho(WR.rho()*pow(pdpR, _ginv));
+                        solution.set_rho(WR.rho() * pow(pdpR, _ginv));
                         solution.set_p(p);
                         vhalf = u - vR;
                     }
@@ -224,13 +228,13 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
             }
         } else {
             solution = WL;
-            double pdpL = p/WL.p();
-            if(p > WL.p()){
+            double pdpL = p / WL.p();
+            if(p > WL.p()) {
                 // shockwave
-                double SL = vL - aL*sqrt(_gp1d2g*pdpL+_gm1d2g);
-                if(SL < 0){
-                    solution.set_rho(WL.rho()*(pdpL+_gm1dgp1)/
-                                     (_gm1dgp1*pdpL+1.));
+                double SL = vL - aL * sqrt(_gp1d2g * pdpL + _gm1d2g);
+                if(SL < 0) {
+                    solution.set_rho(WL.rho() * (pdpL + _gm1dgp1) /
+                                     (_gm1dgp1 * pdpL + 1.));
                     solution.set_p(p);
                     vhalf = u - vL;
                 } else {
@@ -240,18 +244,17 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
             } else {
                 // rarefaction wave
                 double SHL = vL - aL;
-                if(SHL < 0){
-                    double STL = u - aL*pow(pdpL, _gm1d2g);
-                    if(STL > 0){
-                        solution.set_rho(WL.rho()*pow(_tdgp1 +
-                                                      _gm1dgp1/aL*vL,
-                                                      _tdgm1));
-                        vhalf = _tdgp1*(aL + _gm1d2*vL) - vL;
-                        solution.set_p(WL.p()*pow(_tdgp1 +
-                                                  _gm1dgp1/aL*vL,
-                                                  _tgdgm1));
+                if(SHL < 0) {
+                    double STL = u - aL * pow(pdpL, _gm1d2g);
+                    if(STL > 0) {
+                        solution.set_rho(
+                                WL.rho() *
+                                pow(_tdgp1 + _gm1dgp1 / aL * vL, _tdgm1));
+                        vhalf = _tdgp1 * (aL + _gm1d2 * vL) - vL;
+                        solution.set_p(WL.p() * pow(_tdgp1 + _gm1dgp1 / aL * vL,
+                                                    _tgdgm1));
                     } else {
-                        solution.set_rho(WL.rho()*pow(pdpL, _ginv));
+                        solution.set_rho(WL.rho() * pow(pdpL, _ginv));
                         vhalf = u - vL;
                         solution.set_p(p);
                     }
@@ -262,11 +265,11 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
             }
         }
 
-        solution[1] += vhalf*n[0];
-        solution[2] += vhalf*n[1];
-    #if ndim_==3
-        solution[3] += vhalf*n[2];
-    #endif
+        solution[1] += vhalf * n[0];
+        solution[2] += vhalf * n[1];
+#if ndim_ == 3
+        solution[3] += vhalf * n[2];
+#endif
     }
 
     _timer.stop();
@@ -276,12 +279,12 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
     check |= (solution.rho() != solution.rho());
     check |= (solution.vx() != solution.vx());
     check |= (solution.vy() != solution.vy());
-#if ndim_==3
+#if ndim_ == 3
     check |= (solution.vz() != solution.vz());
 #endif
     check |= (solution.p() < 0.);
     check |= (solution.p() != solution.p());
-    if(check){
+    if(check) {
         throw RiemannSolverException(WL, WR, solution);
     }
     return solution;
@@ -301,28 +304,31 @@ StateVector ExactRiemannSolver::solve(StateVector &WL, StateVector &WR, Vec &n,
  */
 StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
                                              double vL, double vR, double aL,
-                                             double aR, Vec &n){
+                                             double aR, Vec& n) {
     _vacuum++;
     StateVector solution;
-    if(!WR.rho() && !WL.rho()){
+    if(!WR.rho() && !WL.rho()) {
         return solution;
     }
     double vhalf;
-    if(!WR.rho()){
+    if(!WR.rho()) {
         solution = WL;
         // vacuum right state
-        if(vL < aL){
-            double SL = vL + 2.*aL/(_gamma-1.);
-            if(SL > 0.){
-                solution.set_rho(WL.rho()*
-                                 pow(2./(_gamma+1.) +
-                                     (_gamma-1.)/(_gamma+1.)/aL*vL,
-                                     2./(_gamma-1.)));
-                vhalf = 2./(_gamma+1.)*(aL + 0.5*(_gamma-1.)*vL) - vL;
-                solution.set_p(WL.p()*
-                               pow(2./(_gamma+1.) +
-                                   (_gamma-1.)/(_gamma+1.)/aL*vL,
-                                   2.*_gamma/(_gamma-1.)));
+        if(vL < aL) {
+            double SL = vL + 2. * aL / (_gamma - 1.);
+            if(SL > 0.) {
+                solution.set_rho(
+                        WL.rho() *
+                        pow(2. / (_gamma + 1.) +
+                                    (_gamma - 1.) / (_gamma + 1.) / aL * vL,
+                            2. / (_gamma - 1.)));
+                vhalf = 2. / (_gamma + 1.) * (aL + 0.5 * (_gamma - 1.) * vL) -
+                        vL;
+                solution.set_p(
+                        WL.p() *
+                        pow(2. / (_gamma + 1.) +
+                                    (_gamma - 1.) / (_gamma + 1.) / aL * vL,
+                            2. * _gamma / (_gamma - 1.)));
             } else {
                 // vacuum
                 solution.reset();
@@ -333,25 +339,29 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
             vhalf = 0.;
         }
     } else {
-        if(!WL.rho()){
+        if(!WL.rho()) {
             solution = WR;
             // vacuum left state
-            if(-vR < aR){
-                double SR = vR - 2.*aR/(_gamma-1.);
-                if(SR >= 0.){
+            if(-vR < aR) {
+                double SR = vR - 2. * aR / (_gamma - 1.);
+                if(SR >= 0.) {
                     // vacuum
                     solution.reset();
                     vhalf = 0.;
                 } else {
-                    solution.set_rho(WR.rho()*
-                                     pow(2./(_gamma+1.) -
-                                         (_gamma-1.)/(_gamma+1.)/aR*vR,
-                                         2./(_gamma-1.)));
-                    vhalf = 2./(_gamma+1.)*(-aR + 0.5*(_gamma-1.)*vR) - vR;
-                    solution.set_p(WR.p()*
-                                   pow(2./(_gamma+1.) -
-                                       (_gamma-1.)/(_gamma+1.)/aR*vR,
-                                       2.*_gamma/(_gamma-1.)));
+                    solution.set_rho(
+                            WR.rho() *
+                            pow(2. / (_gamma + 1.) -
+                                        (_gamma - 1.) / (_gamma + 1.) / aR * vR,
+                                2. / (_gamma - 1.)));
+                    vhalf = 2. / (_gamma + 1.) *
+                                    (-aR + 0.5 * (_gamma - 1.) * vR) -
+                            vR;
+                    solution.set_p(
+                            WR.p() *
+                            pow(2. / (_gamma + 1.) -
+                                        (_gamma - 1.) / (_gamma + 1.) / aR * vR,
+                                2. * _gamma / (_gamma - 1.)));
                 }
             } else {
                 // solution = WR
@@ -359,43 +369,55 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
             }
         } else {
             // vacuum generation
-            double SR = vR - 2.*aR/(_gamma-1.);
-            double SL = vL + 2.*aL/(_gamma-1.);
-            if(SR > 0. && SL < 0.){
-                if(fabs(SR) > fabs(SL)){
-                    vhalf = SR-vR;
+            double SR = vR - 2. * aR / (_gamma - 1.);
+            double SL = vL + 2. * aL / (_gamma - 1.);
+            if(SR > 0. && SL < 0.) {
+                if(fabs(SR) > fabs(SL)) {
+                    vhalf = SR - vR;
                 } else {
-                    vhalf = SL-vL;
+                    vhalf = SL - vL;
                 }
             } else {
-                if(SL >= 0.){
+                if(SL >= 0.) {
                     solution = WL;
-                    if(aL > vL){
-                        solution.set_rho(WL.rho()*
-                                         pow(2./(_gamma+1.) +
-                                             (_gamma-1.)/(_gamma+1.)/aL*vL,
-                                             2./(_gamma-1.)));
-                        vhalf = 2./(_gamma+1.)*(aL + 0.5*(_gamma-1.)*vL)-vL;
-                        solution.set_p(WL.p()*
-                                       pow(2./(_gamma+1.) +
-                                           (_gamma-1.)/(_gamma+1.)/aL*vL,
-                                           2.*_gamma/(_gamma-1.)));
+                    if(aL > vL) {
+                        solution.set_rho(WL.rho() *
+                                         pow(2. / (_gamma + 1.) +
+                                                     (_gamma - 1.) /
+                                                             (_gamma + 1.) /
+                                                             aL * vL,
+                                             2. / (_gamma - 1.)));
+                        vhalf = 2. / (_gamma + 1.) *
+                                        (aL + 0.5 * (_gamma - 1.) * vL) -
+                                vL;
+                        solution.set_p(WL.p() *
+                                       pow(2. / (_gamma + 1.) +
+                                                   (_gamma - 1.) /
+                                                           (_gamma + 1.) / aL *
+                                                           vL,
+                                           2. * _gamma / (_gamma - 1.)));
                     } else {
                         // solution = WL
                         vhalf = 0.;
                     }
                 } else {
                     solution = WR;
-                    if(-vR < aR){
-                        solution.set_rho(WR.rho()*
-                                         pow(2./(_gamma+1.) -
-                                             (_gamma-1.)/(_gamma+1.)/aR*vR,
-                                             2./(_gamma-1.)));
-                        vhalf = 2./(_gamma+1.)*(-aR + 0.5*(_gamma-1.)*vR)-vR;
-                        solution.set_p(WR.p()*
-                                       pow(2./(_gamma+1.) -
-                                           (_gamma-1.)/(_gamma+1.)/aR*vR,
-                                           2.*_gamma/(_gamma-1.)));
+                    if(-vR < aR) {
+                        solution.set_rho(WR.rho() *
+                                         pow(2. / (_gamma + 1.) -
+                                                     (_gamma - 1.) /
+                                                             (_gamma + 1.) /
+                                                             aR * vR,
+                                             2. / (_gamma - 1.)));
+                        vhalf = 2. / (_gamma + 1.) *
+                                        (-aR + 0.5 * (_gamma - 1.) * vR) -
+                                vR;
+                        solution.set_p(WR.p() *
+                                       pow(2. / (_gamma + 1.) -
+                                                   (_gamma - 1.) /
+                                                           (_gamma + 1.) / aR *
+                                                           vR,
+                                           2. * _gamma / (_gamma - 1.)));
                     } else {
                         // solution = WR
                         vhalf = 0.;
@@ -405,10 +427,10 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
         }
     }
 
-    solution[1] += vhalf*n[0];
-    solution[2] += vhalf*n[1];
-#if ndim_==3
-    solution[3] += vhalf*n[2];
+    solution[1] += vhalf * n[0];
+    solution[2] += vhalf * n[1];
+#if ndim_ == 3
+    solution[3] += vhalf * n[2];
 #endif
 
     // sanity check
@@ -416,12 +438,12 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
     check |= (solution.rho() != solution.rho());
     check |= (solution.vx() != solution.vx());
     check |= (solution.vy() != solution.vy());
-#if ndim_==3
+#if ndim_ == 3
     check |= (solution.vz() != solution.vz());
 #endif
     check |= (solution.p() < 0.);
     check |= (solution.p() != solution.p());
-    if(check){
+    if(check) {
         throw RiemannSolverException(WL, WR, solution);
     }
     return solution;
@@ -442,11 +464,10 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
  * @return Pressure in the intermediate state
  */
 double ExactRiemannSolver::BrentsMethodSolve(double lowerLimit,
-                                             double upperLimit,
-                                             double errorTol, StateVector& WL,
-                                             StateVector& WR, double vL,
-                                             double vR, double aL, double aR)
-{
+                                             double upperLimit, double errorTol,
+                                             StateVector& WL, StateVector& WR,
+                                             double vL, double vR, double aL,
+                                             double aR) {
     double a = lowerLimit;
     double b = upperLimit;
     double c = 0.;
@@ -460,17 +481,16 @@ double ExactRiemannSolver::BrentsMethodSolve(double lowerLimit,
     double fs = 0.;
 
     // if f(a) f(b) >= 0 then error-exit
-    if (fa * fb >= 0)
-    {
-        //cout << "Error exit" << endl;
-        if (fa < fb)
+    if(fa * fb >= 0) {
+        // cout << "Error exit" << endl;
+        if(fa < fb)
             return a;
         else
             return b;
     }
 
     // if |f(a)| < |f(b)| then swap (a,b) end if
-    if (fabs(fa) < fabs(fb)){
+    if(fabs(fa) < fabs(fb)) {
         double tmp = a;
         a = b;
         b = tmp;
@@ -484,46 +504,41 @@ double ExactRiemannSolver::BrentsMethodSolve(double lowerLimit,
     bool mflag = true;
     int i = 0;
 
-    while (!(fb==0) && (fabs(a-b) > errorTol*(a+b)*0.5))
-    {
-        if ((fa != fc) && (fb != fc))
+    while(!(fb == 0) && (fabs(a - b) > errorTol * (a + b) * 0.5)) {
+        if((fa != fc) && (fb != fc))
             // Inverse quadratic interpolation
             s = a * fb * fc / (fa - fb) / (fa - fc) +
-                    b * fa * fc / (fb - fa) / (fb - fc) +
-                    c * fa * fb / (fc - fa) / (fc - fb);
+                b * fa * fc / (fb - fa) / (fb - fc) +
+                c * fa * fb / (fc - fa) / (fc - fb);
         else
             // Secant Rule
             s = b - fb * (b - a) / (fb - fa);
 
         double tmp2 = (3. * a + b) / 4.;
-        if (!(((s > tmp2) && (s < b)) || ((s < tmp2) && (s > b))) ||
-                (mflag && (fabs(s - b) >= (fabs(b - c) / 2.))) ||
-                (!mflag && (fabs(s - b) >= (fabs(c - d) / 2.))) ||
-                (mflag && (fabs(b - c) < errorTol)) ||
-                (!mflag && (fabs(c - d) < errorTol)))
-        {
+        if(!(((s > tmp2) && (s < b)) || ((s < tmp2) && (s > b))) ||
+           (mflag && (fabs(s - b) >= (fabs(b - c) / 2.))) ||
+           (!mflag && (fabs(s - b) >= (fabs(c - d) / 2.))) ||
+           (mflag && (fabs(b - c) < errorTol)) ||
+           (!mflag && (fabs(c - d) < errorTol))) {
             s = (a + b) / 2.;
             mflag = true;
-        }
-        else
-        {
+        } else {
             mflag = false;
         }
         fs = f(s, WL, WR, vL, vR, aL, aR);
         d = c;
         c = b;
         fc = fb;
-        if (fa * fs < 0.) {
+        if(fa * fs < 0.) {
             b = s;
             fb = fs;
-        }
-        else {
+        } else {
             a = s;
             fa = fs;
         }
 
         // if |f(a)| < |f(b)| then swap (a,b) end if
-        if (fabs(fa) < fabs(fb)){
+        if(fabs(fa) < fabs(fb)) {
             double tmp = a;
             a = b;
             b = tmp;
@@ -544,14 +559,14 @@ double ExactRiemannSolver::BrentsMethodSolve(double lowerLimit,
  * @param a Soundspeed of the left or right state
  * @return Riemann fL or fR function value
  */
-double ExactRiemannSolver::fb(double p, StateVector& Wb, double a){
+double ExactRiemannSolver::fb(double p, StateVector& Wb, double a) {
     double fval = 0.;
-    if(p > Wb.p()){
-        double A = _tdgp1/Wb.rho();
-        double B = _gm1dgp1*Wb.p();
-        fval = (p-Wb.p())*sqrt(A/(p+B));
+    if(p > Wb.p()) {
+        double A = _tdgp1 / Wb.rho();
+        double B = _gm1dgp1 * Wb.p();
+        fval = (p - Wb.p()) * sqrt(A / (p + B));
     } else {
-        fval = _tdgm1*a*(pow(p/Wb.p(), _gm1d2g) - 1.);
+        fval = _tdgm1 * a * (pow(p / Wb.p(), _gm1d2g) - 1.);
     }
     return fval;
 }
@@ -563,10 +578,10 @@ double ExactRiemannSolver::fb(double p, StateVector& Wb, double a){
  * @param Wb Left or right StateVector
  * @return Value of the Riemann gL or gR function
  */
-double ExactRiemannSolver::gb(double p, StateVector& Wb){
-    double A = _tdgp1/Wb.rho();
-    double B = _gm1dgp1*Wb.p();
-    return sqrt(A/(p+B));
+double ExactRiemannSolver::gb(double p, StateVector& Wb) {
+    double A = _tdgp1 / Wb.rho();
+    double B = _gm1dgp1 * Wb.p();
+    return sqrt(A / (p + B));
 }
 
 /**
@@ -577,14 +592,14 @@ double ExactRiemannSolver::gb(double p, StateVector& Wb){
  * @param a Soundpeed of the left or right state
  * @return Value of the derivative of the Riemann fL or fR function
  */
-double ExactRiemannSolver::fprimeb(double p, StateVector& Wb, double a){
+double ExactRiemannSolver::fprimeb(double p, StateVector& Wb, double a) {
     double fval = 0.;
-    if(p > Wb.p()){
-        double A = _tdgp1/Wb.rho();
-        double B = _gm1dgp1*Wb.p();
-        fval = (1.-0.5*(p-Wb.p())/(B+p))*sqrt(A/(p+B));
+    if(p > Wb.p()) {
+        double A = _tdgp1 / Wb.rho();
+        double B = _gm1dgp1 * Wb.p();
+        fval = (1. - 0.5 * (p - Wb.p()) / (B + p)) * sqrt(A / (p + B));
     } else {
-        fval = 1./(Wb.rho()*a)*pow(p/Wb.p(), -_gp1d2g);
+        fval = 1. / (Wb.rho() * a) * pow(p / Wb.p(), -_gp1d2g);
     }
     return fval;
 }
@@ -600,7 +615,7 @@ double ExactRiemannSolver::fprimeb(double p, StateVector& Wb, double a){
  * @return Value of the derivative of the Riemann f function
  */
 double ExactRiemannSolver::fprime(double p, StateVector& WL, StateVector& WR,
-                                  double aL, double aR){
+                                  double aL, double aR) {
     return fprimeb(p, WL, aL) + fprimeb(p, WR, aR);
 }
 
@@ -617,7 +632,7 @@ double ExactRiemannSolver::fprime(double p, StateVector& WL, StateVector& WR,
  * @return Value of the Riemann f function
  */
 double ExactRiemannSolver::f(double p, StateVector& WL, StateVector& WR,
-                             double vL, double vR, double aL, double aR){
+                             double vL, double vR, double aL, double aR) {
     return fb(p, WL, aL) + fb(p, WR, aR) + (vR - vL);
 }
 
@@ -633,26 +648,27 @@ double ExactRiemannSolver::f(double p, StateVector& WL, StateVector& WR,
  * @return Starting estimate for the pressure iteration
  */
 double ExactRiemannSolver::guess_p(StateVector& WL, StateVector& WR, double vL,
-                                   double vR, double aL, double aR){
+                                   double vR, double aL, double aR) {
     double pguess;
     double pmin = min(WL.p(), WR.p());
     double pmax = max(WL.p(), WR.p());
-    double qmax = pmax/pmin;
-    double ppv = 0.5*(WL.p()+WR.p()) -
-            0.125*(vR - vL)*(WL.rho() + WR.rho())*(aL + aR);
+    double qmax = pmax / pmin;
+    double ppv = 0.5 * (WL.p() + WR.p()) -
+                 0.125 * (vR - vL) * (WL.rho() + WR.rho()) * (aL + aR);
     ppv = max(_tolerance, ppv);
-    if(qmax <= 2. && pmin <= ppv && ppv <= pmax){
+    if(qmax <= 2. && pmin <= ppv && ppv <= pmax) {
         pguess = ppv;
     } else {
-        if(ppv < pmin){
+        if(ppv < pmin) {
             // two rarefactions
-            pguess = pow((aL + aR - _gm1d2*(vR-vL))/
-                         (aL/pow(WL.p(), _gm1d2g) +
-                          aR/pow(WR.p(), _gm1d2g)), _tgdgm1);
+            pguess = pow((aL + aR - _gm1d2 * (vR - vL)) /
+                                 (aL / pow(WL.p(), _gm1d2g) +
+                                  aR / pow(WR.p(), _gm1d2g)),
+                         _tgdgm1);
         } else {
             // two shocks
-            pguess = (gb(ppv, WL)*WL.p() + gb(ppv, WR)*WR.p() -
-                      vR + vL)/(gb(ppv, WL) + gb(ppv, WR));
+            pguess = (gb(ppv, WL) * WL.p() + gb(ppv, WR) * WR.p() - vR + vL) /
+                     (gb(ppv, WL) + gb(ppv, WR));
         }
     }
     // Toro: "Not that approximate solutions may predict, incorrectly, a
@@ -665,7 +681,7 @@ double ExactRiemannSolver::guess_p(StateVector& WL, StateVector& WR, double vL,
 /**
  * @brief Test the Riemann solver on 6 problems with known solutions
  */
-void ExactRiemannSolver::test(){
+void ExactRiemannSolver::test() {
     cout << "Testing the Riemann solver" << endl;
     double rhoL[6] = {1., 1., 1., 1., 5.99924, 1.};
     double rhoR[6] = {0.125, 1., 1., 1., 5.99242, 1.};
@@ -676,8 +692,8 @@ void ExactRiemannSolver::test(){
     double rhosol[6] = {0.47969, 0.00617903, 0.615719, 0.61577, 12.743, 0.};
     double usol[6] = {0.841194, 0., 18.2812, -5.78011, 8.56045, 0.};
     double psol[6] = {0.293945, 8.32249e-05, 445.626, 44.5687, 1841.82, 0.};
-    for(unsigned int i = 0; i < 6; i++){
-        cout << "Test problem " << i+1 << endl;
+    for(unsigned int i = 0; i < 6; i++) {
+        cout << "Test problem " << i + 1 << endl;
         StateVector WL, WR;
         WL.set_rho(rhoL[i]);
         WL.set_vx(uL[i]);
@@ -708,9 +724,9 @@ void ExactRiemannSolver::test(){
  * @param W StateVector
  * @return Soundspeed corresponding to the StateVector
  */
-double ExactRiemannSolver::get_soundspeed(const StateVector &W){
-    if(W.rho()){
-        return sqrt(_gamma*W.p()/W.rho());
+double ExactRiemannSolver::get_soundspeed(const StateVector& W) {
+    if(W.rho()) {
+        return sqrt(_gamma * W.p() / W.rho());
     } else {
         return 0.;
     }
@@ -722,12 +738,14 @@ double ExactRiemannSolver::get_soundspeed(const StateVector &W){
  * @param W StateVector of primitive variables
  * @return Total energy
  */
-double ExactRiemannSolver::get_energy(const StateVector &W){
-#if ndim_==3
-    return 0.5*W.rho()*(W.vx()*W.vx() + W.vy()*W.vy() +
-                        W.vz()*W.vz()) + W.p()/(_gamma-1.);
+double ExactRiemannSolver::get_energy(const StateVector& W) {
+#if ndim_ == 3
+    return 0.5 * W.rho() *
+                   (W.vx() * W.vx() + W.vy() * W.vy() + W.vz() * W.vz()) +
+           W.p() / (_gamma - 1.);
 #else
-    return 0.5*W.rho()*(W.vx()*W.vx() + W.vy()*W.vy()) + W.p()/(_gamma-1.);
+    return 0.5 * W.rho() * (W.vx() * W.vx() + W.vy() * W.vy()) +
+           W.p() / (_gamma - 1.);
 #endif
 }
 
@@ -741,48 +759,53 @@ double ExactRiemannSolver::get_energy(const StateVector &W){
  * convert total energy to pressure
  * @return Primitive variable StateVector
  */
-StateVector ExactRiemannSolver::get_W(double volume, StateVector &Q,
-                                      bool use_energy){
+StateVector ExactRiemannSolver::get_W(double volume, StateVector& Q,
+                                      bool use_energy) {
     StateVector W;
-    if(!Q.m()){
+    if(!Q.m()) {
         return W;
     }
-    W.set_rho(Q.m()/volume);
-    W.set_vx(Q.px()/Q.m());
-    W.set_vy(Q.py()/Q.m());
-#if ndim_==3
-    W.set_vz(Q.pz()/Q.m());
-    W.set_p((_gamma-1.)*(Q.e() - 0.5*(Q.px()*Q.px() + Q.py()*Q.py() +
-                                      Q.pz()*Q.pz())/Q.m())/volume);
+    W.set_rho(Q.m() / volume);
+    W.set_vx(Q.px() / Q.m());
+    W.set_vy(Q.py() / Q.m());
+#if ndim_ == 3
+    W.set_vz(Q.pz() / Q.m());
+    W.set_p((_gamma - 1.) *
+            (Q.e() -
+             0.5 * (Q.px() * Q.px() + Q.py() * Q.py() + Q.pz() * Q.pz()) /
+                     Q.m()) /
+            volume);
 #else
-    W.set_p((_gamma-1.)*(Q.e() -
-                         0.5*(Q.px()*Q.px() + Q.py()*Q.py())/Q.m())/volume);
+    W.set_p((_gamma - 1.) *
+            (Q.e() - 0.5 * (Q.px() * Q.px() + Q.py() * Q.py()) / Q.m()) /
+            volume);
 #endif
-    if(use_energy){
+    if(use_energy) {
         // reset entropy
-        Q.set_paq(Q.m()*W.p()/pow(W.rho(), _gamma));
-        W.set_paq(Q.paq()/Q.m());
+        Q.set_paq(Q.m() * W.p() / pow(W.rho(), _gamma));
+        W.set_paq(Q.paq() / Q.m());
     } else {
-        W.set_paq(Q.paq()/Q.m());
-        W.set_p(W.paq()*pow(W.rho(), _gamma));
-        Q.set_e(get_energy(W)*volume);
+        W.set_paq(Q.paq() / Q.m());
+        W.set_p(W.paq() * pow(W.rho(), _gamma));
+        Q.set_e(get_energy(W) * volume);
     }
-    if(W.p() < 1.e-30){
+    if(W.p() < 1.e-30) {
         W.set_p(1.e-30);
-#if ndim_==3
-        Q.set_e(0.5*(Q.px()*Q.px() + Q.py()*Q.py() +
-                     Q.pz()*Q.pz())/Q.m()+W.p()*volume/(_gamma-1.));
+#if ndim_ == 3
+        Q.set_e(0.5 * (Q.px() * Q.px() + Q.py() * Q.py() + Q.pz() * Q.pz()) /
+                        Q.m() +
+                W.p() * volume / (_gamma - 1.));
 #else
-        Q.set_e(0.5*(Q.px()*Q.px() +
-                     Q.py()*Q.py())/Q.m()+W.p()*volume/(_gamma-1.));
+        Q.set_e(0.5 * (Q.px() * Q.px() + Q.py() * Q.py()) / Q.m() +
+                W.p() * volume / (_gamma - 1.));
 #endif
     }
 
-    if(W.rho() < 1.e-30){
+    if(W.rho() < 1.e-30) {
         W.set_rho(0.);
         W.set_vx(0.);
         W.set_vy(0.);
-#if ndim_==3
+#if ndim_ == 3
         W.set_vz(0.);
 #endif
         W.set_p(0.);
@@ -800,24 +823,27 @@ StateVector ExactRiemannSolver::get_W(double volume, StateVector &Q,
  * @param W Primitive variables in a cell
  * @return Conserved variables StateVector
  */
-StateVector ExactRiemannSolver::get_Q(double volume, const StateVector &W){
+StateVector ExactRiemannSolver::get_Q(double volume, const StateVector& W) {
     StateVector Q;
-    Q.set_m(W.rho()*volume);
-    Q.set_px(Q.m()*W.vx());
-    Q.set_py(Q.m()*W.vy());
-#if ndim_==3
-    Q.set_pz(Q.m()*W.vz());
-    Q.set_e((0.5*W.rho()*(W.vx()*W.vx() + W.vy()*W.vy() + W.vz()*W.vz()) +
-             W.p()/(_gamma-1.))*volume);
+    Q.set_m(W.rho() * volume);
+    Q.set_px(Q.m() * W.vx());
+    Q.set_py(Q.m() * W.vy());
+#if ndim_ == 3
+    Q.set_pz(Q.m() * W.vz());
+    Q.set_e((0.5 * W.rho() *
+                     (W.vx() * W.vx() + W.vy() * W.vy() + W.vz() * W.vz()) +
+             W.p() / (_gamma - 1.)) *
+            volume);
 #else
-    Q.set_e((0.5*W.rho()*(W.vx()*W.vx() + W.vy()*W.vy()) +
-             W.p()/(_gamma-1.))*volume);
+    Q.set_e((0.5 * W.rho() * (W.vx() * W.vx() + W.vy() * W.vy()) +
+             W.p() / (_gamma - 1.)) *
+            volume);
 #endif
     // Ai = Pi/rhoi^gamma
-    Q.set_paq(Q.m()*W.p()/pow(W.rho(), _gamma));
+    Q.set_paq(Q.m() * W.p() / pow(W.rho(), _gamma));
 
     // sanity check results
-    if(Q.m() < 0. || Q.e() < 0.){
+    if(Q.m() < 0. || Q.e() < 0.) {
         throw ConservedVariablesException(W, Q, volume);
     }
 
@@ -833,18 +859,19 @@ StateVector ExactRiemannSolver::get_Q(double volume, const StateVector &W){
  * @param W Primitive variables at the interface
  * @return Flux through the interface
  */
-StateVector ExactRiemannSolver::get_flux(const Vec &v, unsigned int index,
-                                         const StateVector &W){
+StateVector ExactRiemannSolver::get_flux(const Vec& v, unsigned int index,
+                                         const StateVector& W) {
     StateVector F;
-    F[0] = W.rho()*(W[1+index]-v[index]);
-    F[1] = W.rho()*(W[1+index]-v[index])*W.vx();
-    F[2] = W.rho()*(W[1+index]-v[index])*W.vy();
-#if ndim_==3
-    F[3] = W.rho()*(W[1+index]-v[index])*W.vz();
+    F[0] = W.rho() * (W[1 + index] - v[index]);
+    F[1] = W.rho() * (W[1 + index] - v[index]) * W.vx();
+    F[2] = W.rho() * (W[1 + index] - v[index]) * W.vy();
+#if ndim_ == 3
+    F[3] = W.rho() * (W[1 + index] - v[index]) * W.vz();
 #endif
-    F[1+index] += W.p();
-    F[ndim_+1] = (W[1+index]-v[index])*get_energy(W) + W.p()*W[1+index];
-    F.set_paq(W.rho()*(W[1+index]-v[index])*W.paq());
+    F[1 + index] += W.p();
+    F[ndim_ + 1] =
+            (W[1 + index] - v[index]) * get_energy(W) + W.p() * W[1 + index];
+    F.set_paq(W.rho() * (W[1 + index] - v[index]) * W.paq());
     return F;
 }
 
@@ -853,16 +880,14 @@ StateVector ExactRiemannSolver::get_flux(const Vec &v, unsigned int index,
  *
  * @return Number of Riemann solver evaluations
  */
-unsigned long ExactRiemannSolver::get_neval(){
-    return _counterTotal;
-}
+unsigned long ExactRiemannSolver::get_neval() { return _counterTotal; }
 
 /**
  * @brief Dump the solver to the given RestartFile
  *
  * @param rfile RestartFile to write to
  */
-void ExactRiemannSolver::dump(RestartFile &rfile){
+void ExactRiemannSolver::dump(RestartFile& rfile) {
     _timer.dump(rfile);
 
     rfile.write(_gamma);
@@ -890,7 +915,7 @@ void ExactRiemannSolver::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-ExactRiemannSolver::ExactRiemannSolver(RestartFile &rfile) : _timer(rfile){
+ExactRiemannSolver::ExactRiemannSolver(RestartFile& rfile) : _timer(rfile) {
     rfile.read(_gamma);
     rfile.read(_gp1d2g);
     rfile.read(_gm1d2g);
@@ -919,7 +944,7 @@ ExactRiemannSolver::ExactRiemannSolver(RestartFile &rfile) : _timer(rfile){
  */
 PrimitiveVariablesException::PrimitiveVariablesException(StateVector W,
                                                          StateVector Q,
-                                                         double V){
+                                                         double V) {
     _W = W;
     _Q = Q;
     _V = V;
@@ -929,16 +954,17 @@ PrimitiveVariablesException::PrimitiveVariablesException(StateVector W,
  * @brief Human readable error message for this Exception
  * @return Human readable C-string
  */
-const char* PrimitiveVariablesException::what() const throw(){
+const char* PrimitiveVariablesException::what() const throw() {
     cerr << "Error! Negative density/pressure after calculation of primitive "
-            "quantities!" << endl;
+            "quantities!"
+         << endl;
     cerr << "Q: " << _Q.m() << "\t" << _Q.px() << "\t" << _Q.py() << "\t";
-#if ndim_==3
+#if ndim_ == 3
     cerr << _Q.pz() << "\t";
 #endif
     cerr << _Q.e() << endl;
     cerr << "W: " << _W.rho() << "\t" << _W.vx() << "\t" << _W.vy() << "\t";
-#if ndim_==3
+#if ndim_ == 3
     cerr << _W.vz() << "\t";
 #endif
     cerr << _W.p() << endl;
@@ -955,7 +981,7 @@ const char* PrimitiveVariablesException::what() const throw(){
  */
 ConservedVariablesException::ConservedVariablesException(StateVector W,
                                                          StateVector Q,
-                                                         double V){
+                                                         double V) {
     _W = W;
     _Q = Q;
     _V = V;
@@ -967,16 +993,17 @@ ConservedVariablesException::ConservedVariablesException(StateVector W,
  * @brief Human readable error message
  * @return Human readable C-string
  */
-const char* ConservedVariablesException::what() const throw(){
+const char* ConservedVariablesException::what() const throw() {
     cerr << "Error! Negative mass/energy after calculation of conserved "
-            "quantities!" << endl;
+            "quantities!"
+         << endl;
     cerr << "W: " << _W.rho() << "\t" << _W.vx() << "\t" << _W.vy() << "\t";
-#if ndim_==3
+#if ndim_ == 3
     cerr << _W.vz() << "\t";
 #endif
     cerr << _W.p() << endl;
     cerr << "Q: " << _Q.m() << "\t" << _Q.px() << "\t" << _Q.py() << "\t";
-#if ndim_==3
+#if ndim_ == 3
     cerr << _Q.pz() << "\t";
 #endif
     cerr << _Q.e() << endl;
@@ -992,7 +1019,7 @@ const char* ConservedVariablesException::what() const throw(){
  * @param Wstar Solution of the Riemann problem
  */
 RiemannSolverException::RiemannSolverException(StateVector WL, StateVector WR,
-                                               StateVector Wstar){
+                                               StateVector Wstar) {
     _WL = WL;
     _WR = WR;
     _Wstar = Wstar;
@@ -1004,21 +1031,21 @@ RiemannSolverException::RiemannSolverException(StateVector WL, StateVector WR,
  * @brief Human readable error message
  * @return Human readable C-string
  */
-const char* RiemannSolverException::what() const throw(){
+const char* RiemannSolverException::what() const throw() {
     cerr << "Error! Unacceptable solution to Riemann problem!" << endl;
     cerr << "WL: " << _WL.rho() << "\t" << _WL.vx() << "\t" << _WL.vy() << "\t";
-#if ndim_==3
+#if ndim_ == 3
     cerr << _WL.vz() << "\t";
 #endif
     cerr << _WL.p() << endl;
     cerr << "WR: " << _WR.rho() << "\t" << _WR.vx() << "\t" << _WR.vy() << "\t";
-#if ndim_==3
+#if ndim_ == 3
     cerr << _WR.vz() << "\t";
 #endif
     cerr << _WR.p() << endl;
     cerr << "Wstar: " << _Wstar.rho() << "\t" << _Wstar.vx() << "\t"
          << _Wstar.vy() << "\t";
-#if ndim_==3
+#if ndim_ == 3
     cerr << _Wstar.vz() << "\t";
 #endif
     cerr << _Wstar.p() << endl;

@@ -34,15 +34,15 @@ class UnitSet;
  * Physical constants have a constant, hard-coded value in SI units. We store
  * them in simulation units, which might require unit conversion.
  */
-class Physics{
-private:
+class Physics {
+  private:
     /*! \brief The gravitational constant G */
     double _G;
 
-public:
-    Physics(UnitSet &units, bool real_units = true);
+  public:
+    Physics(UnitSet& units, bool real_units = true);
 
     double get_gravitational_constant();
 };
 
-#endif // PHYSICS_HPP
+#endif  // PHYSICS_HPP

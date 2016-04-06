@@ -26,17 +26,17 @@
 #ifndef UNITSETGENERATOR_HPP
 #define UNITSETGENERATOR_HPP
 
-#include <string>
 #include <iostream>
+#include <string>
 
-#include "UnitSet.hpp"
 #include "Error.hpp"
+#include "UnitSet.hpp"
 
 /**
   * \brief Class that generates a UnitSet based on an input string
   */
-class UnitSetGenerator{
-public:
+class UnitSetGenerator {
+  public:
     /**
      * @brief Generate a UnitSet with the given name
      *
@@ -51,20 +51,20 @@ public:
      * @param name Name of the UnitSet to generate
      * @return Pointer to a UnitSet, should be deleted by the caller
      */
-    static UnitSet* generate(std::string name){
-        if(name == "SI"){
+    static UnitSet* generate(std::string name) {
+        if(name == "SI") {
             Unit unit_length("length", "m", 1.);
             Unit unit_mass("mass", "kg", 1.);
             Unit unit_time("time", "s", 1.);
             return new UnitSet(unit_length, unit_mass, unit_time);
         }
-        if(name == "CGS"){
+        if(name == "CGS") {
             Unit unit_length("length", "cm", 0.01);
             Unit unit_mass("mass", "g", 0.001);
             Unit unit_time("time", "s", 1.);
             return new UnitSet(unit_length, unit_mass, unit_time);
         }
-        if(name == "galactic"){
+        if(name == "galactic") {
             Unit unit_length("length", "kpc", 3.08567758e19);
             Unit unit_mass("mass", "Msol", 1.9891e30);
             Unit unit_time("time", "Gyr", 3.154e16);
@@ -76,4 +76,4 @@ public:
     }
 };
 
-#endif // UNITSETGENERATOR_HPP
+#endif  // UNITSETGENERATOR_HPP

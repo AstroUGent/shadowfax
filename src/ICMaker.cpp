@@ -25,15 +25,15 @@
  */
 #include "ICMaker.hpp"
 #include "ICGenerator.hpp"
+#include "MPIGlobal.hpp"
 #include "SnapshotWriterFactory.hpp"
 #include "io/UnitSet.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "MPIGlobal.hpp"
 #include "utilities/HelperFunctions.hpp"
+#include "utilities/ParticleVector.hpp"
+#include <getopt.h>
 #include <mpi.h>
 #include <string>
 #include <vector>
-#include <getopt.h>
 using namespace std;
 
 /**
@@ -60,9 +60,9 @@ using namespace std;
   * @param argc Number of command line arguments
   * @param argv Array of command line arguments
   */
-ICMaker::ICMaker(int argc, char **argv){
+ICMaker::ICMaker(int argc, char** argv) {
     // suppress output for processes other than the process with rank 0
-    if(MPIGlobal::rank){
+    if(MPIGlobal::rank) {
         cout.rdbuf(NULL);
     }
 
@@ -75,68 +75,68 @@ ICMaker::ICMaker(int argc, char **argv){
     string output_name;
 
     static struct option long_options[] = {
-        {"ncell", required_argument, NULL, 'n'},
-        {"mode", required_argument, NULL, 'm'},
-        {"setup", required_argument, NULL, 's'},
-        {"predefined", required_argument, NULL, 'p'},
-        {"seed", required_argument, NULL, 'r'},
-        {"type", required_argument, NULL, 't'},
-        {"filename", required_argument, NULL, 'o'},
-        {0, 0, 0, 0}
-    };
+            {"ncell", required_argument, NULL, 'n'},
+            {"mode", required_argument, NULL, 'm'},
+            {"setup", required_argument, NULL, 's'},
+            {"predefined", required_argument, NULL, 'p'},
+            {"seed", required_argument, NULL, 'r'},
+            {"type", required_argument, NULL, 't'},
+            {"filename", required_argument, NULL, 'o'},
+            {0, 0, 0, 0}};
 
     int c;
     // force rescan of the arguments
     optind = 1;
     opterr = 0;
-    while((c = getopt_long(argc, argv, ":n:m:s:p:r:t:o:", long_options, NULL))
-          != -1){
-        switch(c){
-        case 'n':
-            ncell = atoi(optarg);
-            break;
-        case 'm':
-            if(string(optarg) == "cart"){
-                mode = IC_CART;
-            } else {
-                if(string(optarg) == "rand"){
-                    mode = IC_RAND;
+    while((c = getopt_long(argc, argv, ":n:m:s:p:r:t:o:", long_options,
+                           NULL)) != -1) {
+        switch(c) {
+            case 'n':
+                ncell = atoi(optarg);
+                break;
+            case 'm':
+                if(string(optarg) == "cart") {
+                    mode = IC_CART;
                 } else {
-                    cerr << "Error! Unknown grid mode: " << optarg << endl;
-                    return;
+                    if(string(optarg) == "rand") {
+                        mode = IC_RAND;
+                    } else {
+                        cerr << "Error! Unknown grid mode: " << optarg << endl;
+                        return;
+                    }
                 }
-            }
-            break;
-        case 's':
-            setup = optarg;
-            break;
-        case 'p':
-            spec = optarg;
-            break;
-        case 'r':
-            seed = atoi(optarg);
-            break;
-        case 't':
-            output_type = optarg;
-            break;
-        case 'o':
-            output_name = optarg;
-            break;
-        case ':':
-            cerr << "Error! Missing required argument for option " << optopt
-                 << "!" << endl;
-            return;
+                break;
+            case 's':
+                setup = optarg;
+                break;
+            case 'p':
+                spec = optarg;
+                break;
+            case 'r':
+                seed = atoi(optarg);
+                break;
+            case 't':
+                output_type = optarg;
+                break;
+            case 'o':
+                output_name = optarg;
+                break;
+            case ':':
+                cerr << "Error! Missing required argument for option " << optopt
+                     << "!" << endl;
+                return;
         }
     }
 
     // command line errors
-    if(!setup.size() && !spec.size()){
+    if(!setup.size() && !spec.size()) {
         cerr << "Error! No setup argument specified!" << endl;
         cerr << "Either specify a file containing a simulations setup or "
-                "choose a predefined setup." << endl;
+                "choose a predefined setup."
+             << endl;
         return;
     }
-    if(setup.size() && spec.size()){
+    if(setup.size() && spec.size()) {
         cerr << "Error! Multiple setup arguments specified!" << endl;
         cerr << "You cannot specify both a setup file and a predefined setup!"
              << endl;
@@ -144,34 +144,35 @@ ICMaker::ICMaker(int argc, char **argv){
     }
 
     // command line warnings
-    if(!ncell){
+    if(!ncell) {
         cout << "Warning! No number of cells specified. Using default value of "
-                "10,000." << endl;
+                "10,000."
+             << endl;
         ncell = 10000;
     }
-    if(!output_name.size()){
+    if(!output_name.size()) {
         cout << "Warning! No output filename specified. Using default value "
              << "\"icfile.hdf5\"." << endl;
         output_name = "icfile.hdf5";
     }
 
     // allocate MPI communication buffer
-    unsigned int maxsize = 1<<30; // 1 GB
-    unsigned int size = ncell*sizeof(GasParticle)*100;
+    unsigned int maxsize = 1 << 30;  // 1 GB
+    unsigned int size = ncell * sizeof(GasParticle) * 100;
     // since size is a 32-bit integer, we have to make sure it is small enough
     // before entering the loop below. If not, we risk overflowing, in which
     // case we enter an endless loop...
-    if(size > maxsize){
+    if(size > maxsize) {
         size = maxsize;
     }
     MPIGlobal::sendsize = 1;
-    while(MPIGlobal::sendsize < size){
+    while(MPIGlobal::sendsize < size) {
         MPIGlobal::sendsize <<= 1;
     }
     MPIGlobal::sendsize = std::min(MPIGlobal::sendsize, maxsize);
     MPIGlobal::recvsize = MPIGlobal::sendsize;
-    delete [] MPIGlobal::sendbuffer;
-    delete [] MPIGlobal::recvbuffer;
+    delete[] MPIGlobal::sendbuffer;
+    delete[] MPIGlobal::recvbuffer;
     MPIGlobal::sendbuffer = new char[MPIGlobal::sendsize];
     MPIGlobal::recvbuffer = new char[MPIGlobal::recvsize];
     cout << "Assigned "
@@ -179,7 +180,7 @@ ICMaker::ICMaker(int argc, char **argv){
          << " for MPI communication buffer" << endl;
 
     ICGenerator* icgen;
-    if(spec.size()){
+    if(spec.size()) {
         icgen = new SpecificICGenerator(ncell, 0, atoi(spec.c_str()), seed,
                                         mode);
     } else {
@@ -193,11 +194,8 @@ ICMaker::ICMaker(int argc, char **argv){
     header.set_global_timestep(false);
     UnitSet SI_units;
 
-    SnapshotWriter *writer = SnapshotWriterFactory::generate(output_type,
-                                                             output_name,
-                                                             SI_units,
-                                                             SI_units,
-                                                             -1);
+    SnapshotWriter* writer = SnapshotWriterFactory::generate(
+            output_type, output_name, SI_units, SI_units, -1);
     writer->write_snapshot(0, icpart);
     delete writer;
     delete icgen;
@@ -214,7 +212,7 @@ ICMaker::ICMaker(int argc, char **argv){
  * @param argv Command line arguments
  * @return Exit code
  */
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
     MyMPI_Init(&argc, &argv);
 
     ICMaker(argc, argv);

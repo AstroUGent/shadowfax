@@ -27,11 +27,11 @@
 #ifndef SNAPSHOTREADERFACTORY_HPP
 #define SNAPSHOTREADERFACTORY_HPP
 
-#include <istream>
-#include "SnapshotHandler.hpp"
+#include "Error.hpp"
 #include "GadgetSnapshotReader.hpp"
 #include "ShadowfaxSnapshotReader.hpp"
-#include "Error.hpp"
+#include "SnapshotHandler.hpp"
+#include <istream>
 
 /**
  * @brief Factory class for SnapshotReader
@@ -42,8 +42,8 @@
  *  - Shadowfax (default)
  *  - Gadget
  */
-class SnapshotReaderFactory{
-public:
+class SnapshotReaderFactory {
+  public:
     /**
      * @brief Generate a SnapshotReader with the given type name
      *
@@ -53,11 +53,11 @@ public:
      * @return
      */
     static SnapshotReader* generate(std::string name, std::string snapname,
-                                    UnitSet& units){
-        if(name == "Shadowfax"){
+                                    UnitSet& units) {
+        if(name == "Shadowfax") {
             return new ShadowfaxSnapshotReader(snapname, units);
         }
-        if(name == "Gadget"){
+        if(name == "Gadget") {
             return new GadgetSnapshotReader(snapname, units);
         }
         std::cerr << "Error! Unknown SnapshotWriter: " << name << "!"
@@ -67,4 +67,4 @@ public:
     }
 };
 
-#endif // SNAPSHOTREADERFACTORY_HPP
+#endif  // SNAPSHOTREADERFACTORY_HPP

@@ -32,8 +32,8 @@
 #ifndef HEAD_LINE
 #define HEAD_LINE
 
-#include <vector>
 #include <ostream>
+#include <vector>
 
 class VorGen;
 class Plane;
@@ -44,8 +44,8 @@ class Plane;
  * Currently used to convert two locations to the mathematical representation
  * of the line connecting them.
  */
-class Line{
-private:
+class Line {
+  private:
     /*! \brief x-coordinate of the first endpoint */
     double _x1;
     /*! \brief x-coordinate of the second endpoint */
@@ -60,7 +60,7 @@ private:
     double _xdir;
     /*! \brief y-component of the direction vector of the line */
     double _ydir;
-#if ndim_==3
+#if ndim_ == 3
     /*! \brief z-coordinate of the first endpoint */
     double _z1;
     /*! \brief z-coordinate of the second endpoint */
@@ -72,27 +72,27 @@ private:
 
     std::vector<double> get_midpoint();
 
-public:
+  public:
     Line(VorGen* point1, VorGen* point2);
-#if ndim_==3
+#if ndim_ == 3
     Line(double x, double y, double z, double xdir, double ydir, double zdir);
 #else
     Line(double x, double y, double xdir, double ydir);
 #endif
-    ~Line(){}
+    ~Line() {}
     double x();
     double xdir();
     double y();
     double ydir();
     std::vector<double> get_coordinates(char coord, double value);
-#if ndim_==3
+#if ndim_ == 3
     double z();
     double zdir();
 #endif
-#if ndim_==3
+#if ndim_ == 3
     Plane get_bisector();
 #endif
-    void print(std::ostream &stream);
+    void print(std::ostream& stream);
 };
 
 #endif

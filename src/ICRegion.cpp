@@ -40,15 +40,15 @@ using namespace std;
  */
 ICRegion::ICRegion(Vec origin, Vec sides, double exponent,
                    vector<string> hydrofunctions, vector<string> dmfunction)
-    : _origin(origin), _sides(sides){
+        : _origin(origin), _sides(sides) {
     _exponent = exponent;
-    if(hydrofunctions.size()){
-        _hydrofunctions.resize(ndim_+2);
-        for(unsigned int i = 0; i < ndim_+2; i++){
+    if(hydrofunctions.size()) {
+        _hydrofunctions.resize(ndim_ + 2);
+        for(unsigned int i = 0; i < ndim_ + 2; i++) {
             _hydrofunctions[i] = new SymbolicFunction(hydrofunctions[i]);
         }
     }
-    if(dmfunction.size()){
+    if(dmfunction.size()) {
         _dmfunction.resize(1);
         _dmfunction[0] = new SymbolicFunction(dmfunction[0]);
     }
@@ -59,13 +59,13 @@ ICRegion::ICRegion(Vec origin, Vec sides, double exponent,
  *
  * Clean up the symbolic functions.
  */
-ICRegion::~ICRegion(){
-    if(_hydrofunctions.size()){
-        for(unsigned int i = 0; i < ndim_+2; i++){
+ICRegion::~ICRegion() {
+    if(_hydrofunctions.size()) {
+        for(unsigned int i = 0; i < ndim_ + 2; i++) {
             delete _hydrofunctions[i];
         }
     }
-    if(_dmfunction.size()){
+    if(_dmfunction.size()) {
         delete _dmfunction[0];
     }
 }
@@ -85,18 +85,18 @@ ICRegion::~ICRegion(){
  * @param position Position of the point
  * @return True if the point lies inside the region, false otherwise
  */
-bool ICRegion::inside(Vec position){
+bool ICRegion::inside(Vec position) {
     double r = 0.;
-    for(unsigned int k = ndim_; k--;){
-        double x = 2.*fabs(position[k] - _origin[k])/_sides[k];
-        if(_exponent < 10.){
+    for(unsigned int k = ndim_; k--;) {
+        double x = 2. * fabs(position[k] - _origin[k]) / _sides[k];
+        if(_exponent < 10.) {
             r += pow(x, _exponent);
         } else {
             r = std::max(r, x);
         }
     }
-    if(_exponent < 10.){
-        r = pow(r, 1./_exponent);
+    if(_exponent < 10.) {
+        r = pow(r, 1. / _exponent);
     }
     return (r <= 1.);
 }
@@ -110,17 +110,17 @@ bool ICRegion::inside(Vec position){
  * @param position Position in the region
  * @return Primitive variables Statevector
  */
-StateVector ICRegion::get_hydro(Vec position){
+StateVector ICRegion::get_hydro(Vec position) {
     StateVector hydro;
-    if(_hydrofunctions.size()){
+    if(_hydrofunctions.size()) {
         double r = 0.;
-        for(unsigned int i = 0; i < ndim_; i++){
-            double x = position[i]-_origin[i];
-            r += x*x;
+        for(unsigned int i = 0; i < ndim_; i++) {
+            double x = position[i] - _origin[i];
+            r += x * x;
         }
         r = sqrt(r);
-        for(unsigned int i = 0; i < ndim_+2; i++){
-#if ndim_==3
+        for(unsigned int i = 0; i < ndim_ + 2; i++) {
+#if ndim_ == 3
             hydro[i] = (*_hydrofunctions[i])(r, position.x(), position.y(),
                                              position.z());
 #else
@@ -147,31 +147,33 @@ StateVector ICRegion::get_hydro(Vec position){
  * @param exponent Exponent of the region
  * @return Integral of the SymbolicFunction over the region
  */
-double ICRegion::integrate(SymbolicFunction *function, Vec origin, Vec sides,
-                           double exponent){
-#if ndim_==3
+double ICRegion::integrate(SymbolicFunction* function, Vec origin, Vec sides,
+                           double exponent) {
+#if ndim_ == 3
     double integral = 0.;
-    for(unsigned int i = 0; i < 100; i++){
-        for(unsigned int j = 0; j < 100; j++){
-            for(unsigned int z = 0; z < 100; z++){
-                double pos[3] = {(i+0.5)*0.01*sides[0]-origin[0],
-                                 (j+0.5)*0.01*sides[1]-origin[1],
-                                 (z+0.5)*0.01*sides[2]-origin[2]};
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            for(unsigned int z = 0; z < 100; z++) {
+                double pos[3] = {(i + 0.5) * 0.01 * sides[0] - origin[0],
+                                 (j + 0.5) * 0.01 * sides[1] - origin[1],
+                                 (z + 0.5) * 0.01 * sides[2] - origin[2]};
                 double re = 0.;
-                for(unsigned int k = 0; k < ndim_; k++){
-                    double x = 2.*fabs(pos[k])/sides[k];
-                    if(exponent < 10.){
+                for(unsigned int k = 0; k < ndim_; k++) {
+                    double x = 2. * fabs(pos[k]) / sides[k];
+                    if(exponent < 10.) {
                         re += pow(x, exponent);
                     } else {
                         re = std::max(re, x);
                     }
                 }
-                if(exponent < 10.){
-                    re = pow(re, 1./exponent);
+                if(exponent < 10.) {
+                    re = pow(re, 1. / exponent);
                 }
-                if(re <= 1.){
-                    re = sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
-                    integral += 1.e-6*((*function)(re, pos[0], pos[1], pos[2]));
+                if(re <= 1.) {
+                    re = sqrt(pos[0] * pos[0] + pos[1] * pos[1] +
+                              pos[2] * pos[2]);
+                    integral +=
+                            1.e-6 * ((*function)(re, pos[0], pos[1], pos[2]));
                     _volume += 1.e-6;
                 }
             }
@@ -180,25 +182,25 @@ double ICRegion::integrate(SymbolicFunction *function, Vec origin, Vec sides,
     return integral;
 #else
     double integral = 0.;
-    for(unsigned int i = 0; i < 100; i++){
-        for(unsigned int j = 0; j < 100; j++){
-            double pos[2] = {(i+0.5)*0.01*sides[0]-origin[0],
-                             (j+0.5)*0.01*sides[1]-origin[1]};
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            double pos[2] = {(i + 0.5) * 0.01 * sides[0] - origin[0],
+                             (j + 0.5) * 0.01 * sides[1] - origin[1]};
             double re = 0.;
-            for(unsigned int k = 0; k < ndim_; k++){
-                double x = 2.*fabs(pos[k])/sides[k];
-                if(exponent < 10.){
+            for(unsigned int k = 0; k < ndim_; k++) {
+                double x = 2. * fabs(pos[k]) / sides[k];
+                if(exponent < 10.) {
                     re += pow(x, exponent);
                 } else {
                     re = std::max(re, x);
                 }
             }
-            if(exponent < 10.){
-                re = pow(re, 1./exponent);
+            if(exponent < 10.) {
+                re = pow(re, 1. / exponent);
             }
-            if(re <= 1.){
-                re = sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
-                integral += 1.e-4*((*function)(re, pos[0], pos[1]));
+            if(re <= 1.) {
+                re = sqrt(pos[0] * pos[0] + pos[1] * pos[1]);
+                integral += 1.e-4 * ((*function)(re, pos[0], pos[1]));
                 _volume += 1.e-4;
             }
         }
@@ -218,40 +220,38 @@ double ICRegion::integrate(SymbolicFunction *function, Vec origin, Vec sides,
  * that should not be considered when calculating the maximum
  * @return The maximal hydrodynamical density inside the region
  */
-double ICRegion::get_max_value_hydro(ICRegion* cut_out_region){
-    if(!_hydrofunctions.size()){
+double ICRegion::get_max_value_hydro(ICRegion* cut_out_region) {
+    if(!_hydrofunctions.size()) {
         return 0;
     }
-#if ndim_==3
+#if ndim_ == 3
     _max_value_hydro = 0.;
-    for(unsigned int i = 0; i < 100; i++){
-        for(unsigned int j = 0; j < 100; j++){
-            for(unsigned int z = 0; z < 100; z++){
-                Vec pos((i+0.5)*0.01*_sides[0]-_origin[0],
-                        (j+0.5)*0.01*_sides[1]-_origin[1],
-                        (z+0.5)*0.01*_sides[2]-_origin[2]);
-                if(!cut_out_region || !cut_out_region->inside(pos)){
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            for(unsigned int z = 0; z < 100; z++) {
+                Vec pos((i + 0.5) * 0.01 * _sides[0] - _origin[0],
+                        (j + 0.5) * 0.01 * _sides[1] - _origin[1],
+                        (z + 0.5) * 0.01 * _sides[2] - _origin[2]);
+                if(!cut_out_region || !cut_out_region->inside(pos)) {
                     double re = 0.;
-                    for(unsigned int k = 0; k < ndim_; k++){
-                        double x = 2.*fabs(pos[k])/_sides[k];
-                        if(_exponent < 10.){
+                    for(unsigned int k = 0; k < ndim_; k++) {
+                        double x = 2. * fabs(pos[k]) / _sides[k];
+                        if(_exponent < 10.) {
                             re += pow(x, _exponent);
                         } else {
                             re = std::max(re, x);
                         }
                     }
-                    if(_exponent < 10.){
-                        re = pow(re, 1./_exponent);
+                    if(_exponent < 10.) {
+                        re = pow(re, 1. / _exponent);
                     }
-                    if(re <= 1.){
-                        re = sqrt(pos[0]*pos[0] + pos[1]*pos[1] +
-                                pos[2]*pos[2]);
+                    if(re <= 1.) {
+                        re = sqrt(pos[0] * pos[0] + pos[1] * pos[1] +
+                                  pos[2] * pos[2]);
                         _max_value_hydro =
-                                std::max(
-                                    _max_value_hydro, (*_hydrofunctions[0])(
-                                    re, pos[0], pos[1], pos[2]
-                                )
-                                );
+                                std::max(_max_value_hydro,
+                                         (*_hydrofunctions[0])(re, pos[0],
+                                                               pos[1], pos[2]));
                     }
                 }
             }
@@ -260,30 +260,28 @@ double ICRegion::get_max_value_hydro(ICRegion* cut_out_region){
     return _max_value_hydro;
 #else
     _max_value_hydro = 0.;
-    for(unsigned int i = 0; i < 100; i++){
-        for(unsigned int j = 0; j < 100; j++){
-            Vec pos((i+0.5)*0.01*_sides[0]-_origin[0],
-                    (j+0.5)*0.01*_sides[1]-_origin[1]);
-            if(!cut_out_region || !cut_out_region->inside(pos)){
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            Vec pos((i + 0.5) * 0.01 * _sides[0] - _origin[0],
+                    (j + 0.5) * 0.01 * _sides[1] - _origin[1]);
+            if(!cut_out_region || !cut_out_region->inside(pos)) {
                 double re = 0.;
-                for(unsigned int k = 0; k < ndim_; k++){
-                    double x = 2.*fabs(pos[k])/_sides[k];
-                    if(_exponent < 10.){
+                for(unsigned int k = 0; k < ndim_; k++) {
+                    double x = 2. * fabs(pos[k]) / _sides[k];
+                    if(_exponent < 10.) {
                         re += pow(x, _exponent);
                     } else {
                         re = std::max(re, x);
                     }
                 }
-                if(_exponent < 10.){
-                    re = pow(re, 1./_exponent);
+                if(_exponent < 10.) {
+                    re = pow(re, 1. / _exponent);
                 }
-                if(re <= 1.){
-                    re = sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
+                if(re <= 1.) {
+                    re = sqrt(pos[0] * pos[0] + pos[1] * pos[1]);
                     _max_value_hydro =
-                            std::max(
-                                _max_value_hydro,
-                                (*_hydrofunctions[0])(re, pos[0], pos[1])
-                            );
+                            std::max(_max_value_hydro,
+                                     (*_hydrofunctions[0])(re, pos[0], pos[1]));
                 }
             }
         }
@@ -303,41 +301,37 @@ double ICRegion::get_max_value_hydro(ICRegion* cut_out_region){
  * that should not be considered when calculating the maximum
  * @return The maximal dark matter density inside the region
  */
-double ICRegion::get_max_value_dm(ICRegion* cut_out_region){
-    if(!_dmfunction.size()){
+double ICRegion::get_max_value_dm(ICRegion* cut_out_region) {
+    if(!_dmfunction.size()) {
         return 0;
     }
-#if ndim_==3
+#if ndim_ == 3
     _max_value_dm = 0.;
-    for(unsigned int i = 0; i < 100; i++){
-        for(unsigned int j = 0; j < 100; j++){
-            for(unsigned int z = 0; z < 100; z++){
-                Vec pos((i+0.5)*0.01*_sides[0]-_origin[0],
-                        (j+0.5)*0.01*_sides[1]-_origin[1],
-                        (z+0.5)*0.01*_sides[2]-_origin[2]);
-                if(!cut_out_region || !cut_out_region->inside(pos)){
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            for(unsigned int z = 0; z < 100; z++) {
+                Vec pos((i + 0.5) * 0.01 * _sides[0] - _origin[0],
+                        (j + 0.5) * 0.01 * _sides[1] - _origin[1],
+                        (z + 0.5) * 0.01 * _sides[2] - _origin[2]);
+                if(!cut_out_region || !cut_out_region->inside(pos)) {
                     double re = 0.;
-                    for(unsigned int k = 0; k < ndim_; k++){
-                        double x = 2.*fabs(pos[k])/_sides[k];
-                        if(_exponent < 10.){
+                    for(unsigned int k = 0; k < ndim_; k++) {
+                        double x = 2. * fabs(pos[k]) / _sides[k];
+                        if(_exponent < 10.) {
                             re += pow(x, _exponent);
                         } else {
                             re = std::max(re, x);
                         }
                     }
-                    if(_exponent < 10.){
-                        re = pow(re, 1./_exponent);
+                    if(_exponent < 10.) {
+                        re = pow(re, 1. / _exponent);
                     }
-                    if(re <= 1.){
-                        re = sqrt(pos[0]*pos[0] + pos[1]*pos[1] +
-                                pos[2]*pos[2]);
-                        _max_value_dm =
-                                std::max(
-                                    _max_value_dm,
-                                    (*_dmfunction[0])(
-                                    re, pos[0], pos[1], pos[2]
-                                )
-                                );
+                    if(re <= 1.) {
+                        re = sqrt(pos[0] * pos[0] + pos[1] * pos[1] +
+                                  pos[2] * pos[2]);
+                        _max_value_dm = std::max(
+                                _max_value_dm,
+                                (*_dmfunction[0])(re, pos[0], pos[1], pos[2]));
                     }
                 }
             }
@@ -346,30 +340,28 @@ double ICRegion::get_max_value_dm(ICRegion* cut_out_region){
     return _max_value_dm;
 #else
     _max_value_dm = 0.;
-    for(unsigned int i = 0; i < 100; i++){
-        for(unsigned int j = 0; j < 100; j++){
-            Vec pos((i+0.5)*0.01*_sides[0]-_origin[0],
-                    (j+0.5)*0.01*_sides[1]-_origin[1]);
-            if(!cut_out_region || !cut_out_region->inside(pos)){
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            Vec pos((i + 0.5) * 0.01 * _sides[0] - _origin[0],
+                    (j + 0.5) * 0.01 * _sides[1] - _origin[1]);
+            if(!cut_out_region || !cut_out_region->inside(pos)) {
                 double re = 0.;
-                for(unsigned int k = 0; k < ndim_; k++){
-                    double x = 2.*fabs(pos[k])/_sides[k];
-                    if(_exponent < 10.){
+                for(unsigned int k = 0; k < ndim_; k++) {
+                    double x = 2. * fabs(pos[k]) / _sides[k];
+                    if(_exponent < 10.) {
                         re += pow(x, _exponent);
                     } else {
                         re = std::max(re, x);
                     }
                 }
-                if(_exponent < 10.){
-                    re = pow(re, 1./_exponent);
+                if(_exponent < 10.) {
+                    re = pow(re, 1. / _exponent);
                 }
-                if(re <= 1.){
-                    re = sqrt(pos[0]*pos[0] + pos[1]*pos[1]);
+                if(re <= 1.) {
+                    re = sqrt(pos[0] * pos[0] + pos[1] * pos[1]);
                     _max_value_dm =
-                            std::max(
-                                _max_value_dm,
-                                (*_dmfunction[0])(re, pos[0], pos[1])
-                            );
+                            std::max(_max_value_dm,
+                                     (*_dmfunction[0])(re, pos[0], pos[1]));
                 }
             }
         }
@@ -385,16 +377,15 @@ double ICRegion::get_max_value_dm(ICRegion* cut_out_region){
  * @param position Position inside the region
  * @return True if the position is accepted, false if it is rejected
  */
-bool ICRegion::accept_hydro(Vec position){
-    Vec p = position-_origin;
-#if ndim_==3
-    return ((double)rand())/((double)RAND_MAX) <
-            ((*_hydrofunctions[0])(p.norm(), p.x(), p.y(), p.z()))
-            /_max_value_hydro;
+bool ICRegion::accept_hydro(Vec position) {
+    Vec p = position - _origin;
+#if ndim_ == 3
+    return ((double)rand()) / ((double)RAND_MAX) <
+           ((*_hydrofunctions[0])(p.norm(), p.x(), p.y(), p.z())) /
+                   _max_value_hydro;
 #else
-    return ((double)rand())/((double)RAND_MAX) <
-            ((*_hydrofunctions[0])(p.norm(), p.x(), p.y()))/
-            _max_value_hydro;
+    return ((double)rand()) / ((double)RAND_MAX) <
+           ((*_hydrofunctions[0])(p.norm(), p.x(), p.y())) / _max_value_hydro;
 #endif
 }
 
@@ -405,13 +396,13 @@ bool ICRegion::accept_hydro(Vec position){
  * @param position Position inside the region
  * @return True if the position is accepted, false if it is rejected
  */
-bool ICRegion::accept_dm(Vec position){
-    Vec p = position-_origin;
-#if ndim_==3
-    return ((double)rand())/((double)RAND_MAX) <
-            ((*_dmfunction[0])(p.norm(), p.x(), p.y(), p.z()))/_max_value_dm;
+bool ICRegion::accept_dm(Vec position) {
+    Vec p = position - _origin;
+#if ndim_ == 3
+    return ((double)rand()) / ((double)RAND_MAX) <
+           ((*_dmfunction[0])(p.norm(), p.x(), p.y(), p.z())) / _max_value_dm;
 #else
-    return ((double)rand())/((double)RAND_MAX) <
-            ((*_dmfunction[0])(p.norm(), p.x(), p.y()))/_max_value_dm;
+    return ((double)rand()) / ((double)RAND_MAX) <
+           ((*_dmfunction[0])(p.norm(), p.x(), p.y())) / _max_value_dm;
 #endif
 }

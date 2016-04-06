@@ -23,21 +23,21 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Simulation.hpp"
+#include "DelTess.hpp"
+#include "ExArith.h"
+#include "MPIMethods.hpp"
 #include "Plotter.hpp"
 #include "SidePrograms.hpp"
-#include "DelTess.hpp"
-#include "MPIMethods.hpp"
-#include "ExArith.h"
-#include <iostream>
+#include "Simulation.hpp"
 #include <getopt.h>
+#include <iostream>
 using namespace std;
 
 /**
  * @brief Sideprograms that can be called using the corresponding command line
  * argument
  */
-enum SideProgramTypes{
+enum SideProgramTypes {
     /*! \brief Plot sideprogram */
     SIDEPROGRAM_PLOT = 0,
     /*! \brief ICMaker sideprogram (no longer supported and replaced by an
@@ -86,87 +86,77 @@ enum SideProgramTypes{
  * @return 1 if a sideprogram was flagged and run, 0 if the main simulation
  * program should be started
  */
-unsigned int bootstrap(int argc, char** argv){
-    if(argc < 2){
+unsigned int bootstrap(int argc, char** argv) {
+    if(argc < 2) {
         return 0;
     }
 
     static struct option long_options[] = {
-        {"plot", no_argument, NULL, SIDEPROGRAM_PLOT},
-        {"ic", no_argument, NULL, SIDEPROGRAM_IC},
-        {"area", no_argument, NULL, SIDEPROGRAM_AREA},
-        {"density", no_argument, NULL, SIDEPROGRAM_DENSITY},
-        {"mass", no_argument, NULL, SIDEPROGRAM_MASS},
-        {"epot", no_argument, NULL, SIDEPROGRAM_EPOT},
-        {"sort", no_argument, NULL, SIDEPROGRAM_SORT},
-        {"delaunaycheck", no_argument, NULL, SIDEPROGRAM_DELTEST},
-        {"exact_arithmetics", no_argument, NULL, SIDEPROGRAM_EXARITH},
-        {0, 0, 0, 0}
-    };
+            {"plot", no_argument, NULL, SIDEPROGRAM_PLOT},
+            {"ic", no_argument, NULL, SIDEPROGRAM_IC},
+            {"area", no_argument, NULL, SIDEPROGRAM_AREA},
+            {"density", no_argument, NULL, SIDEPROGRAM_DENSITY},
+            {"mass", no_argument, NULL, SIDEPROGRAM_MASS},
+            {"epot", no_argument, NULL, SIDEPROGRAM_EPOT},
+            {"sort", no_argument, NULL, SIDEPROGRAM_SORT},
+            {"delaunaycheck", no_argument, NULL, SIDEPROGRAM_DELTEST},
+            {"exact_arithmetics", no_argument, NULL, SIDEPROGRAM_EXARITH},
+            {0, 0, 0, 0}};
 
     int c;
     opterr = 0;
-    while((c = getopt_long(argc, argv, "", long_options, NULL)) != -1){
+    while((c = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
         // the extra {} need to be present for this code to compile, see
         // http://stackoverflow.com/questions/2351936/create-an-object-in-
         // switch-case
-        switch(c){
-        case SIDEPROGRAM_PLOT:
-        {
-            // plot snapshot
-            Plotter pl(argc, argv);
-            return 1;
-        }
-        case SIDEPROGRAM_IC:
-        {
-            // make ic
-            cerr <<  "This functionality is no longer supported by the main "
-                     "Shadowfax program. Use the program icmakerNd instead!"
-                  << endl;
-            return 1;
-        }
-        case SIDEPROGRAM_AREA:
-        {
-            AreaCalculator ac(argc, argv);
-            return 1;
-        }
-        case SIDEPROGRAM_DENSITY:
-        {
-            // density code for Cloet-Osselaer et al. 2014
-            DensityCalculator dc(argc, argv);
-            return 1;
-        }
-        case SIDEPROGRAM_MASS:
-        {
-            MassCalculator mc(argc, argv);
-            return 1;
-        }
-        case SIDEPROGRAM_EPOT:
-        {
-            PotentialCalculator pc(argc, argv);
-            return 1;
-        }
-        case SIDEPROGRAM_SORT:
-        {
-            HilbertSorter hs(argc, argv);
-            return 1;
-        }
-        case SIDEPROGRAM_DELTEST:
-        {
-            // check the delaunay algorithms
-            DelTess delaunay(NULL, 0);
-            delaunay.check_methods();
-            return 1;
-        }
-        case SIDEPROGRAM_EXARITH:
-        {
-            ExactArithmetic::test_predicates();
-            return 1;
-        }
-        case '?':
-            return 0;
-        default:
-            return 0;
+        switch(c) {
+            case SIDEPROGRAM_PLOT: {
+                // plot snapshot
+                Plotter pl(argc, argv);
+                return 1;
+            }
+            case SIDEPROGRAM_IC: {
+                // make ic
+                cerr << "This functionality is no longer supported by the main "
+                        "Shadowfax program. Use the program icmakerNd instead!"
+                     << endl;
+                return 1;
+            }
+            case SIDEPROGRAM_AREA: {
+                AreaCalculator ac(argc, argv);
+                return 1;
+            }
+            case SIDEPROGRAM_DENSITY: {
+                // density code for Cloet-Osselaer et al. 2014
+                DensityCalculator dc(argc, argv);
+                return 1;
+            }
+            case SIDEPROGRAM_MASS: {
+                MassCalculator mc(argc, argv);
+                return 1;
+            }
+            case SIDEPROGRAM_EPOT: {
+                PotentialCalculator pc(argc, argv);
+                return 1;
+            }
+            case SIDEPROGRAM_SORT: {
+                HilbertSorter hs(argc, argv);
+                return 1;
+            }
+            case SIDEPROGRAM_DELTEST: {
+                // check the delaunay algorithms
+                DelTess delaunay(NULL, 0);
+                delaunay.check_methods();
+                return 1;
+            }
+            case SIDEPROGRAM_EXARITH: {
+                ExactArithmetic::test_predicates();
+                return 1;
+            }
+            case '?':
+                return 0;
+            default:
+                return 0;
         }
     }
     return 0;
@@ -182,10 +172,10 @@ unsigned int bootstrap(int argc, char** argv){
  * @param argv Command line arguments
  * @return Exit code
  */
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
     MyMPI_Init(&argc, &argv);
 
-    if(!bootstrap(argc, argv)){
+    if(!bootstrap(argc, argv)) {
         // no specific action required. Run simulation
         Simulation sim(argc, argv);
     }

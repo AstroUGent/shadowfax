@@ -27,8 +27,8 @@
 #ifndef PARTICLEFACTORY_HPP
 #define PARTICLEFACTORY_HPP
 
-#include "GasParticle.hpp"
 #include "DMParticle.hpp"
+#include "GasParticle.hpp"
 #include "MPIMethods.hpp"
 
 #include <iostream>
@@ -37,8 +37,8 @@
  * @brief Factory to facilitate the sending and receiving of particles of
  * different types
  */
-class ParticleFactory{
-public:
+class ParticleFactory {
+  public:
     /**
      * @brief Load a particle that was packed using ParticleFactory::dump from
      * the given buffer and return a pointer to it
@@ -48,13 +48,13 @@ public:
      * @param position Current position in the buffer (is updated)
      * @return Pointer to the newly created Particle instance
      */
-    static Particle* load(void* buffer, int bufsize, int* position){
+    static Particle* load(void* buffer, int bufsize, int* position) {
         int type;
         MyMPI_Unpack(buffer, bufsize, position, &type, 1, MPI_INT);
-        if(type == PARTTYPE_GAS){
+        if(type == PARTTYPE_GAS) {
             return new GasParticle(buffer, bufsize, position);
         }
-        if(type == PARTTYPE_DM){
+        if(type == PARTTYPE_DM) {
             return new DMParticle(buffer, bufsize, position);
         }
         std::cerr << "Unknown particle type: " << type << std::endl;
@@ -72,12 +72,12 @@ public:
      * @param bufsize Size of the buffer
      * @param position Current position in the buffer (is updated)
      */
-    static void dump(Particle *particle, void* buffer, int bufsize,
-                     int* position){
+    static void dump(Particle* particle, void* buffer, int bufsize,
+                     int* position) {
         int type = particle->type();
         MyMPI_Pack(&type, 1, MPI_INT, buffer, bufsize, position);
         particle->pack_data(buffer, bufsize, position);
     }
 };
 
-#endif // PARTICLEFACTORY_HPP
+#endif  // PARTICLEFACTORY_HPP

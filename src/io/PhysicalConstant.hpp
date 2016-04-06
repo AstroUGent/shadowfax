@@ -36,23 +36,23 @@
   * The constant has a value and a Unit, such that we can easily
   * convert from one set of units to another.
   */
-class PhysicalConstant{
-private:
+class PhysicalConstant {
+  private:
     /*! \brief Value of the physical constant */
     double _value;
 
     /*! \brief Unit of the physical constant */
     Unit _unit;
 
-public:
+  public:
     /**
       * \brief Construct a physical constant with a Unit and a value
       *
       * @param value Value of the physical constant
       * @param unit Unit of the physical constant
       */
-    inline PhysicalConstant(double value, Unit unit) : _value(value),
-        _unit(unit){}
+    inline PhysicalConstant(double value, Unit unit)
+            : _value(value), _unit(unit) {}
 
     /**
       * \brief Get the raw value of the physical constant
@@ -62,9 +62,7 @@ public:
       *
       * @return Raw value of the physical constant in its original Unit
       */
-    inline double get_value(){
-        return _value;
-    }
+    inline double get_value() { return _value; }
 
     /**
       * \brief Get the raw value of the Unit associated to this physical
@@ -75,9 +73,7 @@ public:
       *
       * @return The original Unit associated with the physical constant
       */
-    inline Unit get_unit(){
-        return _unit;
-    }
+    inline Unit get_unit() { return _unit; }
 
     /**
       * \brief Get the value of the physical constant in the specified system of
@@ -93,12 +89,11 @@ public:
       * @return The value of the physical constant in the desired system of
       * units
       */
-    inline double get_value(UnitSet unitset){
+    inline double get_value(UnitSet unitset) {
         Unit unit = unitset.get_unit(_unit.get_quantity());
         UnitConverter converter(_unit, unit);
         return converter.convert(_value);
     }
-
 };
 
-#endif // PHYSICALCONSTANT_HPP
+#endif  // PHYSICALCONSTANT_HPP

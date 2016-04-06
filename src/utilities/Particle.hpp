@@ -31,14 +31,14 @@
 #ifndef HEAD_PARTICLE
 #define HEAD_PARTICLE
 
-#include "Vec.hpp"
 #include "Hilbert.hpp"
+#include "Vec.hpp"
 
 #include "ParticleTypes.hpp"
 
-#include <string>
-#include <ostream>
 #include <iostream>
+#include <ostream>
+#include <string>
 
 /**
  * \brief Representation of a particle
@@ -47,9 +47,9 @@
  * offers an interface to some mass variable.
  * It also holds a timestep for a numerical integration scheme.
  */
-class Particle : public Hilbert_Object{
+class Particle : public Hilbert_Object {
 
-protected:
+  protected:
     /*! \brief Position of the particle */
     Vec _x;
 
@@ -84,17 +84,17 @@ protected:
     /*! \brief Gravitational softening length of the particle */
     double _hsoft;
 
-public:
+  public:
     Particle();
     Particle(Vec pos);
     Particle(void* buffer, int bufsize, int* position);
-    virtual ~Particle(){}
+    virtual ~Particle() {}
 
     /**
       * \brief Convenience function to distinguish between different
       * implementations of Particle
       */
-    virtual ParticleType type()=0;
+    virtual ParticleType type() = 0;
 
     double x();
     double y();
@@ -109,9 +109,7 @@ public:
       *
       * @return Vec containing the position of the particle
       */
-    Vec& get_position(){
-        return _x;
-    }
+    Vec& get_position() { return _x; }
 
     Vec get_velocity();
     double vel(int index);
@@ -123,8 +121,8 @@ public:
 
     void drift(double dt);
 
-    void print(std::ostream &stream);
-    void print_gen(std::ostream &stream);
+    void print(std::ostream& stream);
+    void print_gen(std::ostream& stream);
 
     unsigned long id();
     void set_id(unsigned long id);
@@ -144,7 +142,7 @@ public:
       *
       * @param a_grav New gravitational acceleration for the particle
       */
-    virtual inline void set_gravitational_acceleration(Vec a_grav){
+    virtual inline void set_gravitational_acceleration(Vec a_grav) {
         _a_grav_new = a_grav;
     }
 
@@ -159,9 +157,7 @@ public:
       * @return The norm of the gravitational acceleration during the previous
       * integration timestep
       */
-    inline double get_old_acceleration(){
-        return _old_a;
-    }
+    inline double get_old_acceleration() { return _old_a; }
 
     /**
      * @brief Add the given number of force calculations to the computational
@@ -169,16 +165,14 @@ public:
      *
      * @param comp_cost unsigned integer number of force calculations
      */
-    inline void add_comp_cost(unsigned int comp_cost){
+    inline void add_comp_cost(unsigned int comp_cost) {
         _comp_cost += comp_cost;
     }
 
     /**
      * @brief Reset the computational cost for the particle to zero
      */
-    inline void reset_comp_cost(){
-        _comp_cost = 0;
-    }
+    inline void reset_comp_cost() { _comp_cost = 0; }
 
     /**
      * @brief Get the computational cost of the gravity calculation for this
@@ -186,23 +180,21 @@ public:
      *
      * @return The computational cost for this particle
      */
-    inline unsigned int get_comp_cost(){
-        return _comp_cost;
-    }
+    inline unsigned int get_comp_cost() { return _comp_cost; }
 
     /**
      * @brief Set the mass of the particle
      *
      * @param mass New mass of the particle
      */
-    virtual void set_mass(double mass)=0;
+    virtual void set_mass(double mass) = 0;
 
     /**
      * @brief Get the mass of the particle
      *
      * @return Mass of the particle
      */
-    virtual double get_mass()=0;
+    virtual double get_mass() = 0;
 
     void accelerate(Vec dv);
     void move(double dt);
@@ -215,8 +207,8 @@ public:
 
     virtual void pack_data(void* buffer, int bufsize, int* position);
 
-    virtual void dump(RestartFile &rfile);
-    Particle(RestartFile &rfile);
+    virtual void dump(RestartFile& rfile);
+    Particle(RestartFile& rfile);
 };
 
 #endif

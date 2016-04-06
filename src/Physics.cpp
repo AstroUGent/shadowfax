@@ -24,8 +24,8 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Physics.hpp"
-#include "io/UnitSet.hpp"
 #include "io/PhysicalConstant.hpp"
+#include "io/UnitSet.hpp"
 using namespace std;
 
 /**
@@ -38,11 +38,11 @@ using namespace std;
  * @param real_units Flag indicating whether physical values or idealized values
  * should be used for the physical constants
  */
-Physics::Physics(UnitSet &units, bool real_units){
+Physics::Physics(UnitSet& units, bool real_units) {
     Unit Gunit("length*length*length/mass/time/time", "Gunit", 1.);
     double Gval;
 
-    if(real_units){
+    if(real_units) {
         // hard coded values in SI-units
         // gravitational constant
         Gval = 6.674e-11;
@@ -60,6 +60,4 @@ Physics::Physics(UnitSet &units, bool real_units){
  *
  * @return The value of the gravitational constant in simulation units
  */
-double Physics::get_gravitational_constant(){
-    return _G;
-}
+double Physics::get_gravitational_constant() { return _G; }

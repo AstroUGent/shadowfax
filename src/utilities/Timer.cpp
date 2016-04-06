@@ -34,7 +34,7 @@ using namespace std;
  * Intialize the internal timeval difference and register the current system
  * time.
  */
-Timer::Timer(){
+Timer::Timer() {
     reset();
     gettimeofday(&_start, NULL);
 }
@@ -42,16 +42,12 @@ Timer::Timer(){
 /**
  * @brief Clear the internal timeval difference
  */
-void Timer::reset(){
-    timerclear(&_diff);
-}
+void Timer::reset() { timerclear(&_diff); }
 
 /**
  * @brief Record the current system time as starting time
  */
-void Timer::start(){
-    gettimeofday(&_start, NULL);
-}
+void Timer::start() { gettimeofday(&_start, NULL); }
 
 /**
  * @brief Record the current system time as stopping time and add the difference
@@ -60,12 +56,12 @@ void Timer::start(){
  * @return The current contents of the internal timeval difference in seconds
  * (with microsecond precision)
  */
-double Timer::stop(){
+double Timer::stop() {
     gettimeofday(&_stop, NULL);
     timeval interval_diff;
     timersub(&_stop, &_start, &interval_diff);
     timeradd(&_diff, &interval_diff, &_diff);
-    return _diff.tv_sec + 1.e-6*_diff.tv_usec;
+    return _diff.tv_sec + 1.e-6 * _diff.tv_usec;
 }
 
 /**
@@ -74,36 +70,32 @@ double Timer::stop(){
  * @return The current contents of the internal timeval difference in seconds
  * (with microsecond precision)
  */
-double Timer::value(){
-    return _diff.tv_sec + 1.e-6*_diff.tv_usec;
-}
+double Timer::value() { return _diff.tv_sec + 1.e-6 * _diff.tv_usec; }
 
 /**
  * @brief Get the current value of the timer without affecting it
  *
  * @return The time in seconds since the timer was last started
  */
-double Timer::interval(){
+double Timer::interval() {
     timeval tempstop;
     gettimeofday(&tempstop, NULL);
     timeval interval;
     timersub(&tempstop, &_start, &interval);
-    return interval.tv_sec + 1.e-6*interval.tv_usec;
+    return interval.tv_sec + 1.e-6 * interval.tv_usec;
 }
 
 /**
  * @brief Restart the timer by overwriting the start time.
  */
-void Timer::restart(){
-    gettimeofday(&_start, NULL);
-}
+void Timer::restart() { gettimeofday(&_start, NULL); }
 
 /**
  * @brief Dump the timer to the given RestartFile
  *
  * @param rfile RestartFile to write to
  */
-void Timer::dump(RestartFile &rfile){
+void Timer::dump(RestartFile& rfile) {
     rfile.write(_start);
     rfile.write(_stop);
     rfile.write(_diff);
@@ -115,7 +107,7 @@ void Timer::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-Timer::Timer(RestartFile &rfile){
+Timer::Timer(RestartFile& rfile) {
     rfile.read(_start);
     rfile.read(_stop);
     rfile.read(_diff);

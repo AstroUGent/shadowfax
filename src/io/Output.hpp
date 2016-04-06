@@ -28,8 +28,8 @@
 #ifndef OUTPUT_HPP
 #define OUTPUT_HPP
 
-#include <string>
 #include <fstream>
+#include <string>
 #include <vector>
 
 class Block;
@@ -41,8 +41,8 @@ class Header;
   * Data is organized in blocks, which are a kind of tables with column names
   * and rows of data. Extra information is provided through a Header.
   */
-class Output{
-public:
+class Output {
+  public:
     /**
       * \brief Output a Block
       *
@@ -52,7 +52,7 @@ public:
       *
       * @param block Block to write out
       */
-    virtual void write(Block& block)=0;
+    virtual void write(Block& block) = 0;
 
     /**
       * \brief Output a Header
@@ -61,7 +61,7 @@ public:
       *
       * @param header Header to write out
       */
-    virtual void write_header(Header& header)=0;
+    virtual void write_header(Header& header) = 0;
 };
 
 /**
@@ -72,16 +72,16 @@ public:
   * Columns correspond to separate datasets inside a group and Unit information
   * is provided for every dataset through HDF5 attributes.
   */
-class FileOutput : public Output{
-private:
+class FileOutput : public Output {
+  private:
     /*! \brief Name of the HDF5 file (has to end with .hdf5) */
     std::string _filename;
 
-public:
+  public:
     FileOutput(std::string filename);
-    ~FileOutput(){}
+    ~FileOutput() {}
     void write(Block& block);
-    void write_header(Header &header);
+    void write_header(Header& header);
 };
 
 /**
@@ -93,10 +93,10 @@ public:
   * data is stored internally and the actual file is written by the
   * deconstructor.
   */
-class AsciiOutput : public Output{
-private:
+class AsciiOutput : public Output {
+  private:
     /*! \brief Internal data vector */
-    std::vector< std::vector<double> > _data;
+    std::vector<std::vector<double> > _data;
 
     /*! \brief Internal vector with column names */
     std::vector<std::string> _column_names;
@@ -106,12 +106,12 @@ private:
 
     void write_column_names(std::ofstream& file);
 
-public:
+  public:
     AsciiOutput(std::string filename);
     ~AsciiOutput();
 
-    void write(Block &block);
-    void write_header(Header &header);
+    void write(Block& block);
+    void write_header(Header& header);
 };
 
-#endif // OUTPUT_HPP
+#endif  // OUTPUT_HPP

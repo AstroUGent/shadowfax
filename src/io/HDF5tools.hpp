@@ -27,16 +27,16 @@
 #define HDF5TOOLS_HPP
 
 #include <hdf5.h>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "Error.hpp"
 
 /**
   * \brief Convenient aliases for the HDF5 datatypes
   */
-namespace HDF5types{
+namespace HDF5types {
 /*! \brief Boolean representation: a native 32-bit unsigned integer */
 static const hid_t BOOL = H5T_NATIVE_UINT32;
 /*! \brief Double precision floating point representation: a native 64-bit
@@ -56,7 +56,7 @@ static const hid_t INT = H5T_NATIVE_INT32;
 /**
   * \brief Convenient aliases for HDF5 constants
   */
-namespace HDF5constants{
+namespace HDF5constants {
 /*! \brief The default property list used if properties are required */
 static const hid_t DEFAULT_PROPERTY_LIST = H5P_DEFAULT;
 /*! \brief Overwrite existing files when creating a new HDF5 file */
@@ -73,16 +73,16 @@ static const hid_t COMPLETE_DATASPACE = H5S_ALL;
 static const H5S_seloper_t SET_NEW_SELECTION = H5S_SELECT_SET;
 /*! \brief Select a continuous block in the dataspace during hyperslab
  *  selection */
-static const hsize_t *CONTINUOUS_SELECTION = NULL;
+static const hsize_t* CONTINUOUS_SELECTION = NULL;
 /*! \brief Return single element blocks when selecting hyperslabs of
  *  dataspaces */
-static const hsize_t *SINGLE_ELEMENT_BLOCKS = NULL;
+static const hsize_t* SINGLE_ELEMENT_BLOCKS = NULL;
 }
 
 /**
   * \brief Simplified wrappers around low level HDF5 API functions
   */
-namespace HDF5tools{
+namespace HDF5tools {
 // if you remove any of the "inline" qualifiers, the code below will
 // fail to compile!!
 
@@ -102,10 +102,10 @@ namespace HDF5tools{
   * attribute
   */
 inline void write_attribute_scalar(hid_t group, std::string name, hid_t type,
-                                   void* value){
+                                   void* value) {
     // create scalar dataspace
     hid_t attspace = H5Screate(H5S_SCALAR);
-    if(attspace < 0){
+    if(attspace < 0) {
         std::cerr << "Error! Failed to create dataspace for scalar attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -113,23 +113,23 @@ inline void write_attribute_scalar(hid_t group, std::string name, hid_t type,
 
     // create attribute
     hid_t att = H5Acreate(group, name.c_str(), type, attspace, H5P_DEFAULT);
-    if(att < 0){
-        std::cerr << "Error! Failed to create scalar attribute \""
-                  << name << "\"" << std::endl;
+    if(att < 0) {
+        std::cerr << "Error! Failed to create scalar attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // write attribute
     herr_t status = H5Awrite(att, type, value);
-    if(status < 0){
-        std::cerr << "Error! Failed to write scalar attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to write scalar attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(attspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace for scalar attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -137,9 +137,9 @@ inline void write_attribute_scalar(hid_t group, std::string name, hid_t type,
 
     // close attribute
     status = H5Aclose(att);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 }
@@ -159,12 +159,12 @@ inline void write_attribute_scalar(hid_t group, std::string name, hid_t type,
   * attribute
   */
 inline void write_attribute_array(hid_t group, unsigned int length,
-                                  std::string name, hid_t type, void* value){
+                                  std::string name, hid_t type, void* value) {
     hsize_t dims[1] = {length};
 
     // create dataspace
     hid_t attspace = H5Screate_simple(1, dims, NULL);
-    if(attspace < 0){
+    if(attspace < 0) {
         std::cerr << "Error! Failed to create dataspace for array attribute \""
                   << name << "\" of length " << length << std::endl;
         my_exit();
@@ -172,23 +172,23 @@ inline void write_attribute_array(hid_t group, unsigned int length,
 
     // create attribute
     hid_t att = H5Acreate(group, name.c_str(), type, attspace, H5P_DEFAULT);
-    if(att < 0){
-        std::cerr << "Error! Failed to create array attribute \""
-                  << name << "\"" << std::endl;
+    if(att < 0) {
+        std::cerr << "Error! Failed to create array attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // write attribute
     herr_t status = H5Awrite(att, type, value);
-    if(status < 0){
-        std::cerr << "Error! Failed to write array attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to write array attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(attspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace for array attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -196,9 +196,9 @@ inline void write_attribute_array(hid_t group, unsigned int length,
 
     // close attribute
     status = H5Aclose(att);
-    if(status < 0){
-        std::cerr << "Error! Failed to close array attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close array attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 }
@@ -217,10 +217,10 @@ inline void write_attribute_array(hid_t group, unsigned int length,
   * attribute
   */
 inline void write_attribute_string(hid_t group, std::string name,
-                                   const void* value){
+                                   const void* value) {
     // create C-string datatype
     hid_t strtype = H5Tcopy(H5T_C_S1);
-    if(strtype < 0){
+    if(strtype < 0) {
         std::cerr << "Error! Failed to copy C-string datatype for attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -228,15 +228,16 @@ inline void write_attribute_string(hid_t group, std::string name,
 
     // set datatype length to variable
     herr_t status = H5Tset_size(strtype, H5T_VARIABLE);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to set size of C-string datatype for "
-                     "attribute \"" << name << "\"" << std::endl;
+                     "attribute \""
+                  << name << "\"" << std::endl;
         my_exit();
     }
 
     // create dataspace
     hid_t attspace = H5Screate(H5S_SCALAR);
-    if(attspace < 0){
+    if(attspace < 0) {
         std::cerr << "Error! Failed to create dataspace for string attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -244,23 +245,23 @@ inline void write_attribute_string(hid_t group, std::string name,
 
     // create attribute
     hid_t att = H5Acreate(group, name.c_str(), strtype, attspace, H5P_DEFAULT);
-    if(att < 0){
-        std::cerr << "Error! Failed to create string attribute \""
-                  << name << "\"" << std::endl;
+    if(att < 0) {
+        std::cerr << "Error! Failed to create string attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // write attribute
     status = H5Awrite(att, strtype, value);
-    if(status < 0){
-        std::cerr << "Error! Failed to write string attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to write string attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // close string type
     status = H5Tclose(strtype);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close C-string datatype of attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -268,7 +269,7 @@ inline void write_attribute_string(hid_t group, std::string name,
 
     // close dataspace
     status = H5Sclose(attspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace for scalar attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -276,9 +277,9 @@ inline void write_attribute_string(hid_t group, std::string name,
 
     // close attribute
     status = H5Aclose(att);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 }
@@ -295,15 +296,14 @@ inline void write_attribute_string(hid_t group, std::string name,
   * HDF5types)
   * @param data Reference to the std::vector containing the data to write
   */
-template<typename T> inline void write_attribute_array(hid_t group,
-                                                       std::string name,
-                                                       hid_t type,
-                                                       std::vector<T> &data){
+template <typename T>
+inline void write_attribute_array(hid_t group, std::string name, hid_t type,
+                                  std::vector<T>& data) {
     hsize_t dims[1] = {data.size()};
 
     // create dataspace
     hid_t attspace = H5Screate_simple(1, dims, NULL);
-    if(attspace < 0){
+    if(attspace < 0) {
         std::cerr << "Error! Failed to create dataspace for array attribute \""
                   << name << "\" of length " << data.size() << std::endl;
         my_exit();
@@ -312,23 +312,23 @@ template<typename T> inline void write_attribute_array(hid_t group,
     // create attribute
     hid_t att = H5Acreate(group, name.c_str(), type, attspace,
                           HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(att < 0){
-        std::cerr << "Error! Failed to create array attribute \""
-                  << name << "\"" << std::endl;
+    if(att < 0) {
+        std::cerr << "Error! Failed to create array attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // write attribute
     herr_t status = H5Awrite(att, type, &data[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to write array attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to write array attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(attspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace for array attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -336,9 +336,9 @@ template<typename T> inline void write_attribute_array(hid_t group,
 
     // close attribute
     status = H5Aclose(att);
-    if(status < 0){
-        std::cerr << "Error! Failed to close array attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close array attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 }
@@ -358,14 +358,14 @@ template<typename T> inline void write_attribute_array(hid_t group,
   * HDF5types)
   * @param data Reference to the single data value to write
   */
-template<typename T> inline void write_attribute_array(hid_t group,
-                                                       std::string name,
-                                                       hid_t type, T &data){
+template <typename T>
+inline void write_attribute_array(hid_t group, std::string name, hid_t type,
+                                  T& data) {
     hsize_t dims[1] = {1};
 
     // create dataspace
     hid_t attspace = H5Screate_simple(1, dims, NULL);
-    if(attspace < 0){
+    if(attspace < 0) {
         std::cerr << "Error! Failed to create dataspace for array attribute \""
                   << name << "\" of length " << 1 << std::endl;
         my_exit();
@@ -374,23 +374,23 @@ template<typename T> inline void write_attribute_array(hid_t group,
     // create attribute
     hid_t att = H5Acreate(group, name.c_str(), type, attspace,
                           HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(att < 0){
-        std::cerr << "Error! Failed to create array attribute \""
-                  << name << "\"" << std::endl;
+    if(att < 0) {
+        std::cerr << "Error! Failed to create array attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // write attribute
     herr_t status = H5Awrite(att, type, &data);
-    if(status < 0){
-        std::cerr << "Error! Failed to write array attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to write array attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(attspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace for array attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -398,9 +398,9 @@ template<typename T> inline void write_attribute_array(hid_t group,
 
     // close attribute
     status = H5Aclose(att);
-    if(status < 0){
-        std::cerr << "Error! Failed to close array attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close array attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 }
@@ -418,15 +418,14 @@ template<typename T> inline void write_attribute_array(hid_t group,
   * @param data Reference to the std::vector containing the data to write to the
   * new dataset
   */
-template<typename T> inline void write_dataset_scalar(hid_t group,
-                                                      std::string name,
-                                                      hid_t type,
-                                                      std::vector<T> &data){
+template <typename T>
+inline void write_dataset_scalar(hid_t group, std::string name, hid_t type,
+                                 std::vector<T>& data) {
     hsize_t dims[1] = {data.size()};
 
     // create dataspace
     hid_t filespace = H5Screate_simple(1, dims, NULL);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to create dataspace for scalar dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -435,35 +434,35 @@ template<typename T> inline void write_dataset_scalar(hid_t group,
     // create dataset
     hid_t dataset = H5Dcreate(group, name.c_str(), type, filespace,
                               HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(dataset < 0){
-        std::cerr << "Error! Failed to create scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to create scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // write dataset
-    herr_t status = H5Dwrite(dataset, type, HDF5constants::COMPLETE_DATASPACE,
-                             filespace, HDF5constants::DEFAULT_PROPERTY_LIST,
-                             &data[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to write scalar dataset \""
-                  << name << "\"" << std::endl;
+    herr_t status =
+            H5Dwrite(dataset, type, HDF5constants::COMPLETE_DATASPACE,
+                     filespace, HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
+    if(status < 0) {
+        std::cerr << "Error! Failed to write scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(filespace);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataset
     status = H5Dclose(dataset);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
     }
 }
 
@@ -482,15 +481,14 @@ template<typename T> inline void write_dataset_scalar(hid_t group,
   * @param data Reference to the std::vector containing the data to write to the
   * new dataset
   */
-template<typename T> inline void write_dataset_vector(hid_t group,
-                                                      std::string name,
-                                                      hid_t type,
-                                                      std::vector<T> &data){
-    hsize_t dims[2] = {data.size()/3, 3};
+template <typename T>
+inline void write_dataset_vector(hid_t group, std::string name, hid_t type,
+                                 std::vector<T>& data) {
+    hsize_t dims[2] = {data.size() / 3, 3};
 
     // create dataspace
     hid_t filespace = H5Screate_simple(2, dims, NULL);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to create dataspace for vector dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -499,35 +497,35 @@ template<typename T> inline void write_dataset_vector(hid_t group,
     // create dataset
     hid_t dataset = H5Dcreate(group, name.c_str(), type, filespace,
                               HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(dataset < 0){
-        std::cerr << "Error! Failed to create vector dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to create vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // write dataset
-    herr_t status = H5Dwrite(dataset, type,
-                             HDF5constants::DEFAULT_PROPERTY_LIST, filespace,
-                             HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to write vector dataset \""
-                  << name << "\"" << std::endl;
+    herr_t status =
+            H5Dwrite(dataset, type, HDF5constants::DEFAULT_PROPERTY_LIST,
+                     filespace, HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
+    if(status < 0) {
+        std::cerr << "Error! Failed to write vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(filespace);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataset
     status = H5Dclose(dataset);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
     }
 }
 
@@ -544,12 +542,12 @@ template<typename T> inline void write_dataset_vector(hid_t group,
  * @return HDF5 id for the newly created dataset
  */
 inline hid_t create_dataset_scalar(hid_t group, std::string name, hid_t type,
-                                   unsigned int size){
+                                   unsigned int size) {
     hsize_t dims[1] = {size};
 
     // create dataspace
     hid_t filespace = H5Screate_simple(1, dims, NULL);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to create dataspace for scalar dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -558,17 +556,17 @@ inline hid_t create_dataset_scalar(hid_t group, std::string name, hid_t type,
     // create dataset
     hid_t dataset = H5Dcreate(group, name.c_str(), type, filespace,
                               HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(dataset < 0){
-        std::cerr << "Error! Failed to create scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to create scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     herr_t status = H5Sclose(filespace);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -588,12 +586,12 @@ inline hid_t create_dataset_scalar(hid_t group, std::string name, hid_t type,
  * @return HDF5 id for the newly created dataset
  */
 inline hid_t create_dataset_vector(hid_t group, std::string name, hid_t type,
-                                   unsigned int size){
+                                   unsigned int size) {
     hsize_t dims[2] = {size, 3};
 
     // create dataspace
     hid_t filespace = H5Screate_simple(2, dims, NULL);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to create dataspace for scalar dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -602,17 +600,17 @@ inline hid_t create_dataset_vector(hid_t group, std::string name, hid_t type,
     // create dataset
     hid_t dataset = H5Dcreate(group, name.c_str(), type, filespace,
                               HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(dataset < 0){
-        std::cerr << "Error! Failed to create scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to create scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     herr_t status = H5Sclose(filespace);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -627,61 +625,62 @@ inline hid_t create_dataset_vector(hid_t group, std::string name, hid_t type,
  * @param offset Offset of the data in the dataset
  * @param data Data to write
  */
-template<typename T> inline void write_dataset_scalar_chunk(
-        hid_t dataset, hid_t type, unsigned int offset, std::vector<T> &data
-        ){
+template <typename T>
+inline void write_dataset_scalar_chunk(hid_t dataset, hid_t type,
+                                       unsigned int offset,
+                                       std::vector<T>& data) {
     // get filespace
     hid_t filespace = H5Dget_space(dataset);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to obtain dataspace of scalar dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // select hyperslab in filespace
     hsize_t dims[1] = {data.size()};
     hsize_t offs[1] = {offset};
-    herr_t status = H5Sselect_hyperslab(filespace,
-                                        HDF5constants::SET_NEW_SELECTION, offs,
-                                        HDF5constants::CONTINUOUS_SELECTION,
-                                        dims,
-                                        HDF5constants::SINGLE_ELEMENT_BLOCKS);
-    if(status < 0){
+    herr_t status =
+            H5Sselect_hyperslab(filespace, HDF5constants::SET_NEW_SELECTION,
+                                offs, HDF5constants::CONTINUOUS_SELECTION, dims,
+                                HDF5constants::SINGLE_ELEMENT_BLOCKS);
+    if(status < 0) {
         std::cerr << "Error! Unable to select hyperslab of dataset filespace!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // create memory space
     hid_t memspace = H5Screate_simple(1, dims, NULL);
-    if(memspace < 0){
+    if(memspace < 0) {
         std::cerr << "Error! Failed to create memory space to write chunk to "
-                     "scalar dataset!" << std::endl;
+                     "scalar dataset!"
+                  << std::endl;
         my_exit();
     }
 
     // write to dataset
     status = H5Dwrite(dataset, type, memspace, filespace,
                       HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to write chunk to scalar dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // close memory space
     status = H5Sclose(memspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close memory space for scalar dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // close filespace
     status = H5Sclose(filespace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close filespace of scalar dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 }
@@ -694,61 +693,62 @@ template<typename T> inline void write_dataset_scalar_chunk(
  * @param offset Offset of the data in the dataset
  * @param data Data to write
  */
-template<typename T> inline void write_dataset_vector_chunk(
-        hid_t dataset, hid_t type, unsigned int offset, std::vector<T> &data
-        ){
+template <typename T>
+inline void write_dataset_vector_chunk(hid_t dataset, hid_t type,
+                                       unsigned int offset,
+                                       std::vector<T>& data) {
     // get filespace
     hid_t filespace = H5Dget_space(dataset);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to obtain dataspace of vector dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // select hyperslab in filespace
-    hsize_t dims[2] = {data.size()/3, 3};
+    hsize_t dims[2] = {data.size() / 3, 3};
     hsize_t offs[2] = {offset, 0};
-    herr_t status = H5Sselect_hyperslab(filespace,
-                                        HDF5constants::SET_NEW_SELECTION, offs,
-                                        HDF5constants::CONTINUOUS_SELECTION,
-                                        dims,
-                                        HDF5constants::SINGLE_ELEMENT_BLOCKS);
-    if(status < 0){
+    herr_t status =
+            H5Sselect_hyperslab(filespace, HDF5constants::SET_NEW_SELECTION,
+                                offs, HDF5constants::CONTINUOUS_SELECTION, dims,
+                                HDF5constants::SINGLE_ELEMENT_BLOCKS);
+    if(status < 0) {
         std::cerr << "Error! Unable to select hyperslab of dataset filespace!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // create memory space
     hid_t memspace = H5Screate_simple(2, dims, NULL);
-    if(memspace < 0){
+    if(memspace < 0) {
         std::cerr << "Error! Failed to create memory space to write chunk to "
-                     "vector dataset!" << std::endl;
+                     "vector dataset!"
+                  << std::endl;
         my_exit();
     }
 
     // write to dataset
     status = H5Dwrite(dataset, type, memspace, filespace,
                       HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to write chunk to vector dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // close memory space
     status = H5Sclose(memspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close memory space for vector dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // close filespace
     status = H5Sclose(filespace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close filespace of vector dataset!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 }
@@ -769,28 +769,28 @@ template<typename T> inline void write_dataset_vector_chunk(
   * should be written to
   */
 inline void read_attribute(hid_t group, std::string name, hid_t type,
-                           void* value){
+                           void* value) {
     // open attribute
     hid_t attr = H5Aopen(group, name.c_str(), H5P_DEFAULT);
-    if(attr < 0){
-        std::cerr << "Error! Failed to open attribute \""
-                  << name << "\"" << std::endl;
+    if(attr < 0) {
+        std::cerr << "Error! Failed to open attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // read attribute
     herr_t status = H5Aread(attr, type, value);
-    if(status < 0){
-        std::cerr << "Error! Failed to read attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close attribute
     status = H5Aclose(attr);
-    if(status < 0){
-        std::cerr << "Error! Failed to close attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close attribute \"" << name << "\""
+                  << std::endl;
     }
 }
 
@@ -808,12 +808,12 @@ inline void read_attribute(hid_t group, std::string name, hid_t type,
   * attribute with this name
   * @return The string contained in the attribute
   */
-inline std::string read_attribute_string(hid_t group, std::string name){
+inline std::string read_attribute_string(hid_t group, std::string name) {
     // open attribute
     hid_t attr = H5Aopen(group, name.c_str(), H5P_DEFAULT);
-    if(attr < 0){
-        std::cerr << "Error! Failed to open string attribute \""
-                  << name << "\"" << std::endl;
+    if(attr < 0) {
+        std::cerr << "Error! Failed to open string attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -821,7 +821,7 @@ inline std::string read_attribute_string(hid_t group, std::string name){
 
     // create C-string datatype
     hid_t strtype = H5Tcopy(H5T_C_S1);
-    if(strtype < 0){
+    if(strtype < 0) {
         std::cerr << "Error! Failed to copy C-string datatype for attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -829,23 +829,24 @@ inline std::string read_attribute_string(hid_t group, std::string name){
 
     // set datatype length to variable
     herr_t status = H5Tset_size(strtype, H5T_VARIABLE);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to set size of C-string datatype for "
-                     "attribute \"" << name << "\"" << std::endl;
+                     "attribute \""
+                  << name << "\"" << std::endl;
         my_exit();
     }
 
     // read attribute
     status = H5Aread(attr, strtype, data);
-    if(status < 0){
-        std::cerr << "Error! Failed to read string attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read string attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close string type
     status = H5Tclose(strtype);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close C-string datatype for attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -853,9 +854,9 @@ inline std::string read_attribute_string(hid_t group, std::string name){
 
     // close attribute
     status = H5Aclose(attr);
-    if(status < 0){
-        std::cerr << "Error! Failed to close string attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close string attribute \"" << name
+                  << "\"" << std::endl;
     }
 
     // make string
@@ -879,32 +880,31 @@ inline std::string read_attribute_string(hid_t group, std::string name){
   * HDF5types)
   * @return The value of the requested attribute
   */
-template<typename T> inline T read_attribute_scalar(hid_t group,
-                                                    std::string name,
-                                                    hid_t type){
+template <typename T>
+inline T read_attribute_scalar(hid_t group, std::string name, hid_t type) {
     // open attribute
-    hid_t attr = H5Aopen(group, name.c_str(),
-                         HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(attr < 0){
-        std::cerr << "Error! Failed to open scalar attribute \""
-                  << name << "\"" << std::endl;
+    hid_t attr =
+            H5Aopen(group, name.c_str(), HDF5constants::DEFAULT_PROPERTY_LIST);
+    if(attr < 0) {
+        std::cerr << "Error! Failed to open scalar attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // read attribute
     T value;
     herr_t status = H5Aread(attr, type, &value);
-    if(status < 0){
-        std::cerr << "Error! Failed to read scalar attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read scalar attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close attribute
     status = H5Aclose(attr);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
@@ -925,21 +925,21 @@ template<typename T> inline T read_attribute_scalar(hid_t group,
   * HDF5types)
   * @return std::vector containing the data in the attribute
   */
-template<typename T> inline std::vector<T> read_attribute_vector(
-        hid_t group, std::string name, hid_t type
-        ){
+template <typename T>
+inline std::vector<T> read_attribute_vector(hid_t group, std::string name,
+                                            hid_t type) {
     // open attribute
-    hid_t attr = H5Aopen(group, name.c_str(),
-                         HDF5constants::DEFAULT_PROPERTY_LIST);
-    if(attr < 0){
-        std::cerr << "Error! Failed to open vector attribute \""
-                  << name << "\"" << std::endl;
+    hid_t attr =
+            H5Aopen(group, name.c_str(), HDF5constants::DEFAULT_PROPERTY_LIST);
+    if(attr < 0) {
+        std::cerr << "Error! Failed to open vector attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // open attribute dataspace
     hid_t space = H5Aget_space(attr);
-    if(space < 0){
+    if(space < 0) {
         std::cerr << "Error! Failed to open dataspace of vector attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -949,27 +949,28 @@ template<typename T> inline std::vector<T> read_attribute_vector(
     hsize_t size[1];
     hsize_t maxsize[1];
     int ndim = H5Sget_simple_extent_dims(space, size, maxsize);
-    if(!ndim){
+    if(!ndim) {
         size[0] = 1;
     }
-    if(ndim < 0){
-        std::cerr << "Error! Unable to query extent of dataspace of attribute \""
-                  << name << "\"" << std::endl;
+    if(ndim < 0) {
+        std::cerr
+                << "Error! Unable to query extent of dataspace of attribute \""
+                << name << "\"" << std::endl;
         my_exit();
     }
 
     // read attribute
     std::vector<T> value(size[0]);
     herr_t status = H5Aread(attr, type, &value[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to read vector attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read vector attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(space);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace of vector attribute \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -977,9 +978,9 @@ template<typename T> inline std::vector<T> read_attribute_vector(
 
     // close attribute
     status = H5Aclose(attr);
-    if(status < 0){
-        std::cerr << "Error! Failed to close vector attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close vector attribute \"" << name
+                  << "\"" << std::endl;
     }
 
     return value;
@@ -997,20 +998,20 @@ template<typename T> inline std::vector<T> read_attribute_vector(
   * HDF5types)
   * @return std::vector containing the data in the dataset
   */
-template<typename T> inline std::vector<T> read_dataset_scalar(
-        hid_t group, std::string name, hid_t type
-        ){
+template <typename T>
+inline std::vector<T> read_dataset_scalar(hid_t group, std::string name,
+                                          hid_t type) {
     // open dataset
     hid_t dataset = H5Dopen(group, name.c_str());
-    if(dataset < 0){
-        std::cerr << "Error! Failed to open scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to open scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // open dataset dataspace
     hid_t filespace = H5Dget_space(dataset);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to open dataspace of scalar dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1020,7 +1021,7 @@ template<typename T> inline std::vector<T> read_dataset_scalar(
     hsize_t size[1];
     hsize_t maxsize[1];
     int ndim = H5Sget_simple_extent_dims(filespace, size, maxsize);
-    if(ndim < 0){
+    if(ndim < 0) {
         std::cerr << "Error! Unable to query extent of dataspace of dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1031,15 +1032,15 @@ template<typename T> inline std::vector<T> read_dataset_scalar(
     herr_t status = H5Dread(dataset, type, HDF5constants::COMPLETE_DATASPACE,
                             HDF5constants::COMPLETE_DATASPACE,
                             HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to read scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(filespace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace of scalar dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1047,9 +1048,9 @@ template<typename T> inline std::vector<T> read_dataset_scalar(
 
     // close dataset
     status = H5Dclose(dataset);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -1070,21 +1071,22 @@ template<typename T> inline std::vector<T> read_dataset_scalar(
   * HDF5types)
   * @return std::vector containing the data in the dataset
   */
-template<typename T> inline std::vector<T> read_dataset_scalar_chunk(
-        hid_t group, unsigned int offset, unsigned int nlines, std::string name,
-        hid_t type
-        ){
+template <typename T>
+inline std::vector<T> read_dataset_scalar_chunk(hid_t group,
+                                                unsigned int offset,
+                                                unsigned int nlines,
+                                                std::string name, hid_t type) {
     // open dataset
     hid_t dataset = H5Dopen(group, name.c_str());
-    if(dataset < 0){
-        std::cerr << "Error! Failed to open scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to open scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // open dataset dataspace
     hid_t filespace = H5Dget_space(dataset);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to open dataspace of scalar dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1093,22 +1095,22 @@ template<typename T> inline std::vector<T> read_dataset_scalar_chunk(
     // select hyperslab in filespace
     hsize_t dims[2] = {nlines, 1};
     hsize_t offs[2] = {offset, 0};
-    herr_t status = H5Sselect_hyperslab(filespace,
-                                        HDF5constants::SET_NEW_SELECTION, offs,
-                                        HDF5constants::CONTINUOUS_SELECTION,
-                                        dims,
-                                        HDF5constants::SINGLE_ELEMENT_BLOCKS);
-    if(status < 0){
+    herr_t status =
+            H5Sselect_hyperslab(filespace, HDF5constants::SET_NEW_SELECTION,
+                                offs, HDF5constants::CONTINUOUS_SELECTION, dims,
+                                HDF5constants::SINGLE_ELEMENT_BLOCKS);
+    if(status < 0) {
         std::cerr << "Error! Unable to select hyperslab of dataset filespace!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // create memory space
     hid_t memspace = H5Screate_simple(2, dims, NULL);
-    if(memspace < 0){
+    if(memspace < 0) {
         std::cerr << "Error! Failed to create memory space for scalar dataset "
-                     "chunk" << std::endl;
+                     "chunk"
+                  << std::endl;
         my_exit();
     }
 
@@ -1116,23 +1118,24 @@ template<typename T> inline std::vector<T> read_dataset_scalar_chunk(
     std::vector<T> data(nlines);
     status = H5Dread(dataset, type, memspace, filespace,
                      HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to read scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close memory space
     status = H5Sclose(memspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close memory space for scalar dataset "
-                     "chunk" << std::endl;
+                     "chunk"
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(filespace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace of scalar dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1140,9 +1143,9 @@ template<typename T> inline std::vector<T> read_dataset_scalar_chunk(
 
     // close dataset
     status = H5Dclose(dataset);
-    if(status < 0){
-        std::cerr << "Error! Failed to close scalar dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close scalar dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -1165,20 +1168,20 @@ template<typename T> inline std::vector<T> read_dataset_scalar_chunk(
   * HDF5types)
   * @return std::vector containing the data in the dataset
   */
-template<typename T> inline std::vector<T> read_dataset_vector(
-        hid_t group, std::string name, hid_t type
-        ){
+template <typename T>
+inline std::vector<T> read_dataset_vector(hid_t group, std::string name,
+                                          hid_t type) {
     // open dataset
     hid_t dataset = H5Dopen(group, name.c_str());
-    if(dataset < 0){
-        std::cerr << "Error! Failed to open vector dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to open vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // open dataspace
     hid_t filespace = H5Dget_space(dataset);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to open dataspace of vector dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1188,26 +1191,26 @@ template<typename T> inline std::vector<T> read_dataset_vector(
     hsize_t size[2];
     hsize_t maxsize[2];
     int ndim = H5Sget_simple_extent_dims(filespace, size, maxsize);
-    if(ndim < 0){
+    if(ndim < 0) {
         std::cerr << "Error! Unable to query extent of dataspace of dataset \""
                   << name << "\"" << std::endl;
         my_exit();
     }
 
     // read dataset
-    std::vector<T> data(size[0]*size[1]);
+    std::vector<T> data(size[0] * size[1]);
     herr_t status = H5Dread(dataset, type, HDF5constants::COMPLETE_DATASPACE,
                             HDF5constants::COMPLETE_DATASPACE,
                             HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to read vector dataset \""
-                  << name <<  "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(filespace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace of vector dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1215,9 +1218,9 @@ template<typename T> inline std::vector<T> read_dataset_vector(
 
     // close dataset
     status = H5Dclose(dataset);
-    if(status < 0){
-        std::cerr << "Error! Failed to close vector dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -1242,21 +1245,22 @@ template<typename T> inline std::vector<T> read_dataset_vector(
   * HDF5types)
   * @return std::vector containing the data in the dataset
   */
-template<typename T> inline std::vector<T> read_dataset_vector_chunk(
-        hid_t group, unsigned int offset, unsigned int nlines, std::string name,
-        hid_t type
-        ){
+template <typename T>
+inline std::vector<T> read_dataset_vector_chunk(hid_t group,
+                                                unsigned int offset,
+                                                unsigned int nlines,
+                                                std::string name, hid_t type) {
     // open dataset
     hid_t dataset = H5Dopen(group, name.c_str());
-    if(dataset < 0){
-        std::cerr << "Error! Failed to open vector dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to open vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // open dataspace
     hid_t filespace = H5Dget_space(dataset);
-    if(filespace < 0){
+    if(filespace < 0) {
         std::cerr << "Error! Failed to open dataspace of vector dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1265,46 +1269,47 @@ template<typename T> inline std::vector<T> read_dataset_vector_chunk(
     // select hyperslab in filespace
     hsize_t dims[2] = {nlines, 3};
     hsize_t offs[2] = {offset, 0};
-    herr_t status = H5Sselect_hyperslab(filespace,
-                                        HDF5constants::SET_NEW_SELECTION, offs,
-                                        HDF5constants::CONTINUOUS_SELECTION,
-                                        dims,
-                                        HDF5constants::SINGLE_ELEMENT_BLOCKS);
-    if(status < 0){
+    herr_t status =
+            H5Sselect_hyperslab(filespace, HDF5constants::SET_NEW_SELECTION,
+                                offs, HDF5constants::CONTINUOUS_SELECTION, dims,
+                                HDF5constants::SINGLE_ELEMENT_BLOCKS);
+    if(status < 0) {
         std::cerr << "Error! Unable to select hyperslab of dataset filespace!"
-                     << std::endl;
+                  << std::endl;
         my_exit();
     }
 
     // create memory space
     hid_t memspace = H5Screate_simple(2, dims, NULL);
-    if(memspace < 0){
+    if(memspace < 0) {
         std::cerr << "Error! Failed to create memory space for scalar dataset "
-                     "chunk" << std::endl;
+                     "chunk"
+                  << std::endl;
         my_exit();
     }
 
     // read dataset
-    std::vector<T> data(nlines*3);
+    std::vector<T> data(nlines * 3);
     status = H5Dread(dataset, type, memspace, filespace,
                      HDF5constants::DEFAULT_PROPERTY_LIST, &data[0]);
-    if(status < 0){
-        std::cerr << "Error! Failed to read vector dataset \""
-                  << name <<  "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to read vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // close memory space
     status = H5Sclose(memspace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close memory space for scalar dataset "
-                     "chunk" << std::endl;
+                     "chunk"
+                  << std::endl;
         my_exit();
     }
 
     // close dataspace
     status = H5Sclose(filespace);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Failed to close dataspace of vector dataset \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1312,9 +1317,9 @@ template<typename T> inline std::vector<T> read_dataset_vector_chunk(
 
     // close dataset
     status = H5Dclose(dataset);
-    if(status < 0){
-        std::cerr << "Error! Failed to close vector dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close vector dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -1335,44 +1340,44 @@ template<typename T> inline std::vector<T> read_dataset_vector_chunk(
  * @return True if the given type is compatible with the type of the attribute,
  * false otherwise
  */
-inline bool attribute_has_type(hid_t group, std::string name, hid_t type){
+inline bool attribute_has_type(hid_t group, std::string name, hid_t type) {
     // open attribute
     hid_t attr = H5Aopen(group, name.c_str(), H5P_DEFAULT);
-    if(attr < 0){
-        std::cerr << "Error! Failed to open attribute \""
-                  << name << "\"" << std::endl;
+    if(attr < 0) {
+        std::cerr << "Error! Failed to open attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // get attribute type
     hid_t atype = H5Aget_type(attr);
-    if(atype < 0){
-        std::cerr << "Error! Unable to determine type of attribute \""
-                  << name << "\"" << std::endl;
+    if(atype < 0) {
+        std::cerr << "Error! Unable to determine type of attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // close attribute
     herr_t status = H5Aclose(attr);
-    if(status < 0){
-        std::cerr << "Error! Failed to close attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // compare attribute type with given type
     htri_t equal = H5Tequal(atype, type);
-    if(equal < 0){
-        std::cerr << "Error! Unable to compare type of attribute \""
-                  << name << "\"" << std::endl;
+    if(equal < 0) {
+        std::cerr << "Error! Unable to compare type of attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // close attribute type
     status = H5Tclose(atype);
-    if(status < 0){
-        std::cerr << "Error! Failed to close type of attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close type of attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
@@ -1390,44 +1395,44 @@ inline bool attribute_has_type(hid_t group, std::string name, hid_t type){
  * @return True if the given type is compatible with the type of the dataset,
  * false otherwise
  */
-inline bool dataset_has_type(hid_t group, std::string name, hid_t type){
+inline bool dataset_has_type(hid_t group, std::string name, hid_t type) {
     // open dataset
     hid_t dataset = H5Dopen(group, name.c_str());
-    if(dataset < 0){
-        std::cerr << "Error! Failed to open dataset \""
-                  << name << "\"" << std::endl;
+    if(dataset < 0) {
+        std::cerr << "Error! Failed to open dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // get dataset type
     hid_t dtype = H5Dget_type(dataset);
-    if(dtype < 0){
-        std::cerr << "Error! Unable to determine type of dataset \""
-                  << name << "\"" << std::endl;
+    if(dtype < 0) {
+        std::cerr << "Error! Unable to determine type of dataset \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // compare dataset type with given type
     htri_t equal = H5Tequal(dtype, type);
-    if(equal < 0){
-        std::cerr << "Error! Unable to compare type of dataset \""
-                  << name << "\"" << std::endl;
+    if(equal < 0) {
+        std::cerr << "Error! Unable to compare type of dataset \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // close datatype
     herr_t status = H5Tclose(dtype);
-    if(status < 0){
-        std::cerr << "Error! Failed to close datatype of dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close datatype of dataset \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // close dataset
     status = H5Dclose(dataset);
-    if(status < 0){
-        std::cerr << "Error! Failed to close dataset \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close dataset \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
@@ -1443,20 +1448,20 @@ inline bool dataset_has_type(hid_t group, std::string name, hid_t type){
   * @return The length of the attribute. If the attribute is a scalar, length 1
   * is returned.
   */
-inline unsigned int get_attribute_size(hid_t group, std::string name){
+inline unsigned int get_attribute_size(hid_t group, std::string name) {
     // open attribute
     hid_t attr = H5Aopen(group, name.c_str(), H5P_DEFAULT);
-    if(attr < 0){
-        std::cerr << "Error! Failed to open attribute \""
-                  << name << "\"" << std::endl;
+    if(attr < 0) {
+        std::cerr << "Error! Failed to open attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
     // get attribute dataspace
     hid_t space = H5Aget_space(attr);
-    if(space < 0){
-        std::cerr << "Error! Failed to open dataspace of attribute \""
-                  << name << "\"" << std::endl;
+    if(space < 0) {
+        std::cerr << "Error! Failed to open dataspace of attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
@@ -1464,29 +1469,30 @@ inline unsigned int get_attribute_size(hid_t group, std::string name){
     hsize_t size[1];
     hsize_t maxsize[1];
     int ndim = H5Sget_simple_extent_dims(space, size, maxsize);
-    if(ndim < 0){
+    if(ndim < 0) {
         std::cerr << "Error! Unable to query extent of dataspace of "
-                     "attribute \"" << name << "\"" << std::endl;
+                     "attribute \""
+                  << name << "\"" << std::endl;
         my_exit();
     }
 
     // close dataspace
     herr_t status = H5Sclose(space);
-    if(status < 0){
-        std::cerr << "Error! Failed to close dataspace of attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close dataspace of attribute \"" << name
+                  << "\"" << std::endl;
         my_exit();
     }
 
     // close attribute
     status = H5Aclose(attr);
-    if(status < 0){
-        std::cerr << "Error! Failed to close attribute \""
-                  << name << "\"" << std::endl;
+    if(status < 0) {
+        std::cerr << "Error! Failed to close attribute \"" << name << "\""
+                  << std::endl;
         my_exit();
     }
 
-    if(!ndim){
+    if(!ndim) {
         size[0] = 1;
     }
 
@@ -1500,10 +1506,10 @@ inline unsigned int get_attribute_size(hid_t group, std::string name){
   * @param name Name of a dataset or attribute
   * @return True if the given name is a child of group, false otherwise
   */
-inline bool exists(hid_t group, std::string name){
+inline bool exists(hid_t group, std::string name) {
     // query group
     htri_t link = H5Lexists(group, name.c_str(), H5P_DEFAULT);
-    if(link < 0){
+    if(link < 0) {
         std::cerr << "Error! Unable to query existence of object with name \""
                   << name << "\"" << std::endl;
         my_exit();
@@ -1518,15 +1524,15 @@ inline bool exists(hid_t group, std::string name){
  * This allows us to use our own more useful error messages without the output
  * being cluttered with meaningless HDF5 errors.
  */
-inline void turn_off_error_handling(){
+inline void turn_off_error_handling() {
     herr_t status = H5Eset_auto(NULL, NULL);
-    if(status < 0){
+    if(status < 0) {
         std::cerr << "Error! Unable to turn off default HDF5 error handling!"
                   << std::endl;
         my_exit();
     }
 }
 
-} // namespace HDF5tools
+}  // namespace HDF5tools
 
-#endif // HDF5TOOLS_HPP
+#endif  // HDF5TOOLS_HPP

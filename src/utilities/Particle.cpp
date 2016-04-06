@@ -34,7 +34,7 @@ using namespace std;
  * \brief Construct a default empty Particle with id, position, velocity... set
  * to zero
  */
-Particle::Particle() : Hilbert_Object(){
+Particle::Particle() : Hilbert_Object() {
     _old_a = 0.;
     _id = 0;
     _starttime = 0;
@@ -50,7 +50,7 @@ Particle::Particle() : Hilbert_Object(){
  *
  * @param pos Vec containing the position of the particle
  */
-Particle::Particle(Vec pos) : Hilbert_Object(){
+Particle::Particle(Vec pos) : Hilbert_Object() {
     _x = pos;
     _old_a = 0.;
     _id = 0;
@@ -66,18 +66,14 @@ Particle::Particle(Vec pos) : Hilbert_Object(){
  *
  * @return The x-coordinate of the position of the particle
  */
-double Particle::x(){
-    return _x[0];
-}
+double Particle::x() { return _x[0]; }
 
 /**
  * \brief Get the y-coordinate of the position of the particle
  *
  * @return The y-coordinate of the position of the particle
  */
-double Particle::y(){
-    return _x[1];
-}
+double Particle::y() { return _x[1]; }
 
 /**
  * \brief Get the z-coordinate of the position of the particle
@@ -87,8 +83,8 @@ double Particle::y(){
  *
  * @return The z-coordinate of the position of the particle
  */
-double Particle::z(){
-#if ndim_==3
+double Particle::z() {
+#if ndim_ == 3
     return _x[2];
 #else
     return 0.;
@@ -107,36 +103,28 @@ double Particle::z(){
  * @return The coordinate of the particle position corresponding to the given
  * index
  */
-double Particle::pos(int index){
-    return _x[index];
-}
+double Particle::pos(int index) { return _x[index]; }
 
 /**
   * \brief Get the velocity of the particle
   *
   * @return Vec containing the velocity of the particle
   */
-Vec Particle::get_velocity(){
-    return _v;
-}
+Vec Particle::get_velocity() { return _v; }
 
 /**
  * \brief Get the x-component of the velocity of the particle
  *
  * @return The x-component of the velocity of the particle
  */
-double Particle::vx(){
-    return _v[0];
-}
+double Particle::vx() { return _v[0]; }
 
 /**
  * \brief Get the y-component of the velocity of the particle
  *
  * @return The y-component of the velocity of the particle
  */
-double Particle::vy(){
-    return _v[1];
-}
+double Particle::vy() { return _v[1]; }
 
 /**
  * \brief Get the z-component of the velocity of the particle
@@ -146,8 +134,8 @@ double Particle::vy(){
  *
  * @return The z-component of the velocity of the particle
  */
-double Particle::vz(){
-#if ndim_==3
+double Particle::vz() {
+#if ndim_ == 3
     return _v[2];
 #else
     return 0.;
@@ -166,27 +154,21 @@ double Particle::vz(){
  * @return The coordinate of the particle velocity corresponding to the given
  * index
  */
-double Particle::vel(int index){
-    return _v[index];
-}
+double Particle::vel(int index) { return _v[index]; }
 
 /**
  * \brief Set the x-coordinate of the position of the particle
  *
  * @param x The new x-coordinate for the position of the particle
  */
-void Particle::set_x(double x){
-    _x[0] = x;
-}
+void Particle::set_x(double x) { _x[0] = x; }
 
 /**
  * \brief Set the y-coordinate of the position of the particle
  *
  * @param y The new y-coordinate for the position of the particle
  */
-void Particle::set_y(double y){
-    _x[1] = y;
-}
+void Particle::set_y(double y) { _x[1] = y; }
 
 /**
  * \brief Set the z-coordinate of the position of the particle
@@ -197,9 +179,7 @@ void Particle::set_y(double y){
  *
  * @param z The new z-coordinate for the position of the particle
  */
-void Particle::set_z(double z){
-    _x[2] = z;
-}
+void Particle::set_z(double z) { _x[2] = z; }
 
 /**
  * \brief Print the Particle to the given ostream
@@ -208,7 +188,7 @@ void Particle::set_z(double z){
  *
  * @param stream The ostream to write to
  */
-void Particle::print(ostream& stream){
+void Particle::print(ostream& stream) {
     // do nothing
 }
 
@@ -222,7 +202,7 @@ void Particle::print(ostream& stream){
   *
   * @param stream std::ostream to write to
   */
-void Particle::print_gen(ostream& stream){
+void Particle::print_gen(ostream& stream) {
     stream << _x[0] << "\t" << _x[1] << "\t" << _x[2] << "\t" << _id << "\n";
 }
 
@@ -236,10 +216,10 @@ void Particle::print_gen(ostream& stream){
   * @param vy The new y-coordinate of the velocity of the particle
   * @param vz The new z-coordinate of the velocity of the particle
   */
-void Particle::set_v(double vx, double vy, double vz){
+void Particle::set_v(double vx, double vy, double vz) {
     _v[0] = vx;
     _v[1] = vy;
-#if ndim_==3
+#if ndim_ == 3
     _v[2] = vz;
 #endif
 }
@@ -249,10 +229,10 @@ void Particle::set_v(double vx, double vy, double vz){
  *
  * @param v New velocity for the particle
  */
-void Particle::set_velocity(Vec &v){
+void Particle::set_velocity(Vec& v) {
     _v[0] = v[0];
     _v[1] = v[1];
-#if ndim_==3
+#if ndim_ == 3
     _v[2] = v[2];
 #endif
 }
@@ -262,17 +242,13 @@ void Particle::set_velocity(Vec &v){
  *
  * @return The id of the Particle
  */
-unsigned long Particle::id(){
-    return _id;
-}
+unsigned long Particle::id() { return _id; }
 
 /**
  * Set the unique identifier for the Particle
  * @param id The new ID for the Particle
  */
-void Particle::set_id(unsigned long id){
-    _id = id;
-}
+void Particle::set_id(unsigned long id) { _id = id; }
 
 /**
  * @brief Drift the particle for the given time with a constant velocity equal
@@ -280,9 +256,7 @@ void Particle::set_id(unsigned long id){
  *
  * @param dt double precision floating-point time interval during which to drift
  */
-void Particle::drift(double dt){
-    _x += dt*_v;
-}
+void Particle::drift(double dt) { _x += dt * _v; }
 
 /**
  * @brief Get the integer timestep for this particle
@@ -290,9 +264,7 @@ void Particle::drift(double dt){
  * @return unsigned long integer timestep for this particle on the integer
  * simulation timeline
  */
-unsigned long Particle::get_timestep(){
-    return _endtime - _starttime;
-}
+unsigned long Particle::get_timestep() { return _endtime - _starttime; }
 
 /**
  * @brief Set the integer timestep for this particle to the given value
@@ -303,9 +275,9 @@ unsigned long Particle::get_timestep(){
  *
  * @param timestep unsigned long integer timestep for this particle
  */
-void Particle::set_timestep(unsigned long timestep){
+void Particle::set_timestep(unsigned long timestep) {
     _starttime = _endtime;
-    _endtime = _starttime+timestep;
+    _endtime = _starttime + timestep;
 }
 
 /**
@@ -316,8 +288,8 @@ void Particle::set_timestep(unsigned long timestep){
  *
  * @param timestep unsigned long integer timestep for this particle
  */
-void Particle::reset_timestep(unsigned long timestep){
-    _endtime = _starttime+timestep;
+void Particle::reset_timestep(unsigned long timestep) {
+    _endtime = _starttime + timestep;
 }
 
 /**
@@ -326,9 +298,7 @@ void Particle::reset_timestep(unsigned long timestep){
  * @return The end time of the current particle timestep on the integer
  * simulation timeline
  */
-unsigned long Particle::get_endtime(){
-    return _endtime;
-}
+unsigned long Particle::get_endtime() { return _endtime; }
 
 /**
  * @brief Set the end time of the current particle timestep on the integer
@@ -336,9 +306,7 @@ unsigned long Particle::get_endtime(){
  *
  * @param endtime unsigned long integer end time for this particle
  */
-void Particle::set_endtime(unsigned long endtime){
-    _endtime = endtime;
-}
+void Particle::set_endtime(unsigned long endtime) { _endtime = endtime; }
 
 /**
  * @brief Set the starting time of the current particle timestep on the integer
@@ -346,7 +314,7 @@ void Particle::set_endtime(unsigned long endtime){
  *
  * @param integertime unsigned long integer starting time for this particle
  */
-void Particle::set_starttime(unsigned long integertime){
+void Particle::set_starttime(unsigned long integertime) {
     _starttime = integertime;
     _endtime = integertime;
 }
@@ -358,18 +326,14 @@ void Particle::set_starttime(unsigned long integertime){
  * @return The starting time of the current particle timestep on the integer
  * simulation timeline
  */
-unsigned long Particle::get_starttime(){
-    return _starttime;
-}
+unsigned long Particle::get_starttime() { return _starttime; }
 
 /**
  * @brief Get the gravitational acceleration for this particle
  *
  * @return The gravitational acceleration for this particle
  */
-Vec Particle::get_gravitational_acceleration(){
-    return _a_grav_new;
-}
+Vec Particle::get_gravitational_acceleration() { return _a_grav_new; }
 
 /**
  * @brief Set the magnitude of the gravitational acceleration during the
@@ -381,63 +345,49 @@ Vec Particle::get_gravitational_acceleration(){
  * @param a_grav The magnitude of the gravitational acceleration during the
  * previous timestep this particle was active
  */
-void Particle::set_old_acceleration(double a_grav){
-    _old_a = a_grav;
-}
+void Particle::set_old_acceleration(double a_grav) { _old_a = a_grav; }
 
 /**
  * @brief Add the given velocity to the particle velocity
  *
  * @param dv Acceleration multiplied with a real time interval
  */
-void Particle::accelerate(Vec dv){
-    _v += dv;
-}
+void Particle::accelerate(Vec dv) { _v += dv; }
 
 /**
  * @brief Identical to Particle::drift()
  *
  * @param dt double precision floating-point time interval during which to drift
  */
-void Particle::move(double dt){
-    _x += _v*dt;
-}
+void Particle::move(double dt) { _x += _v * dt; }
 
 /**
  * @brief Set the gravitational potential for this particle
  *
  * @param epot New value for the gravitational potential
  */
-void Particle::set_gravitational_potential(double epot){
-    _epot = epot;
-}
+void Particle::set_gravitational_potential(double epot) { _epot = epot; }
 
 /**
  * @brief Get the gravitational potential for this particle
  *
  * @return Gravitational potential of this particle
  */
-double Particle::get_gravitational_potential(){
-    return _epot;
-}
+double Particle::get_gravitational_potential() { return _epot; }
 
 /**
  * @brief Set the gravitational softening length for this particle
  *
  * @param hsoft New value for the gravitational softening length
  */
-void Particle::set_hsoft(double hsoft){
-    _hsoft = hsoft;
-}
+void Particle::set_hsoft(double hsoft) { _hsoft = hsoft; }
 
 /**
  * @brief Get the gravitational softening length for this particle
  *
  * @return The gravitational softening length of this particle
  */
-double Particle::get_hsoft(){
-    return _hsoft;
-}
+double Particle::get_hsoft() { return _hsoft; }
 
 /**
  * @brief MPI constructor. Initialize the particle using the given MPI buffer
@@ -446,8 +396,8 @@ double Particle::get_hsoft(){
  * @param bufsize Size of the buffer
  * @param position Position of the buffer (is updated)
  */
-Particle::Particle(void *buffer, int bufsize, int *position)
-    : Hilbert_Object(buffer, bufsize, position) {
+Particle::Particle(void* buffer, int bufsize, int* position)
+        : Hilbert_Object(buffer, bufsize, position) {
     MyMPI_Unpack(buffer, bufsize, position, &_x[0], ndim_, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_v[0], ndim_, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_a_grav_new[0], ndim_, MPI_DOUBLE);
@@ -467,7 +417,7 @@ Particle::Particle(void *buffer, int bufsize, int *position)
  * @param bufsize Size of the buffer
  * @param position Position of the buffer (is updated)
  */
-void Particle::pack_data(void *buffer, int bufsize, int *position){
+void Particle::pack_data(void* buffer, int bufsize, int* position) {
     Hilbert_Object::pack_data(buffer, bufsize, position);
     MyMPI_Pack(&_x[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_v[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
@@ -476,7 +426,7 @@ void Particle::pack_data(void *buffer, int bufsize, int *position){
     MyMPI_Pack(&_id, 1, MPI_UNSIGNED_LONG, buffer, bufsize, position);
     MyMPI_Pack(&_starttime, 1, MPI_UNSIGNED_LONG, buffer, bufsize, position);
     MyMPI_Pack(&_endtime, 1, MPI_UNSIGNED_LONG, buffer, bufsize, position);
-    MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer,bufsize, position);
+    MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer, bufsize, position);
     MyMPI_Pack(&_hsoft, 1, MPI_DOUBLE, buffer, bufsize, position);
 }
 
@@ -485,7 +435,7 @@ void Particle::pack_data(void *buffer, int bufsize, int *position){
  *
  * @param rfile RestartFile to write to
  */
-void Particle::dump(RestartFile &rfile){
+void Particle::dump(RestartFile& rfile) {
     Hilbert_Object::dump(rfile);
     rfile.write(_x);
     rfile.write(_v);
@@ -505,7 +455,7 @@ void Particle::dump(RestartFile &rfile){
  *
  * @param rfile RestartFile to read from
  */
-Particle::Particle(RestartFile &rfile) : Hilbert_Object(rfile){
+Particle::Particle(RestartFile& rfile) : Hilbert_Object(rfile) {
     rfile.read(_x);
     rfile.read(_v);
     rfile.read(_a_grav_new);

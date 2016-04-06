@@ -26,10 +26,10 @@
 #ifndef HEAD_VORTESS
 #define HEAD_VORTESS
 
-#include <vector>
-#include <ostream>
 #include "Image.hpp"
 #include "StateVector.hpp"
+#include <ostream>
+#include <vector>
 
 class DelTess;
 class DelCont;
@@ -47,8 +47,8 @@ class ParticleVector;
  *
  * Used for the old algorithm.
  */
-class VorTess{
-private:
+class VorTess {
+  private:
     /*! \brief Delaunay tesselation of the point set */
     DelTess* _delaunay;
 
@@ -57,17 +57,17 @@ private:
     /*! \brief Faces of the tesselation */
     std::vector<VorFace*> _faces;
 
-public:
+  public:
     VorTess(DelCont* cont, unsigned int numpart, bool periodic = false,
             double tolerance = 1.e-9);
     ~VorTess();
 
-    void print_tesselation(std::ostream &stream);
-    void print_tesselation_gnuplot(std::ostream &stream);
-    void print_delaunay(std::ostream &stream);
-    void print_tesselation_pov(std::ostream &stream);
-    void print_tesselation_vtk(std::ostream &stream);
-    void print_tesselation_fastvor(std::ostream &stream, bool periodic,
+    void print_tesselation(std::ostream& stream);
+    void print_tesselation_gnuplot(std::ostream& stream);
+    void print_delaunay(std::ostream& stream);
+    void print_tesselation_pov(std::ostream& stream);
+    void print_tesselation_vtk(std::ostream& stream);
+    void print_tesselation_fastvor(std::ostream& stream, bool periodic,
                                    bool binary = true);
 #ifndef ICMAKER
     void print_tesselation_leaflet(ColorMap* colormap, StateVector maxW,
@@ -81,7 +81,7 @@ public:
 #endif
     void advect(double dt);
     void construct();
-    void print_cell_statistics(std::ostream &stream);
+    void print_cell_statistics(std::ostream& stream);
     void set_hs();
     void complete(Tree& parttree);
     void update_Ws();

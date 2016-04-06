@@ -31,8 +31,8 @@
 #define HEADER_VORGEN
 
 #include "Vec.hpp"
-#include <list>
 #include <iterator>
+#include <list>
 #include <ostream>
 #include <string>
 
@@ -50,8 +50,8 @@ class GasParticle;
  * During the Delaunay tesselation construction, the VorGen holds a list of
  * simplices of which it is part.
  */
-class VorGen{
-private:
+class VorGen {
+  private:
     /*! \brief Position of the point */
     Vec _p;
     /*! \brief Position of the point in the interval [1,2], used for exact
@@ -84,8 +84,8 @@ private:
     /*! \brief Flag used to flag this VorGen */
     bool _flag;
 
-public:
-#if ndim_==3
+  public:
+#if ndim_ == 3
     VorGen(double x, double y, double z);
 #else
     VorGen(double x, double y);
@@ -102,37 +102,29 @@ public:
      * @param point Second point
      * @return Distance between this point and the given point
      */
-    inline double distance(VorGen point){
-        return (_p-point._p).norm();
-    }
+    inline double distance(VorGen point) { return (_p - point._p).norm(); }
 
     /**
      * @brief Get the x-component of the position of this point
      *
      * @return x-coordinate of the point
      */
-    inline double x(){
-        return _p[0];
-    }
+    inline double x() { return _p[0]; }
 
     /**
      * @brief Get the y-component of the position of this point
      *
      * @return y-coordinate of the point
      */
-    inline double y(){
-        return _p[1];
-    }
+    inline double y() { return _p[1]; }
 
-#if ndim_==3
+#if ndim_ == 3
     /**
      * @brief Get the z-component of the position of this point
      *
      * @return z-coordinate of the point
      */
-    inline double z(){
-        return _p[2];
-    }
+    inline double z() { return _p[2]; }
 #endif
 
     /**
@@ -142,9 +134,7 @@ public:
      * @param index Index of a coordinate of this point
      * @return Value of the requested coordinate
      */
-    inline double pos(int index){
-        return _p[index];
-    }
+    inline double pos(int index) { return _p[index]; }
 
     void move(double x, double y, double z);
     void set_cell(VorCell* cell);
@@ -155,7 +145,7 @@ public:
     GasParticle* get_particle();
     void set_particle_id(unsigned int index);
     unsigned int get_particle_id();
-    void print(std::ostream &stream);
+    void print(std::ostream& stream);
     std::list<Simplex*> get_tetrahedra();
     std::list<unsigned int> get_simplices();
     void set_search_radius(double sr);
@@ -176,7 +166,7 @@ public:
     unsigned int get_process();
 
     void set_p12(Vec p12);
-    Vec &get_p12();
+    Vec& get_p12();
 
     void flag();
     void unflag();

@@ -24,21 +24,21 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Plotter.hpp"
-#include "Vec.hpp"
 #include "DelCont.hpp"
-#include "VorTess.hpp"
-#include "Image.hpp"
-#include "ShadowfaxSnapshotReader.hpp"
 #include "Error.hpp"
+#include "Image.hpp"
 #include "MPIMethods.hpp"
+#include "ShadowfaxSnapshotReader.hpp"
+#include "Vec.hpp"
+#include "VorTess.hpp"
 #include "io/Header.hpp"
 #include "io/Input.hpp"
 #include "io/UnitSet.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"
-#include <vector>
-#include <sstream>
 #include <cstring>
+#include <sstream>
+#include <vector>
 using namespace std;
 
 /**
@@ -74,23 +74,23 @@ using namespace std;
  * @param argc Number of command line arguments
  * @param argv Command line arguments
  */
-Plotter::Plotter(int argc, char **argv){
-    // set up random grid (test)
-#if ndim_==3
+Plotter::Plotter(int argc, char** argv) {
+// set up random grid (test)
+#if ndim_ == 3
     Vec pos(0.5, 0.5, 0.5);
-    Vec sides(1.,1.,1.);
+    Vec sides(1., 1., 1.);
 #else
     Vec pos(0.5, 0.5);
-    Vec sides(1.,1.);
+    Vec sides(1., 1.);
 #endif
     RectangularBox cont(pos, sides);
     vector<Particle*> plist;
 
-    if(argc < 3){
+    if(argc < 3) {
         cout << "not enough arguments, stopping" << endl;
         return;
     }
-    if(string(argv[2]) == "help" || string(argv[2]) == "Help"){
+    if(string(argv[2]) == "help" || string(argv[2]) == "Help") {
         cout << "\nPlot a snapshot.\n\nSYNTAX:\n\n./shadowfax plot NUMBER MAX "
                 "MIN LOG GRID GRAYSCALE\n\n";
         cout << "\tNUMBER:\nnumber of snapshot file (assumed to have name "
@@ -117,40 +117,38 @@ Plotter::Plotter(int argc, char **argv){
     ShadowfaxSnapshotReader reader(filename, units);
     ParticleVector tempvector(true, cont);
     Header header = reader.read_snapshot(tempvector);
-    for(unsigned int i = 0; i < tempvector.gassize(); i++){
+    for(unsigned int i = 0; i < tempvector.gassize(); i++) {
         plist.push_back(tempvector.gas(i));
     }
 
-    double box[ndim_+ndim_] = {0.};
+    double box[ndim_ + ndim_] = {0.};
     header.box(box);
     Vec center;
     Vec side;
-    for(unsigned int i = ndim_; i--;){
-        center[i] = box[i] + 0.5*box[ndim_+i];
-        side[i] = box[ndim_+i];
+    for(unsigned int i = ndim_; i--;) {
+        center[i] = box[i] + 0.5 * box[ndim_ + i];
+        side[i] = box[ndim_ + i];
     }
     cont = RectangularBox(center, side);
 
     double snaptime = header.time();
     cout << "snapshot time " << snaptime << endl;
     bool grid = false;
-    if(argc > 7){
-        if(string(argv[7]) == "grid" || string(argv[7]) == "Grid"){
+    if(argc > 7) {
+        if(string(argv[7]) == "grid" || string(argv[7]) == "Grid") {
             grid = true;
         }
     }
     // full argument example that zooms in on a smaller region
     PlotVariable var = HYDRO_DENSITY;
-    if(argc > 3){
-        if(string(argv[3]) == "velocity_x"){
+    if(argc > 3) {
+        if(string(argv[3]) == "velocity_x") {
             var = HYDRO_VELOCITY_X;
             cout << "plotting velocity_x" << endl;
-        } else
-        if(string(argv[3]) == "velocity_y"){
+        } else if(string(argv[3]) == "velocity_y") {
             var = HYDRO_VELOCITY_Y;
             cout << "plotting velocity_y" << endl;
-        } else
-        if(string(argv[3]) == "pressure"){
+        } else if(string(argv[3]) == "pressure") {
             var = HYDRO_PRESSURE;
             cout << "plotting pressure" << endl;
         } else {
@@ -160,10 +158,11 @@ Plotter::Plotter(int argc, char **argv){
         cout << "plotting density" << endl;
     }
     double imagepars[5] = {0., 0., 1., 1., 0.001};
-    if(argc > 9){
-        if(argc < 14){
+    if(argc > 9) {
+        if(argc < 14) {
             cerr << "Error! If you provide one image parameter, you should "
-                    "provide all of them!" << endl;
+                    "provide all of them!"
+                 << endl;
             my_exit();
         }
         imagepars[0] = atof(argv[9]);
@@ -179,18 +178,18 @@ Plotter::Plotter(int argc, char **argv){
     double min = -1.;
     bool log = false;
     int imgtype = BIN_PPM | CM_JET;
-    if(argc > 4){
+    if(argc > 4) {
         max = atof(argv[4]);
     }
-    if(argc > 5){
+    if(argc > 5) {
         min = atof(argv[5]);
     }
-    if(argc > 6){
+    if(argc > 6) {
         log = string(argv[6]) == "True" || string(argv[6]) == "true" ||
-                string(argv[6]) == "1";
+              string(argv[6]) == "1";
     }
-    if(argc > 8){
-        if(string(argv[8]) == "gray" || string(argv[8]) == "Gray"){
+    if(argc > 8) {
+        if(string(argv[8]) == "gray" || string(argv[8]) == "Gray") {
             imgtype = BIN_PGM;
         }
     }
@@ -208,7 +207,7 @@ Plotter::Plotter(int argc, char **argv){
  * @param filename Filename ending with .hdf5
  * @return Filename without the extension
  */
-string Plotter::get_filename(string filename){
+string Plotter::get_filename(string filename) {
     unsigned int i = strlen(filename.c_str());
-    return filename.substr(0, i-5);
+    return filename.substr(0, i - 5);
 }

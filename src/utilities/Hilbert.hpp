@@ -34,8 +34,8 @@
 #ifndef HEAD_HILBERT
 #define HEAD_HILBERT
 
-#include <iostream>
 #include "TreeRoute.hpp"
+#include <iostream>
 
 class RestartFile;
 
@@ -47,12 +47,12 @@ class RestartFile;
   *
   * Every class that inherits from this class can be sorted in this way.
   */
-class Hilbert_Object{
-private:
+class Hilbert_Object {
+  private:
     /*! \brief The hilbert key */
     unsigned long _key;
 
-public:
+  public:
     Hilbert_Object();
 
     /**
@@ -62,15 +62,15 @@ public:
       */
     Hilbert_Object(unsigned long key) : _key(key) {}
     Hilbert_Object(void* buffer, int bufsize, int* position);
-    ~Hilbert_Object(){}
+    ~Hilbert_Object() {}
 
     void set_key(unsigned long key);
     unsigned long get_key();
 
     void pack_data(void* buffer, int bufsize, int* position);
 
-    void dump(RestartFile &rfile);
-    Hilbert_Object(RestartFile &rfile);
+    void dump(RestartFile& rfile);
+    Hilbert_Object(RestartFile& rfile);
 };
 
 /**
@@ -82,14 +82,13 @@ public:
  * It also provides the basic sort function to sort a list of Hilbert_Object
  * objects
  */
-namespace HB{
-    unsigned long get_key(unsigned long* bits, unsigned int nbits);
-    void get_coords(unsigned long key, unsigned int nbits,
-                    unsigned long* coords);
-    bool sortfunc(Hilbert_Object* a, Hilbert_Object* b);
-    TreeRoute get_route_to_node(unsigned long key);
-    void get_ngb_keys(unsigned long* bits, unsigned int nbits,
-                      unsigned int level, unsigned long* keys);
+namespace HB {
+unsigned long get_key(unsigned long* bits, unsigned int nbits);
+void get_coords(unsigned long key, unsigned int nbits, unsigned long* coords);
+bool sortfunc(Hilbert_Object* a, Hilbert_Object* b);
+TreeRoute get_route_to_node(unsigned long key);
+void get_ngb_keys(unsigned long* bits, unsigned int nbits, unsigned int level,
+                  unsigned long* keys);
 }
 
 #endif

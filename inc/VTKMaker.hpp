@@ -36,8 +36,8 @@
  *
  * The .vtk-file has the same name as the input snapshot.
  */
-class VTKMaker{
-private:
+class VTKMaker {
+  private:
     /**
      * \brief Flag indicating if the system stores floating point values in big
      *  endian or little endian order
@@ -59,7 +59,7 @@ private:
     void check_big_endian();
     void swap_endian(char* buffer, unsigned int length);
 
-public:
+  public:
     VTKMaker(int argc, char** argv);
 };
 

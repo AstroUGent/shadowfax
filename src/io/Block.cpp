@@ -25,8 +25,8 @@
  */
 #include "Block.hpp"
 #include "Error.hpp"
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 using namespace std;
 
 /**
@@ -45,13 +45,13 @@ using namespace std;
   */
 Block::Block(string name, vector<string>& headers,
              vector<unsigned int>& dimensions, vector<Unit>& units,
-             unsigned int size){
+             unsigned int size) {
     _name = name;
     _data.resize(headers.size());
-    for(unsigned int i = 0; i < headers.size(); i++){
+    for(unsigned int i = 0; i < headers.size(); i++) {
         _headers.push_back(headers[i]);
         _dimensions.push_back(dimensions[i]);
-        _data[i].resize(size*dimensions[i]);
+        _data[i].resize(size * dimensions[i]);
         _units.push_back(units[i]);
     }
     _emptyline = 0;
@@ -64,9 +64,9 @@ Block::Block(string name, vector<string>& headers,
   * @param data A data buffer with dimensions equal to or smaller than the
   * dimensions of the internal buffer.
   */
-void Block::add_data(std::vector< std::vector<double> >& data){
-    for(unsigned int i = data.size(); i--;){
-        for(unsigned int j = data[i].size(); j--;){
+void Block::add_data(std::vector<std::vector<double> >& data) {
+    for(unsigned int i = data.size(); i--;) {
+        for(unsigned int j = data[i].size(); j--;) {
             _data[i][j] = data[i][j];
         }
     }
@@ -83,13 +83,13 @@ void Block::add_data(std::vector< std::vector<double> >& data){
   * @param data A row of data with the same dimensions as the number of columns
   * in the Block
   */
-void Block::add_data(std::vector<double>& data){
-    if(_emptyline == _data[0].size()){
-        for(unsigned int i = _data.size(); i--;){
+void Block::add_data(std::vector<double>& data) {
+    if(_emptyline == _data[0].size()) {
+        for(unsigned int i = _data.size(); i--;) {
             _data[i].push_back(0.);
         }
     }
-    for(unsigned int i = _data.size(); i--;){
+    for(unsigned int i = _data.size(); i--;) {
         _data[i][_emptyline] = data[i];
     }
     _emptyline++;
@@ -102,7 +102,7 @@ void Block::add_data(std::vector<double>& data){
   * @param y The index of the column in the internal data buffer (or the index
   * of the column in the headers)
   */
-void Block::add_column(vector<double> &data, unsigned int y){
+void Block::add_column(vector<double>& data, unsigned int y) {
     _data[y] = data;
 }
 
@@ -117,18 +117,18 @@ void Block::add_column(vector<double> &data, unsigned int y){
   * @param data A row of data with the same dimensions as the number of columns
   * in the Block (and taking into account multidimensional columns)
   */
-void Block::add_row(vector<double> &data){
-    if(_emptyline == _data[0].size()){
-        for(unsigned int i = _data.size(); i--;){
-            for(unsigned int j = _dimensions[i]; j--;){
+void Block::add_row(vector<double>& data) {
+    if(_emptyline == _data[0].size()) {
+        for(unsigned int i = _data.size(); i--;) {
+            for(unsigned int j = _dimensions[i]; j--;) {
                 _data[i].push_back(0.);
             }
         }
     }
     unsigned int index = 0;
-    for(unsigned int i = 0; i < _data.size(); i++){
-        for(unsigned int j = 0; j < _dimensions[i]; j++){
-            _data[i][_emptyline*_dimensions[i]+j] = data[index++];
+    for(unsigned int i = 0; i < _data.size(); i++) {
+        for(unsigned int j = 0; j < _dimensions[i]; j++) {
+            _data[i][_emptyline * _dimensions[i] + j] = data[index++];
         }
     }
     _emptyline++;
@@ -141,15 +141,16 @@ void Block::add_row(vector<double> &data){
   * @param y Index of the column (so a column number)
   * @param data The data to add to the cell
   */
-void Block::add_data(unsigned int x, unsigned int y, double data){
-    if(y >= _headers.size()){
+void Block::add_data(unsigned int x, unsigned int y, double data) {
+    if(y >= _headers.size()) {
         // error!
         cout << "Error in Block.cpp: trying to add element in column that does "
-                "not exist! (x=" << x << ")" << endl;
+                "not exist! (x="
+             << x << ")" << endl;
         my_exit();
     }
-    if(x >= _data[0].size()){
-        for(unsigned int i = _headers.size(); i--;){
+    if(x >= _data[0].size()) {
+        for(unsigned int i = _headers.size(); i--;) {
             _data[i].push_back(0.);
         }
     }
@@ -161,9 +162,7 @@ void Block::add_data(unsigned int x, unsigned int y, double data){
   *
   * @return A reference to the internal data buffer
   */
-const vector< vector<double> >& Block::get_data(){
-    return _data;
-}
+const vector<vector<double> >& Block::get_data() { return _data; }
 
 /**
   * @brief Access a column of the internal data buffer
@@ -173,9 +172,7 @@ const vector< vector<double> >& Block::get_data(){
   * @return A c-type void pointer to the buffer underlying the specified column,
   * which can be used to read from or write to the column
   */
-const void* Block::get_buffer(unsigned int index){
-    return &_data[index][0];
-}
+const void* Block::get_buffer(unsigned int index) { return &_data[index][0]; }
 
 /**
   * @brief Get the Unit associated with a column in the Block
@@ -183,27 +180,21 @@ const void* Block::get_buffer(unsigned int index){
   * @param index The index of the column in the header list
   * @return A reference to the unit assiociated to the given column
   */
-Unit& Block::get_unit(unsigned int index){
-    return _units[index];
-}
+Unit& Block::get_unit(unsigned int index) { return _units[index]; }
 
 /**
   * @brief Access the name of the Block
   *
   * @return A reference to the name of the Block
   */
-const string& Block::get_name(){
-    return _name;
-}
+const string& Block::get_name() { return _name; }
 
 /**
   * @brief Access the header list
   *
   * @return A reference to the header list of the Block
   */
-const vector<string>& Block::get_headers(){
-    return _headers;
-}
+const vector<string>& Block::get_headers() { return _headers; }
 
 /**
   * @brief Access the dimensions list. The dimension of a given column is the
@@ -211,18 +202,14 @@ const vector<string>& Block::get_headers(){
   *
   * @return A reference to the dimensions list of the Block
   */
-const vector<unsigned int>& Block::get_dimensions(){
-    return _dimensions;
-}
+const vector<unsigned int>& Block::get_dimensions() { return _dimensions; }
 
 /**
   * @brief Get information on the number of cells in the Block
   *
   * @return The number of cells in one column of the Block
   */
-unsigned int Block::number_of_lines(){
-    return _data[0].size();
-}
+unsigned int Block::number_of_lines() { return _data[0].size(); }
 
 /**
   * @brief Access a row of the Block
@@ -230,9 +217,9 @@ unsigned int Block::number_of_lines(){
   * @param index The valid index of a row in the internal buffer
   * @return A std::vector containing the data in the specified row of the Block
   */
-const vector<double> Block::get_line(unsigned int index){
+const vector<double> Block::get_line(unsigned int index) {
     vector<double> line(_headers.size());
-    for(unsigned int i = _data.size(); i--;){
+    for(unsigned int i = _data.size(); i--;) {
         line[i] = _data[i][index];
     }
     return line;
@@ -244,6 +231,4 @@ const vector<double> Block::get_line(unsigned int index){
   * @return The number of cells in a single column of the Block, taking into
   * account the number of dimensions of the columns
   */
-unsigned int Block::get_size(){
-    return _data[0].size()/_dimensions[0];
-}
+unsigned int Block::get_size() { return _data[0].size() / _dimensions[0]; }

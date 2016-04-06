@@ -24,16 +24,16 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "TimeLine.hpp"
+#include "MPIGlobal.hpp"
+#include "MPIMethods.hpp"
+#include "ProgramLog.hpp"
+#include "RestartFile.hpp"
 #include "SnapshotHandler.hpp"
 #include "SnapshotWriterFactory.hpp"
+#include "TimeStepWalker.hpp"
 #include "utilities/DMParticle.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"
-#include "TimeStepWalker.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "RestartFile.hpp"
-#include "ProgramLog.hpp"
 using namespace std;
 
 /**
@@ -67,15 +67,14 @@ using namespace std;
  * snapshot file or all nodes should write to the same file (if possible)
  */
 TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
-                   ParticleVector &particlevector, std::string snaptype,
-                   std::string snapname, UnitSet& units, UnitSet &output_units,
+                   ParticleVector& particlevector, std::string snaptype,
+                   std::string snapname, UnitSet& units, UnitSet& output_units,
                    bool gravity, bool periodic, bool treetime,
                    double max_timestep, double min_timestep,
                    unsigned int lastsnap, bool per_node_output)
-    : _particles(particlevector) {
-    _snapshotwriter = SnapshotWriterFactory::generate(snaptype, snapname, units,
-                                                      output_units, lastsnap,
-                                                      per_node_output);
+        : _particles(particlevector) {
+    _snapshotwriter = SnapshotWriterFactory::generate(
+            snaptype, snapname, units, output_units, lastsnap, per_node_output);
     _maxtime = maxtime;
     _integer_maxtime = 1;
     _integer_maxtime <<= 60;
@@ -88,16 +87,16 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
     _treetime = treetime;
     _grav_eta = grav_eta;
     _max_timestep = _integer_maxtime;
-    if(max_timestep){
+    if(max_timestep) {
         max_timestep /= maxtime;
-        while(_max_timestep > max_timestep*_integer_maxtime){
+        while(_max_timestep > max_timestep * _integer_maxtime) {
             _max_timestep >>= 1;
         }
     }
-    if(min_timestep){
+    if(min_timestep) {
         min_timestep /= maxtime;
         _min_timestep = _integer_maxtime;
-        while(_min_timestep > max_timestep*_integer_maxtime){
+        while(_min_timestep > max_timestep * _integer_maxtime) {
             _min_timestep >>= 1;
         }
     } else {
@@ -116,8 +115,8 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
   *
   * @returns The physical (floating point) time of the simulation
   */
-double TimeLine::get_time(){
-    return _current_time*_maxtime/(double)_integer_maxtime;
+double TimeLine::get_time() {
+    return _current_time * _maxtime / (double)_integer_maxtime;
 }
 
 /**
@@ -125,9 +124,7 @@ double TimeLine::get_time(){
   *
   * @returns A 64-bit representing the current internal time
   */
-unsigned long TimeLine::get_integertime(){
-    return _current_time;
-}
+unsigned long TimeLine::get_integertime() { return _current_time; }
 
 /**
   * @brief Increase the internal time by the internal timestep and check if a
@@ -137,9 +134,9 @@ unsigned long TimeLine::get_integertime(){
   *
   * @returns False if we have reached the end of the simulation, true otherwise
   */
-bool TimeLine::step_forward(){
+bool TimeLine::step_forward() {
     _current_time += _timestep;
-    if(get_time() >= _snaptime*_snapshotwriter->get_lastsnap()){
+    if(get_time() >= _snaptime * _snapshotwriter->get_lastsnap()) {
         _iotimer->start();
         _snapshotwriter->write_snapshot(get_time(), _particles);
         _iotimer->stop();
@@ -154,9 +151,7 @@ bool TimeLine::step_forward(){
   *
   * @param time A new 64-bit integer current time for the TimeLine
   */
-void TimeLine::set_time(unsigned long time){
-    _current_time = time;
-}
+void TimeLine::set_time(unsigned long time) { _current_time = time; }
 
 /**
  * @brief Set the current internal time of the timeline
@@ -166,8 +161,8 @@ void TimeLine::set_time(unsigned long time){
  *
  * @param time Floating point time
  */
-void TimeLine::set_time(double time){
-    _current_time = (unsigned long)(time*_integer_maxtime/_maxtime);
+void TimeLine::set_time(double time) {
+    _current_time = (unsigned long)(time * _integer_maxtime / _maxtime);
 }
 
 /**
@@ -176,27 +171,26 @@ void TimeLine::set_time(double time){
  *
  * @return Integer system timestep for the next system step
  */
-unsigned long TimeLine::calculate_timestep(){
+unsigned long TimeLine::calculate_timestep() {
     LOGS("Starting timestep calculation");
 
     unsigned int numactive = 0;
 
-    if(_treetime){
+    if(_treetime) {
         _particles.get_tree().set_velocities();
-        if(MPIGlobal::size > 1){
+        if(MPIGlobal::size > 1) {
             _particles.get_tree().exchange_pseudonodes();
         }
         // determine hydro timesteps
-        _particles.get_tree().walk_tree<TimeStepWalker>(_particles, true, false,
-                                                        _current_time+_timestep
-                                                        );
+        _particles.get_tree().walk_tree<TimeStepWalker>(
+                _particles, true, false, _current_time + _timestep);
     } else {
-        for(unsigned int i = 0; i < _particles.gassize(); i++){
-            if(_particles.gas(i)->get_endtime() == _current_time+_timestep){
+        for(unsigned int i = 0; i < _particles.gassize(); i++) {
+            if(_particles.gas(i)->get_endtime() == _current_time + _timestep) {
                 GasParticle* p = _particles.gas(i);
                 StateVector W = p->get_Wvec();
                 Vec v;
-#if ndim_==3
+#if ndim_ == 3
                 v.set(W[1], W[2], W[3]);
 #else
                 v.set(W[1], W[2]);
@@ -204,7 +198,7 @@ unsigned long TimeLine::calculate_timestep(){
                 v -= p->get_velocity();
                 double vi = v.norm();
                 double ci = p->get_soundspeed();
-                double dt = p->h()/(vi+ci);
+                double dt = p->h() / (vi + ci);
                 _particles.gas(i)->set_real_timestep(dt);
             }
         }
@@ -214,48 +208,50 @@ unsigned long TimeLine::calculate_timestep(){
     unsigned long Smin = Smax;
     double eta = _grav_eta;
     // put them in a power of two hierarchy
-    for(unsigned int i = 0; i < _particles.gassize(); i++){
-        if(_particles.gas(i)->get_endtime() == _current_time+_timestep){
+    for(unsigned int i = 0; i < _particles.gassize(); i++) {
+        if(_particles.gas(i)->get_endtime() == _current_time + _timestep) {
             numactive++;
-            double S = _cfl*_particles.gas(i)->get_real_timestep();
-            if(_gravity){
+            double S = _cfl * _particles.gas(i)->get_real_timestep();
+            if(_gravity) {
                 double a = _particles.gas(i)
-                        ->get_gravitational_acceleration().norm();
+                                   ->get_gravitational_acceleration()
+                                   .norm();
                 // apply gravitational timestep criterion
                 double eps = _particles.gas(i)->get_hsoft();
-                if(a){
-                    S = std::min(S, sqrt(2.*eps*eta/a));
+                if(a) {
+                    S = std::min(S, sqrt(2. * eps * eta / a));
                 }
             }
             unsigned long S2;
-            if(get_realtime(Smax) < S){
+            if(get_realtime(Smax) < S) {
                 S2 = Smax;
             } else {
                 S2 = _integer_maxtime;
-                while(get_realtime(S2) > S){
+                while(get_realtime(S2) > S) {
                     S2 >>= 1;
                 }
 
-                if(!S2){
+                if(!S2) {
                     cerr << "Timestep 0!" << endl;
                     my_exit();
                 }
 
-                while((_integer_maxtime-_particles.gas(i)->get_endtime())%S2){
-                    S2 >>= 1;//cells[i]->get_timestep();
+                while((_integer_maxtime - _particles.gas(i)->get_endtime()) %
+                      S2) {
+                    S2 >>= 1;  // cells[i]->get_timestep();
                 }
                 S2 = std::max(S2, _min_timestep);
                 S2 = std::min(S2, _max_timestep);
                 Smin = std::min(S2, Smin);
-                if(!_particles.global_timestep()){
+                if(!_particles.global_timestep()) {
                     _particles.gas(i)->set_timestep(S2);
                 }
             }
         }
     }
 
-    for(unsigned int i = _particles.dmsize(); i--;){
-        if(_particles.dm(i)->get_endtime() != _current_time+_timestep){
+    for(unsigned int i = _particles.dmsize(); i--;) {
+        if(_particles.dm(i)->get_endtime() != _current_time + _timestep) {
             continue;
         }
         numactive++;
@@ -263,34 +259,35 @@ unsigned long TimeLine::calculate_timestep(){
         // if the acceleration is 0, timestep is formally infinite, so we set it
         // to the maximal timestep
         unsigned long tidt = Smax;
-        if(a){
+        if(a) {
             double eps = _particles.dm(i)->get_hsoft();
-            double dt = sqrt(2.*eps*eta/a);
-            tidt = std::min(tidt,
-                            (unsigned long)((dt/_maxtime)*_integer_maxtime));
+            double dt = sqrt(2. * eps * eta / a);
+            tidt = std::min(
+                    tidt, (unsigned long)((dt / _maxtime) * _integer_maxtime));
         }
         // make the timestep a power of 2 subdivision of the total simulation
         // time
         unsigned long pidt = _integer_maxtime;
-        while(tidt < pidt){
+        while(tidt < pidt) {
             pidt >>= 1;
         }
 
-        if(!pidt){
+        if(!pidt) {
             cerr << "Timestep 0!" << endl;
             my_exit();
         }
 
         // if the timestep wants to increase, make sure it synchronizes
-        while((_integer_maxtime-_particles.dm(i)->get_endtime())%pidt){
+        while((_integer_maxtime - _particles.dm(i)->get_endtime()) % pidt) {
             pidt >>= 1;
         }
         pidt = std::max(pidt, _min_timestep);
         pidt = std::min(pidt, _max_timestep);
-        if(!_particles.global_timestep()){
+        if(!_particles.global_timestep()) {
             // increase particle timestep
             _particles.dm(i)->set_starttime(_particles.dm(i)->get_endtime());
-            _particles.dm(i)->set_endtime(_particles.dm(i)->get_endtime()+pidt);
+            _particles.dm(i)->set_endtime(_particles.dm(i)->get_endtime() +
+                                          pidt);
         }
         // set global timestep to smallest timestep of all particles
         Smin = std::min(pidt, Smin);
@@ -300,11 +297,11 @@ unsigned long TimeLine::calculate_timestep(){
 
     unsigned long Smin_glob;
     MyMPI_Allreduce(&Smin, &Smin_glob, 1, MPI_LONG, MPI_MIN);
-    if(_particles.global_timestep()){
-        for(unsigned int i = _particles.gassize(); i--;){
+    if(_particles.global_timestep()) {
+        for(unsigned int i = _particles.gassize(); i--;) {
             _particles.gas(i)->set_timestep(Smin_glob);
         }
-        for(unsigned int i = _particles.dmsize(); i--;){
+        for(unsigned int i = _particles.dmsize(); i--;) {
             _particles.dm(i)->set_timestep(Smin_glob);
         }
     }
@@ -319,39 +316,39 @@ unsigned long TimeLine::calculate_timestep(){
  *
  * @return Integer timestep to be used for the next system step
  */
-unsigned long TimeLine::calculate_gravitational_timestep(){
+unsigned long TimeLine::calculate_gravitational_timestep() {
     double eta = _grav_eta;
     unsigned long Smax = _integer_maxtime;
     unsigned long Smin = Smax;
 
-    for(unsigned int i = _particles.gassize(); i--;){
-        if(_particles.gas(i)->get_endtime() != _current_time+_timestep){
+    for(unsigned int i = _particles.gassize(); i--;) {
+        if(_particles.gas(i)->get_endtime() != _current_time + _timestep) {
             continue;
         }
         double a = _particles.gas(i)->get_gravitational_acceleration().norm();
         // if the acceleration is 0, timestep is formally infinite, so we set it
         // to the maximal timestep
         unsigned long tidt = Smax;
-        if(a){
+        if(a) {
             double eps = _particles.gas(i)->get_hsoft();
-            double dt = sqrt(2.*eps*eta/a);
-            tidt = std::min(tidt,
-                            (unsigned long)((dt/_maxtime)*_integer_maxtime));
+            double dt = sqrt(2. * eps * eta / a);
+            tidt = std::min(
+                    tidt, (unsigned long)((dt / _maxtime) * _integer_maxtime));
         }
         // make the timestep a power of 2 subdivision of the total simulation
         // time
         unsigned long pidt = _integer_maxtime;
-        while(tidt < pidt){
+        while(tidt < pidt) {
             pidt >>= 1;
         }
         // if the timestep wants to increase, make sure it synchronizes
-        while((_integer_maxtime-_particles.gas(i)->get_endtime())%pidt){
+        while((_integer_maxtime - _particles.gas(i)->get_endtime()) % pidt) {
             pidt >>= 1;
         }
-        if(!_particles.global_timestep()){
+        if(!_particles.global_timestep()) {
             // increase particle timestep
             _particles.gas(i)->set_starttime(_particles.gas(i)->get_endtime());
-            _particles.gas(i)->set_endtime(_particles.gas(i)->get_endtime()+
+            _particles.gas(i)->set_endtime(_particles.gas(i)->get_endtime() +
                                            pidt);
         }
         // set global timestep to smallest timestep of all particles
@@ -360,8 +357,8 @@ unsigned long TimeLine::calculate_gravitational_timestep(){
 
     unsigned long Smin_glob;
     MyMPI_Allreduce(&Smin, &Smin_glob, 1, MPI_LONG, MPI_MIN);
-    if(_particles.global_timestep()){
-        for(unsigned int i = _particles.gassize(); i--;){
+    if(_particles.global_timestep()) {
+        for(unsigned int i = _particles.gassize(); i--;) {
             _particles.gas(i)->set_timestep(Smin_glob);
         }
     }
@@ -374,9 +371,9 @@ unsigned long TimeLine::calculate_gravitational_timestep(){
  * @param integer_time Integer time on the integer timeline
  * @return Floating point physical time
  */
-double TimeLine::get_realtime(unsigned long integer_time){
-    double t = (double)integer_time/(double)_integer_maxtime;
-    return _maxtime*t;
+double TimeLine::get_realtime(unsigned long integer_time) {
+    double t = (double)integer_time / (double)_integer_maxtime;
+    return _maxtime * t;
 }
 
 /**
@@ -384,34 +381,28 @@ double TimeLine::get_realtime(unsigned long integer_time){
  *
  * @param timestep New value for the system timestep
  */
-void TimeLine::set_timestep(unsigned long timestep){
-    _timestep = timestep;
-}
+void TimeLine::set_timestep(unsigned long timestep) { _timestep = timestep; }
 
 /**
  * @brief Get the system timestep
  *
  * @return The integer system timestep
  */
-unsigned long TimeLine::get_timestep(){
-    return _timestep;
-}
+unsigned long TimeLine::get_timestep() { return _timestep; }
 
 /**
  * @brief Check if gravity is switched on
  *
  * @return True if gravity is on, false otherwise
  */
-bool TimeLine::has_gravity(){
-    return _gravity;
-}
+bool TimeLine::has_gravity() { return _gravity; }
 
 /**
  * @brief Dump the timeline to the given RestartFile
  *
  * @param rfile RestartFile to write to
  */
-void TimeLine::dump(RestartFile &rfile){
+void TimeLine::dump(RestartFile& rfile) {
     SnapshotWriterFactory::dump(rfile, _snapshotwriter);
     rfile.write(_maxtime);
     rfile.write(_integer_maxtime);
@@ -438,9 +429,9 @@ void TimeLine::dump(RestartFile &rfile){
  * @param units Internal simulation UnitSet
  * @param output_units Output UnitSet
  */
-TimeLine::TimeLine(RestartFile &rfile, ParticleVector &particlevector,
-                   UnitSet &units, UnitSet &output_units)
-    : _particles(particlevector){
+TimeLine::TimeLine(RestartFile& rfile, ParticleVector& particlevector,
+                   UnitSet& units, UnitSet& output_units)
+        : _particles(particlevector) {
     _snapshotwriter = SnapshotWriterFactory::load(rfile, units, output_units);
     rfile.read(_maxtime);
     rfile.read(_integer_maxtime);

@@ -29,8 +29,8 @@
 #include <string>
 #include <vector>
 
-#include "Vec.hpp"
 #include "StateVector.hpp"
+#include "Vec.hpp"
 
 class SymbolicFunction;
 
@@ -50,8 +50,8 @@ class SymbolicFunction;
  *               \left(2\frac{x_z-o_z}{l_z}\right)^e} \leq 1.
  * \f]
  */
-class ICRegion{
-private:
+class ICRegion {
+  private:
     /*! \brief Exponent \f$e\f$ of the region */
     double _exponent;
 
@@ -76,10 +76,10 @@ private:
     /*! \brief Volume of the region */
     double _volume;
 
-    double integrate(SymbolicFunction *function, Vec origin, Vec sides,
+    double integrate(SymbolicFunction* function, Vec origin, Vec sides,
                      double exponent);
 
-public:
+  public:
     ICRegion(Vec origin, Vec sides, double exponent,
              std::vector<std::string> hydrofunctions,
              std::vector<std::string> dmfunction);
@@ -96,4 +96,4 @@ public:
     bool accept_dm(Vec position);
 };
 
-#endif // ICREGION_H
+#endif  // ICREGION_H

@@ -26,8 +26,8 @@
 #ifndef IMAGE_HPP
 #define IMAGE_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
 class Particle;
 class DelCont;
@@ -35,7 +35,7 @@ class DelCont;
 /**
   * \brief Variables that can be plotted
   */
-enum PlotVariable{
+enum PlotVariable {
     /*! \brief The hydrodynamical density */
     HYDRO_DENSITY,
     /*! \brief The x-component of the hydrodynamical velocity */
@@ -53,7 +53,7 @@ enum PlotVariable{
 /**
   * \brief Image options
   */
-enum ImageType{
+enum ImageType {
     /*! \brief A binary grayscale image */
     BIN_PGM,
     /*! \brief An ascii grayscale image */
@@ -80,14 +80,14 @@ enum ImageType{
   * the saving of the resulting image to a file using the Netpbm format
   * (http://en.wikipedia.org/wiki/Netpbm_format)
   */
-class Image{
-private:
+class Image {
+  private:
     void calculate(std::vector<Particle*>& plist, PlotVariable variable,
                    bool grid, double offset_x, double offset_y, double height,
                    double width, double pixsize);
 
     /*! \brief The grid of pixels that constitutes the actual image */
-    std::vector< std::vector<double> > _image;
+    std::vector<std::vector<double> > _image;
     /*! \brief The maximal value of the plotting variable over all pixels */
     double _maxval;
     /*! \brief The minimal value of the plotting variable over all pixels */
@@ -99,12 +99,12 @@ private:
      *  reflective */
     bool _periodic;
 
-public:
+  public:
     Image(std::vector<Particle*>& plist, DelCont& delcont,
           bool periodic = false, PlotVariable variable = HYDRO_DENSITY,
           bool grid = false, double offset_x = 0., double offset_y = 0.,
           double height = 1., double width = 1., double pixsize = 0.001);
-    ~Image(){}
+    ~Image() {}
 
     void draw_line(int x0, int y0, int x1, int y1);
     void save(std::string name, int type = BIN_PPM | CM_RDBU,
@@ -122,8 +122,8 @@ public:
   * pre-defined color maps) are copied from the corresponding Matplotlib code
   * (https://github.com/matplotlib/matplotlib).
   */
-class ColorMap{
-private:
+class ColorMap {
+  private:
     double interpolate(double value, std::vector<double>& cx,
                        std::vector<double>& cy);
 
@@ -140,13 +140,13 @@ private:
     /*! \brief y-components of the blue color function */
     std::vector<double> _by;
 
-public:
+  public:
     ColorMap(double* rx, double* ry, unsigned int nr, double* gx, double* gy,
              unsigned int ng, double* bx, double* by, unsigned int nb);
-    ~ColorMap(){}
+    ~ColorMap() {}
 
     void save_map(std::string filename, int type = BIN_PPM);
     void get_color(double value, int* colors);
 };
 
-#endif // IMAGE_HPP
+#endif  // IMAGE_HPP

@@ -27,8 +27,8 @@
 #define BLOCK_HPP
 
 #include "Unit.hpp"
-#include <vector>
 #include <string>
+#include <vector>
 
 /**
   * \brief A block of data to be written to or read from a snapshot file
@@ -40,8 +40,8 @@
   * internal data can be accessed through a void pointer, as is customary in
   * standard c writing and reading routines.
   */
-class Block{
-private:
+class Block {
+  private:
     /*! \brief The name of the Block */
     std::string _name;
 
@@ -53,7 +53,7 @@ private:
     std::vector<unsigned int> _dimensions;
 
     /*! \brief The internal data buffer of the Block */
-    std::vector< std::vector<double> > _data;
+    std::vector<std::vector<double> > _data;
 
     /*! \brief The index of the first uninitialized row in the internal data
      *  buffer. If no uninitialized rows exist, this is equal to the column
@@ -63,17 +63,17 @@ private:
     /*! \brief A vector with a Unit for every column in the Block */
     std::vector<Unit> _units;
 
-public:
+  public:
     Block(std::string name, std::vector<std::string>& headers,
           std::vector<unsigned int>& dimensions, std::vector<Unit>& units,
           unsigned int size = 0);
-    void add_data(std::vector< std::vector<double> >& data);
+    void add_data(std::vector<std::vector<double> >& data);
     void add_data(std::vector<double>& data);
     void add_data(unsigned int x, unsigned int y, double data);
     void add_column(std::vector<double>& data, unsigned int y);
     void add_row(std::vector<double>& data);
 
-    const std::vector< std::vector<double> >& get_data();
+    const std::vector<std::vector<double> >& get_data();
     const void* get_buffer(unsigned int index);
     Unit& get_unit(unsigned int index);
     const std::string& get_name();
@@ -86,4 +86,4 @@ public:
     unsigned int get_size();
 };
 
-#endif // BLOCK_HPP
+#endif  // BLOCK_HPP

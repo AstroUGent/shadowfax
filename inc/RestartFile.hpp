@@ -30,8 +30,8 @@
 #include <string>
 #include <vector>
 
-#include "Vec.hpp"
 #include "StateVector.hpp"
+#include "Vec.hpp"
 
 /**
  * @brief Wrapper around the std::ofstream or std::ifstream that is used to dump
@@ -45,8 +45,8 @@
  * constructor of their members. No explicit reading or writing should be done
  * outside this class.
  */
-class RestartFile{
-private:
+class RestartFile {
+  private:
     /*! \brief Output file stream if this RestartFile is used to dump data */
     std::ofstream _ofile;
 
@@ -60,7 +60,7 @@ private:
     std::string get_foldername(std::string prefix, int rank, int size,
                                std::string suffix = "");
 
-public:
+  public:
     RestartFile(std::string outputdir, double simtime);
     RestartFile(std::string filename);
 
@@ -70,7 +70,7 @@ public:
      * @param value Value to write to the stream. Can be any type that can be
      * casted to a binary array with a size known at compile time
      */
-    template<typename T> void write(T value){
+    template <typename T> void write(T value) {
         _ofile.write(reinterpret_cast<char*>(&value), sizeof(T));
     }
 
@@ -81,7 +81,7 @@ public:
      *
      * @param value Boolean value to write to the stream
      */
-    void write(bool value){
+    void write(bool value) {
         char boolean = value;
         _ofile.write(&boolean, 1);
     }
@@ -94,8 +94,9 @@ public:
      *
      * @param value Vec to write to the stream
      */
-    void write(Vec &value){
-        _ofile.write(reinterpret_cast<char*>(&value[0]), ndim_*sizeof(double));
+    void write(Vec& value) {
+        _ofile.write(reinterpret_cast<char*>(&value[0]),
+                     ndim_ * sizeof(double));
     }
 
     /**
@@ -106,9 +107,9 @@ public:
      *
      * @param value StateVector to write to the stream
      */
-    void write(StateVector &value){
+    void write(StateVector& value) {
         _ofile.write(reinterpret_cast<char*>(&value[0]),
-                     (ndim_+2)*sizeof(double));
+                     (ndim_ + 2) * sizeof(double));
     }
 
     /**
@@ -120,10 +121,10 @@ public:
      * @param vec std::vector containing any other datatype that can be written
      * to the stream
      */
-    template<typename T> void write(std::vector<T> &vec){
+    template <typename T> void write(std::vector<T>& vec) {
         unsigned int vsize = vec.size();
         write(vsize);
-        for(unsigned int i = 0; i < vsize; i++){
+        for(unsigned int i = 0; i < vsize; i++) {
             write(vec[i]);
         }
     }
@@ -136,7 +137,7 @@ public:
      *
      * @param value std::string to write to the stream
      */
-    void write(std::string &value){
+    void write(std::string& value) {
         unsigned int ssize = value.size();
         write(ssize);
         _ofile.write(value.c_str(), ssize);
@@ -151,8 +152,8 @@ public:
      * @param array Array to write to the stream
      * @param size unsigned integer length of the array
      */
-    template<typename T> void write(T *array, unsigned int size){
-        _ofile.write(reinterpret_cast<char*>(array), sizeof(T)*size);
+    template <typename T> void write(T* array, unsigned int size) {
+        _ofile.write(reinterpret_cast<char*>(array), sizeof(T) * size);
     }
 
     /**
@@ -164,13 +165,13 @@ public:
      * @param array Array to write to the stream
      * @param size unsigned integer length of the array
      */
-    void write(bool *array, unsigned int size){
-        char *byte_array = new char[size];
-        for(unsigned int i = 0; i < size; i++){
+    void write(bool* array, unsigned int size) {
+        char* byte_array = new char[size];
+        for(unsigned int i = 0; i < size; i++) {
             byte_array[i] = array[i];
         }
         _ofile.write(byte_array, size);
-        delete [] byte_array;
+        delete[] byte_array;
     }
 
     /**
@@ -181,7 +182,7 @@ public:
      *
      * @param value Value to read from the stream
      */
-    template<typename T> void read(T &value){
+    template <typename T> void read(T& value) {
         _ifile.read(reinterpret_cast<char*>(&value), sizeof(value));
     }
 
@@ -193,8 +194,8 @@ public:
      *
      * @param value Vec to read from the stream
      */
-    void read(Vec &value){
-        _ifile.read(reinterpret_cast<char*>(&value[0]), ndim_*sizeof(double));
+    void read(Vec& value) {
+        _ifile.read(reinterpret_cast<char*>(&value[0]), ndim_ * sizeof(double));
     }
 
     /**
@@ -205,9 +206,9 @@ public:
      *
      * @param value StateVector to read from the stream
      */
-    void read(StateVector &value){
+    void read(StateVector& value) {
         _ifile.read(reinterpret_cast<char*>(&value[0]),
-                    (ndim_+2)*sizeof(double));
+                    (ndim_ + 2) * sizeof(double));
     }
 
     /**
@@ -218,11 +219,11 @@ public:
      *
      * @param vec std::vector to read from the stream
      */
-    template<typename T> void read(std::vector<T> &vec){
+    template <typename T> void read(std::vector<T>& vec) {
         unsigned int vsize;
         read(vsize);
         vec.resize(vsize);
-        for(unsigned int i = 0; i < vsize; i++){
+        for(unsigned int i = 0; i < vsize; i++) {
             T element;
             read(element);
             vec[i] = element;
@@ -241,14 +242,14 @@ public:
      *
      * @param value std::string to read from the stream
      */
-    void read(std::string &value){
+    void read(std::string& value) {
         unsigned int ssize;
         read(ssize);
-        char* stringval = new char[ssize+1];
+        char* stringval = new char[ssize + 1];
         _ifile.read(stringval, ssize);
         stringval[ssize] = '\0';
         value = string(stringval);
-        delete [] stringval;
+        delete[] stringval;
     }
 
     /**
@@ -260,8 +261,8 @@ public:
      * @param array Array to read from the stream
      * @param size Size of the array
      */
-    template<typename T> void read(T *array, unsigned int size){
-        _ifile.read(reinterpret_cast<char*>(array), sizeof(T)*size);
+    template <typename T> void read(T* array, unsigned int size) {
+        _ifile.read(reinterpret_cast<char*>(array), sizeof(T) * size);
     }
 
     /**
@@ -273,14 +274,14 @@ public:
      * @param array Array to read from the stream
      * @param size Size of the array
      */
-    void read(bool *array, unsigned int size){
-        char *byte_array = new char[size];
+    void read(bool* array, unsigned int size) {
+        char* byte_array = new char[size];
         _ifile.read(byte_array, size);
-        for(unsigned int i = 0; i < size; i++){
+        for(unsigned int i = 0; i < size; i++) {
             array[i] = byte_array[i] > 0;
         }
-        delete [] byte_array;
+        delete[] byte_array;
     }
 };
 
-#endif // RESTARTFILE_HPP
+#endif  // RESTARTFILE_HPP

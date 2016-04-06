@@ -38,7 +38,7 @@
 #define LOGE(message) global_logger.log<LOGLEVEL_E>(message)
 #define DOLOG
 
-#else // LOGLEVEL_ALL
+#else  // LOGLEVEL_ALL
 
 #ifdef LOGLEVEL_WARNINGS
 
@@ -49,7 +49,7 @@
 #define LOGE(message) global_logger.log<LOGLEVEL_E>(message)
 #define DOLOG
 
-#else // LOGLEVEL_WARNINGS
+#else  // LOGLEVEL_WARNINGS
 
 #ifdef LOGLEVEL_ERRORS
 
@@ -60,7 +60,7 @@
 #define LOGE(message) global_logger.log<LOGLEVEL_E>(message)
 #define DOLOG
 
-#else // LOGLEVEL_ERRORS
+#else  // LOGLEVEL_ERRORS
 
 // no logging
 #define LOGINIT(foldername)
@@ -68,22 +68,22 @@
 #define LOGW(message)
 #define LOGE(message)
 
-#endif // LOGLEVEL_ERRORS
+#endif  // LOGLEVEL_ERRORS
 
-#endif // LOGLEVEL_WARNINGS
+#endif  // LOGLEVEL_WARNINGS
 
-#endif // LOGLEVEL_ALL
+#endif  // LOGLEVEL_ALL
 
 #ifdef DOLOG
 
+#include "MPIGlobal.hpp"
 #include <fstream>
 #include <string>
-#include "MPIGlobal.hpp"
 
 /**
  * @brief Three possible levels of logging
  */
-enum LogLevel{
+enum LogLevel {
     /*! \brief Lowest level of logging, provides most information */
     LOGLEVEL_S = 0,
     /*! \brief Warning level. Invoked to log non-fatal warnings */
@@ -98,19 +98,19 @@ enum LogLevel{
  * All logs are written to a file programlog.txt in the program output
  * directory and contain a time label, a log level label and a custom message.
  */
-class ProgramLog{
-private:
+class ProgramLog {
+  private:
     /*! \brief Output stream to write logs to */
     std::ofstream _ofile;
 
-public:
+  public:
     /**
      * @brief Open the log file in the given folder
      *
      * @param foldername Name of the folder where the logfile should be created
      */
-    void open(std::string foldername){
-        if(MPIGlobal::rank){
+    void open(std::string foldername) {
+        if(MPIGlobal::rank) {
             return;
         }
         std::string filename = foldername + std::string("/programlog.txt");
@@ -122,12 +122,12 @@ public:
      *
      * @param message Custom message to append to the log line
      */
-    template<LogLevel level> void log(std::string message){
-        if(MPIGlobal::rank){
+    template <LogLevel level> void log(std::string message) {
+        if(MPIGlobal::rank) {
             return;
         }
         timeval curtime;
-        struct tm *date;
+        struct tm* date;
         gettimeofday(&curtime, NULL);
         date = localtime(&curtime.tv_sec);
         // convert the date to a string format
@@ -136,16 +136,16 @@ public:
         strftime(buffer, 11, "%H:%M:%S: ", date);
         _ofile << buffer;
 
-        switch(level){
-        case LOGLEVEL_S:
-            _ofile << "S: ";
-            break;
-        case LOGLEVEL_W:
-            _ofile << "W: ";
-            break;
-        case LOGLEVEL_E:
-            _ofile << "E: ";
-            break;
+        switch(level) {
+            case LOGLEVEL_S:
+                _ofile << "S: ";
+                break;
+            case LOGLEVEL_W:
+                _ofile << "W: ";
+                break;
+            case LOGLEVEL_E:
+                _ofile << "E: ";
+                break;
         }
 
         _ofile << message << std::endl;
@@ -157,4 +157,4 @@ extern ProgramLog global_logger;
 
 #endif
 
-#endif // PROGRAMLOG_HPP
+#endif  // PROGRAMLOG_HPP

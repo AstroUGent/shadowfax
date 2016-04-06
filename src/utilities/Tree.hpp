@@ -26,26 +26,26 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
-#include <ostream>
-#include <fstream>
-#include <sstream>
-#include "Vec.hpp"
-#include "TreeRoute.hpp"
 #include "EwaldTable.hpp"
 #include "Hilbert.hpp"
+#include "TreeRoute.hpp"
+#include "Vec.hpp"
+#include <fstream>
+#include <ostream>
+#include <sstream>
 
 #include "Box.hpp"
 #include "Cuboid.hpp"
 
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
-#include "utilities/Particle.hpp"
-#include "utilities/GasParticle.hpp"
 #include "utilities/DMParticle.hpp"
+#include "utilities/GasParticle.hpp"
+#include "utilities/Particle.hpp"
 
 class VorGen;
 
-#if ndim_==3
+#if ndim_ == 3
 #define numnode_ 8
 #else
 #define numnode_ 4
@@ -58,8 +58,8 @@ class PeriodicTreeWalker;
  * @brief Auxiliary class used to communicate TreeNode information to a
  * PseudoNode on another MPI process
  */
-class NodeInfo{
-private:
+class NodeInfo {
+  private:
     /*! \brief Hilbert key of the node */
     unsigned long _key;
 
@@ -78,7 +78,7 @@ private:
     /*! \brief Center of mass of the node */
     Vec _center_of_mass;
 
-public:
+  public:
     NodeInfo() : _key(0), _cmax(0.), _vmax(0.), _mass(0.), _hmax(0.) {}
 
     /**
@@ -92,63 +92,51 @@ public:
      * @param center_of_mass Center of mass of the node
      */
     NodeInfo(unsigned long key, double cmax, double vmax, double mass,
-             double hmax, Vec center_of_mass) :
-        _key(key), _cmax(cmax), _vmax(vmax), _mass(mass), _hmax(hmax),
-        _center_of_mass(center_of_mass) {}
+             double hmax, Vec center_of_mass)
+            : _key(key), _cmax(cmax), _vmax(vmax), _mass(mass), _hmax(hmax),
+              _center_of_mass(center_of_mass) {}
 
     /**
      * @brief Get the Hilbert key of the node
      *
      * @return Hilbert key of the node
      */
-    inline unsigned long get_key(){
-        return _key;
-    }
+    inline unsigned long get_key() { return _key; }
 
     /**
      * @brief Get the maximum soundspeed in the node
      *
      * @return Maximum soundspeed in the node
      */
-    inline double get_cmax(){
-        return _cmax;
-    }
+    inline double get_cmax() { return _cmax; }
 
     /**
      * @brief Get the maximum velocity in the node
      *
      * @return Maximum velocity in the node
      */
-    inline double get_vmax(){
-        return _vmax;
-    }
+    inline double get_vmax() { return _vmax; }
 
     /**
      * @brief Get the total mass inside the node
      *
      * @return Total mass inside the node
      */
-    inline double get_mass(){
-        return _mass;
-    }
+    inline double get_mass() { return _mass; }
 
     /**
      * @brief Get the maximum softening length in the node
      *
      * @return Maximum softening length in the node
      */
-    inline double get_hmax(){
-        return _hmax;
-    }
+    inline double get_hmax() { return _hmax; }
 
     /**
      * @brief Get the center of mass of the node
      *
      * @return Center of mass of the node
      */
-    inline Vec get_center_of_mass(){
-        return _center_of_mass;
-    }
+    inline Vec get_center_of_mass() { return _center_of_mass; }
 
     /**
      * @brief Add the node information to the given MPI buffer for communication
@@ -158,14 +146,14 @@ public:
      * @param bufsize Buffer size
      * @param position Position in the buffer (is updated)
      */
-    inline void pack_data(void *buffer, int bufsize, int *position){
+    inline void pack_data(void* buffer, int bufsize, int* position) {
         MyMPI_Pack(&_key, 1, MPI_UNSIGNED_LONG, buffer, bufsize, position);
         MyMPI_Pack(&_cmax, 1, MPI_DOUBLE, buffer, bufsize, position);
         MyMPI_Pack(&_vmax, 1, MPI_DOUBLE, buffer, bufsize, position);
         MyMPI_Pack(&_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
         MyMPI_Pack(&_hmax, 1, MPI_DOUBLE, buffer, bufsize, position);
         MyMPI_Pack(&_center_of_mass[0], ndim_, MPI_DOUBLE, buffer, bufsize,
-                position);
+                   position);
     }
 
     /**
@@ -176,14 +164,14 @@ public:
      * @param bufsize Buffer size
      * @param position Position in the buffer (is updated)
      */
-    inline NodeInfo(void *buffer, int bufsize, int *position){
+    inline NodeInfo(void* buffer, int bufsize, int* position) {
         MyMPI_Unpack(buffer, bufsize, position, &_key, 1, MPI_UNSIGNED_LONG);
         MyMPI_Unpack(buffer, bufsize, position, &_cmax, 1, MPI_DOUBLE);
         MyMPI_Unpack(buffer, bufsize, position, &_vmax, 1, MPI_DOUBLE);
         MyMPI_Unpack(buffer, bufsize, position, &_mass, 1, MPI_DOUBLE);
         MyMPI_Unpack(buffer, bufsize, position, &_hmax, 1, MPI_DOUBLE);
         MyMPI_Unpack(buffer, bufsize, position, &_center_of_mass[0], ndim_,
-                MPI_DOUBLE);
+                     MPI_DOUBLE);
     }
 };
 
@@ -195,12 +183,12 @@ public:
  * implementations and offers some utility functions to distinguish between
  * different implementations.
  */
-class Node{
-protected:
+class Node {
+  protected:
     /*! \brief Flag used to keep track of relevant node information */
     unsigned int _flag;
 
-public:
+  public:
     /**
      * @brief Constructor
      *
@@ -212,54 +200,46 @@ public:
      * @param is_leaf True if the node is a leaf of the tree, false otherwise
      * @param is_pseudo True if the node is a pseudonode of the tree
      */
-    Node(bool is_leaf, bool is_pseudo = false) : _flag(is_leaf){
-        _flag |= (is_pseudo<<2);
+    Node(bool is_leaf, bool is_pseudo = false) : _flag(is_leaf) {
+        _flag |= (is_pseudo << 2);
     }
 
-    virtual ~Node(){}
+    virtual ~Node() {}
 
     /**
      * @brief Check if the node is a leaf of the tree
      *
      * @return True if the node is a Leaf
      */
-    inline bool is_leaf(){
-        return (_flag&1);
-    }
+    inline bool is_leaf() { return (_flag & 1); }
 
     /**
      * @brief Check if the node is the last child of its parent
      *
      * @return True if the node is the last child of its parent
      */
-    inline bool is_last(){
-        return (_flag>>1)&1;
-    }
+    inline bool is_last() { return (_flag >> 1) & 1; }
 
     /**
      * @brief Check if the node is a pseudonode of the tree
      *
      * @return True if the node is a PseudoNode
      */
-    inline bool is_pseudo(){
-        return (_flag>>2)&1;
-    }
+    inline bool is_pseudo() { return (_flag >> 2) & 1; }
 
     /**
      * @brief Check if the node has only children on the local MPI process
      *
      * @return True if none of the descendants of the node is a PseudoNode
      */
-    inline bool is_local(){
-        return !((_flag>>3)&1);
-    }
+    inline bool is_local() { return !((_flag >> 3) & 1); }
 
     /**
      * @brief Print the node to the given stream
      *
      * @param out std::ostream to write to
      */
-    virtual void print(std::ostream& out)=0;
+    virtual void print(std::ostream& out) = 0;
 
     /**
      * @brief Finalize the node
@@ -273,21 +253,21 @@ public:
      * parent in the efficient Tree traversal ordering
      * @return Number of descendants of this node
      */
-    virtual unsigned int finalize(Node* sibling, bool last)=0;
+    virtual unsigned int finalize(Node* sibling, bool last) = 0;
 
     /**
      * @brief Get the total mass inside this node
      *
      * @return The mass of this node
      */
-    virtual double get_mass()=0;
+    virtual double get_mass() = 0;
 
     /**
      * @brief Get the maximum softening length in this node
      *
      * @return Maximum softening length in the node
      */
-    virtual double get_hmax()=0;
+    virtual double get_hmax() = 0;
 
     /**
      * @brief Get the given coordinate of the center of mass of the node
@@ -295,21 +275,21 @@ public:
      * @param index Index of the coordinate (x = 0, y = 1, z = 2)
      * @return Requested coordinate of the center of mass of the node
      */
-    virtual double get_center_of_mass(unsigned int index)=0;
+    virtual double get_center_of_mass(unsigned int index) = 0;
 
     /**
      * @brief Get the maximum soundspeed in the node
      *
      * @return Maximum soundspeed in the node
      */
-    virtual double get_cmax()=0;
+    virtual double get_cmax() = 0;
 
     /**
      * @brief Get the maximum velocity in the node
      *
      * @return Maximum velocity in the node
      */
-    virtual double get_vmax()=0;
+    virtual double get_vmax() = 0;
 
     /**
      * @brief Recursively walk the node using the given TreeWalker
@@ -318,18 +298,18 @@ public:
      *
      * @param walker TreeWalker used to walk the tree
      */
-    virtual void walk(TreeWalker& walker)=0;
+    virtual void walk(TreeWalker& walker) = 0;
 };
 
 /**
  * @brief Pair of Node pointer and associated Hilbert key
  */
 class ExportNode : public Hilbert_Object {
-private:
+  private:
     /*! \brief Node associated with this export node */
     Node* _node;
 
-public:
+  public:
     /**
      * @brief Constructor
      *
@@ -337,18 +317,16 @@ public:
      * @param key Hilber key associated with the node
      */
     ExportNode(Node* node, unsigned long key)
-        : Hilbert_Object(key), _node(node) {}
+            : Hilbert_Object(key), _node(node) {}
 
-    ~ExportNode(){}
+    ~ExportNode() {}
 
     /**
      * @brief Get the node associated with this export node
      *
      * @return The node
      */
-    inline Node* get_node(){
-        return _node;
-    }
+    inline Node* get_node() { return _node; }
 };
 
 /**
@@ -359,7 +337,7 @@ public:
  * PseudoNode also come from another process.
  */
 class PseudoNode : public Node, public Hilbert_Object {
-private:
+  private:
     /*! \brief Node on the same level that is next in the efficient Tree
      *  traversal order */
     Node* _sibling;
@@ -386,11 +364,11 @@ private:
     /*! \brief Maximum softening length in the node */
     double _hmax;
 
-public:
+  public:
     PseudoNode(Box box, unsigned int src, unsigned long key);
     ~PseudoNode();
 
-    unsigned int finalize(Node *sibling, bool last);
+    unsigned int finalize(Node* sibling, bool last);
     double get_mass();
     double get_hmax();
     double get_center_of_mass(unsigned int index);
@@ -412,7 +390,7 @@ public:
 
     Node* get_sibling();
 
-    void walk(TreeWalker &walker);
+    void walk(TreeWalker& walker);
 };
 
 /**
@@ -423,15 +401,15 @@ public:
  * general properties like a center of mass and a total mass that are used
  * during treewalks when it does not have to be opened.
  */
-class TreeNode : public Node{
-private:
+class TreeNode : public Node {
+  private:
     /*! \brief Box specifying the geometrical dimensions of the node */
     Box _box;
-    union{
+    union {
         /*! \brief Child nodes of the treenode during tree construction */
         Node* _nodes[numnode_];
 
-        struct{
+        struct {
             /*! \brief Node on the same level that is next in the efficient Tree
             *  traversal order */
             Node* _sibling;
@@ -465,7 +443,7 @@ private:
         };
     };
 
-public:
+  public:
     TreeNode(Box box);
     ~TreeNode();
 
@@ -503,7 +481,7 @@ public:
     void update_quantities(bool all = false);
     void update_mesh_masses();
 
-    void walk(TreeWalker &walker);
+    void walk(TreeWalker& walker);
 };
 
 /**
@@ -512,8 +490,8 @@ public:
  * The Leaf stores a pointer to a Particle and provides functions to access
  * Particle properties.
  */
-class Leaf : public Node{
-private:
+class Leaf : public Node {
+  private:
     /*! \brief Particle stored in this leaf */
     Particle* _particle;
 
@@ -521,7 +499,7 @@ private:
      *  traversal order */
     Node* _sibling;
 
-public:
+  public:
     Leaf();
     ~Leaf();
 
@@ -537,7 +515,7 @@ public:
 
     Node* get_sibling();
 
-    void walk(TreeWalker &walker);
+    void walk(TreeWalker& walker);
 };
 
 /**
@@ -551,10 +529,10 @@ public:
  * making use of pseudonodes (Springel 2005), each containing a fraction of
  * the total space filling Hilbert curve.
  */
-class Tree{
-private:
+class Tree {
+  private:
     /*! \brief Ewald table used to calculate periodic force corrections */
-    EwaldTable *_ewald_table;
+    EwaldTable* _ewald_table;
 
     /*! \brief Root node of the tree */
     Node* _root;
@@ -579,7 +557,7 @@ private:
      *  reflective (false) */
     bool _periodic;
 
-public:
+  public:
     Tree(Cuboid box, bool periodic = false, bool do_ewald = false,
          double alpha = 2., unsigned int size = 64);
     ~Tree();
@@ -597,7 +575,7 @@ public:
     void get_neighbours_outside(Vec& coords, double radius,
                                 std::vector<VorGen*>& ngblist,
                                 std::vector<bool>& exportlist,
-                                unsigned int index=0);
+                                unsigned int index = 0);
 
     Particle* get_closest(Vec& coords, double r);
     Particle* get_periodic_closest(Vec& coords, double r);
@@ -610,7 +588,7 @@ public:
      *
      * @return PseudoNodes in the local tree
      */
-    std::vector<PseudoNode> get_pseudonode_info(){
+    std::vector<PseudoNode> get_pseudonode_info() {
         std::vector<PseudoNode> pseudos;
         return pseudos;
     }
@@ -622,7 +600,7 @@ public:
      *
      * @param pseudonodes List of PseudoNodes
      */
-    void set_pseudonode_info(std::vector<PseudoNode>& pseudonodes){}
+    void set_pseudonode_info(std::vector<PseudoNode>& pseudonodes) {}
 
     void reset(Cuboid box);
 
@@ -638,14 +616,14 @@ public:
      * @param walker TreeWalker containing the necessary functions to walk the
      * tree
      */
-    template<typename T> void walk_tree(T& walker){
-        if(_periodic){
+    template <typename T> void walk_tree(T& walker) {
+        if(_periodic) {
             walker.set_boxsize(_side);
         }
         Node* stack = ((TreeNode*)_root)->get_child();
-        while(stack){
-            if(stack->is_leaf()){
-                if(stack->is_pseudo()){
+        while(stack) {
+            if(stack->is_leaf()) {
+                if(stack->is_pseudo()) {
                     walker.pseudonodeaction(((PseudoNode*)stack));
                     stack = ((PseudoNode*)stack)->get_sibling();
                 } else {
@@ -653,7 +631,7 @@ public:
                     stack = ((Leaf*)stack)->get_sibling();
                 }
             } else {
-                if(walker.splitnode((TreeNode*)stack)){
+                if(walker.splitnode((TreeNode*)stack)) {
                     stack = ((TreeNode*)stack)->get_child();
                 } else {
                     stack = ((TreeNode*)stack)->get_sibling();
@@ -671,20 +649,20 @@ public:
      * @param exports List of Export objects that have to be communicated to
      * other MPI processes to perform external parts of the treewalk
      */
-    template<typename T> void walk_tree(
-            T& walker, std::vector< std::vector<typename T::Export> >& exports
-            ){
-        if(_periodic){
+    template <typename T>
+    void walk_tree(T& walker,
+                   std::vector<std::vector<typename T::Export> >& exports) {
+        if(_periodic) {
             walker.set_boxsize(_side);
         }
         // we cannot just add Exports to exports, since we only want to add
         // every Export at most once for every process
         std::vector<bool> do_export(exports.size(), false);
         Node* stack = ((TreeNode*)_root)->get_child();
-        while(stack){
-            if(stack->is_leaf()){
-                if(stack->is_pseudo()){
-                    if(walker.export_to_pseudonode((PseudoNode*)stack)){
+        while(stack) {
+            if(stack->is_leaf()) {
+                if(stack->is_pseudo()) {
+                    if(walker.export_to_pseudonode((PseudoNode*)stack)) {
                         do_export[((PseudoNode*)stack)->get_source()] = true;
                     }
                     stack = ((PseudoNode*)stack)->get_sibling();
@@ -693,15 +671,15 @@ public:
                     stack = ((Leaf*)stack)->get_sibling();
                 }
             } else {
-                if(walker.splitnode((TreeNode*)stack)){
+                if(walker.splitnode((TreeNode*)stack)) {
                     stack = ((TreeNode*)stack)->get_child();
                 } else {
                     stack = ((TreeNode*)stack)->get_sibling();
                 }
             }
         }
-        for(unsigned int i = 0; i < exports.size(); i++){
-            if(do_export[i]){
+        for(unsigned int i = 0; i < exports.size(); i++) {
+            if(do_export[i]) {
                 exports[i].push_back(walker.get_export());
             }
         }
@@ -715,13 +693,13 @@ public:
      * @param walker TreeWalker containing the necessary functions to walk the
      * tree
      */
-    template<typename T> void walk_tree_periodic(T& walker){
+    template <typename T> void walk_tree_periodic(T& walker) {
         walk_tree(walker);
         // now do the periodic stuff
         Node* stack = ((TreeNode*)_root)->get_child();
-        while(stack){
-            if(stack->is_leaf()){
-                if(stack->is_pseudo()){
+        while(stack) {
+            if(stack->is_leaf()) {
+                if(stack->is_pseudo()) {
                     walker.periodicpseudonodeaction(((PseudoNode*)stack),
                                                     _ewald_table);
                     stack = ((PseudoNode*)stack)->get_sibling();
@@ -730,7 +708,7 @@ public:
                     stack = ((Leaf*)stack)->get_sibling();
                 }
             } else {
-                if(walker.periodicsplitnode((TreeNode*)stack, _ewald_table)){
+                if(walker.periodicsplitnode((TreeNode*)stack, _ewald_table)) {
                     stack = ((TreeNode*)stack)->get_child();
                 } else {
                     stack = ((TreeNode*)stack)->get_sibling();
@@ -740,7 +718,7 @@ public:
     }
 
     /*! \brief Tags used to distinguish between MPI messages */
-    enum MPI_TAGS{
+    enum MPI_TAGS {
         /*! Tag for the sending of Export information to external processes */
         TAG_EXPORT,
         /*! Tag for the receiving of Import information on the local process */
@@ -758,18 +736,18 @@ public:
      * ParticleVector
      * @param current_time unsigned long integer current simulation time
      */
-    template<class T, typename P> void walk_tree(P& particles, bool gas,
-                                                 bool dm,
-                                                 unsigned long current_time){
+    template <class T, typename P>
+    void walk_tree(P& particles, bool gas, bool dm,
+                   unsigned long current_time) {
         // the walker has two associated classes called Import and Export, which
         // are used to communicate relevant information to and from other
         // processes
         typedef typename T::Export TExport;
         typedef typename T::Import TImport;
-        std::vector< std::vector<TExport> > exports(MPIGlobal::size);
-        if(gas){
-            for(unsigned int i = 0; i < particles.gassize(); i++){
-                if(particles.gas(i)->get_endtime() == current_time){
+        std::vector<std::vector<TExport> > exports(MPIGlobal::size);
+        if(gas) {
+            for(unsigned int i = 0; i < particles.gassize(); i++) {
+                if(particles.gas(i)->get_endtime() == current_time) {
                     T walker(particles.gas(i));
                     walk_tree(walker, exports);
                     walker.after_walk();
@@ -777,12 +755,12 @@ public:
             }
         }
 
-        if(dm){
+        if(dm) {
             // first do the local treewalk. If the treewalk encounters a part
             // of the three that is on another process, an Export is added to
             // the list
-            for(unsigned int i = 0; i < particles.dmsize(); i++){
-                if(particles.dm(i)->get_endtime() == current_time){
+            for(unsigned int i = 0; i < particles.dmsize(); i++) {
+                if(particles.dm(i)->get_endtime() == current_time) {
                     T walker(particles.dm(i));
                     walk_tree(walker, exports);
                     walker.after_walk();
@@ -807,68 +785,71 @@ public:
         // blocking MPI_IProbe. We now have to check manually if a send has
         // completed, but it might be easier to just launch send and receives
         // and wait for any of them to finish
-        if(MPIGlobal::size > 1){
+        if(MPIGlobal::size > 1) {
             // MPI_Requests used for the non-blocking sends. They are never
             // actually used, but we need to provide them for calls to MPI_Isend
             // And we need to free them with an MPI_Waitall or MPI_Test to make
             // sure the associated memory is not leaked!!
-            std::vector<MPI_Request> reqs((MPIGlobal::size-1)*2,
+            std::vector<MPI_Request> reqs((MPIGlobal::size - 1) * 2,
                                           MPI_REQUEST_NULL);
             // Offsets in the MPIGlobal buffers. For every external process, we
             // reserve 2 blocks in each buffer to allow for non-blocking
             // communication of buffers (if we would use a single buffer, then
             // subsequent sends would overwrite it)
-            std::vector<unsigned int> buffers((MPIGlobal::size-1)*2);
-            unsigned int bufsize = MPIGlobal::sendsize/buffers.size();
-            for(unsigned int i = 0; i < buffers.size(); i++){
-                buffers[i] = i*bufsize;
+            std::vector<unsigned int> buffers((MPIGlobal::size - 1) * 2);
+            unsigned int bufsize = MPIGlobal::sendsize / buffers.size();
+            for(unsigned int i = 0; i < buffers.size(); i++) {
+                buffers[i] = i * bufsize;
             }
 
             unsigned int typesize = std::max(sizeof(TExport), sizeof(TImport));
-            unsigned int maxsize = bufsize/typesize;
-            if(!(bufsize%typesize)){
+            unsigned int maxsize = bufsize / typesize;
+            if(!(bufsize % typesize)) {
                 maxsize--;
             }
 
             // pack the local TExports and send them to their respective
             // processes
-            vector<int> allflag(MPIGlobal::size-1);
-            vector<unsigned int> numsend(MPIGlobal::size-1);
-            vector<unsigned int> sendsizes(MPIGlobal::size-1);
+            vector<int> allflag(MPIGlobal::size - 1);
+            vector<unsigned int> numsend(MPIGlobal::size - 1);
+            vector<unsigned int> sendsizes(MPIGlobal::size - 1);
             // we keep track of the total number of messages that should be sent
             // and received. We send and receive at least one message for every
             // process. For every message that is sent, an answer has to be
             // received. For incomplete sends, we need to send additional
             // messages. For incomplete receives, we have to receive additional
             // messages.
-            int numtoreceive = MPIGlobal::size-1;
-            int numtosend = MPIGlobal::size-1;
+            int numtoreceive = MPIGlobal::size - 1;
+            int numtosend = MPIGlobal::size - 1;
             int numrecv = 0;
             int numsent = 0;
-            for(int i = 0; i < MPIGlobal::size-1; i++){
+            for(int i = 0; i < MPIGlobal::size - 1; i++) {
                 sendsizes[i] =
-                        exports[(MPIGlobal::rank+1+i)%MPIGlobal::size].size();
+                        exports[(MPIGlobal::rank + 1 + i) % MPIGlobal::size]
+                                .size();
 
                 int send_pos = 0;
                 for(unsigned int si = 0; si < std::min(maxsize, sendsizes[i]);
-                    si++){
-                    exports[(MPIGlobal::rank+1+i)%MPIGlobal::size][si].
-                            pack_data(&MPIGlobal::sendbuffer[buffers[2*i]],
-                                      bufsize, &send_pos);
+                    si++) {
+                    exports[(MPIGlobal::rank + 1 + i) % MPIGlobal::size]
+                           [si].pack_data(
+                                   &MPIGlobal::sendbuffer[buffers[2 * i]],
+                                   bufsize, &send_pos);
                 }
                 allflag[i] = (sendsizes[i] <= maxsize);
-                if(!allflag[i]){
+                if(!allflag[i]) {
                     numtosend++;
                 }
                 numsend[i] = 1;
                 // add continuation signal
                 MyMPI_Pack(&allflag[i], 1, MPI_INT,
-                           &MPIGlobal::sendbuffer[buffers[2*i]], bufsize,
+                           &MPIGlobal::sendbuffer[buffers[2 * i]], bufsize,
                            &send_pos);
 
-                MyMPI_Isend(&MPIGlobal::sendbuffer[buffers[2*i]], send_pos,
-                            MPI_PACKED, (MPIGlobal::rank+1+i)%MPIGlobal::size,
-                            MPI_TAGS::TAG_EXPORT, &reqs[2*i]);
+                MyMPI_Isend(&MPIGlobal::sendbuffer[buffers[2 * i]], send_pos,
+                            MPI_PACKED,
+                            (MPIGlobal::rank + 1 + i) % MPIGlobal::size,
+                            MPI_TAGS::TAG_EXPORT, &reqs[2 * i]);
                 numsent++;
                 numtoreceive++;
             }
@@ -878,43 +859,45 @@ public:
             // We use MPI_Probe to detect arriving messages, independent of
             // their origin or tag. We then receive and process these messages
             // according to their tag.
-            vector<unsigned int> numreceived(MPIGlobal::size-1, 0);
-            while(numrecv < numtoreceive || numsent < numtosend){
+            vector<unsigned int> numreceived(MPIGlobal::size - 1, 0);
+            while(numrecv < numtoreceive || numsent < numtosend) {
                 MPI_Status status;
-                if(numsent < numtosend){
-                    for(int j = 0; j < MPIGlobal::size-1; j++){
-                        if(!allflag[j]){
+                if(numsent < numtosend) {
+                    for(int j = 0; j < MPIGlobal::size - 1; j++) {
+                        if(!allflag[j]) {
                             int flag;
                             MyMPI_Test(&reqs[j], &flag, &status);
-                            if(flag){
+                            if(flag) {
                                 int send_pos = 0;
-                                for(unsigned int si = numsend[j]*maxsize;
-                                    si < std::min((numsend[j]+1)*maxsize,
+                                for(unsigned int si = numsend[j] * maxsize;
+                                    si < std::min((numsend[j] + 1) * maxsize,
                                                   sendsizes[j]);
-                                    si++){
-                                    exports[(MPIGlobal::rank+1+j)%
-                                            MPIGlobal::size][si].pack_data(
-                                                &MPIGlobal::sendbuffer
-                                                [buffers[2*j]], bufsize,
-                                                &send_pos
-                                                );
+                                    si++) {
+                                    exports[(MPIGlobal::rank + 1 + j) %
+                                            MPIGlobal::size]
+                                           [si].pack_data(
+                                                   &MPIGlobal::sendbuffer
+                                                           [buffers[2 * j]],
+                                                   bufsize, &send_pos);
                                 }
                                 allflag[j] = (sendsizes[j] <=
-                                              (numsend[j]+1)*maxsize);
-                                if(!allflag[j]){
+                                              (numsend[j] + 1) * maxsize);
+                                if(!allflag[j]) {
                                     numtosend++;
                                 }
                                 numsend[j]++;
                                 // add continuation signal
-                                MyMPI_Pack(&allflag[j], 1, MPI_INT,
-                                           &MPIGlobal::sendbuffer[buffers[2*j]],
-                                           bufsize, &send_pos);
+                                MyMPI_Pack(
+                                        &allflag[j], 1, MPI_INT,
+                                        &MPIGlobal::sendbuffer[buffers[2 * j]],
+                                        bufsize, &send_pos);
 
-                                MyMPI_Isend(&MPIGlobal::sendbuffer
-                                            [buffers[2*j]], send_pos,
-                                            MPI_PACKED, (MPIGlobal::rank+1+j)%
-                                            MPIGlobal::size,
-                                            MPI_TAGS::TAG_EXPORT, &reqs[2*j]);
+                                MyMPI_Isend(
+                                        &MPIGlobal::sendbuffer[buffers[2 * j]],
+                                        send_pos, MPI_PACKED,
+                                        (MPIGlobal::rank + 1 + j) %
+                                                MPIGlobal::size,
+                                        MPI_TAGS::TAG_EXPORT, &reqs[2 * j]);
                                 numsent++;
                                 numtoreceive++;
                             }
@@ -922,7 +905,7 @@ public:
                     }
                 }
 
-                if(numrecv < numtoreceive){
+                if(numrecv < numtoreceive) {
                     int index;
                     int tag;
                     int recv_pos;
@@ -941,66 +924,64 @@ public:
                     // select an index in the buffers to use for receiving and
                     // sending
                     int freebuffer;
-                    if(index == MPIGlobal::size-1){
-                        freebuffer = 2*MPIGlobal::rank;
+                    if(index == MPIGlobal::size - 1) {
+                        freebuffer = 2 * MPIGlobal::rank;
                     } else {
-                        freebuffer = 2*index;
+                        freebuffer = 2 * index;
                     }
                     // TAG_EXPORT: the arriving message contains TExports. We
                     // receive them as TImports and walk the local tree. We then
                     // send the TImports back to their original process
-                    if(tag == MPI_TAGS::TAG_EXPORT){
+                    if(tag == MPI_TAGS::TAG_EXPORT) {
                         MyMPI_Recv(&MPIGlobal::recvbuffer[buffers[freebuffer]],
                                    nelements, MPI_PACKED, index,
                                    MPI_TAGS::TAG_EXPORT, &status);
                         recv_pos = 0;
                         send_pos = 0;
-                        while(recv_pos < nelements-4){
+                        while(recv_pos < nelements - 4) {
                             TImport import(
-                                        &MPIGlobal::recvbuffer
-                                        [buffers[freebuffer]], nelements,
-                                        &recv_pos
-                                    );
+                                    &MPIGlobal::recvbuffer[buffers[freebuffer]],
+                                    nelements, &recv_pos);
                             T walker(import);
                             particles.get_tree().walk_tree(walker);
                             walker.after_walk(import);
-                            import.pack_data(&MPIGlobal::sendbuffer
-                                             [buffers[freebuffer+1]], bufsize,
-                                             &send_pos);
+                            import.pack_data(
+                                    &MPIGlobal::sendbuffer[buffers[freebuffer +
+                                                                   1]],
+                                    bufsize, &send_pos);
                         }
                         int flag;
-                        MyMPI_Unpack(&MPIGlobal::recvbuffer
-                                     [buffers[freebuffer]], nelements,
-                                     &recv_pos, &flag, 1, MPI_INT);
-                        if(!flag){
+                        MyMPI_Unpack(
+                                &MPIGlobal::recvbuffer[buffers[freebuffer]],
+                                nelements, &recv_pos, &flag, 1, MPI_INT);
+                        if(!flag) {
                             numtoreceive++;
                         }
 
-                        MyMPI_Isend(&MPIGlobal::sendbuffer
-                                    [buffers[freebuffer+1]], send_pos,
-                                    MPI_PACKED, index, MPI_TAGS::TAG_IMPORT,
-                                    &reqs[freebuffer+1]);
+                        MyMPI_Isend(
+                                &MPIGlobal::sendbuffer[buffers[freebuffer + 1]],
+                                send_pos, MPI_PACKED, index,
+                                MPI_TAGS::TAG_IMPORT, &reqs[freebuffer + 1]);
                     }
 
                     // TAG_IMPORT: the arriving message contains TImports. We
                     // unpack them in their respective TExport to add the
                     // contribution of the source process to the local particles
-                    if(tag == MPI_TAGS::TAG_IMPORT){
-                        MyMPI_Recv(&MPIGlobal::recvbuffer
-                                   [buffers[freebuffer+1]], nelements,
-                                   MPI_PACKED, index, MPI_TAGS::TAG_IMPORT,
-                                   &status);
-                        unsigned int j = numreceived[freebuffer/2];
+                    if(tag == MPI_TAGS::TAG_IMPORT) {
+                        MyMPI_Recv(
+                                &MPIGlobal::recvbuffer[buffers[freebuffer + 1]],
+                                nelements, MPI_PACKED, index,
+                                MPI_TAGS::TAG_IMPORT, &status);
+                        unsigned int j = numreceived[freebuffer / 2];
                         recv_pos = 0;
-                        while(recv_pos < nelements){
+                        while(recv_pos < nelements) {
                             exports[index][j].unpack_data(
-                                        &MPIGlobal::recvbuffer
-                                        [buffers[freebuffer+1]], nelements,
-                                        &recv_pos
-                                    );
+                                    &MPIGlobal::recvbuffer[buffers[freebuffer +
+                                                                   1]],
+                                    nelements, &recv_pos);
                             j++;
                         }
-                        numreceived[freebuffer/2] = j;
+                        numreceived[freebuffer / 2] = j;
                     }
                 }
             }
@@ -1016,11 +997,11 @@ public:
             // By putting a barrier here, we prevent this from happening
             // Another solution would be to use treewalk specific message tags,
             // but this is difficult when using template walkers.
-            vector<MPI_Status> status((MPIGlobal::size-1)*2);
-            MyMPI_Waitall((MPIGlobal::size-1)*2, &reqs[0], &status[0]);
+            vector<MPI_Status> status((MPIGlobal::size - 1) * 2);
+            MyMPI_Waitall((MPIGlobal::size - 1) * 2, &reqs[0], &status[0]);
             MyMPI_Barrier();
         }
     }
 };
 
-#endif // TREE_HPP
+#endif  // TREE_HPP

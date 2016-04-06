@@ -38,11 +38,11 @@ using namespace std;
  */
 NgbSearch::NgbSearch(Vec center, double radius, vector<bool>& exportlist,
                      unsigned int reserve)
-    : _center(center), _exportlist(exportlist){
-    if(reserve){
+        : _center(center), _exportlist(exportlist) {
+    if(reserve) {
         _ngbs.reserve(reserve);
     }
-    _radius2 = radius*radius;
+    _radius2 = radius * radius;
 }
 
 /**
@@ -50,9 +50,7 @@ NgbSearch::NgbSearch(Vec center, double radius, vector<bool>& exportlist,
  *
  * @return List of neighbours
  */
-vector<GasParticle*> NgbSearch::get_ngbs(){
-    return _ngbs;
-}
+vector<GasParticle*> NgbSearch::get_ngbs() { return _ngbs; }
 
 /**
  * @brief Decide whether to open the given node
@@ -62,7 +60,7 @@ vector<GasParticle*> NgbSearch::get_ngbs(){
  * @param node TreeNode on which to operate
  * @return True if the node should be opened, false otherwise
  */
-bool NgbSearch::splitnode(TreeNode *node){
+bool NgbSearch::splitnode(TreeNode* node) {
     return node->get_distance(_center) <= _radius2;
 }
 
@@ -74,10 +72,10 @@ bool NgbSearch::splitnode(TreeNode *node){
  *
  * @param leaf Leaf on which to operate
  */
-void NgbSearch::leafaction(Leaf *leaf){
+void NgbSearch::leafaction(Leaf* leaf) {
     Particle* p = leaf->get_particle();
-    if(p->type() == PARTTYPE_GAS){
-        if((p->get_position()-_center).norm2() <= _radius2){
+    if(p->type() == PARTTYPE_GAS) {
+        if((p->get_position() - _center).norm2() <= _radius2) {
             _ngbs.push_back((GasParticle*)p);
         }
     }
@@ -88,12 +86,11 @@ void NgbSearch::leafaction(Leaf *leaf){
  *
  * @param pseudonode PseudoNode on which to operate
  */
-void NgbSearch::pseudonodeaction(PseudoNode *pseudonode){
-    if(pseudonode->get_distance(_center) <= _radius2){
+void NgbSearch::pseudonodeaction(PseudoNode* pseudonode) {
+    if(pseudonode->get_distance(_center) <= _radius2) {
         _exportlist[pseudonode->get_source()] = true;
     }
 }
-
 
 // ClosestNgbSearch
 
@@ -103,9 +100,10 @@ void NgbSearch::pseudonodeaction(PseudoNode *pseudonode){
  * @param center Center of the closest neighbour search
  * @param radius Radius of the closest neighbour search
  */
-ClosestNgbSearch::ClosestNgbSearch(Vec center, double radius) : _center(center){
+ClosestNgbSearch::ClosestNgbSearch(Vec center, double radius)
+        : _center(center) {
     _closest = NULL;
-    _radius = radius*radius;
+    _radius = radius * radius;
 }
 
 /**
@@ -113,34 +111,26 @@ ClosestNgbSearch::ClosestNgbSearch(Vec center, double radius) : _center(center){
  *
  * @param position Position for the closest neighbour search
  */
-void ClosestNgbSearch::set_position(Vec position){
-    _center = position;
-}
+void ClosestNgbSearch::set_position(Vec position) { _center = position; }
 
 /**
  * @brief Get the position for the closest neighbour search
  *
  * @return Position for the closest neighbour search
  */
-Vec ClosestNgbSearch::get_position(){
-    return _center;
-}
+Vec ClosestNgbSearch::get_position() { return _center; }
 
 /**
  * @brief Get the closest Particle
  *
  * @return Result of the treewalk
  */
-GasParticle* ClosestNgbSearch::get_closest(){
-    return _closest;
-}
+GasParticle* ClosestNgbSearch::get_closest() { return _closest; }
 
 /**
  * @brief Increase the search radius with a factor 2
  */
-void ClosestNgbSearch::increase_radius(){
-    _radius *= 4.;
-}
+void ClosestNgbSearch::increase_radius() { _radius *= 4.; }
 
 /**
  * @brief Decide whether to open the node
@@ -150,7 +140,7 @@ void ClosestNgbSearch::increase_radius(){
  * @param node TreeNode on which we operate
  * @return True if the node should be opened, false otherwise
  */
-bool ClosestNgbSearch::splitnode(TreeNode *node){
+bool ClosestNgbSearch::splitnode(TreeNode* node) {
     return node->get_distance(_center) < _radius;
 }
 
@@ -164,11 +154,11 @@ bool ClosestNgbSearch::splitnode(TreeNode *node){
  *
  * @param leaf Leaf on which to operate
  */
-void ClosestNgbSearch::leafaction(Leaf *leaf){
+void ClosestNgbSearch::leafaction(Leaf* leaf) {
     Particle* p = leaf->get_particle();
-    if(p->type() == PARTTYPE_GAS){
-        double r2 = (p->get_position()-_center).norm2();
-        if(r2 < _radius){
+    if(p->type() == PARTTYPE_GAS) {
+        double r2 = (p->get_position() - _center).norm2();
+        if(r2 < _radius) {
             _closest = (GasParticle*)p;
             _radius = r2;
         }
@@ -182,6 +172,6 @@ void ClosestNgbSearch::leafaction(Leaf *leaf){
  *
  * @param pseudonode PseudoNode on which to operate
  */
-void ClosestNgbSearch::pseudonodeaction(PseudoNode *pseudonode){
+void ClosestNgbSearch::pseudonodeaction(PseudoNode* pseudonode) {
     // do something
 }

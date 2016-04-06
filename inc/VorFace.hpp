@@ -26,11 +26,11 @@
 #ifndef HEAD_VORFACE
 #define HEAD_VORFACE
 
-#include "Vec.hpp"
 #include "StateVector.hpp"
-#include <vector>
-#include <ostream>
+#include "Vec.hpp"
 #include <exception>
+#include <ostream>
+#include <vector>
 
 class VorGen;
 class VorCell;
@@ -47,8 +47,8 @@ class ParticleVector;
  * This is different from the mesh evolution algorithm, where these steps
  * are represented by separate classes.
  */
-class VorFace{
-private:
+class VorFace {
+  private:
     /*! \brief Vertices that make up the face */
     std::vector<VorGen*> _vertices;
 
@@ -92,47 +92,47 @@ private:
      * @return Limited value of the quantity at the interface
      */
     static double limit(const double phimid0, const double phiL,
-                        const double phiR, const double* d, const double r){
+                        const double phiR, const double* d, const double r) {
         double psi1 = 0.5;
         double psi2 = 0.25;
-#if ndim_==3
-        double dnrm = sqrt( d[0] * d[0] + d[1] * d[1] + d[2] * d[2] );
+#if ndim_ == 3
+        double dnrm = sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
 #else
-        double dnrm = sqrt( d[0] * d[0] + d[1] * d[1] );
+        double dnrm = sqrt(d[0] * d[0] + d[1] * d[1]);
 #endif
 
-        double delta1 = psi1 * fabs( phiL - phiR );
-        double delta2 = psi2 * fabs( phiL - phiR );
+        double delta1 = psi1 * fabs(phiL - phiR);
+        double delta2 = psi2 * fabs(phiL - phiR);
 
-        double phimin = fmin( phiL, phiR );
-        double phimax = fmax( phiL, phiR );
+        double phimin = fmin(phiL, phiR);
+        double phimax = fmax(phiL, phiR);
 
-        double phibar = phiL + dnrm / r * ( phiR - phiL );
+        double phibar = phiL + dnrm / r * (phiR - phiL);
 
         /* if sign(phimax+delta1) == sign(phimax) */
         double phiplus;
-        if( ( phimax + delta1 ) * phimax > 0. ){
+        if((phimax + delta1) * phimax > 0.) {
             phiplus = phimax + delta1;
         } else {
-            phiplus = phimax / ( 1. + delta1 / fabs(phimax) );
+            phiplus = phimax / (1. + delta1 / fabs(phimax));
         }
 
         /* if sign(phimin-delta1) == sign(phimin) */
         double phiminus;
-        if( ( phimin - delta1 ) * phimin > 0. ){
+        if((phimin - delta1) * phimin > 0.) {
             phiminus = phimin - delta1;
         } else {
-            phiminus = phimin / ( 1. + delta1 / fabs(phimin) );
+            phiminus = phimin / (1. + delta1 / fabs(phimin));
         }
 
         double phimid;
-        if( phiL == phiR ){
+        if(phiL == phiR) {
             phimid = phiL;
         } else {
-            if( phiL < phiR ){
-                phimid = fmax( phiminus, fmin( phibar + delta2, phimid0 ) );
+            if(phiL < phiR) {
+                phimid = fmax(phiminus, fmin(phibar + delta2, phimid0));
             } else {
-                phimid = fmin( phiplus, fmax( phibar - delta2, phimid0 ) );
+                phimid = fmin(phiplus, fmax(phibar - delta2, phimid0));
             }
         }
         return phimid;
@@ -151,13 +151,13 @@ private:
      */
     static StateVector limit(const StateVector& W, const StateVector& WL,
                              const StateVector& WR, const double* d,
-                             const double r){
+                             const double r) {
         StateVector Wtemp;
         Wtemp[0] = limit(W[0], WL[0], WR[0], d, r);
         Wtemp[1] = limit(W[1], WL[1], WR[1], d, r);
         Wtemp[2] = limit(W[2], WL[2], WR[2], d, r);
         Wtemp[3] = limit(W[3], WL[3], WR[3], d, r);
-#if ndim_==3
+#if ndim_ == 3
         Wtemp[4] = limit(W[4], WL[4], WR[4], d, r);
 #endif
         return Wtemp;
@@ -174,32 +174,37 @@ private:
      * @return Reconstructed StateVector at the interface
      */
     static StateVector reconstruct(const StateVector& W,
-                                   const StateVector* gradW, const double* d){
+                                   const StateVector* gradW, const double* d) {
         StateVector Wtemp(W);
-#if ndim_==3
-        Wtemp[0] += gradW[0][0]*d[0] + gradW[1][0]*d[1] + gradW[2][0]*d[2];
-        Wtemp[1] += gradW[0][1]*d[0] + gradW[1][1]*d[1] + gradW[2][1]*d[2];
-        Wtemp[2] += gradW[0][2]*d[0] + gradW[1][2]*d[1] + gradW[2][2]*d[2];
-        Wtemp[3] += gradW[0][3]*d[0] + gradW[1][3]*d[1] + gradW[2][3]*d[2];
-        Wtemp[4] += gradW[0][4]*d[0] + gradW[1][4]*d[1] + gradW[2][4]*d[2];
+#if ndim_ == 3
+        Wtemp[0] +=
+                gradW[0][0] * d[0] + gradW[1][0] * d[1] + gradW[2][0] * d[2];
+        Wtemp[1] +=
+                gradW[0][1] * d[0] + gradW[1][1] * d[1] + gradW[2][1] * d[2];
+        Wtemp[2] +=
+                gradW[0][2] * d[0] + gradW[1][2] * d[1] + gradW[2][2] * d[2];
+        Wtemp[3] +=
+                gradW[0][3] * d[0] + gradW[1][3] * d[1] + gradW[2][3] * d[2];
+        Wtemp[4] +=
+                gradW[0][4] * d[0] + gradW[1][4] * d[1] + gradW[2][4] * d[2];
 
 #else
-        Wtemp[0] += gradW[0][0]*d[0] + gradW[1][0]*d[1];
-        Wtemp[1] += gradW[0][1]*d[0] + gradW[1][1]*d[1];
-        Wtemp[2] += gradW[0][2]*d[0] + gradW[1][2]*d[1];
-        Wtemp[3] += gradW[0][3]*d[0] + gradW[1][3]*d[1];
+        Wtemp[0] += gradW[0][0] * d[0] + gradW[1][0] * d[1];
+        Wtemp[1] += gradW[0][1] * d[0] + gradW[1][1] * d[1];
+        Wtemp[2] += gradW[0][2] * d[0] + gradW[1][2] * d[1];
+        Wtemp[3] += gradW[0][3] * d[0] + gradW[1][3] * d[1];
 #endif
         return Wtemp;
     }
 
-public:
+  public:
     VorFace(unsigned int index, std::vector<VorGen*>& points);
-    ~VorFace(){}
+    ~VorFace() {}
 
-    void print(std::ostream &stream);
-    void print_pov_frame(std::ostream &stream);
-    void print_pov(std::ostream &stream);
-    void print_leaflet(std::ostream &vstream, int ox, int oy, VorGen* center);
+    void print(std::ostream& stream);
+    void print_pov_frame(std::ostream& stream);
+    void print_pov(std::ostream& stream);
+    void print_leaflet(std::ostream& vstream, int ox, int oy, VorGen* center);
     bool overlap(double* box);
 
     void add_vertex(VorGen* point);
@@ -223,7 +228,7 @@ public:
     void set_area(double area);
     void calculate_area();
 
-    void transform(StateVector& W, const Vec &left, const Vec &right);
+    void transform(StateVector& W, const Vec& left, const Vec& right);
     void invtransform(StateVector& W, const Vec& left, const Vec& right);
     void get_normal(double* angles);
 
@@ -242,8 +247,8 @@ public:
 /**
  * @brief Exception thrown when something goes wrong during the flux calculation
  */
-class FluxCalculationException : public std::exception{
-private:
+class FluxCalculationException : public std::exception {
+  private:
     /*! \brief Left StateVector */
     StateVector _WL;
 
@@ -256,7 +261,7 @@ private:
     /*! \brief Reference to the Solver used to solve the Riemann problem */
     RiemannSolver& _solver;
 
-public:
+  public:
     FluxCalculationException(StateVector WL, StateVector WR, unsigned int rank,
                              RiemannSolver& solver);
 

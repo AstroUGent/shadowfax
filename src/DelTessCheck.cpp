@@ -33,14 +33,13 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "DelTess.hpp"
-#include "Vec.hpp"
 #include "DelCont.hpp"
-#include "VorGen.hpp"
-#include "Simplex.hpp"
 #include "Error.hpp"
+#include "Simplex.hpp"
+#include "Vec.hpp"
+#include "VorGen.hpp"
 #include <iostream>
 using namespace std;
-
 
 /**
  * @brief Function to test the robustness of all point insertion algorithms
@@ -49,17 +48,17 @@ using namespace std;
  * relations are correct. In order to facilitate checks, the ids are multiples
  * of 2; the sum of ids will always be unique for every tetrahedron/triangle.
  */
-#if ndim_==3
-void DelTess::check_methods(){
+#if ndim_ == 3
+void DelTess::check_methods() {
     // first step: setup known large tetrahedron
-    if(_points.size()){
+    if(_points.size()) {
         cout << "Error: check_methods() requires an empty DelTess setup.\n";
         cout << "Set up an empty DelTess by using (new) DelTess(NULL).\n";
         cout << "Aborting..." << endl;
         my_exit();
     }
     cout << "Setting up test volume..." << endl;
-    Vec origin(0.5,0.5,0.5);
+    Vec origin(0.5, 0.5, 0.5);
     _container = new CubicBox(origin, 1.);
     // manually add ghosts (because the ghost positions changed)
     _points.push_back(new VorGen(-2., -2., -2.));
@@ -129,36 +128,37 @@ void DelTess::check_methods(){
     faces[30][8] = 1;
     faces[30][16] = -1;
     bool check = true;
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         VorGen* P = _points[i];
         list<Simplex*> simplices = P->get_tetrahedra();
         for(list<Simplex*>::iterator s = simplices.begin();
-            s != simplices.end(); s++){
+            s != simplices.end(); s++) {
             unsigned int* Pidx = (*s)->get_vorgens();
             VorGen* PP[4] = {_points[Pidx[0]], _points[Pidx[1]],
                              _points[Pidx[2]], _points[Pidx[3]]};
             unsigned int sum = (*s)->get_idsum(_points);
-            for(unsigned int i = 0; i < 4; i++){
-                if(!(*s)->get_ngb(i)){
-                    if(result[sum][PP[i]->get_id()] != -1){
+            for(unsigned int i = 0; i < 4; i++) {
+                if(!(*s)->get_ngb(i)) {
+                    if(result[sum][PP[i]->get_id()] != -1) {
                         cout << "incorrect NULL neighbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != -1){
+                    if(faces[sum][PP[i]->get_id()] != -1) {
                         cout << "NULL neighbour has ngbface!" << endl;
                         check = false;
                     }
                 } else {
                     if(result[sum][PP[i]->get_id()] !=
-                            static_cast<int>(_simplices[(*s)->get_ngb(i)]
-                                             ->get_idsum(_points))){
+                       static_cast<int>(_simplices[(*s)->get_ngb(i)]->get_idsum(
+                               _points))) {
                         cout << "Incorrect neigbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != static_cast<int>(
-                                _points[_simplices[(*s)->get_ngb(i)]
-                                ->vorgen((*s)->get_ngbface(i))]->get_id()
-                                )){
+                    if(faces[sum][PP[i]->get_id()] !=
+                       static_cast<int>(
+                               _points[_simplices[(*s)->get_ngb(i)]->vorgen(
+                                               (*s)->get_ngbface(i))]
+                                       ->get_id())) {
                         cout << "Incorrect ngbface!" << endl;
                         check = false;
                     }
@@ -166,7 +166,7 @@ void DelTess::check_methods(){
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -242,36 +242,37 @@ void DelTess::check_methods(){
     faces[58][2] = 4;
     faces[58][8] = 4;
     faces[58][32] = 4;
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         VorGen* P = _points[i];
         list<Simplex*> simplices = P->get_tetrahedra();
         for(list<Simplex*>::iterator s = simplices.begin();
-            s != simplices.end(); s++){
+            s != simplices.end(); s++) {
             unsigned int* Pidx = (*s)->get_vorgens();
             VorGen* PP[4] = {_points[Pidx[0]], _points[Pidx[1]],
                              _points[Pidx[2]], _points[Pidx[3]]};
             unsigned int sum = (*s)->get_idsum(_points);
-            for(unsigned int i = 0; i < 4; i++){
-                if(!(*s)->get_ngb(i)){
-                    if(result[sum][PP[i]->get_id()] != -1){
+            for(unsigned int i = 0; i < 4; i++) {
+                if(!(*s)->get_ngb(i)) {
+                    if(result[sum][PP[i]->get_id()] != -1) {
                         cout << "incorrect NULL neighbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != -1){
+                    if(faces[sum][PP[i]->get_id()] != -1) {
                         cout << "NULL neighbour has ngbface!" << endl;
                         check = false;
                     }
                 } else {
                     if(result[sum][PP[i]->get_id()] !=
-                            static_cast<int>(_simplices[(*s)->get_ngb(i)]
-                                             ->get_idsum(_points))){
+                       static_cast<int>(_simplices[(*s)->get_ngb(i)]->get_idsum(
+                               _points))) {
                         cout << "Incorrect neigbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != static_cast<int>(
-                                _points[_simplices[(*s)->get_ngb(i)]
-                                ->vorgen((*s)->get_ngbface(i))]->get_id()
-                                )){
+                    if(faces[sum][PP[i]->get_id()] !=
+                       static_cast<int>(
+                               _points[_simplices[(*s)->get_ngb(i)]->vorgen(
+                                               (*s)->get_ngbface(i))]
+                                       ->get_id())) {
                         cout << "Incorrect ngbface!" << endl;
                         check = false;
                     }
@@ -279,7 +280,7 @@ void DelTess::check_methods(){
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -391,36 +392,37 @@ void DelTess::check_methods(){
     faces[39][2] = 8;
     faces[39][4] = 8;
     faces[39][32] = -1;
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         VorGen* P = _points[i];
         list<Simplex*> simplices = P->get_tetrahedra();
         for(list<Simplex*>::iterator s = simplices.begin();
-            s != simplices.end(); s++){
+            s != simplices.end(); s++) {
             unsigned int* Pidx = (*s)->get_vorgens();
             VorGen* PP[4] = {_points[Pidx[0]], _points[Pidx[1]],
                              _points[Pidx[2]], _points[Pidx[3]]};
             unsigned int sum = (*s)->get_idsum(_points);
-            for(unsigned int i = 0; i < 4; i++){
-                if(!(*s)->get_ngb(i)){
-                    if(result[sum][PP[i]->get_id()] != -1){
+            for(unsigned int i = 0; i < 4; i++) {
+                if(!(*s)->get_ngb(i)) {
+                    if(result[sum][PP[i]->get_id()] != -1) {
                         cout << "incorrect NULL neighbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != -1){
+                    if(faces[sum][PP[i]->get_id()] != -1) {
                         cout << "NULL neighbour has ngbface!" << endl;
                         check = false;
                     }
                 } else {
                     if(result[sum][PP[i]->get_id()] !=
-                            static_cast<int>(_simplices[(*s)->get_ngb(i)]
-                                             ->get_idsum(_points))){
+                       static_cast<int>(_simplices[(*s)->get_ngb(i)]->get_idsum(
+                               _points))) {
                         cout << "Incorrect neigbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != static_cast<int>(
-                                _points[_simplices[(*s)->get_ngb(i)]
-                                ->vorgen((*s)->get_ngbface(i))]->get_id()
-                                )){
+                    if(faces[sum][PP[i]->get_id()] !=
+                       static_cast<int>(
+                               _points[_simplices[(*s)->get_ngb(i)]->vorgen(
+                                               (*s)->get_ngbface(i))]
+                                       ->get_id())) {
                         cout << "Incorrect ngbface!" << endl;
                         check = false;
                     }
@@ -428,7 +430,7 @@ void DelTess::check_methods(){
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -436,15 +438,15 @@ void DelTess::check_methods(){
     }
 
     // we start over again for the flipping algorithms
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         delete _points[i];
     }
     _points.clear();
     delete A;
     delete B;
     delete C;
-    for(unsigned int i = 0; i < _simplices.size(); i++){
-        if(_simplices[i] != NULL){
+    for(unsigned int i = 0; i < _simplices.size(); i++) {
+        if(_simplices[i] != NULL) {
             delete _simplices[i];
         }
     }
@@ -468,11 +470,11 @@ void DelTess::check_methods(){
          << endl;
     // check on ordinary 2 to 3 flip algorithm
     cout << "Checking 2 to 3 flip..." << endl;
-    A = new VorGen(0.5,0.5,0.5);
+    A = new VorGen(0.5, 0.5, 0.5);
     A->set_id(16);
     _points.push_back(A);
     add_point(4);
-    B = new VorGen(1.,0.9,0.4);
+    B = new VorGen(1., 0.9, 0.4);
     B->set_id(32);
     _points.push_back(B);
     add_point(5);
@@ -548,36 +550,37 @@ void DelTess::check_methods(){
     faces[46][4] = 16;
     faces[46][8] = 1;
     faces[46][32] = -1;
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         VorGen* P = _points[i];
         list<Simplex*> simplices = P->get_tetrahedra();
         for(list<Simplex*>::iterator s = simplices.begin();
-            s != simplices.end(); s++){
+            s != simplices.end(); s++) {
             unsigned int* Pidx = (*s)->get_vorgens();
             VorGen* PP[4] = {_points[Pidx[0]], _points[Pidx[1]],
                              _points[Pidx[2]], _points[Pidx[3]]};
             unsigned int sum = (*s)->get_idsum(_points);
-            for(unsigned int i = 0; i < 4; i++){
-                if(!(*s)->get_ngb(i)){
-                    if(result[sum][PP[i]->get_id()] != -1){
+            for(unsigned int i = 0; i < 4; i++) {
+                if(!(*s)->get_ngb(i)) {
+                    if(result[sum][PP[i]->get_id()] != -1) {
                         cout << "incorrect NULL neighbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != -1){
+                    if(faces[sum][PP[i]->get_id()] != -1) {
                         cout << "NULL neighbour has ngbface!" << endl;
                         check = false;
                     }
                 } else {
                     if(result[sum][PP[i]->get_id()] !=
-                            static_cast<int>(_simplices[(*s)->get_ngb(i)]
-                                             ->get_idsum(_points))){
+                       static_cast<int>(_simplices[(*s)->get_ngb(i)]->get_idsum(
+                               _points))) {
                         cout << "Incorrect neigbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != static_cast<int>(
-                                _points[_simplices[(*s)->get_ngb(i)]
-                                ->vorgen((*s)->get_ngbface(i))]->get_id()
-                                )){
+                    if(faces[sum][PP[i]->get_id()] !=
+                       static_cast<int>(
+                               _points[_simplices[(*s)->get_ngb(i)]->vorgen(
+                                               (*s)->get_ngbface(i))]
+                                       ->get_id())) {
                         cout << "Incorrect ngbface!" << endl;
                         check = false;
                     }
@@ -585,7 +588,7 @@ void DelTess::check_methods(){
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -593,14 +596,14 @@ void DelTess::check_methods(){
     }
 
     // we start over again for the flipping algorithms
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         delete _points[i];
     }
     _points.clear();
     delete A;
     delete B;
-    for(unsigned int i = 0; i < _simplices.size(); i++){
-        if(_simplices[i] != NULL){
+    for(unsigned int i = 0; i < _simplices.size(); i++) {
+        if(_simplices[i] != NULL) {
             delete _simplices[i];
         }
     }
@@ -622,11 +625,11 @@ void DelTess::check_methods(){
 
     // check on 4 to 4 flip
     cout << "Checking 4 to 4 flip..." << endl;
-    A = new VorGen(0.,0.,0.);
+    A = new VorGen(0., 0., 0.);
     A->set_id(16);
     _points.push_back(A);
     add_point(4);
-    B = new VorGen(0.1,2.5,0.1);
+    B = new VorGen(0.1, 2.5, 0.1);
     B->set_id(32);
     _points.push_back(B);
     add_point(5);
@@ -693,36 +696,37 @@ void DelTess::check_methods(){
     faces[27][2] = 32;
     faces[27][8] = 32;
     faces[27][16] = -1;
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         VorGen* P = _points[i];
         list<Simplex*> simplices = P->get_tetrahedra();
         for(list<Simplex*>::iterator s = simplices.begin();
-            s != simplices.end(); s++){
+            s != simplices.end(); s++) {
             unsigned int* Pidx = (*s)->get_vorgens();
             VorGen* PP[4] = {_points[Pidx[0]], _points[Pidx[1]],
                              _points[Pidx[2]], _points[Pidx[3]]};
             unsigned int sum = (*s)->get_idsum(_points);
-            for(unsigned int i = 0; i < 4; i++){
-                if(!(*s)->get_ngb(i)){
-                    if(result[sum][PP[i]->get_id()] != -1){
+            for(unsigned int i = 0; i < 4; i++) {
+                if(!(*s)->get_ngb(i)) {
+                    if(result[sum][PP[i]->get_id()] != -1) {
                         cout << "incorrect NULL neighbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != -1){
+                    if(faces[sum][PP[i]->get_id()] != -1) {
                         cout << "NULL neighbour has ngbface!" << endl;
                         check = false;
                     }
                 } else {
                     if(result[sum][PP[i]->get_id()] !=
-                            static_cast<int>(_simplices[(*s)->get_ngb(i)]
-                                             ->get_idsum(_points))){
+                       static_cast<int>(_simplices[(*s)->get_ngb(i)]->get_idsum(
+                               _points))) {
                         cout << "Incorrect neigbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != static_cast<int>(
-                                _points[_simplices[(*s)->get_ngb(i)]
-                                ->vorgen((*s)->get_ngbface(i))]->get_id()
-                                )){
+                    if(faces[sum][PP[i]->get_id()] !=
+                       static_cast<int>(
+                               _points[_simplices[(*s)->get_ngb(i)]->vorgen(
+                                               (*s)->get_ngbface(i))]
+                                       ->get_id())) {
                         cout << "Incorrect ngbface!" << endl;
                         check = false;
                     }
@@ -730,7 +734,7 @@ void DelTess::check_methods(){
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -738,14 +742,14 @@ void DelTess::check_methods(){
     }
 
     // we start over again for the flipping algorithms
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         delete _points[i];
     }
     _points.clear();
     delete A;
     delete B;
-    for(unsigned int i = 0; i < _simplices.size(); i++){
-        if(_simplices[i] != NULL){
+    for(unsigned int i = 0; i < _simplices.size(); i++) {
+        if(_simplices[i] != NULL) {
             delete _simplices[i];
         }
     }
@@ -769,11 +773,11 @@ void DelTess::check_methods(){
     // we also have a 2 to 3 flip in the process, but since this one is already
     // ok, this is no problem
     cout << "Checking 3 to 2 flip..." << endl;
-    A = new VorGen(0.,0.,0.);
+    A = new VorGen(0., 0., 0.);
     A->set_id(16);
     _points.push_back(A);
     add_point(4);
-    B = new VorGen(0.2,2.5,0.1);
+    B = new VorGen(0.2, 2.5, 0.1);
     B->set_id(32);
     _points.push_back(B);
     add_point(5);
@@ -840,36 +844,37 @@ void DelTess::check_methods(){
     faces[27][2] = 32;
     faces[27][8] = 32;
     faces[27][16] = -1;
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++) {
         VorGen* P = _points[i];
         list<Simplex*> simplices = P->get_tetrahedra();
         for(list<Simplex*>::iterator s = simplices.begin();
-            s != simplices.end(); s++){
+            s != simplices.end(); s++) {
             unsigned int* Pidx = (*s)->get_vorgens();
             VorGen* PP[4] = {_points[Pidx[0]], _points[Pidx[1]],
                              _points[Pidx[2]], _points[Pidx[3]]};
             unsigned int sum = (*s)->get_idsum(_points);
-            for(unsigned int i = 0; i < 4; i++){
-                if(!(*s)->get_ngb(i)){
-                    if(result[sum][PP[i]->get_id()] != -1){
+            for(unsigned int i = 0; i < 4; i++) {
+                if(!(*s)->get_ngb(i)) {
+                    if(result[sum][PP[i]->get_id()] != -1) {
                         cout << "incorrect NULL neighbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != -1){
+                    if(faces[sum][PP[i]->get_id()] != -1) {
                         cout << "NULL neighbour has ngbface!" << endl;
                         check = false;
                     }
                 } else {
                     if(result[sum][PP[i]->get_id()] !=
-                            static_cast<int>(_simplices[(*s)->get_ngb(i)]
-                                             ->get_idsum(_points))){
+                       static_cast<int>(_simplices[(*s)->get_ngb(i)]->get_idsum(
+                               _points))) {
                         cout << "Incorrect neigbour!" << endl;
                         check = false;
                     }
-                    if(faces[sum][PP[i]->get_id()] != static_cast<int>(
-                                _points[_simplices[(*s)->get_ngb(i)]
-                                ->vorgen((*s)->get_ngbface(i))]->get_id()
-                                )){
+                    if(faces[sum][PP[i]->get_id()] !=
+                       static_cast<int>(
+                               _points[_simplices[(*s)->get_ngb(i)]->vorgen(
+                                               (*s)->get_ngbface(i))]
+                                       ->get_id())) {
                         cout << "Incorrect ngbface!" << endl;
                         check = false;
                     }
@@ -877,7 +882,7 @@ void DelTess::check_methods(){
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -887,9 +892,9 @@ void DelTess::check_methods(){
     cout << "Checks finished, no problems encountered." << endl;
 }
 #else
-void DelTess::check_methods(){
+void DelTess::check_methods() {
     // first step: setup known large tetrahedron
-    if(_points.size()){
+    if(_points.size()) {
         cout << "Error: check_methods() requires an empty DelTess setup.\n";
         cout << "Set up an empty DelTess by using (new) DelTess(NULL).\n";
         cout << "Aborting..." << endl;
@@ -898,7 +903,7 @@ void DelTess::check_methods(){
     _points.resize(3, NULL);
     cout << "Setting up test volume..." << endl;
     Vec pos(0., 0.);
-    _container = new CubicBox( pos, 1. );
+    _container = new CubicBox(pos, 1.);
     add_ghosts();
     // set id's of ghost particles
     // the order and position of the points is determined by the CubicBox
@@ -939,38 +944,41 @@ void DelTess::check_methods(){
     faces[14][4] = 1;
     faces[14][8] = -1;
     bool check = true;
-    for(unsigned int i = 1; i < _simplices.size(); i++){
+    for(unsigned int i = 1; i < _simplices.size(); i++) {
         unsigned int* Pidx = _simplices[i]->get_vorgens();
         VorGen* P[3] = {_points[Pidx[0]], _points[Pidx[1]], _points[Pidx[2]]};
         unsigned int sum = _simplices[i]->get_idsum(_points);
-        for(unsigned int j = 0; j < 3; j++){
-            if(!_simplices[i]->get_ngb(j)){
-                if(result[sum][P[j]->get_id()] != -1){
+        for(unsigned int j = 0; j < 3; j++) {
+            if(!_simplices[i]->get_ngb(j)) {
+                if(result[sum][P[j]->get_id()] != -1) {
                     cout << "incorrect NULL neighbour!" << endl;
                     check = false;
                 }
-                if(faces[sum][P[j]->get_id()] != -1){
+                if(faces[sum][P[j]->get_id()] != -1) {
                     cout << "NULL neighbour has ngbface!" << endl;
                     check = false;
                 }
             } else {
                 if(result[sum][P[j]->get_id()] !=
-                        static_cast<int>(_simplices[_simplices[i]->get_ngb(j)]
-                                         ->get_idsum(_points))){
+                   static_cast<int>(
+                           _simplices[_simplices[i]->get_ngb(j)]->get_idsum(
+                                   _points))) {
                     cout << "Incorrect neigbour!" << endl;
                     check = false;
                 }
-                if(faces[sum][P[j]->get_id()] != static_cast<int>(
-                            _points[_simplices[_simplices[i]->get_ngb(j)]
-                            ->vorgen(_simplices[i]->get_ngbface(j))]->get_id()
-                            )){
+                if(faces[sum][P[j]->get_id()] !=
+                   static_cast<int>(
+                           _points[_simplices[_simplices[i]->get_ngb(j)]
+                                           ->vorgen(_simplices[i]->get_ngbface(
+                                                   j))]
+                                   ->get_id())) {
                     cout << "Incorrect ngbface!" << endl;
                     check = false;
                 }
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -979,7 +987,7 @@ void DelTess::check_methods(){
 
     // Next up: degenerate case
     cout << "Checking degenerate case of insertion algorithm..." << endl;
-    VorGen* B = new VorGen(1.,1.);
+    VorGen* B = new VorGen(1., 1.);
     B->set_id(16);
     _points.push_back(B);
     add_point(4);
@@ -1018,38 +1026,41 @@ void DelTess::check_methods(){
     faces[14][2] = 16;
     faces[14][4] = 16;
     faces[14][8] = -1;
-    for(unsigned int i = 1; i < _simplices.size(); i++){
+    for(unsigned int i = 1; i < _simplices.size(); i++) {
         unsigned int* Pidx = _simplices[i]->get_vorgens();
         VorGen* P[3] = {_points[Pidx[0]], _points[Pidx[1]], _points[Pidx[2]]};
         unsigned int sum = _simplices[i]->get_idsum(_points);
-        for(unsigned int j = 0; j < 3; j++){
-            if(!_simplices[i]->get_ngb(j)){
-                if(result[sum][P[j]->get_id()] != -1){
+        for(unsigned int j = 0; j < 3; j++) {
+            if(!_simplices[i]->get_ngb(j)) {
+                if(result[sum][P[j]->get_id()] != -1) {
                     cout << "incorrect NULL neighbour!" << endl;
                     check = false;
                 }
-                if(faces[sum][P[j]->get_id()] != -1){
+                if(faces[sum][P[j]->get_id()] != -1) {
                     cout << "NULL neighbour has ngbface!" << endl;
                     check = false;
                 }
             } else {
                 if(result[sum][P[j]->get_id()] !=
-                        static_cast<int>(_simplices[_simplices[i]->get_ngb(j)]
-                                         ->get_idsum(_points))){
+                   static_cast<int>(
+                           _simplices[_simplices[i]->get_ngb(j)]->get_idsum(
+                                   _points))) {
                     cout << "Incorrect neigbour!" << endl;
                     check = false;
                 }
-                if(faces[sum][P[j]->get_id()] != static_cast<int>(
-                            _points[_simplices[_simplices[i]->get_ngb(j)]
-                            ->vorgen(_simplices[i]->get_ngbface(j))]->get_id()
-                            )){
+                if(faces[sum][P[j]->get_id()] !=
+                   static_cast<int>(
+                           _points[_simplices[_simplices[i]->get_ngb(j)]
+                                           ->vorgen(_simplices[i]->get_ngbface(
+                                                   j))]
+                                   ->get_id())) {
                     cout << "Incorrect ngbface!" << endl;
                     check = false;
                 }
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;
@@ -1058,7 +1069,7 @@ void DelTess::check_methods(){
 
     // Last check: flipping algorithm
     cout << "Checking flip algorithm..." << endl;
-    VorGen* C = new VorGen(0.6,0.7);
+    VorGen* C = new VorGen(0.6, 0.7);
     C->set_id(32);
     _points.push_back(C);
     add_point(5);
@@ -1111,38 +1122,41 @@ void DelTess::check_methods(){
     faces[14][2] = 16;
     faces[14][4] = 16;
     faces[14][8] = -1;
-    for(unsigned int i = 1; i < _simplices.size(); i++){
+    for(unsigned int i = 1; i < _simplices.size(); i++) {
         unsigned int* Pidx = _simplices[i]->get_vorgens();
         VorGen* P[3] = {_points[Pidx[0]], _points[Pidx[1]], _points[Pidx[2]]};
         unsigned int sum = _simplices[i]->get_idsum(_points);
-        for(unsigned int j = 0; j < 3; j++){
-            if(!_simplices[i]->get_ngb(j)){
-                if(result[sum][P[j]->get_id()] != -1){
+        for(unsigned int j = 0; j < 3; j++) {
+            if(!_simplices[i]->get_ngb(j)) {
+                if(result[sum][P[j]->get_id()] != -1) {
                     cout << "incorrect NULL neighbour!" << endl;
                     check = false;
                 }
-                if(faces[sum][P[j]->get_id()] != -1){
+                if(faces[sum][P[j]->get_id()] != -1) {
                     cout << "NULL neighbour has ngbface!" << endl;
                     check = false;
                 }
             } else {
                 if(result[sum][P[j]->get_id()] !=
-                        static_cast<int>(_simplices[_simplices[i]->get_ngb(j)]
-                                         ->get_idsum(_points))){
+                   static_cast<int>(
+                           _simplices[_simplices[i]->get_ngb(j)]->get_idsum(
+                                   _points))) {
                     cout << "Incorrect neigbour!" << endl;
                     check = false;
                 }
-                if(faces[sum][P[j]->get_id()] != static_cast<int>(
-                            _points[_simplices[_simplices[i]->get_ngb(j)]
-                            ->vorgen(_simplices[i]->get_ngbface(j))]->get_id()
-                            )){
+                if(faces[sum][P[j]->get_id()] !=
+                   static_cast<int>(
+                           _points[_simplices[_simplices[i]->get_ngb(j)]
+                                           ->vorgen(_simplices[i]->get_ngbface(
+                                                   j))]
+                                   ->get_id())) {
                     cout << "Incorrect ngbface!" << endl;
                     check = false;
                 }
             }
         }
     }
-    if(check){
+    if(check) {
         cout << "Passed." << endl;
     } else {
         cout << "Failed!" << endl;

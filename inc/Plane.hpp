@@ -32,7 +32,7 @@
 #ifndef HEAD_PLANE
 #define HEAD_PLANE
 
-#if ndim_==3
+#if ndim_ == 3
 
 class VorGen;
 class Line;
@@ -40,8 +40,8 @@ class Line;
 /**
  * @brief Representation of a geometrical plane in 3D
  */
-class Plane{
-private:
+class Plane {
+  private:
     /*! \brief x-component of the normal vector of the plane */
     double _nx;
     /*! \brief y-component of the normal vector of the plane */
@@ -56,7 +56,7 @@ private:
     /*! \brief z-coordinate of a reference point on the plane */
     double _z;
 
-public:
+  public:
     Plane(double nx, double ny, double nz, double x, double y, double z);
     Plane(VorGen* point1, VorGen* point2, VorGen* point3);
     ~Plane(){};

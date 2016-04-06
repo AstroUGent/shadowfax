@@ -34,12 +34,12 @@
 #ifndef HEAD_DELTESS
 #define HEAD_DELTESS
 
-#include <vector>
-#include <ostream>
-#include <string>
-#include <set>
-#include <map>
 #include <cmath>
+#include <map>
+#include <ostream>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "utilities/Cuboid.hpp"
 
@@ -59,8 +59,8 @@ class VorCell;
  * The triangulation itself is stored in Point instances by linking these
  * through Tetrahedron instances.
  */
-class DelTess{
-private:
+class DelTess {
+  private:
     /*! \brief Tolerance value used to discriminate between exact and inexact
      *   arithmetics */
     double _tolerance;
@@ -102,7 +102,7 @@ private:
      *  to the range [1,2] for exact geometrical tests */
     Cuboid _box12;
 
-#if ndim_==3
+#if ndim_ == 3
     /** \brief An array holding free entries in the simplices vector.
      *
      * Used in 3D where not every Simplex that is removed is replaced by a new
@@ -122,15 +122,15 @@ private:
 
     /*! \brief A vector of vectors of ghost particles (one vector for every
      *  process) */
-    std::vector< std::vector<GasParticle*> > _ghosts;
+    std::vector<std::vector<GasParticle*> > _ghosts;
 
     /*! \brief A vector of vectors of exported particles (one vector for every
      *  process) */
-    std::vector< std::vector<GasParticle*> > _exports;
+    std::vector<std::vector<GasParticle*> > _exports;
 
     /*! \brief A vector of vectors of exported particle copies (one vector for
      *  every process) */
-    std::vector< std::vector<GasParticle*> > _exportcopies;
+    std::vector<std::vector<GasParticle*> > _exportcopies;
 
     /*! \brief A vector of ghost cells (cells associated with particles on
      *  another process) */
@@ -141,7 +141,7 @@ private:
     bool _periodic;
 
     void add_ghosts();
-#if ndim_==3
+#if ndim_ == 3
     void two_to_six_flip(unsigned int index, unsigned int* indices);
     void four_to_four_flip(unsigned int v1, unsigned int v2, unsigned int v3,
                            unsigned int v4, unsigned int s1, unsigned int s2,
@@ -160,7 +160,7 @@ private:
 
     Vec get_p12(Vec pos);
 
-public:
+  public:
     DelTess(DelCont* container, unsigned int numpart, bool periodic = false,
             double tolerance = 1.e-9);
     ~DelTess();
@@ -168,7 +168,7 @@ public:
     void add_particle(GasParticle* particle, unsigned int index);
     void add_point(unsigned int index);
     void add_voronoi_tesselation(VorTess* voronoi);
-    void output_tesselation(std::ostream &stream);
+    void output_tesselation(std::ostream& stream);
     DelCont* get_container();
     std::vector<VorGen*> get_points();
     void add_mirrors(Tree& parttree);

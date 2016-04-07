@@ -26,26 +26,29 @@
 #ifndef SYMBOLICFUNCIONS_HPP
 #define SYMBOLICFUNCIONS_HPP
 
+#define BOOST_SPIRIT_USE_PHOENIX_V3
+
 #include <boost/config/warning_disable.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/qi.hpp>
-
-#include <cmath>
-#include <exception>
-#include <string>
+#include <cmath>      // for acos, asin, atan, cbrt, cos, etc
+#include <exception>  // for exception
+#include <string>     // for basic_string, etc
 
 namespace mathparser {
 
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
 
-/*! \brief Symbolic mathematical constants */
+/*! @brief Symbolic mathematical constants */
 static struct constant_ : qi::symbols<char, double> {
-    constant_() { this->add("pi", boost::math::constants::pi<double>()); }
-} constant; /*!< \brief Symbolic mathematical constants */
+    constant_() {
+        this->add("pi", boost::math::constants::pi<double>());
+    }
+} constant; /*!< @brief Symbolic mathematical constants */
 
-/*! \brief Symbolic functions with a single argument */
+/*! @brief Symbolic functions with a single argument */
 static struct function_ : qi::symbols<char, double (*)(double)> {
     function_() {
         this->add("cos", static_cast<double (*)(double)>(&std::cos))(
@@ -63,14 +66,19 @@ static struct function_ : qi::symbols<char, double (*)(double)> {
                 "sqrt", static_cast<double (*)(double)>(&std::sqrt))(
                 "cbrt", static_cast<double (*)(double)>(&cbrt));
     }
-} function; /*!< \brief Symbolic functions with a single argument */
+} function; /*!< @brief Symbolic functions with a single argument */
 
-/*! \brief Symbolic power function */
+/*! @brief Symbolic power function */
 struct power_ {
-    /*! \brief Result type of the power function */
-    template <typename X, typename Y> struct result {
-        /*! \brief Result typedef */
-        typedef X type;
+
+    /*! @brief Default result type */
+    template<class> struct result;
+
+    /*! @brief Phoenix 3 compliant result type */
+    template<class F, typename X, typename Y>
+    struct result<F(X, Y)> {
+        /*! @brief The result is an X reference */
+        typedef X& type;
     };
 
     /**
@@ -80,17 +88,23 @@ struct power_ {
      * @param y Exponent of the power
      * @return Base to the power exponent
      */
-    template <typename X, typename Y> X operator()(X x, Y y) const {
-        return std::pow(x, y);
+    template <typename X, typename Y> X& operator()(X &x, Y y) const {
+        x = std::pow(x, y);
+        return x;
     }
 };
 
-/*! \brief Symbolic function wrapper around a function */
+/*! @brief Symbolic function wrapper around a function */
 struct func_ {
-    /*! \brief Result type of the function */
-    template <typename F, typename X> struct result {
-        /*! \brief Result typedef */
-        typedef X type;
+
+    /*! @brief Default result type */
+    template<class> struct result;
+
+    /*! @brief Phoenix 3 compliant result type */
+    template<class Q, typename F, typename X>
+    struct result<Q(F, X)> {
+        /*! @brief The result is an X reference */
+        typedef X& type;
     };
 
     /**
@@ -100,8 +114,9 @@ struct func_ {
      * @param x Parameter passed on to the function
      * @return Result of the function call
      */
-    template <typename F, typename X> X operator()(F f, X x) const {
-        return f(x);
+    template <typename F, typename X> X& operator()(F f, X &x) const {
+        x = f(x);
+        return x;
     }
 };
 
@@ -123,6 +138,9 @@ struct math : qi::grammar<std::string::const_iterator, double(),
             : math::base_type(expr) {
         boost::phoenix::function<power_> power;
         boost::phoenix::function<func_> func;
+
+        //        struct function_ function;
+        //        struct constant_ constant;
 
         expr = term[qi::_val = qi::_1] >> *(('+' >> term[qi::_val += qi::_1]) |
                                             ('-' >> term[qi::_val -= qi::_1]));
@@ -186,7 +204,7 @@ struct math : qi::grammar<std::string::const_iterator, double(),
     }
 
     /**@{*/
-    /*! \brief Rules used to parse the expression */
+    /*! @brief Rules used to parse the expression */
     qi::rule<std::string::const_iterator, double(), ascii::space_type> expr,
             term, factor, arg, symbols, symbol_r, symbol_x, symbol_y, symbol_z;
     /**@}*/
@@ -218,10 +236,10 @@ class badexpressionexception : public std::exception {
  */
 class SymbolicFunction {
   private:
-    /*! \brief Parser used to interpret strings and treat them as functions */
+    /*! @brief Parser used to interpret strings and treat them as functions */
     mathparser::math _math;
 
-    /*! \brief String that is being interpreted */
+    /*! @brief String that is being interpreted */
     std::string _str;
 
     /**

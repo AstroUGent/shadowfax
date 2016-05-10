@@ -159,9 +159,6 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
             double box[6];
             // write header, runtimepars and units: only process 0
             if(!rank) {
-                // for now, we assume that the anchor of the box is (0,0,0). We
-                // should generalize this to other anchors and move the
-                // particles accordingly if necessary...
                 particles.get_local_header().box(box);
                 vector<double> simbox(3, 0.);
 #if ndim_ == 3
@@ -257,10 +254,9 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
                                                  HDF5types::DOUBLE, utime);
 
                 status = H5Gclose(group);
+            } else {
+                particles.get_local_header().box(box);
             }
-
-            // communicate box information
-            MyMPI_Bcast(box, 6, MPI_DOUBLE, 0);
 
             // gas particles
             if(gassizes.back()) {

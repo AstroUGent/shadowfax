@@ -417,6 +417,8 @@ void TimeLine::dump(RestartFile& rfile) {
     rfile.write(_min_timestep);
     rfile.write(_treetime);
 
+    _iotimer->dump(rfile);
+
     LOGS("TimeLine dumped");
 }
 
@@ -445,6 +447,8 @@ TimeLine::TimeLine(RestartFile& rfile, ParticleVector& particlevector,
     rfile.read(_max_timestep);
     rfile.read(_min_timestep);
     rfile.read(_treetime);
+
+    _iotimer = new Timer(rfile);
 
     LOGS("TimeLine restarted");
 }

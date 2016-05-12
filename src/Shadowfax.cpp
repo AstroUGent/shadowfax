@@ -24,7 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "DelTess.hpp"
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "MPIMethods.hpp"
 #include "Plotter.hpp"
 #include "SidePrograms.hpp"

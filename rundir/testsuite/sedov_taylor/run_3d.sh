@@ -36,8 +36,9 @@ fi
 
 cd 3d
 # generate initial condition
-mpirun -np $i ../../../icmaker3d --ncell $n --mode cart \
-    --setup ../sedov_taylor3d.xml --filename ic_sedov_taylor3d.hdf5
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../icmaker3d \
+    @MPIEXEC_POSTFLAGS@ --ncell $n --mode cart --setup ../sedov_taylor3d.xml \
+    --filename ic_sedov_taylor3d.hdf5
 status=$?
 
 if [ $status -ne 0 ]
@@ -46,7 +47,8 @@ exit $status
 fi
 
 # run simulation
-mpirun -np $i ../../../shadowfax3d --params ../sedov_taylor3d.ini 2>&1 \
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../shadowfax3d \
+    @MPIEXEC_POSTFLAGS@ --params ../sedov_taylor3d.ini 2>&1 \
     | tee sedov_taylor3d.log
 status=${PIPESTATUS[0]}
 cd ..

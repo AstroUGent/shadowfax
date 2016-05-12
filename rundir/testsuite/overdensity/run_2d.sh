@@ -34,7 +34,8 @@ fi
 
 cd 2d
 # generate initial condition
-mpirun -np $i ../../../icmaker2d --ncell $n --setup ../overdensity2d.xml \
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../icmaker2d \
+    @MPIEXEC_POSTFLAGS@ --ncell $n --setup ../overdensity2d.xml \
     --filename ic_overdensity2d.hdf5
 status=$?
 
@@ -44,7 +45,8 @@ exit $status
 fi
 
 # run simulation
-mpirun -np $i ../../../shadowfax2d --params ../overdensity2d.ini 2>&1 \
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../shadowfax2d \
+    @MPIEXEC_POSTFLAGS@ --params ../overdensity2d.ini 2>&1 \
     | tee overdensity2d.log
 status=${PIPESTATUS[0]}
 cd ..

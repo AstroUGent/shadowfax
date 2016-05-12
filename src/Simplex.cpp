@@ -25,7 +25,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Simplex.hpp"
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "Line.hpp"
 #include "Plane.hpp"
 #include "VorGen.hpp"

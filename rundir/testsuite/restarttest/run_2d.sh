@@ -34,8 +34,9 @@ fi
 
 cd 2d
 # generate initial condition
-mpirun -np $i ../../../icmaker2d --ncell $n --setup ../overdensity2d.xml \
-    --filename ic_overdensity2d.hdf5
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../icmaker2d \
+    @MPIEXEC_POSTFLAGS@ --ncell $n --setup ../overdensity2d.xml \
+    --filename ic_overdensity2d.hdf5 --output_mass
 status=$?
 
 if [ $status -ne 0 ]
@@ -44,7 +45,8 @@ exit $status
 fi
 
 # run simulation
-mpirun -np $i ../../../shadowfax2d --params ../overdensity2d.ini 2>&1 \
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../shadowfax2d \
+    @MPIEXEC_POSTFLAGS@ --params ../overdensity2d.ini --read_mass 2>&1 \
     | tee overdensity2d.log
 status=${PIPESTATUS[0]}
 
@@ -54,10 +56,10 @@ exit $status
 fi
 
 mv overdensity2d010.hdf5 original010.hdf5
-mpirun -np $i ../../../shadowfax2d --restart restart \
-    | tee overdensity2d.log
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../shadowfax2d \
+    @MPIEXEC_POSTFLAGS@ --restart restart | tee overdensity2d_restart.log
 status=${PIPESTATUS[0]}
-h5diff -d 1.e-4 overdensity2d010.hdf5 original010.hdf5
+@HDF5_DIFF_EXECUTABLE@ -d 1.e-4 overdensity2d010.hdf5 original010.hdf5
 cd ..
 
 exit $status

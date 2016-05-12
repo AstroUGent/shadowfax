@@ -16,7 +16,6 @@
 # along with Shadowfax. If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-import scipy as sp
 import pylab as pl
 import numpy as np
 import h5py
@@ -30,7 +29,7 @@ for i in range(11):
   for j in range(len(density)):
     radius[j] = np.sqrt((coords[j,0]-0.5)**2 + (coords[j,1]-0.5)**2)
     
-  exact = sp.loadtxt("exact2d/csnap{0:03d}.dat".format(i))
+  exact = np.loadtxt("exact2d/profile2d{0:03d}.txt".format(i))
   pl.plot(exact[:,0], exact[:,1], "r-")
   pl.plot(radius, density, "k.")
   
@@ -46,7 +45,7 @@ for i in range(11):
   for j in range(len(density)):
     radius[j] = np.sqrt((coords[j,0]-0.5)**2 + (coords[j,1]-0.5)**2 + (coords[j,2]-0.5)**2)
     
-  exact = sp.loadtxt("exact3d/csnap{0:03d}.dat".format(i))
+  exact = np.loadtxt("exact3d/profile3d{0:03d}.txt".format(i))
   pl.plot(exact[:,0], exact[:,1], "r-")
   pl.plot(radius, density, "k.")
   

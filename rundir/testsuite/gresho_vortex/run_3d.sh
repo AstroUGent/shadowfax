@@ -34,10 +34,21 @@ fi
 
 cd 3d
 # generate initial condition
-../../../icmaker3d --ncell $n --setup ../gresho_vortex3d.xml \
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../icmaker3d \
+    @MPIEXEC_POSTFLAGS@ --ncell $n --setup ../gresho_vortex3d.xml \
     --filename ic_gresho_vortex3d.hdf5
+status=$?
+
+if [ $status -ne 0 ]
+then
+exit $status
+fi
 
 # run simulation
-mpirun -np $i ../../../shadowfax3d --params ../gresho_vortex3d.ini 2>&1 \
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@  $i @MPIEXEC_PREFLAGS@ ../../../shadowfax3d \
+    @MPIEXEC_POSTFLAGS@ --params ../gresho_vortex3d.ini 2>&1 \
     | tee gresho_vortex3d.log
+status=${PIPESTATUS[0]}
 cd ..
+
+exit $status

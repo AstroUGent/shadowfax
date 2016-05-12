@@ -34,7 +34,8 @@ fi
 
 cd 3d
 # generate initial condition
-mpirun -np $i ../../../icmaker3d --ncell $n --setup ../evrard3d.xml \
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../icmaker3d \
+    @MPIEXEC_POSTFLAGS@ --ncell $n --setup ../evrard3d.xml \
     --filename ic_evrard3d.hdf5
 status=$?
 
@@ -44,8 +45,8 @@ exit $status
 fi
 
 # run simulation
-mpirun -np $i ../../../shadowfax3d --params ../evrard3d.ini 2>&1 \
-    | tee evrard3d.log
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../shadowfax3d \
+    @MPIEXEC_POSTFLAGS@ --params ../evrard3d.ini 2>&1 | tee evrard3d.log
 # we cannot simply use $?, since then we get the exit status of tee
 status=${PIPESTATUS[0]}
 cd ..

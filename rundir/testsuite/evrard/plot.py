@@ -16,7 +16,6 @@
 # along with Shadowfax. If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-import scipy as sp
 import pylab as pl
 import numpy as np
 import h5py
@@ -40,7 +39,7 @@ for fname in sorted(glob.glob("3d/evrard3d*.hdf5")):
     for j in range(len(x)):
         radius[j] = np.sqrt((x[j,0]-2.)**2 + (x[j,1]-2.)**2 + (x[j,2]-2.)**2)
   
-    exact = sp.loadtxt("exact3d/profile3d{nr}.dat".format(nr = fname[-8:-5]))
+    exact = np.loadtxt("exact3d/profile3d{nr}.txt".format(nr = fname[-8:-5]))
     pl.loglog(exact[:,0], exact[:,1], "r-")
     pl.loglog(radius, density, "k.")
     pl.xlim(0.01, 0.8)

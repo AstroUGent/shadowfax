@@ -28,7 +28,7 @@
 #define HEAD_TETRAHEDRON
 
 #include "Error.hpp"
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "VorGen.hpp"
 #include <iostream>
 #include <map>

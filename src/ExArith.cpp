@@ -23,7 +23,7 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/Timer.hpp"
 #include <boost/multiprecision/cpp_int.hpp>

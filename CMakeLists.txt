@@ -21,10 +21,14 @@ project(shadowfax)
 
 # The version number.
 set(SHADOWFAX_VERSION_MAJOR 1)
-set(SHADOWFAX_VERSION_MINOR 0)
+set(SHADOWFAX_VERSION_MINOR 1)
 
-# suppress warnings about duplicate build directories (caused by the foreach over dimensions)
-# these warnings are unnecessary in this case and displaying them may confuse the enduser
+enable_testing()
+
+# suppress warnings about duplicate build directories (caused by the foreach
+# over dimensions)
+# these warnings are unnecessary in this case and displaying them may confuse
+# the enduser
 cmake_policy(SET CMP0013 OLD)
 
 add_definitions(-std=c++0x)
@@ -42,11 +46,24 @@ endif(NO_SANITIZER)
 if(SANITIZER)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         if(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8")
-            set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
-            set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
+            set(CMAKE_CXX_FLAGS_DEBUG
+                "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
+            set(CMAKE_CXX_FLAGS_DEBUG
+                "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer")
+            set(CMAKE_EXE_LINKER_FLAGS_DEBUG
+                "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
             add_definitions(-DSANITIZER)
         endif(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8")
     endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_CXX_FLAGS_DEBUG
+            "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
+        set(CMAKE_CXX_FLAGS_DEBUG
+            "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer")
+        set(CMAKE_EXE_LINKER_FLAGS_DEBUG
+            "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
+        add_definitions(-DSANITIZER)
+    endif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif(SANITIZER)
 
 # fix for strange errors on the UGent HPC
@@ -69,10 +86,12 @@ endif(NO_MPI_SEEK)
 add_definitions(-DH5_USE_16_API)
 
 # the include directories
-include_directories(${PROJECT_SOURCE_DIR}/inc)
+include_directories(${PROJECT_BINARY_DIR}/inc)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 find_package(MPI REQUIRED)
+message(STATUS "Found MPI_EXEC: " ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG}
+        ${MPIEXEC_PREFLAGS} ${MPIEXEC_POSTFLAGS})
 include_directories(${MPI_INCLUDE_PATH})
 
 find_package(Boost 1.53.0 REQUIRED)
@@ -81,6 +100,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 set(ALL_Boost_LIBRARIES ${Boost_LIBRARIES})
 
 find_package(HDF5 REQUIRED)
+message(STATUS "Found HDF5_DIFF: " ${HDF5_DIFF_EXECUTABLE})
 include_directories(${HDF5_INCLUDE_DIR})
 link_directories(${HDF5_LIBRARY_DIRS})
 
@@ -112,17 +132,30 @@ foreach(NDIM ${NDIMS})
     add_subdirectory(src)
 endforeach(NDIM)
 
-# copy the testsuite (if it does not already exist)
-if(NOT EXISTS ${PROJECT_BINARY_DIR}/rundir/testsuite/)
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/rundir)
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/rundir/testsuite)
-    execute_process(COMMAND cp -a ${PROJECT_SOURCE_DIR}/rundir/testsuite/. ${PROJECT_BINARY_DIR}/rundir/testsuite/)
-endif()
+# copy the testsuite
+message(STATUS "Copying testsuite...")
+file(GLOB_RECURSE TESTSUITE_FILES
+     "${PROJECT_SOURCE_DIR}/rundir/testsuite/*")
+foreach(TESTSUITE_FILE ${TESTSUITE_FILES})
+    file(RELATIVE_PATH TESTSUITE_FILE_ONLYNAME ${PROJECT_SOURCE_DIR}
+         ${TESTSUITE_FILE})
+    # configure_file only works for text files if COPYONLY is not specified
+    get_filename_component(TESTSUITE_FILE_EXT ${TESTSUITE_FILE} EXT)
+    if(${TESTSUITE_FILE_EXT} STREQUAL ".hdf5")
+        configure_file(${TESTSUITE_FILE}
+                       ${PROJECT_BINARY_DIR}/${TESTSUITE_FILE_ONLYNAME}
+                       COPYONLY)
+    else(${TESTSUITE_FILE_EXT} STREQUAL ".hdf5")
+        configure_file(${TESTSUITE_FILE}
+                       ${PROJECT_BINARY_DIR}/${TESTSUITE_FILE_ONLYNAME} @ONLY)
+    endif(${TESTSUITE_FILE_EXT} STREQUAL ".hdf5")
+endforeach(TESTSUITE_FILE ${TESTSUITE_FILES})
 
 # doxygen
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in
+               ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
 add_custom_target(doc
 ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

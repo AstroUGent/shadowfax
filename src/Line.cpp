@@ -24,7 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Line.hpp"
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "Plane.hpp"
 #include "VorGen.hpp"
 #include <cmath>

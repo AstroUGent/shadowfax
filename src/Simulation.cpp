@@ -26,7 +26,7 @@
 #include "Simulation.hpp"
 #include "ApproximateSolver.hpp"
 #include "DelCont.hpp"
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "GravityWalker.hpp"
 #include "LogFiles.hpp"
 #include "MPIGlobal.hpp"

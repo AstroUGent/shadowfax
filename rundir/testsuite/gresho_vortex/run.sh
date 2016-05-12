@@ -25,7 +25,7 @@ cd ../../..
 if [ ! -f CMakeCache.txt ];
 then
   echo "No build files found. Running cmake..."
-  cmake -DCMAKE_BUILD_TYPE=Release ../
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=@CMAKE_PREFIX_PATH@ ..
 fi
 make
 if [ $? -ne 0 ]

@@ -26,94 +26,99 @@ if(DO_SHADOWFAX)
     set(SHADOWFAXNAME shadowfax${NDIM}d)
 
     set(SHADOWFAXSOURCES
-    ParameterFile.cpp
-    Plane.cpp
+    ApproximateSolver.cpp
     CircularBox.cpp
-    Plotter.cpp
     CubicBox.cpp
-    RectangularBox.cpp
+    DelTess.cpp
     DelTessCheck.cpp
     ExactRiemannSolver.cpp
-    DelTess.cpp
+    ExArith.cpp
+    FixedGrid.cpp
+    GadgetSnapshotReader.cpp
+    GadgetSnapshotWriter.cpp
+    GravityWalker.cpp
+    Image.cpp
+    Line.cpp
+    LogFiles.cpp
+    MPIGlobal.cpp
+    NgbSearch.cpp
+    ParameterFile.cpp
+    Physics.hpp
+    Plane.cpp
+    Plotter.cpp
+    ProgramLog.cpp
+    RectangularBox.cpp
+    RestartFile.cpp
+    Shadowfax.cpp
+    ShadowfaxSnapshotReader.cpp
+    ShadowfaxSnapshotWriter.cpp
     SidePrograms.cpp
     Simplex.cpp
     Simulation.cpp
     SnapshotHandler.cpp
-    ShadowfaxSnapshotReader.cpp
-    ShadowfaxSnapshotWriter.cpp
     TimeLine.cpp
-    VorCell.cpp
-    Image.cpp
-    VorFace.cpp
-    Line.cpp
-    VorGen.cpp
-    Shadowfax.cpp
-    VorTess.cpp
-    NgbSearch.cpp
     TimeStepWalker.cpp
-    GravityWalker.cpp
-    ../inc/GravityWalker.hpp
-    ../inc/DelCont.hpp
-    ../inc/DelTess.hpp
-    ../inc/ExArith.h
-    ../inc/Image.hpp
-    ../inc/Line.hpp
-    ../inc/MPIGlobal.hpp
-    MPIGlobal.cpp
-    ../inc/MPIMethods.hpp
-    ../inc/MPIMethods.hpp
-    ../inc/Error.hpp
-    ../inc/ParameterFile.hpp
-    ../inc/Plane.hpp
-    ../inc/Plotter.hpp
-    ../inc/RiemannSolver.hpp
-    ../inc/ExactRiemannSolver.hpp
-    ../inc/SidePrograms.hpp
-    ../inc/Simplex.hpp
-    ../inc/Simulation.hpp
-    ../inc/SnapshotHandler.hpp
-    ../inc/StateVector.hpp
-    ../inc/TimeLine.hpp
-    ../inc/Vec.hpp
-    ../inc/VorCell.hpp
-    ../inc/VorFace.hpp
-    ../inc/VorGen.hpp
-    ../inc/VorTess.hpp
+    VorCell.cpp
+    VorFace.cpp
+    VorGen.cpp
+    VorTess.cpp
     VorTessManager.cpp
-    ../inc/VorTessManager.hpp
-    ApproximateSolver.cpp
-    ../inc/ApproximateSolver.hpp
-    ../inc/RiemannSolverFactory.hpp
-    GadgetSnapshotReader.cpp
-    ../inc/GadgetSnapshotReader.hpp
-    GadgetSnapshotWriter.cpp
-    ../inc/GadgetSnapshotWriter.hpp
-    FixedGrid.cpp
-    ../inc/FixedGrid.hpp
-    ../inc/TimeStepWalker.hpp
-    ../inc/SnapshotWriterFactory.hpp
-    ../inc/SnapshotReaderFactory.hpp
-    RestartFile.cpp
-    ../inc/RestartFile.hpp
-    LogFiles.cpp
-    ../inc/LogFiles.hpp
-    ExArith.cpp
+
+    ApproximateSolver.hpp
+    DelCont.hpp
+    DelTess.hpp
+    Error.hpp
+    ExactRiemannSolver.hpp
+    ExArith.hpp
+    FixedGrid.hpp
+    GadgetSnapshotReader.hpp
+    GadgetSnapshotWriter.hpp
+    GravityWalker.hpp
+    Image.hpp
+    Line.hpp
+    LogFiles.hpp
+    MPIGlobal.hpp
+    MPIMethods.hpp
+    ParameterFile.hpp
     Physics.cpp
-    ../inc/Physics.hpp
-    ProgramLog.cpp
-    ../inc/ProgramLog.hpp
+    Plane.hpp
+    Plotter.hpp
+    ProgramLog.hpp
+    RestartFile.hpp
+    RiemannSolver.hpp
+    RiemannSolverFactory.hpp
+    SidePrograms.hpp
+    Simplex.hpp
+    Simulation.hpp
+    SnapshotHandler.hpp
+    SnapshotReaderFactory.hpp
+    SnapshotWriterFactory.hpp
+    StateVector.hpp
+    TimeLine.hpp
+    TimeStepWalker.hpp
+    Vec.hpp
+    VorCell.hpp
+    VorFace.hpp
+    VorGen.hpp
+    VorTess.hpp
+    VorTessManager.hpp
     )
 
     # create a new version file if one of the source files changes
     # this way, we will always have the correct compilation time in our
     # restart file
-    add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/inc/ShadowfaxVersion.hpp
-                       COMMAND cmake -P ${PROJECT_SOURCE_DIR}/write_version.cmake
+    add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/inc/ShadowfaxVersion.hpp
+                       COMMAND
+                       cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                       -DPROJECT_BINARY_DIR=${PROJECT_BINARY_DIR}
+                       -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
+                       -P ${PROJECT_SOURCE_DIR}/write_version.cmake
                        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                        DEPENDS ${SHADOWFAXSOURCES} ${IONAME} ${UTILNAME})
 
     add_executable(${SHADOWFAXNAME} ${SHADOWFAXSOURCES})
-    set_target_properties(${SHADOWFAXNAME} PROPERTIES COMPILE_FLAGS -Dndim_=${NDIM})
+    set_target_properties(${SHADOWFAXNAME} PROPERTIES
+                          COMPILE_FLAGS -Dndim_=${NDIM})
 
     target_link_libraries(${SHADOWFAXNAME} ${IONAME})
     target_link_libraries(${SHADOWFAXNAME} ${UTILNAME})
@@ -125,7 +130,8 @@ if(DO_SHADOWFAX)
     # make sure version_number is called, but only once
     if(${NDIM} EQUAL 2 OR ONLY_3D)
         add_custom_target(version_number
-                          DEPENDS ${PROJECT_SOURCE_DIR}/inc/ShadowfaxVersion.hpp)
+                          DEPENDS
+                          ${PROJECT_BINARY_DIR}/inc/ShadowfaxVersion.hpp)
         add_dependencies(${SHADOWFAXNAME} version_number)
     endif(${NDIM} EQUAL 2 OR ONLY_3D)
 endif(DO_SHADOWFAX)
@@ -135,59 +141,61 @@ if(DO_ICMAKER)
 
     set(ICMAKERSOURCES
     BlockICGenerator.cpp
-    Plane.cpp
     CircularBox.cpp
     CubicBox.cpp
-    RectangularBox.cpp
-    DelTessCheck.cpp
     DelTess.cpp
-    Simplex.cpp
-    SnapshotHandler.cpp
-    ShadowfaxSnapshotReader.cpp
-    ShadowfaxSnapshotWriter.cpp
+    DelTessCheck.cpp
+    ExArith.cpp
     GadgetSnapshotWriter.cpp
-    SpecificICGenerator.cpp
     ICMaker.cpp
     ICRegion.cpp
+    Line.cpp
+    MPIGlobal.cpp
+    NgbSearch.cpp
+    Plane.cpp
+    ProgramLog.cpp
+    RectangularBox.cpp
+    ShadowfaxSnapshotReader.cpp
+    ShadowfaxSnapshotWriter.cpp
+    Simplex.cpp
+    SnapshotHandler.cpp
+    SpecificICGenerator.cpp
+    TimeLine.cpp
+    TimeStepWalker.cpp
     VorCell.cpp
     VorFace.cpp
-    Line.cpp
     VorGen.cpp
     VorTess.cpp
     VorTessManager.cpp
-    TimeLine.cpp
-    TimeStepWalker.cpp
-    NgbSearch.cpp
-    ../inc/DelCont.hpp
-    ../inc/DelTess.hpp
-    ../inc/ExArith.h
-    ../inc/ICGenerator.hpp
-    ../inc/ICMaker.hpp
-    ../inc/ICRegion.hpp
-    ../inc/Line.hpp
-    ../inc/MPIGlobal.hpp
-    MPIGlobal.cpp
-    ../inc/MPIMethods.hpp
-    ../inc/Plane.hpp
-    ../inc/Simplex.hpp
-    ../inc/SnapshotHandler.hpp
-    ../inc/ShadowfaxSnapshotWriter.hpp
-    ../inc/ShadowfaxSnapshotReader.hpp
-    ../inc/StateVector.hpp
-    ../inc/Vec.hpp
-    ../inc/VorCell.hpp
-    ../inc/VorFace.hpp
-    ../inc/VorGen.hpp
-    ../inc/VorTess.hpp
-    ../inc/SymbolicFunction.hpp
-    ExArith.cpp
-    ProgramLog.cpp
-    ../inc/ProgramLog.hpp
+    
+    DelCont.hpp
+    DelTess.hpp
+    ExArith.hpp
+    ICGenerator.hpp
+    ICMaker.hpp
+    ICRegion.hpp
+    Line.hpp
+    MPIGlobal.hpp
+    MPIMethods.hpp
+    Plane.hpp
+    ProgramLog.hpp
+    Simplex.hpp
+    ShadowfaxSnapshotReader.hpp
+    ShadowfaxSnapshotWriter.hpp
+    SnapshotHandler.hpp
+    StateVector.hpp
+    SymbolicFunction.hpp
+    Vec.hpp
+    VorCell.hpp
+    VorFace.hpp
+    VorGen.hpp
+    VorTess.hpp
     )
 
     add_executable(${ICMAKERNAME} ${ICMAKERSOURCES})
 
-    set_target_properties(${ICMAKERNAME} PROPERTIES COMPILE_FLAGS "-Dndim_=${NDIM} -DICMAKER")
+    set_target_properties(${ICMAKERNAME} PROPERTIES
+                          COMPILE_FLAGS "-Dndim_=${NDIM} -DICMAKER")
 
     target_link_libraries(${ICMAKERNAME} ${IONAME})
     target_link_libraries(${ICMAKERNAME} ${UTILNAME})
@@ -200,35 +208,37 @@ endif(DO_ICMAKER)
 if(DO_VTKMAKER)
     set(VTKMAKERNAME vtkmaker${NDIM}d)
     add_executable(${VTKMAKERNAME}
-    Plane.cpp
     CubicBox.cpp
-    RectangularBox.cpp
     DelTess.cpp
-    Simplex.cpp
-    SnapshotHandler.cpp
-    ShadowfaxSnapshotReader.cpp
+    ExArith.cpp
     GadgetSnapshotReader.cpp
+    GadgetSnapshotWriter.cpp
+    Image.cpp
+    Line.cpp
+    MPIGlobal.cpp
+    NgbSearch.cpp
+    Plane.cpp
+    ProgramLog.cpp
+    RectangularBox.cpp
+    Simplex.cpp
+    ShadowfaxSnapshotReader.cpp
+    ShadowfaxSnapshotWriter.cpp
+    SnapshotHandler.cpp
+    TimeLine.cpp
+    TimeStepWalker.cpp
     VorCell.cpp
     VorFace.cpp
-    Line.cpp
-    ../inc/MPIGlobal.hpp
-    MPIGlobal.cpp
-    ../inc/MPIMethods.hpp
     VorGen.cpp
     VorTess.cpp
-    NgbSearch.cpp
     VTKMaker.cpp
-    ../inc/VTKMaker.hpp
-    Image.cpp
-    TimeLine.cpp
-    ShadowfaxSnapshotWriter.cpp
-    GadgetSnapshotWriter.cpp
-    TimeStepWalker.cpp
-    ExArith.cpp
-    ProgramLog.cpp
-    ../inc/ProgramLog.hpp
+    
+    MPIGlobal.hpp
+    MPIMethods.hpp
+    ProgramLog.hpp
+    VTKMaker.hpp
     )
-    set_target_properties(${VTKMAKERNAME} PROPERTIES COMPILE_FLAGS "-Dndim_=${NDIM}")
+    set_target_properties(${VTKMAKERNAME} PROPERTIES
+                          COMPILE_FLAGS "-Dndim_=${NDIM}")
 
     target_link_libraries(${VTKMAKERNAME} ${IONAME})
     target_link_libraries(${VTKMAKERNAME} ${UTILNAME})

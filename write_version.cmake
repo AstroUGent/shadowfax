@@ -17,7 +17,7 @@
 ################################################################################
 
 find_package(Git)
-execute_process(COMMAND ${GIT_EXECUTABLE} describe --always
+execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags
                 OUTPUT_VARIABLE GIT_BUILD_STRING
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND date "+%d/%m/%y"
@@ -26,5 +26,9 @@ execute_process(COMMAND date "+%d/%m/%y"
 execute_process(COMMAND date "+%H:%M:%S"
                 OUTPUT_VARIABLE TIME_STRING
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(RELEASE_BUILD True)
+endif()
 
-configure_file(inc/ShadowfaxVersion.hpp.in inc/ShadowfaxVersion.hpp)
+configure_file(${PROJECT_SOURCE_DIR}/src/ShadowfaxVersion.hpp.in
+               ${PROJECT_BINARY_DIR}/inc/ShadowfaxVersion.hpp)

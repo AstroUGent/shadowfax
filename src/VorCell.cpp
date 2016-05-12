@@ -25,7 +25,7 @@
  */
 #include "VorCell.hpp"
 #include "Error.hpp"
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "Simplex.hpp"
 #include "VorFace.hpp"
 #include "utilities/GasParticle.hpp"

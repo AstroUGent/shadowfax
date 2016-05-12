@@ -26,6 +26,7 @@
 # exit (0 begin success, all other values being a failed test)
 testnames=( overdensity nbody evrard gresho_vortex sedov_taylor restarttest )
 tests=()
+timings=()
 
 for test in "${testnames[@]}"
 do
@@ -33,8 +34,12 @@ cd $test
 
 echo "Running \"$test\" test"
 
+starttime=$(date +%s.%N)
 ./run.sh
 status=$?
+endtime=$(date +%s.%N)
+timediff=$(echo "$endtime - $starttime" | bc)
+timings+=($timediff)
 tests+=($status)
 
 if [ $status -ne 0 ]
@@ -54,10 +59,12 @@ for i in $(eval echo {0..$testcount})
 do
 flag=${tests[$i]}
 testname=${testnames[$i]}
+timing=${timings[$i]}
 if [ $flag -ne 0 ]
 then
 echo -e "Test \"$testname\" \e[31mfailed\e[0m!"
 else
 echo -e "Test \"$testname\" \e[32mpassed\e[0m."
 fi
+echo $timing
 done

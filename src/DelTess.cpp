@@ -26,7 +26,7 @@
 #include "DelTess.hpp"
 #include "DelCont.hpp"
 #include "Error.hpp"
-#include "ExArith.h"
+#include "ExArith.hpp"
 #include "Line.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"

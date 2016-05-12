@@ -41,8 +41,8 @@ cp ../ic_nbody3d.hdf5 .
 fi
 
 # run simulation
-mpirun -np $i ../../../shadowfax3d --params ../nbody3d.ini 2>&1 \
-    | tee nbody3d.log
+@MPIEXEC@ @MPIEXEC_NUMPROC_FLAG@ $i @MPIEXEC_PREFLAGS@ ../../../shadowfax3d \
+    @MPIEXEC_POSTFLAGS@ --params ../nbody3d.ini 2>&1 | tee nbody3d.log
 status=${PIPESTATUS[0]}
 cd ..
 

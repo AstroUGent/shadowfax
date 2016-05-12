@@ -43,9 +43,7 @@ namespace ascii = boost::spirit::ascii;
 
 /*! @brief Symbolic mathematical constants */
 static struct constant_ : qi::symbols<char, double> {
-    constant_() {
-        this->add("pi", boost::math::constants::pi<double>());
-    }
+    constant_() { this->add("pi", boost::math::constants::pi<double>()); }
 } constant; /*!< @brief Symbolic mathematical constants */
 
 /*! @brief Symbolic functions with a single argument */
@@ -72,11 +70,10 @@ static struct function_ : qi::symbols<char, double (*)(double)> {
 struct power_ {
 
     /*! @brief Default result type */
-    template<class> struct result;
+    template <class> struct result;
 
     /*! @brief Phoenix 3 compliant result type */
-    template<class F, typename X, typename Y>
-    struct result<F(X, Y)> {
+    template <class F, typename X, typename Y> struct result<F(X, Y)> {
         /*! @brief The result is an X reference */
         typedef X& type;
     };
@@ -88,7 +85,7 @@ struct power_ {
      * @param y Exponent of the power
      * @return Base to the power exponent
      */
-    template <typename X, typename Y> X& operator()(X &x, Y y) const {
+    template <typename X, typename Y> X& operator()(X& x, Y y) const {
         x = std::pow(x, y);
         return x;
     }
@@ -98,11 +95,10 @@ struct power_ {
 struct func_ {
 
     /*! @brief Default result type */
-    template<class> struct result;
+    template <class> struct result;
 
     /*! @brief Phoenix 3 compliant result type */
-    template<class Q, typename F, typename X>
-    struct result<Q(F, X)> {
+    template <class Q, typename F, typename X> struct result<Q(F, X)> {
         /*! @brief The result is an X reference */
         typedef X& type;
     };
@@ -114,7 +110,7 @@ struct func_ {
      * @param x Parameter passed on to the function
      * @return Result of the function call
      */
-    template <typename F, typename X> X& operator()(F f, X &x) const {
+    template <typename F, typename X> X& operator()(F f, X& x) const {
         x = f(x);
         return x;
     }

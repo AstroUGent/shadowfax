@@ -57,6 +57,9 @@ class RiemannSolverFactory {
         if(tag == "EXAC") {
             return new ExactRiemannSolver(rfile);
         }
+        if(tag == "HLLC") {
+            return new HLLCRiemannSolver(rfile);
+        }
         if(tag == "TRRS") {
             return new TRRSSolver(rfile);
         }
@@ -96,6 +99,9 @@ class RiemannSolverFactory {
                                    double tolerance, double cutoff) {
         if(name == "Exact") {
             return new ExactRiemannSolver(gamma, tolerance, cutoff);
+        }
+        if(name == "HLLC") {
+            return new HLLCRiemannSolver(gamma);
         }
         if(name == "TRRS") {
             return new TRRSSolver(gamma);

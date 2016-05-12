@@ -217,7 +217,9 @@ void VorCell::print_vtk(ostream& vstream, unsigned int& numv, ostream& pstream,
  *
  * @return Reference to the centroid of the cell
  */
-Vec& VorCell::get_centroid() { return _centroid; }
+Vec& VorCell::get_centroid() {
+    return _centroid;
+}
 
 /**
  * @brief Set the centroid of the cell
@@ -239,7 +241,9 @@ void VorCell::set_centroid(double* centroid) {
  *
  * @param centroid New centroid of the cell
  */
-void VorCell::set_centroid(Vec centroid) { _centroid = centroid; }
+void VorCell::set_centroid(Vec centroid) {
+    _centroid = centroid;
+}
 
 /**
  * @brief Calculate the centroid of the cell
@@ -323,14 +327,18 @@ void VorCell::calculate_centroid() {
  *
  * @return Volume of the cell
  */
-double VorCell::get_volume() { return _volume; }
+double VorCell::get_volume() {
+    return _volume;
+}
 
 /**
  * @brief Set the volume of the cell
  *
  * @param volume New volume of the cell
  */
-void VorCell::set_volume(double volume) { _volume = volume; }
+void VorCell::set_volume(double volume) {
+    _volume = volume;
+}
 
 /**
  * @brief Calculate the volume of the cell
@@ -405,35 +413,45 @@ void VorCell::calculate_total_area() {
  *
  * @param ngb A VorGen that is a neighbour to this cell
  */
-void VorCell::add_ngb(VorGen* ngb) { _ngbs.push_back(ngb); }
+void VorCell::add_ngb(VorGen* ngb) {
+    _ngbs.push_back(ngb);
+}
 
 /**
  * @brief Access the neighbours of this cell
  *
  * @return A vector containing the neighbouring points of this cell
  */
-vector<VorGen*> VorCell::get_ngbs() { return _ngbs; }
+vector<VorGen*> VorCell::get_ngbs() {
+    return _ngbs;
+}
 
 /**
  * @brief Add the given face to the back of the face list
  *
  * @param face VorFace to add
  */
-void VorCell::add_face(VorFace* face) { _faces.push_back(face); }
+void VorCell::add_face(VorFace* face) {
+    _faces.push_back(face);
+}
 
 /**
  * @brief Return the number of faces stored in this cell
  *
  * @return The number of faces stored in this cell
  */
-int VorCell::number_of_faces() { return _faces.size(); }
+int VorCell::number_of_faces() {
+    return _faces.size();
+}
 
 /**
  * @brief Get the faces of this cell
  *
  * @return A vector containing the faces of this cell
  */
-vector<VorFace*> VorCell::get_faces() { return _faces; }
+vector<VorFace*> VorCell::get_faces() {
+    return _faces;
+}
 
 /**
  * @brief Estimate slope-limited gradients for the primitive variables in this
@@ -533,28 +551,36 @@ VorFace* VorCell::get_face(VorGen* point) {
  *
  * @param ngb Index of a VorGen in the DelTess point list
  */
-void VorCell::add_ngb_id(unsigned int ngb) { _ngb_ids.push_back(ngb); }
+void VorCell::add_ngb_id(unsigned int ngb) {
+    _ngb_ids.push_back(ngb);
+}
 
 /**
  * @brief Get the indices of the neighbours of this cell
  *
  * @return Vector with indices of points in the DelTess point list
  */
-vector<unsigned int> VorCell::get_ngb_ids() { return _ngb_ids; }
+vector<unsigned int> VorCell::get_ngb_ids() {
+    return _ngb_ids;
+}
 
 /**
  * @brief Add the given index to the back of the face index list
  *
  * @param face Index of a VorFace in the VorTess face list
  */
-void VorCell::add_face_id(unsigned int face) { _face_ids.push_back(face); }
+void VorCell::add_face_id(unsigned int face) {
+    _face_ids.push_back(face);
+}
 
 /**
  * @brief Get the indices of the faces of this cell
  *
  * @return Vector with indices of faces in the VorTess face list
  */
-vector<unsigned int> VorCell::get_face_ids() { return _face_ids; }
+vector<unsigned int> VorCell::get_face_ids() {
+    return _face_ids;
+}
 
 #if ndim_ == 3
 /**
@@ -973,7 +999,9 @@ Vec VorCell::get_velocity() {
  *
  * @return GasParticle corresponding to this cell
  */
-GasParticle* VorCell::get_particle() { return _central_point->get_particle(); }
+GasParticle* VorCell::get_particle() {
+    return _central_point->get_particle();
+}
 
 /**
  * @brief Get the triangles that make up this cell

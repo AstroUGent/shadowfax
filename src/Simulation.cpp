@@ -24,7 +24,6 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Simulation.hpp"
-#include "ApproximateSolver.hpp"
 #include "DelCont.hpp"
 #include "ExArith.hpp"
 #include "GravityWalker.hpp"
@@ -35,8 +34,6 @@
 #include "Physics.hpp"
 #include "ProgramLog.hpp"
 #include "RestartFile.hpp"
-#include "RiemannSolver.hpp"
-#include "RiemannSolverFactory.hpp"
 #include "SnapshotReaderFactory.hpp"
 #include "TimeLine.hpp"
 #include "Vec.hpp"
@@ -49,6 +46,9 @@
 #include "io/Output.hpp"
 #include "io/UnitSet.hpp"
 #include "io/UnitSetGenerator.hpp"
+#include "riemann/ApproximateSolver.hpp"
+#include "riemann/RiemannSolver.hpp"
+#include "riemann/RiemannSolverFactory.hpp"
 #include "utilities/DMParticle.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/HelperFunctions.hpp"

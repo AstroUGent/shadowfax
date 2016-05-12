@@ -61,14 +61,18 @@ class Box {
      *
      * @return Bottom left (front) corner of the box
      */
-    inline Vec get_anchor() { return _anchor; }
+    inline Vec get_anchor() {
+        return _anchor;
+    }
 
     /**
      * @brief Get the side length of the box
      *
      * @return Side length of the box
      */
-    inline double get_side() { return _side; }
+    inline double get_side() {
+        return _side;
+    }
 };
 
 #endif  // BOX_HPP

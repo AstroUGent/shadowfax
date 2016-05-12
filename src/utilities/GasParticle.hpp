@@ -141,7 +141,9 @@ class GasParticle : public Particle {
       *
       * @return PARTTYPE_GAS
       */
-    ParticleType type() { return PARTTYPE_GAS; }
+    ParticleType type() {
+        return PARTTYPE_GAS;
+    }
 
     void set_soundspeed(double csnd);
     double get_soundspeed();
@@ -176,7 +178,9 @@ class GasParticle : public Particle {
       *
       * @param old_mass Value to store in the conserved quantities StateVector
       */
-    void set_old_mass(double old_mass) { _old_Q[0] = old_mass; }
+    void set_old_mass(double old_mass) {
+        _old_Q[0] = old_mass;
+    }
 
     /**
       * \brief Get the mass of the particle
@@ -185,7 +189,9 @@ class GasParticle : public Particle {
       *
       * @return The mass of the gas inside the Voronoi grid cell
       */
-    inline double get_mass() { return _Q[0]; }
+    inline double get_mass() {
+        return _Q[0];
+    }
 
     /**
       * \brief Get the mass of the particle during the previous timestep
@@ -193,7 +199,9 @@ class GasParticle : public Particle {
       * @return The mass of the gas inside the Voronoi grid cell during the
       * previous timestep
       */
-    inline double get_old_mass() { return _old_Q[0]; }
+    inline double get_old_mass() {
+        return _old_Q[0];
+    }
 
     void set_mesh_v(Vec& mesh_v);
     Vec& get_mesh_v();

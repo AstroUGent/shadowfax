@@ -78,14 +78,18 @@ class TreeRoute {
      *
      * @return Index of the next child node in the route
      */
-    inline unsigned int next() { return _path[_curpos++]; }
+    inline unsigned int next() {
+        return _path[_curpos++];
+    }
 
     /**
      * @brief Check if we are at the deepest level of the route
      *
      * @return True if we are at the end of the route, false otherwise
      */
-    inline bool finished() { return _curpos == _length; }
+    inline bool finished() {
+        return _curpos == _length;
+    }
 
     /**
      * @brief Print the route to the given stream

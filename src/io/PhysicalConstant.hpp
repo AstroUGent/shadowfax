@@ -62,7 +62,9 @@ class PhysicalConstant {
       *
       * @return Raw value of the physical constant in its original Unit
       */
-    inline double get_value() { return _value; }
+    inline double get_value() {
+        return _value;
+    }
 
     /**
       * \brief Get the raw value of the Unit associated to this physical
@@ -73,7 +75,9 @@ class PhysicalConstant {
       *
       * @return The original Unit associated with the physical constant
       */
-    inline Unit get_unit() { return _unit; }
+    inline Unit get_unit() {
+        return _unit;
+    }
 
     /**
       * \brief Get the value of the physical constant in the specified system of

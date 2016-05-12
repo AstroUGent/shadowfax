@@ -26,10 +26,10 @@
 #include "VorFace.hpp"
 #include "Error.hpp"
 #include "MPIGlobal.hpp"
-#include "RiemannSolver.hpp"
 #include "TimeLine.hpp"
 #include "VorCell.hpp"
 #include "VorGen.hpp"
+#include "riemann/RiemannSolver.hpp"
 #include "utilities/GasParticle.hpp"
 #include <cmath>
 #include <cstdlib>
@@ -178,14 +178,18 @@ bool VorFace::overlap(double* box) {
  *
  * @param point VorGen to be added to the end of the internal vertex list
  */
-void VorFace::add_vertex(VorGen* point) { _vertices.push_back(point); }
+void VorFace::add_vertex(VorGen* point) {
+    _vertices.push_back(point);
+}
 
 /**
  * @brief Get the vertices of the face
  *
  * @return Vertices of the face
  */
-vector<VorGen*> VorFace::get_vertices() { return _vertices; }
+vector<VorGen*> VorFace::get_vertices() {
+    return _vertices;
+}
 
 /**
  * @brief Add the given VorGen as face neighbour to the face
@@ -195,34 +199,44 @@ vector<VorGen*> VorFace::get_vertices() { return _vertices; }
  *
  * @param ngb VorGen to be added to the end of the face neighbour list
  */
-void VorFace::add_facengb(VorGen* ngb) { _ngbs.push_back(ngb); }
+void VorFace::add_facengb(VorGen* ngb) {
+    _ngbs.push_back(ngb);
+}
 
 /**
  * @brief Get the face neighbours of the face
  * @return Face neighbours of the face
  */
-vector<VorGen*> VorFace::get_facengbs() { return _ngbs; }
+vector<VorGen*> VorFace::get_facengbs() {
+    return _ngbs;
+}
 
 /**
  * @brief Make the given VorGen the right generator of this face
  *
  * @param ngb Right generator of the face
  */
-void VorFace::add_ngb(VorGen* ngb) { _right = ngb; }
+void VorFace::add_ngb(VorGen* ngb) {
+    _right = ngb;
+}
 
 /**
  * @brief Get the right generator of the face
  *
  * @return Right generator of the face
  */
-VorGen* VorFace::get_ngb() { return _right; }
+VorGen* VorFace::get_ngb() {
+    return _right;
+}
 
 /**
  * @brief Get the left generator of the face
  *
  * @return Left generator of the face
  */
-VorGen* VorFace::get_left() { return _left; }
+VorGen* VorFace::get_left() {
+    return _left;
+}
 
 /**
  * @brief Set the index of the right generator of the face in the DelTess VorGen
@@ -230,7 +244,9 @@ VorGen* VorFace::get_left() { return _left; }
  *
  * @param ngb Index of the right generator of the face
  */
-void VorFace::add_ngb_id(unsigned int ngb) { _vright = ngb; }
+void VorFace::add_ngb_id(unsigned int ngb) {
+    _vright = ngb;
+}
 
 /**
  * @brief Get the index of the right generator of the face in the DelTess VorGen
@@ -238,14 +254,18 @@ void VorFace::add_ngb_id(unsigned int ngb) { _vright = ngb; }
  *
  * @return Index of the right generator
  */
-unsigned int VorFace::get_ngb_id() { return _vright; }
+unsigned int VorFace::get_ngb_id() {
+    return _vright;
+}
 
 /**
  * @brief Get the geometrical midpoint of the face
  *
  * @return The midpoint of the face
  */
-Vec& VorFace::get_midpoint() { return _midpoint; }
+Vec& VorFace::get_midpoint() {
+    return _midpoint;
+}
 
 /**
  * @brief Set the geometrical midpoint of the face to the given value
@@ -321,14 +341,18 @@ void VorFace::calculate_midpoint() {
  *
  * @return The area of the face
  */
-double VorFace::get_area() { return _area; }
+double VorFace::get_area() {
+    return _area;
+}
 
 /**
  * @brief Set the geometrical area of the face to the given value
  *
  * @param area New value for the area of the face
  */
-void VorFace::set_area(double area) { _area = area; }
+void VorFace::set_area(double area) {
+    _area = area;
+}
 
 /**
  * @brief Calculate the geometrical area of the face
@@ -550,7 +574,9 @@ void VorFace::get_normal(double* angles) {
  *
  * @return Velocity of the face
  */
-Vec& VorFace::get_v() { return _v; }
+Vec& VorFace::get_v() {
+    return _v;
+}
 
 /**
  * @brief Set the velocity of the face based on the velocities of the left and
@@ -705,47 +731,10 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
             double correction = cell->pos(n) - point->pos(n);
             d[n] = _midpoint[n] - centroid[n] + correction;
         }
-#if ndim_ == 3
-        double Bx[5][5] = {
-                {Wtemp[1], Wtemp[0], 0., 0., 0.},
-                {0., Wtemp[1], 0., 0., 1. / Wtemp[0]},
-                {0., 0., Wtemp[1], 0., 0.},
-                {0., 0., 0., Wtemp[1], 0.},
-                {0., solver.get_gamma() * Wtemp[4], 0., 0., Wtemp[1]}};
-        double By[5][5] = {
-                {Wtemp[2], 0., Wtemp[0], 0., 0.},
-                {0., Wtemp[2], 0., 0., 0.},
-                {0., 0., Wtemp[2], 0., 1. / Wtemp[0]},
-                {0., 0., 0., Wtemp[2], 0.},
-                {0., 0., solver.get_gamma() * Wtemp[4], 0., Wtemp[2]}};
-        double Bz[5][5] = {
-                {Wtemp[3], 0., 0., Wtemp[0], 0.},
-                {0., Wtemp[3], 0., 0., 0.},
-                {0., 0., Wtemp[3], 0., 0.},
-                {0., 0., 0., Wtemp[3], 1. / Wtemp[0]},
-                {0., 0., 0., solver.get_gamma() * Wtemp[4], Wtemp[3]}};
-#else
-        double Bx[4][4] = {{Wtemp[1], Wtemp[0], 0., 0.},
-                           {0., Wtemp[1], 0., 1. / Wtemp[0]},
-                           {0., 0., Wtemp[1], 0.},
-                           {0., solver.get_gamma() * Wtemp[3], 0., Wtemp[1]}};
-        double By[4][4] = {{Wtemp[2], 0., Wtemp[0], 0.},
-                           {0., Wtemp[2], 0., 0.},
-                           {0., 0., Wtemp[2], 1. / Wtemp[0]},
-                           {0., 0., solver.get_gamma() * Wtemp[3], Wtemp[2]}};
-#endif
-        StateVector deltaW;
-        for(unsigned int m = ndim_ + 2; m--;) {
-            for(unsigned int n = ndim_ + 2; n--;) {
-                deltaW[m] -= 0.5 * dtp * Bx[m][n] * cell->get_gradient(n, 0);
-                deltaW[m] -= 0.5 * dtp * By[m][n] * cell->get_gradient(n, 1);
-#if ndim_ == 3
-                deltaW[m] -= 0.5 * dtp * Bz[m][n] * cell->get_gradient(n, 2);
-#endif
-            }
-        }
         StateVector gradients[ndim_];
         cell->get_gradients(gradients);
+        StateVector deltaW =
+                0.5 * dtp * solver.get_time_derivative(Wtemp, gradients);
         Wtemp = reconstruct(Wtemp, gradients, d);
         Vec centdiff = _left->get_particle()->get_centroid() -
                        _right->get_particle()->get_centroid();
@@ -788,44 +777,10 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
         double correction = cell->pos(n) - point->pos(n);
         d[n] = _midpoint[n] - centroid[n] + correction;
     }
-#if ndim_ == 3
-    double Ax[5][5] = {{Wtemp[1], Wtemp[0], 0., 0., 0.},
-                       {0., Wtemp[1], 0., 0., 1. / Wtemp[0]},
-                       {0., 0., Wtemp[1], 0., 0.},
-                       {0., 0., 0., Wtemp[1], 0.},
-                       {0., solver.get_gamma() * Wtemp[4], 0., 0., Wtemp[1]}};
-    double Ay[5][5] = {{Wtemp[2], 0., Wtemp[0], 0., 0.},
-                       {0., Wtemp[2], 0., 0., 0.},
-                       {0., 0., Wtemp[2], 0., 1. / Wtemp[0]},
-                       {0., 0., 0., Wtemp[2], 0.},
-                       {0., 0., solver.get_gamma() * Wtemp[4], 0., Wtemp[2]}};
-    double Az[5][5] = {{Wtemp[3], 0., 0., Wtemp[0], 0.},
-                       {0., Wtemp[3], 0., 0., 0.},
-                       {0., 0., Wtemp[3], 0., 0.},
-                       {0., 0., 0., Wtemp[3], 1. / Wtemp[0]},
-                       {0., 0., 0., solver.get_gamma() * Wtemp[4], Wtemp[3]}};
-#else
-    double Ax[4][4] = {{Wtemp[1], Wtemp[0], 0., 0.},
-                       {0., Wtemp[1], 0., 1. / Wtemp[0]},
-                       {0., 0., Wtemp[1], 0.},
-                       {0., solver.get_gamma() * Wtemp[3], 0., Wtemp[1]}};
-    double Ay[4][4] = {{Wtemp[2], 0., Wtemp[0], 0.},
-                       {0., Wtemp[2], 0., 0.},
-                       {0., 0., Wtemp[2], 1. / Wtemp[0]},
-                       {0., 0., solver.get_gamma() * Wtemp[3], Wtemp[2]}};
-#endif
-    StateVector deltaW;
-    for(unsigned int m = ndim_ + 2; m--;) {
-        for(unsigned int n = ndim_ + 2; n--;) {
-            deltaW[m] -= 0.5 * dtp * Ax[m][n] * cell->get_gradient(n, 0);
-            deltaW[m] -= 0.5 * dtp * Ay[m][n] * cell->get_gradient(n, 1);
-#if ndim_ == 3
-            deltaW[m] -= 0.5 * dtp * Az[m][n] * cell->get_gradient(n, 2);
-#endif
-        }
-    }
     StateVector gradientsL[ndim_];
     cell->get_gradients(gradientsL);
+    StateVector deltaW =
+            0.5 * dtp * solver.get_time_derivative(Wtemp, gradientsL);
     Wtemp = reconstruct(Wtemp, gradientsL, d);
     if(_right->get_particle()) {
         Vec centdiff = _left->get_particle()->get_centroid() -
@@ -865,8 +820,6 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
     for(unsigned int i = 0; i < ndim_; ++i) {
         n[i] = angles[i];
     }
-    Whalf = solver.solve(WL, WR, n, maxmach, _right->get_particle() == NULL);
-    Whalf += _v;
 
     _left->get_particle()->set_max_mach(
             std::max(_left->get_particle()->get_max_mach(), maxmach));
@@ -875,17 +828,10 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
                 std::max(_right->get_particle()->get_max_mach(), maxmach));
     }
 
-    StateVector fluxvec[ndim_];
-    for(unsigned int i = ndim_; i--;) {
-        fluxvec[i] = solver.get_flux(_v, i, Whalf);
-    }
-
-    StateVector dQL;
-    StateVector dQR;
-    for(unsigned int i = ndim_; i--;) {
-        dQL += dt * get_area() * angles[i] * fluxvec[i];
-        dQR -= dt * get_area() * angles[i] * fluxvec[i];
-    }
+    StateVector flux = solver.solve_for_flux(WL, WR, n, _v,
+                                             _right->get_particle() == NULL);
+    StateVector dQL = dt * get_area() * flux;
+    StateVector dQR = -dt * get_area() * flux;
 
     // flux limiter
     // if one of the particles is inactive, it is possible that we still
@@ -1003,7 +949,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
                     dQL[0] * (_left->get_position() - _right->get_position()));
         }
     }
-    if(fluxvec[0][0] != fluxvec[0][0]) {
+    if(flux[0] != flux[0]) {
 #if ndim_ == 3
         cerr << "position left: " << _left->x() << "\t" << _left->y() << "\t"
              << _left->z() << endl;

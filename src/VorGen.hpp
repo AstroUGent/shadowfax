@@ -102,21 +102,27 @@ class VorGen {
      * @param point Second point
      * @return Distance between this point and the given point
      */
-    inline double distance(VorGen point) { return (_p - point._p).norm(); }
+    inline double distance(VorGen point) {
+        return (_p - point._p).norm();
+    }
 
     /**
      * @brief Get the x-component of the position of this point
      *
      * @return x-coordinate of the point
      */
-    inline double x() { return _p[0]; }
+    inline double x() {
+        return _p[0];
+    }
 
     /**
      * @brief Get the y-component of the position of this point
      *
      * @return y-coordinate of the point
      */
-    inline double y() { return _p[1]; }
+    inline double y() {
+        return _p[1];
+    }
 
 #if ndim_ == 3
     /**
@@ -124,7 +130,9 @@ class VorGen {
      *
      * @return z-coordinate of the point
      */
-    inline double z() { return _p[2]; }
+    inline double z() {
+        return _p[2];
+    }
 #endif
 
     /**
@@ -134,7 +142,9 @@ class VorGen {
      * @param index Index of a coordinate of this point
      * @return Value of the requested coordinate
      */
-    inline double pos(int index) { return _p[index]; }
+    inline double pos(int index) {
+        return _p[index];
+    }
 
     void move(double x, double y, double z);
     void set_cell(VorCell* cell);

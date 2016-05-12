@@ -43,7 +43,9 @@ namespace ascii = boost::spirit::ascii;
 
 /*! @brief Symbolic mathematical constants */
 static struct constant_ : qi::symbols<char, double> {
-    constant_() { this->add("pi", boost::math::constants::pi<double>()); }
+    constant_() {
+        this->add("pi", boost::math::constants::pi<double>());
+    }
 } constant; /*!< @brief Symbolic mathematical constants */
 
 /*! @brief Symbolic functions with a single argument */

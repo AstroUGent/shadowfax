@@ -27,8 +27,8 @@
 #include "MPIGlobal.hpp"
 #include "ProgramLog.hpp"
 #include "RestartFile.hpp"
-#include "RiemannSolver.hpp"
 #include "TimeLine.hpp"
+#include "riemann/RiemannSolver.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/ParticleVector.hpp"
 using namespace std;

@@ -210,14 +210,18 @@ DelTess::~DelTess() {
  * @param voronoi A VoronoiTesselation constructed based on this
  * DelaunayTesselation
  */
-void DelTess::add_voronoi_tesselation(VorTess* voronoi) { _voronoi = voronoi; }
+void DelTess::add_voronoi_tesselation(VorTess* voronoi) {
+    _voronoi = voronoi;
+}
 
 /**
  * @brief Get a pointer to the DelCont defining the tesselation domain.
  *
  * @return The DelCont used by this DelTess
  */
-DelCont* DelTess::get_container() { return _container; }
+DelCont* DelTess::get_container() {
+    return _container;
+}
 
 #if ndim_ == 3
 void DelTess::add_ghosts() {
@@ -2226,7 +2230,9 @@ void DelTess::output_tesselation(ostream& stream) {
  *
  * @return A vector containing all the points of the tesselation
  */
-vector<VorGen*> DelTess::get_points() { return _points; }
+vector<VorGen*> DelTess::get_points() {
+    return _points;
+}
 
 /**
  * @brief Brute force check of the validity of the tesselation
@@ -2278,7 +2284,9 @@ void DelTess::check_tesselation() {
   * @param index The index of a Simplex in the internal simplices vector
   * @return A Simplex
   */
-Simplex* DelTess::get_simplex(unsigned int index) { return _simplices[index]; }
+Simplex* DelTess::get_simplex(unsigned int index) {
+    return _simplices[index];
+}
 
 #if ndim_ == 3
 void DelTess::set_relations() {

@@ -34,7 +34,9 @@ using namespace std;
   * @param filename Name of the file to write. The file is overwritten if it
   * already exists
   */
-AsciiOutput::AsciiOutput(string filename) { _filename = filename; }
+AsciiOutput::AsciiOutput(string filename) {
+    _filename = filename;
+}
 
 /**
   * \brief Destructor. Does the actual writing of the file

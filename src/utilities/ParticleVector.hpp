@@ -118,14 +118,18 @@ class ParticleVector {
      *
      * @return Size of the local gas particle list
      */
-    unsigned int gassize() { return _sizes[PARTTYPE_GAS]; }
+    unsigned int gassize() {
+        return _sizes[PARTTYPE_GAS];
+    }
 
     /**
      * @brief Get the size of the dark matter particle list
      *
      * @return Size of the local dark matter particle list
      */
-    unsigned int dmsize() { return _sizes[PARTTYPE_DM]; }
+    unsigned int dmsize() {
+        return _sizes[PARTTYPE_DM];
+    }
 
     /**
      * @brief Resize the gas particle list
@@ -187,7 +191,9 @@ class ParticleVector {
      *
      * @return Refernce to the Tree
      */
-    Tree& get_tree() { return _tree; }
+    Tree& get_tree() {
+        return _tree;
+    }
 
     /**
      * @brief Get a reference to the last gas particle in the list
@@ -214,14 +220,18 @@ class ParticleVector {
      *
      * @return DelCont used for the Voronoi grid construction
      */
-    DelCont& get_container() { return _container; }
+    DelCont& get_container() {
+        return _container;
+    }
 
     /**
      * @brief Check if we use a global timestep or individual timesteps
      *
      * @return True if we use a global timestep, false otherwise
      */
-    bool global_timestep() { return _header.global_timestep(); }
+    bool global_timestep() {
+        return _header.global_timestep();
+    }
 
     void print_local_particles(std::string filename);
 
@@ -232,7 +242,9 @@ class ParticleVector {
      *
      * @return Reference to the Header
      */
-    Header& get_local_header() { return _header; }
+    Header& get_local_header() {
+        return _header;
+    }
 
     void set_numactive(unsigned int numactive);
     unsigned int get_numactive();

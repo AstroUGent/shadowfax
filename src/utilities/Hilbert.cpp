@@ -492,21 +492,27 @@ bool HB::sortfunc(Hilbert_Object* a, Hilbert_Object* b) {
   *
   * Initialize a Hilbert_Object with key 0.
   */
-Hilbert_Object::Hilbert_Object() { _key = 0; }
+Hilbert_Object::Hilbert_Object() {
+    _key = 0;
+}
 
 /**
   * \brief Set the hilbert key of a Hilbert_Object
   *
   * @param key A hilbert key
   */
-void Hilbert_Object::set_key(unsigned long key) { _key = key; }
+void Hilbert_Object::set_key(unsigned long key) {
+    _key = key;
+}
 
 /**
   * \brief Access the hilbert key of the Hilbert_Object
   *
   * @return The hilbert key of the Hilbert_Object
   */
-unsigned long Hilbert_Object::get_key() { return _key; }
+unsigned long Hilbert_Object::get_key() {
+    return _key;
+}
 
 /**
  * @brief MPI constructor. Initialize the Hilbert object using the given
@@ -536,11 +542,15 @@ void Hilbert_Object::pack_data(void* buffer, int bufsize, int* position) {
  *
  * @param rfile RestartFile to write to
  */
-void Hilbert_Object::dump(RestartFile& rfile) { rfile.write(_key); }
+void Hilbert_Object::dump(RestartFile& rfile) {
+    rfile.write(_key);
+}
 
 /**
  * @brief Restart constructor. Initialize the object using the given RestartFile
  *
  * @param rfile RestartFile to read from
  */
-Hilbert_Object::Hilbert_Object(RestartFile& rfile) { rfile.read(_key); }
+Hilbert_Object::Hilbert_Object(RestartFile& rfile) {
+    rfile.read(_key);
+}

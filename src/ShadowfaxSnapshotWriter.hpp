@@ -47,7 +47,9 @@ class ShadowfaxSnapshotWriter : public SnapshotWriter {
      *
      * @return SHAD, because this is ShadowfaxSnapshotWriter
      */
-    virtual std::string get_tag() { return "SHAD"; }
+    virtual std::string get_tag() {
+        return "SHAD";
+    }
 
     void write_snapshot(double currentTime, ParticleVector& particles);
 

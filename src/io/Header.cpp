@@ -106,7 +106,9 @@ void Header::set_box(double* box) {
   *
   * @param time The current time of the simulation
   */
-void Header::set_time(double time) { _time = time; }
+void Header::set_time(double time) {
+    _time = time;
+}
 
 /**
   * @brief Set the global timestep flag
@@ -124,14 +126,18 @@ void Header::set_global_timestep(bool global_timestep) {
  * @param periodic Boolean specifying if the simulation box is periodic (true)
  * or reflective (false)
  */
-void Header::set_periodic(bool periodic) { _periodic = periodic; }
+void Header::set_periodic(bool periodic) {
+    _periodic = periodic;
+}
 
 /**
  * @brief Set the gravity flag
  *
  * @param gravity Boolean indicating whether we use gravity or not
  */
-void Header::set_gravity(bool gravity) { _gravity = gravity; }
+void Header::set_gravity(bool gravity) {
+    _gravity = gravity;
+}
 
 /**
  * @brief Set the global softening length
@@ -139,7 +145,9 @@ void Header::set_gravity(bool gravity) { _gravity = gravity; }
  * @param hsoft Softening length used if no individual softening lenght is
  * specified for a Particle
  */
-void Header::set_hsoft(double hsoft) { _hsoft = hsoft; }
+void Header::set_hsoft(double hsoft) {
+    _hsoft = hsoft;
+}
 
 /**
   * @brief Get a pointer to buffer containing the number of particles per type,
@@ -148,7 +156,9 @@ void Header::set_hsoft(double hsoft) { _hsoft = hsoft; }
   * @return A pointer to the memory location holding the number of particles per
   * type
   */
-void* Header::get_npartspec() { return &_npartspec; }
+void* Header::get_npartspec() {
+    return &_npartspec;
+}
 
 /**
   * @brief Get a pointer to buffer containing the number of dimensions, as used
@@ -156,7 +166,9 @@ void* Header::get_npartspec() { return &_npartspec; }
   *
   * @return A pointer to the memory location holding the number of dimensions
   */
-void* Header::get_ndim() { return &_ndim; }
+void* Header::get_ndim() {
+    return &_ndim;
+}
 
 /**
   * @brief Get a pointer to buffer containing the simulation box, as used by
@@ -164,7 +176,9 @@ void* Header::get_ndim() { return &_ndim; }
   *
   * @return A pointer to the memory location holding the simulation box
   */
-void* Header::get_box() { return _box; }
+void* Header::get_box() {
+    return _box;
+}
 
 /**
   * @brief Get a pointer to buffer containing the simulation time, as used by
@@ -172,7 +186,9 @@ void* Header::get_box() { return _box; }
   *
   * @return A pointer to the memory location holding the simulation time
   */
-void* Header::get_time() { return &_time; }
+void* Header::get_time() {
+    return &_time;
+}
 
 /**
   * @brief Get a pointer to buffer containing the periodic boundary flag, as
@@ -180,7 +196,9 @@ void* Header::get_time() { return &_time; }
   *
   * @return A pointer to the memory location holding the periodic boundary flag
   */
-void* Header::get_periodic() { return &_periodic; }
+void* Header::get_periodic() {
+    return &_periodic;
+}
 
 /**
   * @brief Get a pointer to buffer containing the second order flag, as used by
@@ -188,7 +206,9 @@ void* Header::get_periodic() { return &_periodic; }
   *
   * @return A pointer to the memory location holding the second order flag
   */
-void* Header::get_second_order() { return &_second_order; }
+void* Header::get_second_order() {
+    return &_second_order;
+}
 
 /**
   * @brief Get a pointer to buffer containing the static flag, as used by
@@ -196,7 +216,9 @@ void* Header::get_second_order() { return &_second_order; }
   *
   * @return A pointer to the memory location holding the static flag
   */
-void* Header::get_static() { return &_static; }
+void* Header::get_static() {
+    return &_static;
+}
 
 /**
   * @brief Get a pointer to buffer containing the global timestep flag, as used
@@ -204,7 +226,9 @@ void* Header::get_static() { return &_static; }
   *
   * @return A pointer to the memory location holding the global timestep flag
   */
-void* Header::get_global_timestep() { return &_global_timestep; }
+void* Header::get_global_timestep() {
+    return &_global_timestep;
+}
 
 /**
   * @brief Get a pointer to buffer containing the adiabatic index, as used by
@@ -212,7 +236,9 @@ void* Header::get_global_timestep() { return &_global_timestep; }
   *
   * @return A pointer to the memory location holding the adiabatic index
   */
-void* Header::get_gamma() { return &_gamma; }
+void* Header::get_gamma() {
+    return &_gamma;
+}
 
 /**
  * @brief Get a pointer to buffer containing the gravity flag, as used by
@@ -220,7 +246,9 @@ void* Header::get_gamma() { return &_gamma; }
  *
  * @return A pointer to the memory location holding the gravity flag
  */
-void* Header::get_gravity() { return &_gravity; }
+void* Header::get_gravity() {
+    return &_gravity;
+}
 
 /**
  * @brief Get a pointer to buffer containing the softening length, as used by
@@ -228,7 +256,9 @@ void* Header::get_gravity() { return &_gravity; }
  *
  * @return A pointer to the memory location holding the softening length
  */
-void* Header::get_hsoft() { return &_hsoft; }
+void* Header::get_hsoft() {
+    return &_hsoft;
+}
 
 /**
   * @brief Check if the compile flag options and the Header variables are
@@ -297,14 +327,18 @@ unsigned int Header::npart() {
   *
   * @return The number of gas particles in the simulation
   */
-unsigned int Header::ngaspart() { return _npartspec[0]; }
+unsigned int Header::ngaspart() {
+    return _npartspec[0];
+}
 
 /**
   * @brief Get the number of DM particles
   *
   * @return The number of DM particles in the simulation
   */
-unsigned int Header::ndmpart() { return _npartspec[1]; }
+unsigned int Header::ndmpart() {
+    return _npartspec[1];
+}
 
 /**
   * @brief Get the simulation box
@@ -322,7 +356,9 @@ void Header::box(double* box) {
   *
   * @return The simulation time
   */
-double Header::time() { return _time; }
+double Header::time() {
+    return _time;
+}
 
 /**
   * @brief Get the global timestep flag
@@ -330,21 +366,27 @@ double Header::time() { return _time; }
   * @return true if a global timestep is used, false if individual timesteps are
   * desired
   */
-bool Header::global_timestep() { return _global_timestep & 1; }
+bool Header::global_timestep() {
+    return _global_timestep & 1;
+}
 
 /**
  * @brief Get the periodic simulation box flag
  *
  * @return true if the simulation box is periodic, false if it is reflective
  */
-bool Header::periodic() { return _periodic & 1; }
+bool Header::periodic() {
+    return _periodic & 1;
+}
 
 /**
  * @brief Get the gravity flag
  *
  * @return true if gravity is used, false otherwise
  */
-bool Header::gravity() { return _gravity; }
+bool Header::gravity() {
+    return _gravity;
+}
 
 /**
  * @brief Get the general softening length
@@ -352,7 +394,9 @@ bool Header::gravity() { return _gravity; }
  * @return The general softening length used for particles that do not have an
  * individual softening length
  */
-double Header::hsoft() { return _hsoft; }
+double Header::hsoft() {
+    return _hsoft;
+}
 
 /**
  * @brief Pack data to MPI buffer for communication

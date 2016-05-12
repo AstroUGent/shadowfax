@@ -71,13 +71,17 @@ class Cuboid {
      * @brief Get the bottom left (front) corner of the box
      * @return Bottom left (front) corner of the box
      */
-    inline Vec get_anchor() { return _anchor; }
+    inline Vec get_anchor() {
+        return _anchor;
+    }
 
     /**
      * @brief Get the sides of the box
      * @return Sides of the box
      */
-    inline Vec get_sides() { return _sides; }
+    inline Vec get_sides() {
+        return _sides;
+    }
 
     /**
      * @brief Dump the box to the given RestartFile

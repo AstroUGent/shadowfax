@@ -343,7 +343,9 @@ void ParticleVector::print_local_particles(string filename) {
  *
  * @return Reference to the Header
  */
-Header& ParticleVector::get_header() { return _header; }
+Header& ParticleVector::get_header() {
+    return _header;
+}
 
 /**
  * @brief Set the number of active particles at the current system time
@@ -359,7 +361,9 @@ void ParticleVector::set_numactive(unsigned int numactive) {
  *
  * @return Number of active particles
  */
-unsigned int ParticleVector::get_numactive() { return _numactive; }
+unsigned int ParticleVector::get_numactive() {
+    return _numactive;
+}
 
 /**
  * @brief Dump the particle vector to the given RestartFile

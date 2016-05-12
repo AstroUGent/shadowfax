@@ -166,42 +166,54 @@ class TimeStepWalker : public TreeWalker {
          *
          * @return Fluid velocity of the particle
          */
-        Vec get_v() { return _v; }
+        Vec get_v() {
+            return _v;
+        }
 
         /**
          * @brief Get the position of the particle
          *
          * @return Position of the particle
          */
-        Vec get_position() { return _pos; }
+        Vec get_position() {
+            return _pos;
+        }
 
         /**
          * @brief Get the magnitude of the fluid velocity of the particle
          *
          * @return Magnitude of the fluid velocity of the particle
          */
-        double get_vi() { return _vi; }
+        double get_vi() {
+            return _vi;
+        }
 
         /**
          * @brief Get the soundspeed of the particle
          *
          * @return Soundspeed of the particle
          */
-        double get_ci() { return _ci; }
+        double get_ci() {
+            return _ci;
+        }
 
         /**
          * @brief Get the current value of the timestep
          *
          * @return Current value of the timestep
          */
-        double get_t() { return _t; }
+        double get_t() {
+            return _t;
+        }
 
         /**
          * @brief Set the current value of the timestep
          *
          * @param t Current value of the timestep
          */
-        void set_t(double t) { _t = t; }
+        void set_t(double t) {
+            _t = t;
+        }
 
         /**
          * @brief Add data to the given MPI buffer for export to the original

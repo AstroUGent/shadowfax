@@ -88,7 +88,9 @@ std::string SnapshotHandler::get_snapshot_name(unsigned int nr, int rank,
  *
  * @param rfile RestartFile to write to
  */
-void SnapshotHandler::dump(RestartFile& rfile) { rfile.write(_name); }
+void SnapshotHandler::dump(RestartFile& rfile) {
+    rfile.write(_name);
+}
 
 /**
  * @brief Restart constructor. Initialize the snapshot handler using the given

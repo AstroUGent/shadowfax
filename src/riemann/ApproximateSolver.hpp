@@ -80,6 +80,10 @@ class TRRSSolver : public RiemannSolver {
 
     virtual StateVector solve(StateVector& WL, StateVector& WR, Vec& n,
                               double& mach0, bool reflective = false);
+    virtual StateVector solve_for_flux(StateVector& WL, StateVector& WR, Vec& n,
+                                       Vec& v, bool reflective = false);
+    virtual StateVector get_time_derivative(const StateVector& W,
+                                            const StateVector* gradients);
     virtual double get_soundspeed(const StateVector& W);
     virtual void test();
     virtual StateVector get_Q(double volume, const StateVector& W);

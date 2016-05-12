@@ -87,14 +87,18 @@ GravityWalker::GravityWalker(Import& import) {
  *
  * Free GravityKernel memory.
  */
-GravityWalker::~GravityWalker() { delete _kernel; }
+GravityWalker::~GravityWalker() {
+    delete _kernel;
+}
 
 /**
  * @brief Get the resulting gravitational acceleration
  *
  * @return The result of the treewalk
  */
-Vec GravityWalker::get_acceleration() { return _a; }
+Vec GravityWalker::get_acceleration() {
+    return _a;
+}
 
 /**
  * @brief Decide whether the given TreeNode should be opened or can be treated
@@ -232,14 +236,18 @@ bool GravityWalker::export_to_pseudonode(PseudoNode* pseudonode) {
  *
  * @param position New position for the treewalk
  */
-void GravityWalker::set_position(Vec position) { _position = position; }
+void GravityWalker::set_position(Vec position) {
+    _position = position;
+}
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec GravityWalker::get_position() { return _position; }
+Vec GravityWalker::get_position() {
+    return _position;
+}
 
 /**
  * @brief Periodic version of GravityWalker::splitnode()
@@ -335,7 +343,9 @@ void GravityWalker::after_walk() {
  * @return An Export that can be used to communicate relevant Particle data to
  * another MPI-process
  */
-GravityWalker::Export GravityWalker::get_export() { return Export(_p, _olda); }
+GravityWalker::Export GravityWalker::get_export() {
+    return Export(_p, _olda);
+}
 
 /**
  * @brief Finalize the local treewalk for another MPI-process by setting the
@@ -405,14 +415,18 @@ PotentialWalker::PotentialWalker(Import& import) {
  *
  * Free GravityKernel memory.
  */
-PotentialWalker::~PotentialWalker() { delete _kernel; }
+PotentialWalker::~PotentialWalker() {
+    delete _kernel;
+}
 
 /**
  * @brief Get the resulting gravitational potential
  *
  * @return The result of the treewalk
  */
-double PotentialWalker::get_epot() { return _epot; }
+double PotentialWalker::get_epot() {
+    return _epot;
+}
 
 /**
  * @brief Decide if the given TreeNode should be opened
@@ -542,14 +556,18 @@ bool PotentialWalker::export_to_pseudonode(PseudoNode* pseudonode) {
  *
  * @param position New position for the treewalk
  */
-void PotentialWalker::set_position(Vec position) { _position = position; }
+void PotentialWalker::set_position(Vec position) {
+    _position = position;
+}
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec PotentialWalker::get_position() { return _position; }
+Vec PotentialWalker::get_position() {
+    return _position;
+}
 
 /**
  * @brief Periodic version of PotentialWalker::splitnode()
@@ -711,14 +729,18 @@ BHGravityWalker::BHGravityWalker(Import& import) {
  *
  * Free GravityKernel memory.
  */
-BHGravityWalker::~BHGravityWalker() { delete _kernel; }
+BHGravityWalker::~BHGravityWalker() {
+    delete _kernel;
+}
 
 /**
  * @brief Get the resulting gravitational acceleration
  *
  * @return Result of the treewalk
  */
-Vec BHGravityWalker::get_acceleration() { return _a; }
+Vec BHGravityWalker::get_acceleration() {
+    return _a;
+}
 
 /**
  * @brief Decide whether to open the given TreeNode or treat it as a whole
@@ -849,14 +871,18 @@ bool BHGravityWalker::export_to_pseudonode(PseudoNode* pseudonode) {
  *
  * @param position New value for the position
  */
-void BHGravityWalker::set_position(Vec position) { _position = position; }
+void BHGravityWalker::set_position(Vec position) {
+    _position = position;
+}
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec BHGravityWalker::get_position() { return _position; }
+Vec BHGravityWalker::get_position() {
+    return _position;
+}
 
 /**
  * @brief Periodic version of BHGravityWalker::splitnode
@@ -931,7 +957,9 @@ void BHGravityWalker::after_walk() {
  *
  * @return An Export that can be sent to another MPI-process
  */
-BHGravityWalker::Export BHGravityWalker::get_export() { return Export(_p); }
+BHGravityWalker::Export BHGravityWalker::get_export() {
+    return Export(_p);
+}
 
 /**
  * @brief Finalize the local treewalk for another MPI-process by setting the
@@ -1000,14 +1028,18 @@ BHPotentialWalker::BHPotentialWalker(Import& import) {
  *
  * Free GravityKernel memory.
  */
-BHPotentialWalker::~BHPotentialWalker() { delete _kernel; }
+BHPotentialWalker::~BHPotentialWalker() {
+    delete _kernel;
+}
 
 /**
  * @brief Get the resulting gravitational potential
  *
  * @return Result of the treewalk
  */
-double BHPotentialWalker::get_epot() { return _epot; }
+double BHPotentialWalker::get_epot() {
+    return _epot;
+}
 
 /**
  * @brief Decide whether to split the given TreeNode or treat it as a whole
@@ -1136,14 +1168,18 @@ bool BHPotentialWalker::export_to_pseudonode(PseudoNode* pseudonode) {
  *
  * @param position New position used for the treewalk
  */
-void BHPotentialWalker::set_position(Vec position) { _position = position; }
+void BHPotentialWalker::set_position(Vec position) {
+    _position = position;
+}
 
 /**
  * @brief Get the position used for the treewalk
  *
  * @return Position used for the treewalk
  */
-Vec BHPotentialWalker::get_position() { return _position; }
+Vec BHPotentialWalker::get_position() {
+    return _position;
+}
 
 /**
  * @brief Periodic version of BHPotentialWalker::splitnode()
@@ -1220,7 +1256,9 @@ void BHPotentialWalker::after_walk() {
  *
  * @return An Export that can be exported to another MPI-process
  */
-BHPotentialWalker::Export BHPotentialWalker::get_export() { return Export(_p); }
+BHPotentialWalker::Export BHPotentialWalker::get_export() {
+    return Export(_p);
+}
 
 /**
  * @brief Finalize the local treewalk for another MPI-process by setting the

@@ -60,4 +60,6 @@ Physics::Physics(UnitSet& units, bool real_units) {
  *
  * @return The value of the gravitational constant in simulation units
  */
-double Physics::get_gravitational_constant() { return _G; }
+double Physics::get_gravitational_constant() {
+    return _G;
+}

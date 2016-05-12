@@ -48,7 +48,9 @@ std::string make_hdf5_file(std::string name);
  *
  * @return A uniform random double
  */
-inline double rand_double() { return ((double)rand()) / ((double)RAND_MAX); }
+inline double rand_double() {
+    return ((double)rand()) / ((double)RAND_MAX);
+}
 
 /**
  * @brief Get the sign of the argument or 0 when the argument is zero
@@ -60,7 +62,9 @@ inline double rand_double() { return ((double)rand()) / ((double)RAND_MAX); }
  * @param val Value
  * @return -1, 0 or 1, depending on the sign of the value
  */
-template <typename T> int sign(T val) { return (T(0) < val) - (val < T(0)); }
+template <typename T> int sign(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 }
 
 #endif  // HELPERFUNCIONS_HPP

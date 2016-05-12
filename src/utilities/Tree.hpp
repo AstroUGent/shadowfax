@@ -101,42 +101,54 @@ class NodeInfo {
      *
      * @return Hilbert key of the node
      */
-    inline unsigned long get_key() { return _key; }
+    inline unsigned long get_key() {
+        return _key;
+    }
 
     /**
      * @brief Get the maximum soundspeed in the node
      *
      * @return Maximum soundspeed in the node
      */
-    inline double get_cmax() { return _cmax; }
+    inline double get_cmax() {
+        return _cmax;
+    }
 
     /**
      * @brief Get the maximum velocity in the node
      *
      * @return Maximum velocity in the node
      */
-    inline double get_vmax() { return _vmax; }
+    inline double get_vmax() {
+        return _vmax;
+    }
 
     /**
      * @brief Get the total mass inside the node
      *
      * @return Total mass inside the node
      */
-    inline double get_mass() { return _mass; }
+    inline double get_mass() {
+        return _mass;
+    }
 
     /**
      * @brief Get the maximum softening length in the node
      *
      * @return Maximum softening length in the node
      */
-    inline double get_hmax() { return _hmax; }
+    inline double get_hmax() {
+        return _hmax;
+    }
 
     /**
      * @brief Get the center of mass of the node
      *
      * @return Center of mass of the node
      */
-    inline Vec get_center_of_mass() { return _center_of_mass; }
+    inline Vec get_center_of_mass() {
+        return _center_of_mass;
+    }
 
     /**
      * @brief Add the node information to the given MPI buffer for communication
@@ -211,28 +223,36 @@ class Node {
      *
      * @return True if the node is a Leaf
      */
-    inline bool is_leaf() { return (_flag & 1); }
+    inline bool is_leaf() {
+        return (_flag & 1);
+    }
 
     /**
      * @brief Check if the node is the last child of its parent
      *
      * @return True if the node is the last child of its parent
      */
-    inline bool is_last() { return (_flag >> 1) & 1; }
+    inline bool is_last() {
+        return (_flag >> 1) & 1;
+    }
 
     /**
      * @brief Check if the node is a pseudonode of the tree
      *
      * @return True if the node is a PseudoNode
      */
-    inline bool is_pseudo() { return (_flag >> 2) & 1; }
+    inline bool is_pseudo() {
+        return (_flag >> 2) & 1;
+    }
 
     /**
      * @brief Check if the node has only children on the local MPI process
      *
      * @return True if none of the descendants of the node is a PseudoNode
      */
-    inline bool is_local() { return !((_flag >> 3) & 1); }
+    inline bool is_local() {
+        return !((_flag >> 3) & 1);
+    }
 
     /**
      * @brief Print the node to the given stream
@@ -326,7 +346,9 @@ class ExportNode : public Hilbert_Object {
      *
      * @return The node
      */
-    inline Node* get_node() { return _node; }
+    inline Node* get_node() {
+        return _node;
+    }
 };
 
 /**

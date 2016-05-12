@@ -168,7 +168,9 @@ void CubicBox::get_bounding_box(double* box) {
  *
  * @return The side of the CubicBox
  */
-double CubicBox::get_box_width() { return _side; }
+double CubicBox::get_box_width() {
+    return _side;
+}
 
 /**
   * @brief Calculate a hilbert key for the given coordinates of a Particle or

@@ -96,7 +96,9 @@ class Unit {
       *
       * @returns The SI value of the Unit
       */
-    inline double get_SI_value() { return _SI_value; }
+    inline double get_SI_value() {
+        return _SI_value;
+    }
 
     /**
       * @brief Get the quantity associated with this Unit
@@ -112,7 +114,9 @@ class Unit {
       *
       * @returns The name of the quantity of the Unit
       */
-    inline const std::string get_quantity() { return _quantity; }
+    inline const std::string get_quantity() {
+        return _quantity;
+    }
 
     /**
       * @brief Get the name of the Unit
@@ -125,28 +129,36 @@ class Unit {
       *
       * @returns The name of the Unit
       */
-    inline const std::string get_name() { return _name; }
+    inline const std::string get_name() {
+        return _name;
+    }
 
     /**
       * @brief void pointer to the SI value needed for C-style writing routines
       *
       * @returns A void pointer to the internal _SI_value
       */
-    inline void* SI_value() { return &_SI_value; }
+    inline void* SI_value() {
+        return &_SI_value;
+    }
 
     /**
       * @brief void pointer to the name needed for C-style writing routines
       *
       * @returns A void pointer to the internal _name
       */
-    inline const void* name() { return &_name; }
+    inline const void* name() {
+        return &_name;
+    }
 
     /**
       * @brief void pointer to the quantity needed for C-style writing routines
       *
       * @returns A void pointer to the internal _quantity
       */
-    inline const void* quantity() { return &_quantity; }
+    inline const void* quantity() {
+        return &_quantity;
+    }
 
     /**
       * @brief Divide this Unit by another Unit
@@ -211,7 +223,9 @@ class Unit {
   * @param b Unit in denominator of the division
   * @returns A new Unit which is the result of the division
   */
-inline Unit operator/(Unit a, Unit b) { return a /= b; }
+inline Unit operator/(Unit a, Unit b) {
+    return a /= b;
+}
 
 /**
   * @brief Multiply two units
@@ -220,6 +234,8 @@ inline Unit operator/(Unit a, Unit b) { return a /= b; }
   * @param b Unit two
   * @returns A new Unit which is the result of the multiplication
   */
-inline Unit operator*(Unit a, Unit b) { return a *= b; }
+inline Unit operator*(Unit a, Unit b) {
+    return a *= b;
+}
 
 #endif  // UNIT_HPP

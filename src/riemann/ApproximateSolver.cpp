@@ -182,6 +182,87 @@ StateVector TRRSSolver::solve(StateVector& WL, StateVector& WR, Vec& n,
 }
 
 /**
+ * @brief Solve for the flux directly
+ *
+ * @param WL Left StateVector
+ * @param WR Right StateVector
+ * @param n Interface normal
+ * @param v Interface velocity
+ * @param reflective Flag indicating if the right state should be a
+ * reflective copy of the left state
+ * @return Flux along the interface normal
+ */
+StateVector TRRSSolver::solve_for_flux(StateVector& WL, StateVector& WR, Vec& n,
+                                       Vec& v, bool reflective) {
+    double maxmach;
+    StateVector Whalf = solve(WL, WR, n, maxmach, reflective);
+    Whalf += v;
+
+    StateVector fluxes[ndim_];
+    fluxes[0] = get_flux(v, 0, Whalf);
+    fluxes[1] = get_flux(v, 1, Whalf);
+#if ndim_ == 3
+    fluxes[2] = get_flux(v, 2, Whalf);
+#endif
+
+    StateVector flux;
+#if ndim_ == 3
+    flux = fluxes[0] * n[0] + fluxes[1] * n[1] + fluxes[2] * n[2];
+#else
+    flux = fluxes[0] * n[0] + fluxes[1] * n[1];
+#endif
+
+    return flux;
+}
+
+/**
+ * @brief Convert gradients to time derivatives using the Euler equations in
+ * primitive form
+ *
+ * These can be used in the MUSCL-Hancock prediction step.
+ *
+ * @param W Primitive variables
+ * @param gradients Spatial derivatives of the primitive variables
+ * @return Time derivatives of the primitive variables
+ */
+StateVector TRRSSolver::get_time_derivative(const StateVector& W,
+                                            const StateVector* gradients) {
+
+    StateVector dWdt;
+
+#if ndim_ == 3
+    // there is a mistake in Toro (2009): the element rho in the first row of
+    // matrices 3.91 and 3.92 should move 1 and 2 cells to the right
+    // respectively
+    dWdt[0] = -W.rho() * (gradients[0].vx() + gradients[1].vy() +
+                          gradients[2].vz()) -
+              W.vx() * gradients[0].rho() - W.vy() * gradients[1].rho() -
+              W.vz() * gradients[2].rho();
+    dWdt[1] = -W.vx() * gradients[0].vx() - W.vy() * gradients[1].vx() -
+              W.vz() * gradients[2].vx() - gradients[0].p() / W.rho();
+    dWdt[2] = -W.vx() * gradients[0].vy() - W.vy() * gradients[1].vy() -
+              W.vz() * gradients[2].vy() - gradients[1].p() / W.rho();
+    dWdt[3] = -W.vx() * gradients[0].vz() - W.vy() * gradients[1].vz() -
+              W.vz() * gradients[2].vz() - gradients[2].p() / W.rho();
+    dWdt[4] = -_gamma * W.p() * (gradients[0].vx() + gradients[1].vy() +
+                                 gradients[2].vz()) -
+              W.vx() * gradients[0].p() - W.vy() * gradients[1].p() -
+              W.vz() * gradients[2].p();
+#else
+    dWdt[0] = -W.vx() * gradients[0].rho() - W.vy() * gradients[1].rho() -
+              W.rho() * (gradients[0].vx() + gradients[1].vy());
+    dWdt[1] = -W.vx() * gradients[0].vx() - W.vy() * gradients[1].vx() -
+              gradients[0].p() / W.rho();
+    dWdt[2] = -W.vx() * gradients[1].vy() - W.vy() * gradients[1].vy() -
+              gradients[1].p() / W.rho();
+    dWdt[3] = -_gamma * W.p() * (gradients[0].vx() + gradients[1].vy()) -
+              W.vx() * gradients[0].p() - W.vy() * gradients[1].p();
+#endif
+
+    return dWdt;
+}
+
+/**
  * @brief Get the soundspeed corresponding to the given primitive variables
  *
  * @param W Primitive variables StateVector

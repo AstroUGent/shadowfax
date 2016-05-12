@@ -73,7 +73,9 @@ class UnitConverter {
       * @param value Input value, in original Unit
       * @returns Converted value in the new Unit
       */
-    double convert(const double value) { return value * _conversion_factor; }
+    double convert(const double value) {
+        return value * _conversion_factor;
+    }
 };
 
 #endif  // UNITCONVERTER_HPP

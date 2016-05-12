@@ -124,7 +124,9 @@ double TimeLine::get_time() {
   *
   * @returns A 64-bit representing the current internal time
   */
-unsigned long TimeLine::get_integertime() { return _current_time; }
+unsigned long TimeLine::get_integertime() {
+    return _current_time;
+}
 
 /**
   * @brief Increase the internal time by the internal timestep and check if a
@@ -151,7 +153,9 @@ bool TimeLine::step_forward() {
   *
   * @param time A new 64-bit integer current time for the TimeLine
   */
-void TimeLine::set_time(unsigned long time) { _current_time = time; }
+void TimeLine::set_time(unsigned long time) {
+    _current_time = time;
+}
 
 /**
  * @brief Set the current internal time of the timeline
@@ -381,21 +385,27 @@ double TimeLine::get_realtime(unsigned long integer_time) {
  *
  * @param timestep New value for the system timestep
  */
-void TimeLine::set_timestep(unsigned long timestep) { _timestep = timestep; }
+void TimeLine::set_timestep(unsigned long timestep) {
+    _timestep = timestep;
+}
 
 /**
  * @brief Get the system timestep
  *
  * @return The integer system timestep
  */
-unsigned long TimeLine::get_timestep() { return _timestep; }
+unsigned long TimeLine::get_timestep() {
+    return _timestep;
+}
 
 /**
  * @brief Check if gravity is switched on
  *
  * @return True if gravity is on, false otherwise
  */
-bool TimeLine::has_gravity() { return _gravity; }
+bool TimeLine::has_gravity() {
+    return _gravity;
+}
 
 /**
  * @brief Dump the timeline to the given RestartFile

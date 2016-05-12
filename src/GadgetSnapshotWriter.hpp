@@ -48,7 +48,9 @@ class GadgetSnapshotWriter : public SnapshotWriter {
      *
      * @return "GADG", because this is GadgetSnapshotWriter
      */
-    virtual std::string get_tag() { return "GADG"; }
+    virtual std::string get_tag() {
+        return "GADG";
+    }
 
     virtual void write_snapshot(double t, ParticleVector& particles);
 

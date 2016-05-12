@@ -75,14 +75,18 @@ class Splitter {
      *
      * @return Hilbert key at which the split is performed
      */
-    inline unsigned long key() const { return _key; }
+    inline unsigned long key() const {
+        return _key;
+    }
 
     /**
      * @brief Get the index
      *
      * @return Index of the key if multiple objects have the same key
      */
-    inline unsigned int index() const { return _index; }
+    inline unsigned int index() const {
+        return _index;
+    }
 };
 
 /**

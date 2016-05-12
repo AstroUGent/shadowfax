@@ -172,28 +172,36 @@ void Line::print(ostream& stream) {
  *
  * @return x-coordinate of the first endpoint
  */
-double Line::x() { return _x1; }
+double Line::x() {
+    return _x1;
+}
 
 /**
  * @brief Get the x-coordinate of the direction vector of the line
  *
  * @return x-coordinate of the direction vector
  */
-double Line::xdir() { return _xdir; }
+double Line::xdir() {
+    return _xdir;
+}
 
 /**
  * @brief Get the y-coordinate of the first endpoint
  *
  * @return y-coordinate of the first endpoint
  */
-double Line::y() { return _y1; }
+double Line::y() {
+    return _y1;
+}
 
 /**
  * @brief Get the y-coordinate of the direction vector of the line
  *
  * @return y-coordinate of the direction vector
  */
-double Line::ydir() { return _ydir; }
+double Line::ydir() {
+    return _ydir;
+}
 
 #if ndim_ == 3
 /**
@@ -201,14 +209,18 @@ double Line::ydir() { return _ydir; }
  *
  * @return z-coordinate of the first endpoint
  */
-double Line::z() { return _z1; }
+double Line::z() {
+    return _z1;
+}
 
 /**
  * @brief Get the z-coordinate of the direction vector of the line
  *
  * @return z-coordinate of the direction vector
  */
-double Line::zdir() { return _zdir; }
+double Line::zdir() {
+    return _zdir;
+}
 #endif
 
 /**

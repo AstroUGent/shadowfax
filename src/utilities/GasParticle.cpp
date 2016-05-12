@@ -132,42 +132,54 @@ GasParticle::GasParticle(GasParticle& p) : Particle(p) {
  *
  * Free exports buffer.
  */
-GasParticle::~GasParticle() { delete[] _exports; }
+GasParticle::~GasParticle() {
+    delete[] _exports;
+}
 
 /**
  * @brief Set the soundspeed of the particle to the given value
  *
  * @param csnd New soundspeed for the particle
  */
-void GasParticle::set_soundspeed(double csnd) { _csnd = csnd; }
+void GasParticle::set_soundspeed(double csnd) {
+    _csnd = csnd;
+}
 
 /**
  * @brief Get the soundspeed of the particle
  *
  * @return Soundspeed of the particle
  */
-double GasParticle::get_soundspeed() { return _csnd; }
+double GasParticle::get_soundspeed() {
+    return _csnd;
+}
 
 /**
  * @brief Set the VorGen corresponding to this GasParticle
  *
  * @param vorgen The VorGen corresponding to this GasParticle
  */
-void GasParticle::set_vorgen(VorGen* vorgen) { _vorgen = vorgen; }
+void GasParticle::set_vorgen(VorGen* vorgen) {
+    _vorgen = vorgen;
+}
 
 /**
  * @brief Get the VorGen corresponding to this GasParticle
  *
  * @return The VorGen corresponding to this GasParticle
  */
-VorGen* GasParticle::get_vorgen() { return _vorgen; }
+VorGen* GasParticle::get_vorgen() {
+    return _vorgen;
+}
 
 /**
  * @brief Get the VorCell corresponding to this GasParticle
  *
  * @return The VorCell corresponding to this GasParticle
  */
-VorCell* GasParticle::get_cell() { return _vorgen->get_cell(); }
+VorCell* GasParticle::get_cell() {
+    return _vorgen->get_cell();
+}
 
 /**
  * @brief Set the index of the VorGen corresponding to this GasParticle in the
@@ -175,7 +187,9 @@ VorCell* GasParticle::get_cell() { return _vorgen->get_cell(); }
  *
  * @param vorgenid The index of the VorGen corresponding to this GasParticle
  */
-void GasParticle::set_vorgenid(unsigned int vorgenid) { _vorgenid = vorgenid; }
+void GasParticle::set_vorgenid(unsigned int vorgenid) {
+    _vorgenid = vorgenid;
+}
 
 /**
  * @brief Get the index of the VorGen corresponding to this GasParticle in the
@@ -183,56 +197,72 @@ void GasParticle::set_vorgenid(unsigned int vorgenid) { _vorgenid = vorgenid; }
  *
  * @return The index of the VorGen corresponding to this GasParticle
  */
-unsigned int GasParticle::get_vorgenid() { return _vorgenid; }
+unsigned int GasParticle::get_vorgenid() {
+    return _vorgenid;
+}
 
 /**
  * @brief Set the primitive quantities of this particle
  *
  * @param W StateVector containing the primitive quantities for this particle
  */
-void GasParticle::set_W(StateVector W) { _W = W; }
+void GasParticle::set_W(StateVector W) {
+    _W = W;
+}
 
 /**
  * @brief Get the primitive quantities of this particle
  *
  * @return StateVector containing the primitive quantities for this particle
  */
-const StateVector& GasParticle::get_Wvec() { return _W; }
+const StateVector& GasParticle::get_Wvec() {
+    return _W;
+}
 
 /**
  * @brief Set the conserved quantities of this particle
  *
  * @param Q StateVector containing the conserved quantities for this particle
  */
-void GasParticle::set_Q(StateVector Q) { _Q = Q; }
+void GasParticle::set_Q(StateVector Q) {
+    _Q = Q;
+}
 
 /**
  * @brief Get the conserved quantities of this particle
  *
  * @return StateVector containing the conserved quantities for this particle
  */
-StateVector& GasParticle::get_Qvec() { return _Q; }
+StateVector& GasParticle::get_Qvec() {
+    return _Q;
+}
 
 /**
  * @brief Get the characteristic length of the particle
  *
  * @return The characteristic length of the particle
  */
-double GasParticle::h() { return _h; }
+double GasParticle::h() {
+    return _h;
+}
 
 /**
  * @brief Set the characteristic length of the particle
  *
  * @param h The new characteristic length for the particle
  */
-void GasParticle::set_h(double h) { _h = h; }
+void GasParticle::set_h(double h) {
+    _h = h;
+}
 
 /**
  * @brief Get the total surface area of the cell associated with this particle
  *
  * @return Total surface area of the Voronoi cell
  */
-double GasParticle::get_total_area() { return _total_area; }
+double GasParticle::get_total_area() {
+    return _total_area;
+}
 
 /**
  * @brief Set the total surface area of the cell associated with this particle
@@ -306,7 +336,9 @@ void GasParticle::apply_gravity(double dt) {
 /**
  * @brief Make an internal backup of the conserved quantities
  */
-void GasParticle::save_Q() { _old_Q = _Q; }
+void GasParticle::save_Q() {
+    _old_Q = _Q;
+}
 
 /**
  * @brief Set the mass of the particle
@@ -315,7 +347,9 @@ void GasParticle::save_Q() { _old_Q = _Q; }
  *
  * @param mass New mass for the particle
  */
-void GasParticle::set_mass(double mass) { _Q[0] = mass; }
+void GasParticle::set_mass(double mass) {
+    _Q[0] = mass;
+}
 
 /**
  * @brief Set the mesh velocity for this particle
@@ -324,7 +358,9 @@ void GasParticle::set_mass(double mass) { _Q[0] = mass; }
  *
  * @param mesh_v New mesh velocity for this particle
  */
-void GasParticle::set_mesh_v(Vec& mesh_v) { _mesh_v = mesh_v; }
+void GasParticle::set_mesh_v(Vec& mesh_v) {
+    _mesh_v = mesh_v;
+}
 
 /**
  * @brief Get the mesh velocity for this particle
@@ -333,7 +369,9 @@ void GasParticle::set_mesh_v(Vec& mesh_v) { _mesh_v = mesh_v; }
  *
  * @return Mesh velocity for this particle
  */
-Vec& GasParticle::get_mesh_v() { return _mesh_v; }
+Vec& GasParticle::get_mesh_v() {
+    return _mesh_v;
+}
 
 /**
  * @brief Set the mesh mass for this particle
@@ -342,7 +380,9 @@ Vec& GasParticle::get_mesh_v() { return _mesh_v; }
  *
  * @param mesh_m New mesh mass for this particle
  */
-void GasParticle::set_mesh_m(double mesh_m) { _mesh_m = mesh_m; }
+void GasParticle::set_mesh_m(double mesh_m) {
+    _mesh_m = mesh_m;
+}
 
 /**
  * @brief Get the mesh mass for this particle
@@ -351,19 +391,25 @@ void GasParticle::set_mesh_m(double mesh_m) { _mesh_m = mesh_m; }
  *
  * @return Mesh mass for this particle
  */
-double GasParticle::get_mesh_m() { return _mesh_m; }
+double GasParticle::get_mesh_m() {
+    return _mesh_m;
+}
 
 /**
  * @brief Flag this GasParticle as a pseudoparticle
  */
-void GasParticle::set_pseudo() { _is_pseudo = true; }
+void GasParticle::set_pseudo() {
+    _is_pseudo = true;
+}
 
 /**
  * @brief Check if this GasParticle is a pseudoparticle
  *
  * @return True if this particle is a pseudoparticle, false otherwise
  */
-bool GasParticle::is_pseudo() { return _is_pseudo; }
+bool GasParticle::is_pseudo() {
+    return _is_pseudo;
+}
 
 /**
  * @brief Signal that the given copy of the particle was made on the MPI process
@@ -410,7 +456,9 @@ void GasParticle::reset_copies() {
  *
  * @param id Rank of the MPI process to which the particle is exported
  */
-void GasParticle::do_export(unsigned int id) { _exports[id] = true; }
+void GasParticle::do_export(unsigned int id) {
+    _exports[id] = true;
+}
 
 /**
  * @brief Check if the particle was exported to the given MPI process
@@ -418,7 +466,9 @@ void GasParticle::do_export(unsigned int id) { _exports[id] = true; }
  * @param id Rank of the MPI process
  * @return True if the particle was exported, false otherwise
  */
-bool GasParticle::is_exported(unsigned int id) { return _exports[id]; }
+bool GasParticle::is_exported(unsigned int id) {
+    return _exports[id];
+}
 
 /**
  * @brief Reset export information
@@ -443,7 +493,9 @@ void GasParticle::set_max_radius(double max_radius) {
  *
  * @return Maximal search radius for the particle
  */
-double GasParticle::get_max_radius() { return _max_radius; }
+double GasParticle::get_max_radius() {
+    return _max_radius;
+}
 
 /**
  * @brief Update the primitive variables of this particle
@@ -496,19 +548,25 @@ void GasParticle::get_gradients(StateVector* gradients) {
  *
  * @param dQ Conserved quantity increase
  */
-void GasParticle::increase_dQ(StateVector dQ) { _dQ += dQ; }
+void GasParticle::increase_dQ(StateVector dQ) {
+    _dQ += dQ;
+}
 
 /**
  * @brief Get the increase in conserved quantities during the current timestep
  *
  * @return Increase in conserved quantities
  */
-StateVector& GasParticle::get_dQvec() { return _dQ; }
+StateVector& GasParticle::get_dQvec() {
+    return _dQ;
+}
 
 /**
  * @brief Reset the increase in conserved quantities during the current timestep
  */
-void GasParticle::reset_dQ() { _dQ.reset(); }
+void GasParticle::reset_dQ() {
+    _dQ.reset();
+}
 
 /**
  * @brief Increase the gravitational energy difference during the current
@@ -516,7 +574,9 @@ void GasParticle::reset_dQ() { _dQ.reset(); }
  *
  * @param dE Gravitational work term
  */
-void GasParticle::increase_delta_E(Vec dE) { _delta_E_grav += dE; }
+void GasParticle::increase_delta_E(Vec dE) {
+    _delta_E_grav += dE;
+}
 
 /**
  * @brief Add the gravitational work term of the cell
@@ -545,7 +605,9 @@ void GasParticle::reset_dE_grav() {
  *
  * @return Gravitational work term
  */
-Vec GasParticle::get_delta_E() { return _delta_E_grav; }
+Vec GasParticle::get_delta_E() {
+    return _delta_E_grav;
+}
 
 /**
  * @brief Update the conserved quantities of the particle by adding the increase
@@ -568,7 +630,9 @@ void GasParticle::update_Q() {
  * @param index Deprecated parameter
  * @param paq New value for the PAQ of this particle
  */
-void GasParticle::set_paq(unsigned int index, double paq) { _W.set_paq(paq); }
+void GasParticle::set_paq(unsigned int index, double paq) {
+    _W.set_paq(paq);
+}
 
 ///**
 // * @brief Save the particle properties to the given Block for output
@@ -646,7 +710,9 @@ void GasParticle::set_paq(unsigned int index, double paq) { _W.set_paq(paq); }
  * @param mach Maximal Mach number of all shocks encountered in faces of the
  * cell associated with this particle
  */
-void GasParticle::set_max_mach(double mach) { _max_mach = mach; }
+void GasParticle::set_max_mach(double mach) {
+    _max_mach = mach;
+}
 
 /**
  * @brief Get the maximal Mach number for this particle
@@ -654,7 +720,9 @@ void GasParticle::set_max_mach(double mach) { _max_mach = mach; }
  * @return Maximal Mach number of all shocks encountered in faces of the cell
  * associated with this particle
  */
-double GasParticle::get_max_mach() { return _max_mach; }
+double GasParticle::get_max_mach() {
+    return _max_mach;
+}
 
 /**
  * @brief MPI constructor
@@ -975,7 +1043,9 @@ void GasParticle::dump_ascii(ostream& stream) {
  *
  * @param centroid Coordinates of the centroid
  */
-void GasParticle::set_centroid(Vec centroid) { _centroid = centroid; }
+void GasParticle::set_centroid(Vec centroid) {
+    _centroid = centroid;
+}
 
 /**
  * @brief Get the geometrical centroid of the last cell associated with this
@@ -983,35 +1053,45 @@ void GasParticle::set_centroid(Vec centroid) { _centroid = centroid; }
  *
  * @return Reference to the coordinates of the centroid
  */
-Vec& GasParticle::get_centroid() { return _centroid; }
+Vec& GasParticle::get_centroid() {
+    return _centroid;
+}
 
 /**
  * @brief Set the index of the particle in the local ParticleVector
  *
  * @param local_id Index of the particle in the local ParticleVector
  */
-void GasParticle::set_local_id(unsigned int local_id) { _local_id = local_id; }
+void GasParticle::set_local_id(unsigned int local_id) {
+    _local_id = local_id;
+}
 
 /**
  * @brief Get the index of the particle in the local ParticleVector
  *
  * @return Index of the particle in the local ParticleVector
  */
-unsigned int GasParticle::get_local_id() { return _local_id; }
+unsigned int GasParticle::get_local_id() {
+    return _local_id;
+}
 
 /**
  * @brief Set the gravitational factor for this particle
  *
  * @param eta Gravitational factor
  */
-void GasParticle::set_eta(double eta) { _eta = eta; }
+void GasParticle::set_eta(double eta) {
+    _eta = eta;
+}
 
 /**
  * @brief Get the gravitational factor for this particle
  *
  * @return Gravitational factor
  */
-double GasParticle::get_eta() { return _eta; }
+double GasParticle::get_eta() {
+    return _eta;
+}
 
 /**
  * @brief Set the real timestep of the particle (as opposed to the integer
@@ -1019,7 +1099,9 @@ double GasParticle::get_eta() { return _eta; }
  *
  * @param real_dt Real timestep of the particle
  */
-void GasParticle::set_real_timestep(double real_dt) { _real_dt = real_dt; }
+void GasParticle::set_real_timestep(double real_dt) {
+    _real_dt = real_dt;
+}
 
 /**
  * @brief Get the real timestep of the particle (as opposed to the integer
@@ -1027,7 +1109,9 @@ void GasParticle::set_real_timestep(double real_dt) { _real_dt = real_dt; }
  *
  * @return Reall timestep of the particle
  */
-double GasParticle::get_real_timestep() { return _real_dt; }
+double GasParticle::get_real_timestep() {
+    return _real_dt;
+}
 
 /**
  * @brief Constructor

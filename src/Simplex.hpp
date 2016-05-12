@@ -257,14 +257,18 @@ class Simplex {
      *
      * @param next_check Next Simplex to check
      */
-    void set_next_check(unsigned int next_check) { _next_check = next_check; }
+    void set_next_check(unsigned int next_check) {
+        _next_check = next_check;
+    }
 
     /**
      * @brief Get the next Simplex to check in a linked list
      *
      * @return Next Simplex to check
      */
-    unsigned int get_next_check() { return _next_check; }
+    unsigned int get_next_check() {
+        return _next_check;
+    }
 
     /**
      * @brief Set the previous Simplex to check in a linked list
@@ -280,7 +284,9 @@ class Simplex {
      *
      * @return Previous Simplex to check
      */
-    unsigned int get_previous_check() { return _previous_check; }
+    unsigned int get_previous_check() {
+        return _previous_check;
+    }
 
     VorGen* get_special_point(std::vector<VorGen*>& points);
 
@@ -289,7 +295,9 @@ class Simplex {
      *
      * @return A pointer to the internal vertex list
      */
-    unsigned int* get_vorgens() { return _vorgens; }
+    unsigned int* get_vorgens() {
+        return _vorgens;
+    }
 
     /**
      * @brief Get the vertex with the given index
@@ -297,7 +305,9 @@ class Simplex {
      * @param index Index of the vertex
      * @return Index of the requested vertex in the DelTess VorGen list
      */
-    inline unsigned int vorgen(int index) { return _vorgens[index]; }
+    inline unsigned int vorgen(int index) {
+        return _vorgens[index];
+    }
 
     void print(std::ostream& stream, std::vector<VorGen*>& points);
 
@@ -376,7 +386,9 @@ class Simplex {
      * @param index Index of the neighbour in the internal list
      * @return Index of the neighbour in the DelTess Simplex list
      */
-    inline unsigned int get_ngb(int index) { return _ngbs[index]; }
+    inline unsigned int get_ngb(int index) {
+        return _ngbs[index];
+    }
 
     /**
      * @brief Get the index of the given point in the internal vertex list
@@ -406,7 +418,9 @@ class Simplex {
      * @return Index of this simplex in the neighbour list of the given
      * neighbour
      */
-    inline int get_ngbindex(unsigned int ngb) { return _ngbface[ngb]; }
+    inline int get_ngbindex(unsigned int ngb) {
+        return _ngbface[ngb];
+    }
 
     void get_centroid(double* centroid, std::vector<VorGen*>& points);
 

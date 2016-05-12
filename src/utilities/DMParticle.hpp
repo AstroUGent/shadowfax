@@ -50,7 +50,9 @@ class DMParticle : public Particle {
       *
       * @return PARTTYPE_DM
       */
-    ParticleType type() { return PARTTYPE_DM; }
+    ParticleType type() {
+        return PARTTYPE_DM;
+    }
 
     void set_mass(double mass);
 
@@ -59,7 +61,9 @@ class DMParticle : public Particle {
       *
       * @return The mass of the dark matter particle
       */
-    inline double get_mass() { return _mass; }
+    inline double get_mass() {
+        return _mass;
+    }
 
     // NOTE: the "virtual" is really important here
     // it's the thing that makes sure that this particular version of pack_data

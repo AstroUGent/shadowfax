@@ -71,21 +71,27 @@ TimeStepWalker::TimeStepWalker(Import& import) {
  *
  * @param position Position for the tree walk
  */
-void TimeStepWalker::set_position(Vec position) { _position = position; }
+void TimeStepWalker::set_position(Vec position) {
+    _position = position;
+}
 
 /**
  * @brief Get the position for the tree walk
  *
  * @return Position for the tree walk
  */
-Vec TimeStepWalker::get_position() { return _position; }
+Vec TimeStepWalker::get_position() {
+    return _position;
+}
 
 /**
  * @brief Get the resulting timestep
  *
  * @return Resulting particle timestep
  */
-double TimeStepWalker::get_timestep() { return _t; }
+double TimeStepWalker::get_timestep() {
+    return _t;
+}
 
 /**
  * @brief Decide if the given TreeNode should be opened or treated as a whole
@@ -186,14 +192,18 @@ bool TimeStepWalker::export_to_pseudonode(PseudoNode* pseudonode) {
 /**
  * @brief Finalize the treewalk by setting the timestep of the GasParticle
  */
-void TimeStepWalker::after_walk() { _p->set_real_timestep(_t); }
+void TimeStepWalker::after_walk() {
+    _p->set_real_timestep(_t);
+}
 
 /**
  * @brief Finalize the external treewalk by setting the timestep of the Import
  *
  * @param import Import that will be exported back to the original MPI process
  */
-void TimeStepWalker::after_walk(Import& import) { import.set_t(_t); }
+void TimeStepWalker::after_walk(Import& import) {
+    import.set_t(_t);
+}
 
 /**
  * @brief Get an Export to export the treewalk to another MPI process

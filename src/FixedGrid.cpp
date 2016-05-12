@@ -25,11 +25,11 @@
  */
 #include "FixedGrid.hpp"
 #include "Error.hpp"
-#include "RiemannSolverFactory.hpp"
 #include "TimeLine.hpp"
 #include "VorCell.hpp"
 #include "VorFace.hpp"
 #include "VorGen.hpp"
+#include "riemann/RiemannSolverFactory.hpp"
 #include "utilities/ParticleVector.hpp"
 using namespace std;
 
@@ -630,7 +630,9 @@ FixedGrid::~FixedGrid() {
  *
  * @return The characteristic length of any cell in the grid
  */
-double FixedGrid::get_h() { return _cellh; }
+double FixedGrid::get_h() {
+    return _cellh;
+}
 
 /**
  * @brief Get the volume of any cell in the grid
@@ -640,7 +642,9 @@ double FixedGrid::get_h() { return _cellh; }
  *
  * @return The volume of any cell in the grid
  */
-double FixedGrid::get_volume() { return _cellvolume; }
+double FixedGrid::get_volume() {
+    return _cellvolume;
+}
 
 /**
  * @brief Calculate hydrodynamical fluxes for all faces in the grid

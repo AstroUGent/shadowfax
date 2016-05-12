@@ -17,22 +17,22 @@
 ################################################################################
 
 set(IONAME io${NDIM}d)
+set(RIEMANNNAME riemann${NDIM}d)
 set(UTILNAME utilities${NDIM}d)
 
 add_subdirectory(io)
+add_subdirectory(riemann)
 add_subdirectory(utilities)
 
 if(DO_SHADOWFAX)
     set(SHADOWFAXNAME shadowfax${NDIM}d)
 
     set(SHADOWFAXSOURCES
-    ApproximateSolver.cpp
     CircularBox.cpp
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
     DelTessCheck.cpp
-    ExactRiemannSolver.cpp
     ExArith.cpp
     FixedGrid.cpp
     GadgetSnapshotReader.cpp
@@ -65,11 +65,9 @@ if(DO_SHADOWFAX)
     VorTess.cpp
     VorTessManager.cpp
 
-    ApproximateSolver.hpp
     DelCont.hpp
     DelTess.hpp
     Error.hpp
-    ExactRiemannSolver.hpp
     ExArith.hpp
     FixedGrid.hpp
     GadgetSnapshotReader.hpp
@@ -86,8 +84,6 @@ if(DO_SHADOWFAX)
     Plotter.hpp
     ProgramLog.hpp
     RestartFile.hpp
-    RiemannSolver.hpp
-    RiemannSolverFactory.hpp
     SidePrograms.hpp
     Simplex.hpp
     Simulation.hpp
@@ -122,6 +118,7 @@ if(DO_SHADOWFAX)
                           COMPILE_FLAGS -Dndim_=${NDIM})
 
     target_link_libraries(${SHADOWFAXNAME} ${IONAME})
+    target_link_libraries(${SHADOWFAXNAME} ${RIEMANNNAME})
     target_link_libraries(${SHADOWFAXNAME} ${UTILNAME})
     target_link_libraries(${SHADOWFAXNAME} ${MPI_CXX_LIBRARIES})
     target_link_libraries(${SHADOWFAXNAME} ${MPI_C_LIBRARIES})

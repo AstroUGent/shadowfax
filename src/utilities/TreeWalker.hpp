@@ -119,7 +119,9 @@ class TreeWalker {
      * @return True: we always open all nodes if no splitnode function is
      * implemented
      */
-    virtual bool splitnode(TreeNode* node) { return true; }
+    virtual bool splitnode(TreeNode* node) {
+        return true;
+    }
 
     /**
      * @brief Dummy splitaction

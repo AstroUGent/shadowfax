@@ -50,7 +50,9 @@ NgbSearch::NgbSearch(Vec center, double radius, vector<bool>& exportlist,
  *
  * @return List of neighbours
  */
-vector<GasParticle*> NgbSearch::get_ngbs() { return _ngbs; }
+vector<GasParticle*> NgbSearch::get_ngbs() {
+    return _ngbs;
+}
 
 /**
  * @brief Decide whether to open the given node
@@ -111,26 +113,34 @@ ClosestNgbSearch::ClosestNgbSearch(Vec center, double radius)
  *
  * @param position Position for the closest neighbour search
  */
-void ClosestNgbSearch::set_position(Vec position) { _center = position; }
+void ClosestNgbSearch::set_position(Vec position) {
+    _center = position;
+}
 
 /**
  * @brief Get the position for the closest neighbour search
  *
  * @return Position for the closest neighbour search
  */
-Vec ClosestNgbSearch::get_position() { return _center; }
+Vec ClosestNgbSearch::get_position() {
+    return _center;
+}
 
 /**
  * @brief Get the closest Particle
  *
  * @return Result of the treewalk
  */
-GasParticle* ClosestNgbSearch::get_closest() { return _closest; }
+GasParticle* ClosestNgbSearch::get_closest() {
+    return _closest;
+}
 
 /**
  * @brief Increase the search radius with a factor 2
  */
-void ClosestNgbSearch::increase_radius() { _radius *= 4.; }
+void ClosestNgbSearch::increase_radius() {
+    _radius *= 4.;
+}
 
 /**
  * @brief Decide whether to open the node

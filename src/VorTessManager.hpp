@@ -35,8 +35,8 @@ class AdaptiveVorTess3d;
 class FixedGrid;
 class RestartFile;
 
-#include "RiemannSolver.hpp"
 #include "TimeLine.hpp"
+#include "riemann/RiemannSolver.hpp"
 #include "utilities/Timer.hpp"
 #include "utilities/Tree.hpp"
 

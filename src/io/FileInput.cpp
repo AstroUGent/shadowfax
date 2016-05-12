@@ -47,7 +47,9 @@ using namespace std;
   *
   * @param filename Name of the file (should end with .hdf5)
   */
-FileInput::FileInput(string filename) { _filename = filename; }
+FileInput::FileInput(string filename) {
+    _filename = filename;
+}
 
 /**
   * @brief Read information from a HDF5-file and store the contents in the

@@ -23,11 +23,11 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "ExactRiemannSolver.hpp"  // for ExactRiemannSolver
-#include "RiemannSolver.hpp"       // for RiemannSolver
-#include "StateVector.hpp"         // for StateVector, operator*
-#include "Vec.hpp"                 // for Vec
-#include "myAssert.hpp"            // for assert_values_equal
+#include "StateVector.hpp"                 // for StateVector, operator*
+#include "Vec.hpp"                         // for Vec
+#include "myAssert.hpp"                    // for assert_values_equal
+#include "riemann/ExactRiemannSolver.hpp"  // for ExactRiemannSolver
+#include "riemann/RiemannSolver.hpp"       // for RiemannSolver
 #include <iostream>
 
 /**
@@ -100,8 +100,7 @@ void test_RiemannFlux(double rhoL, double vxL, double pL, double rhoR,
     n[0] = 1.;
     Vec v;
 
-    //    StateVector flux = solver.solve_for_flux(WL, WR, n, v);
-    StateVector flux;
+    StateVector flux = solver.solve_for_flux(WL, WR, n, v);
 
     cerr << flux.rho() << " =?= " << Frho << endl;
     cerr << flux.vx() << " =?= " << Fvx << endl;
@@ -156,35 +155,27 @@ void test_Sod() {
             }
             StateVector WR = Ws[ip];
             WR -= v;
-            //            StateVector flux = solver.solve_for_flux(WL, WR, n, v,
-            //            false);
-            StateVector flux;
+            StateVector flux = solver.solve_for_flux(WL, WR, n, v, false);
             Qs[i] -= dt * flux;
             Qs[ip] += dt * flux;
 #else
             StateVector WL = Ws[i];
             if(!i) {
                 WL -= vzero;
-                //                StateVector flux =
-                //                        solver.solve_for_flux(WL, WL, n,
-                //                        vzero, true);
-                StateVector flux;
+                StateVector flux =
+                        solver.solve_for_flux(WL, WL, n, vzero, true);
                 Qs[i] += dt * flux;
             }
             if(i == 99) {
                 WL -= vzero;
-                //                StateVector flux =
-                //                        solver.solve_for_flux(WL, WL, n,
-                //                        vzero, true);
-                StateVector flux;
+                StateVector flux =
+                        solver.solve_for_flux(WL, WL, n, vzero, true);
                 Qs[i] -= dt * flux;
             } else {
                 WL -= v;
                 StateVector WR = Ws[i + 1];
                 WR -= v;
-                //                StateVector flux = solver.solve_for_flux(WL,
-                //                WR, n, v, false);
-                StateVector flux;
+                StateVector flux = solver.solve_for_flux(WL, WR, n, v, false);
                 Qs[i] -= dt * flux;
                 Qs[i + 1] += dt * flux;
             }
@@ -219,8 +210,7 @@ int main(int argc, char** argv) {
     StateVector WR(0.5625, 0., 0., 0., 0.55);
     Vec n(1., 0., 0.);
     Vec v;
-    //    StateVector flux = solver.solve_for_flux(WL, WR, n, v);
-    StateVector flux;
+    StateVector flux = solver.solve_for_flux(WL, WR, n, v);
     cout << flux[0] << " " << flux[1] << " " << flux[2] << " " << flux[3] << " "
          << flux[4] << endl;
 

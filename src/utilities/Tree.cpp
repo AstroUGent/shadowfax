@@ -103,7 +103,9 @@ Tree::~Tree() {
  * @param periodic True if the tree is embedded in a periodic box, false if it
  * is embedded in a reflective box
  */
-void Tree::set_periodic(bool periodic) { _periodic = periodic; }
+void Tree::set_periodic(bool periodic) {
+    _periodic = periodic;
+}
 
 /**
  * @brief Reset the tree
@@ -150,7 +152,9 @@ void Tree::reset(Cuboid box) {
  *
  * @param p Particle to add
  */
-void Tree::add_particle(Particle* p) { ((TreeNode*)_root)->add_particle(p); }
+void Tree::add_particle(Particle* p) {
+    ((TreeNode*)_root)->add_particle(p);
+}
 
 /**
  * @brief Signal that no more particles will be added to the tree and
@@ -406,7 +410,9 @@ void Tree::set_keyrange(unsigned long keylow, unsigned long keyhigh) {
  * @brief Print the tree to the given stream
  * @param out std::ostream to write to
  */
-void Tree::print(ostream& out) { _root->print(out); }
+void Tree::print(ostream& out) {
+    _root->print(out);
+}
 
 /**
  * @brief Print global properties of the tree to the given stream
@@ -428,14 +434,18 @@ void Tree::print_top_quantities(ostream& out) {
  * the nodes of the tree can get outdated. We update this information by
  * recursively updating the nodes from bottom to top.
  */
-void Tree::set_velocities() { ((TreeNode*)_root)->update_quantities(true); }
+void Tree::set_velocities() {
+    ((TreeNode*)_root)->update_quantities(true);
+}
 
 /**
  * @brief Update the mesh masses
  *
  * @deprecated This method is not used
  */
-void Tree::set_mesh_masses() { ((TreeNode*)_root)->update_mesh_masses(); }
+void Tree::set_mesh_masses() {
+    ((TreeNode*)_root)->update_mesh_masses();
+}
 
 /**
  * @brief Get the particles inside the sphere with given origin and radius
@@ -787,21 +797,27 @@ TreeNode::~TreeNode() {
  *
  * @return Total mass in the node
  */
-double TreeNode::get_mass() { return _total_mass; }
+double TreeNode::get_mass() {
+    return _total_mass;
+}
 
 /**
  * @brief Get the total mass in the node
  *
  * @return Total mass in the node
  */
-double TreeNode::get_mass_node() { return _total_mass; }
+double TreeNode::get_mass_node() {
+    return _total_mass;
+}
 
 /**
  * @brief Get the maximal softening length in the node
  *
  * @return Maximal softening length in the node
  */
-double TreeNode::get_hmax() { return _hmax; }
+double TreeNode::get_hmax() {
+    return _hmax;
+}
 
 /**
  * @brief Get the given coordinate of the center of mass of the node
@@ -845,14 +861,18 @@ Vec TreeNode::get_center_of_mass_node() {
  *
  * @return Maximal soundspeed in the node
  */
-double TreeNode::get_cmax() { return _cmax; }
+double TreeNode::get_cmax() {
+    return _cmax;
+}
 
 /**
  * @brief Get the maximal fluid velocity in the node
  *
  * @return Maximal fluid velocity in the node
  */
-double TreeNode::get_vmax() { return _vmax; }
+double TreeNode::get_vmax() {
+    return _vmax;
+}
 
 /**
  * @brief Set the mesh mass of the node
@@ -861,7 +881,9 @@ double TreeNode::get_vmax() { return _vmax; }
  *
  * @param mesh_m Mesh mass of the node
  */
-void TreeNode::set_mesh_m(double mesh_m) { _mesh_m = mesh_m; }
+void TreeNode::set_mesh_m(double mesh_m) {
+    _mesh_m = mesh_m;
+}
 
 /**
  * @brief Get the mesh mass of the node
@@ -870,7 +892,9 @@ void TreeNode::set_mesh_m(double mesh_m) { _mesh_m = mesh_m; }
  *
  * @return Mesh mass of the node
  */
-double TreeNode::get_mesh_m() { return _mesh_m; }
+double TreeNode::get_mesh_m() {
+    return _mesh_m;
+}
 
 /**
  * @brief Get the distance between the given coordinates and the box of this
@@ -899,7 +923,9 @@ double TreeNode::get_distance(Vec& coords) {
  *
  * @return First child of the node
  */
-Node* TreeNode::get_child() { return _child; }
+Node* TreeNode::get_child() {
+    return _child;
+}
 
 /**
  * @brief Get the Node on the same level that is next in the tree traversal
@@ -907,21 +933,27 @@ Node* TreeNode::get_child() { return _child; }
  *
  * @return The next Node in the tree traversal algorithm
  */
-Node* TreeNode::get_sibling() { return _sibling; }
+Node* TreeNode::get_sibling() {
+    return _sibling;
+}
 
 /**
  * @brief Get the width of the node
  *
  * @return Width of the node
  */
-double TreeNode::get_width() { return _box.get_side(); }
+double TreeNode::get_width() {
+    return _box.get_side();
+}
 
 /**
  * @brief Get the center of the node
  *
  * @return Center of the node
  */
-Vec TreeNode::get_center() { return _box.get_anchor(); }
+Vec TreeNode::get_center() {
+    return _box.get_anchor();
+}
 
 /**
  * @brief Add the given particle on the given level to the node
@@ -1357,7 +1389,9 @@ void TreeNode::walk(TreeWalker& walker) {
 /**
  * @brief Constructor
  */
-Leaf::Leaf() : Node(true) { _sibling = NULL; }
+Leaf::Leaf() : Node(true) {
+    _sibling = NULL;
+}
 
 /**
  * @brief Destructor
@@ -1375,14 +1409,18 @@ Leaf::~Leaf() {
  *
  * @return Mass of the Particle
  */
-double Leaf::get_mass() { return _particle->get_mass(); }
+double Leaf::get_mass() {
+    return _particle->get_mass();
+}
 
 /**
  * @brief Get the softening length of the Particle in the leaf
  *
  * @return Softening length of the Particle
  */
-double Leaf::get_hmax() { return _particle->get_hsoft(); }
+double Leaf::get_hmax() {
+    return _particle->get_hsoft();
+}
 
 /**
  * @brief Get the given coordinate of the  Particle in the leaf
@@ -1437,21 +1475,27 @@ double Leaf::get_vmax() {
  *
  * @return Next Node on this level
  */
-Node* Leaf::get_sibling() { return _sibling; }
+Node* Leaf::get_sibling() {
+    return _sibling;
+}
 
 /**
  * @brief Add the given Particle to the leaf
  *
  * @param p Particle to add
  */
-void Leaf::add_particle(Particle* p) { _particle = p; }
+void Leaf::add_particle(Particle* p) {
+    _particle = p;
+}
 
 /**
  * @brief Get the Particle in this leaf
  *
  * @return Particle in the leaf
  */
-Particle* Leaf::get_particle() { return _particle; }
+Particle* Leaf::get_particle() {
+    return _particle;
+}
 
 /**
  * @brief Restructure the leaf for the efficient tree traversal algorithm
@@ -1544,14 +1588,18 @@ unsigned int PseudoNode::finalize(Node* sibling, bool last) {
  *
  * @return Mass of the node
  */
-double PseudoNode::get_mass() { return _total_mass; }
+double PseudoNode::get_mass() {
+    return _total_mass;
+}
 
 /**
  * @brief Get the maximal softening length in the node
  *
  * @return Maximal softening length in the node
  */
-double PseudoNode::get_hmax() { return _hmax; }
+double PseudoNode::get_hmax() {
+    return _hmax;
+}
 
 /**
  * @brief Get the given coordinate of the center of mass of the node
@@ -1568,14 +1616,18 @@ double PseudoNode::get_center_of_mass(unsigned int index) {
  *
  * @return Center of mass of the node
  */
-Vec PseudoNode::get_center_of_mass_node() { return _center_of_mass; }
+Vec PseudoNode::get_center_of_mass_node() {
+    return _center_of_mass;
+}
 
 /**
  * @brief Get the next Node in the efficient tree traversal algorithm
  *
  * @return Next Node on the same level
  */
-Node* PseudoNode::get_sibling() { return _sibling; }
+Node* PseudoNode::get_sibling() {
+    return _sibling;
+}
 
 /**
  * @brief Get the distance between the given coordinates and the box of the node
@@ -1603,14 +1655,18 @@ double PseudoNode::get_distance(Vec& coords) {
  *
  * @return Maximal fluid velocity in the node
  */
-double PseudoNode::get_vmax() { return _vmax; }
+double PseudoNode::get_vmax() {
+    return _vmax;
+}
 
 /**
  * @brief Get the maximal soundspeed in the node
  *
  * @return Maximal soundspeed in the node
  */
-double PseudoNode::get_cmax() { return _cmax; }
+double PseudoNode::get_cmax() {
+    return _cmax;
+}
 
 /**
  * @brief Get the rank of the MPI process which holds the TreeNode corresponding
@@ -1618,55 +1674,71 @@ double PseudoNode::get_cmax() { return _cmax; }
  *
  * @return Rank of the original MPI process of the node
  */
-unsigned int PseudoNode::get_source() { return _src; }
+unsigned int PseudoNode::get_source() {
+    return _src;
+}
 
 /**
  * @brief Set the center of mass of the node
  *
  * @param com New center of mass for the node
  */
-void PseudoNode::set_center_of_mass(Vec com) { _center_of_mass = com; }
+void PseudoNode::set_center_of_mass(Vec com) {
+    _center_of_mass = com;
+}
 
 /**
  * @brief Set the maximal soundspeed in the node
  *
  * @param cmax New value for the maximal soundspeed in the node
  */
-void PseudoNode::set_cmax(double cmax) { _cmax = cmax; }
+void PseudoNode::set_cmax(double cmax) {
+    _cmax = cmax;
+}
 
 /**
  * @brief Set the maximal fluid velocity in the node
  * @param vmax New value for the maximal fluid velocity in the node
  */
-void PseudoNode::set_vmax(double vmax) { _vmax = vmax; }
+void PseudoNode::set_vmax(double vmax) {
+    _vmax = vmax;
+}
 
 /**
  * @brief Get the width of the node
  *
  * @return The width of the node
  */
-double PseudoNode::get_width() { return _box.get_side(); }
+double PseudoNode::get_width() {
+    return _box.get_side();
+}
 
 /**
  * @brief Get the center of the node
  *
  * @return Center of the node
  */
-Vec PseudoNode::get_center() { return _box.get_anchor(); }
+Vec PseudoNode::get_center() {
+    return _box.get_anchor();
+}
 
 /**
  * @brief Set the total mass in the node
  *
  * @param mass New value for the total mass in the node
  */
-void PseudoNode::set_mass(double mass) { _total_mass = mass; }
+void PseudoNode::set_mass(double mass) {
+    _total_mass = mass;
+}
 
 /**
  * @brief Set the maximal softening length in the node
  *
  * @param hmax New value for the maximal softening length in the node
  */
-void PseudoNode::set_hmax(double hmax) { _hmax = hmax; }
+void PseudoNode::set_hmax(double hmax) {
+    _hmax = hmax;
+}
 
 /**
  * @brief Print the pseudonode to the given stream

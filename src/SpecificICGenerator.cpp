@@ -117,7 +117,9 @@ SpecificICGenerator::SpecificICGenerator(unsigned int ngaspart,
 /**
  * @brief Destructor. Free the simulation box
  */
-SpecificICGenerator::~SpecificICGenerator() { delete _container; }
+SpecificICGenerator::~SpecificICGenerator() {
+    delete _container;
+}
 
 /**
   * \brief Generate initial conditions
@@ -553,7 +555,9 @@ void SpecificICGenerator::apply_profile_evrard(ParticleVector& grid) {
  *
  * @param grid ParticleVector to fill
  */
-void SpecificICGenerator::add_DM(ParticleVector& grid) { add_DM_plummer(grid); }
+void SpecificICGenerator::add_DM(ParticleVector& grid) {
+    add_DM_plummer(grid);
+}
 
 /**
  * @brief Set up a Plummer dark matter profile

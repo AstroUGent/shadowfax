@@ -122,7 +122,9 @@ void VorTess::print_tesselation_gnuplot(ostream& stream) {
  *
  * @return std::vector containing the cells of the tesselation
  */
-vector<VorCell*> VorTess::get_cells() { return _cells; }
+vector<VorCell*> VorTess::get_cells() {
+    return _cells;
+}
 
 /**
  * @brief Add the given GasParticle with the given index to the tesselation
@@ -653,22 +655,30 @@ void VorTess::set_hs() {
  *
  * @param parttree Tree for the particle set
  */
-void VorTess::complete(Tree& parttree) { _delaunay->add_mirrors(parttree); }
+void VorTess::complete(Tree& parttree) {
+    _delaunay->add_mirrors(parttree);
+}
 
 /**
  * @brief Communicate primitive variables between MPI processes
  */
-void VorTess::update_Ws() { _delaunay->update_Ws(); }
+void VorTess::update_Ws() {
+    _delaunay->update_Ws();
+}
 
 /**
  * @brief Communicate gradients between MPI processes
  */
-void VorTess::update_gradients() { _delaunay->update_gradients(); }
+void VorTess::update_gradients() {
+    _delaunay->update_gradients();
+}
 
 /**
  * @brief Communicate fluxes between MPI processes
  */
-void VorTess::update_dQs() { _delaunay->update_dQs(); }
+void VorTess::update_dQs() {
+    _delaunay->update_dQs();
+}
 
 /**
  * @brief Communicate timesteps between MPI processes
@@ -697,7 +707,9 @@ void VorTess::update_gravitational_corrections() {
  * added to the tesselation
  * @return VorCell corresponding to the given index
  */
-VorCell* VorTess::get_cell(unsigned int index) { return _cells[index]; }
+VorCell* VorTess::get_cell(unsigned int index) {
+    return _cells[index];
+}
 
 /**
  * @brief Check if the Delaunay tesselation fulfils the geometrical criterion
@@ -705,14 +717,18 @@ VorCell* VorTess::get_cell(unsigned int index) { return _cells[index]; }
  * @warning This method is computationally very expensive and should only be
  * used for debugging and for small point sets!
  */
-void VorTess::check_delaunay() { _delaunay->check_tesselation(); }
+void VorTess::check_delaunay() {
+    _delaunay->check_tesselation();
+}
 
 /**
  * @brief Get the faces of the tesselation
  *
  * @return Reference to the face list
  */
-vector<VorFace*>& VorTess::get_faces() { return _faces; }
+vector<VorFace*>& VorTess::get_faces() {
+    return _faces;
+}
 
 /**
  * @brief Get the triangles that make up the cells of the tesselation

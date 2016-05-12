@@ -42,12 +42,16 @@ Timer::Timer() {
 /**
  * @brief Clear the internal timeval difference
  */
-void Timer::reset() { timerclear(&_diff); }
+void Timer::reset() {
+    timerclear(&_diff);
+}
 
 /**
  * @brief Record the current system time as starting time
  */
-void Timer::start() { gettimeofday(&_start, NULL); }
+void Timer::start() {
+    gettimeofday(&_start, NULL);
+}
 
 /**
  * @brief Record the current system time as stopping time and add the difference
@@ -70,7 +74,9 @@ double Timer::stop() {
  * @return The current contents of the internal timeval difference in seconds
  * (with microsecond precision)
  */
-double Timer::value() { return _diff.tv_sec + 1.e-6 * _diff.tv_usec; }
+double Timer::value() {
+    return _diff.tv_sec + 1.e-6 * _diff.tv_usec;
+}
 
 /**
  * @brief Get the current value of the timer without affecting it
@@ -88,7 +94,9 @@ double Timer::interval() {
 /**
  * @brief Restart the timer by overwriting the start time.
  */
-void Timer::restart() { gettimeofday(&_start, NULL); }
+void Timer::restart() {
+    gettimeofday(&_start, NULL);
+}
 
 /**
  * @brief Dump the timer to the given RestartFile

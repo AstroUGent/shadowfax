@@ -109,7 +109,9 @@ class Particle : public Hilbert_Object {
       *
       * @return Vec containing the position of the particle
       */
-    Vec& get_position() { return _x; }
+    Vec& get_position() {
+        return _x;
+    }
 
     Vec get_velocity();
     double vel(int index);
@@ -157,7 +159,9 @@ class Particle : public Hilbert_Object {
       * @return The norm of the gravitational acceleration during the previous
       * integration timestep
       */
-    inline double get_old_acceleration() { return _old_a; }
+    inline double get_old_acceleration() {
+        return _old_a;
+    }
 
     /**
      * @brief Add the given number of force calculations to the computational
@@ -172,7 +176,9 @@ class Particle : public Hilbert_Object {
     /**
      * @brief Reset the computational cost for the particle to zero
      */
-    inline void reset_comp_cost() { _comp_cost = 0; }
+    inline void reset_comp_cost() {
+        _comp_cost = 0;
+    }
 
     /**
      * @brief Get the computational cost of the gravity calculation for this
@@ -180,7 +186,9 @@ class Particle : public Hilbert_Object {
      *
      * @return The computational cost for this particle
      */
-    inline unsigned int get_comp_cost() { return _comp_cost; }
+    inline unsigned int get_comp_cost() {
+        return _comp_cost;
+    }
 
     /**
      * @brief Set the mass of the particle

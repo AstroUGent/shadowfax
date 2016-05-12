@@ -118,6 +118,12 @@ class ExactRiemannSolver : public RiemannSolver {
     StateVector solve(StateVector& WL, StateVector& WR, Vec& n, double& mach,
                       bool reflective = false);
 
+    StateVector solve_for_flux(StateVector& WL, StateVector& WR, Vec& n, Vec& v,
+                               bool reflective = false);
+
+    StateVector get_time_derivative(const StateVector& W,
+                                    const StateVector* gradients);
+
     /**
      * @brief Return the adiabatic index of the fluid
      *

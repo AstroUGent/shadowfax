@@ -166,7 +166,9 @@ class SnapshotWriter : public SnapshotHandler {
      *
      * @return The snapshot counter
      */
-    unsigned int get_lastsnap() { return _lastsnap; }
+    unsigned int get_lastsnap() {
+        return _lastsnap;
+    }
 
     /**
      * @brief Dump the snapshot writer to the given RestartFile

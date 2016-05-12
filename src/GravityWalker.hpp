@@ -85,7 +85,9 @@ class GasGravityKernel : public GravityKernel {
      * @param hsoftinv3 Inverse softening length cubed
      * @return Value of hte kernel at the given distance
      */
-    virtual double operator()(double u, double hsoftinv3) { return hsoftinv3; }
+    virtual double operator()(double u, double hsoftinv3) {
+        return hsoftinv3;
+    }
 
     /**
      * @brief Get the value of the integral of the kernel at the given inverse
@@ -167,7 +169,9 @@ class DMGravityKernel : public GravityKernel {
      * @return Value of the derivative of the kernel at the given relative
      * radius
      */
-    virtual double derivative(double u, double hsoftinv) { return 0.; }
+    virtual double derivative(double u, double hsoftinv) {
+        return 0.;
+    }
 };
 
 /**
@@ -349,48 +353,62 @@ class GravityWalker : public PeriodicTreeWalker {
          *
          * @return The position of the external Particle
          */
-        Vec get_position() { return _pos; }
+        Vec get_position() {
+            return _pos;
+        }
 
         /**
          * @brief Get the old acceleration of the external Particle
          *
          * @return Old acceleration of the external Particle
          */
-        double get_olda() { return _olda; }
+        double get_olda() {
+            return _olda;
+        }
 
         /**
          * @brief Get the softening length of the external Particle
          *
          * @return Softening length of the external Particle
          */
-        double get_hsoft() { return _hsoft; }
+        double get_hsoft() {
+            return _hsoft;
+        }
 
         /**
          * @brief Get the type of the external Particle
          *
          * @return Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM)
          */
-        ParticleType get_type() { return _type; }
+        ParticleType get_type() {
+            return _type;
+        }
 
         /**
          * @brief set_a Set the acceleration
          *
          * @param a Value of the acceleration
          */
-        void set_a(Vec a) { _a = a; }
+        void set_a(Vec a) {
+            _a = a;
+        }
 
         /**
          * @brief Set the computational cost
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) { _comp_cost = comp_cost; }
+        void set_comp_cost(unsigned int comp_cost) {
+            _comp_cost = comp_cost;
+        }
 
         /**
          * @brief Set the \f$\eta\f$-factor for variable softening lengths
          *
          * @param eta Value of the \f$\eta\f$-factor
          */
-        void set_eta(double eta) { _eta = eta; }
+        void set_eta(double eta) {
+            _eta = eta;
+        }
 
         /**
          * @brief Add the relevant data to the given communication buffer to
@@ -596,42 +614,54 @@ class PotentialWalker : public PeriodicTreeWalker {
          *
          * @return Position of the external Particle
          */
-        Vec get_position() { return _pos; }
+        Vec get_position() {
+            return _pos;
+        }
 
         /**
          * @brief Get the old acceleration of the external Particle
          *
          * @return Old acceleration of the Particle
          */
-        double get_olda() { return _olda; }
+        double get_olda() {
+            return _olda;
+        }
 
         /**
          * @brief Get the softening length of the external Particle
          *
          * @return Softening length of the external Particle
          */
-        double get_hsoft() { return _hsoft; }
+        double get_hsoft() {
+            return _hsoft;
+        }
 
         /**
          * @brief Get the type of the external Particle
          *
          * @return Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM)
          */
-        ParticleType get_type() { return _type; }
+        ParticleType get_type() {
+            return _type;
+        }
 
         /**
          * @brief Set the potential
          *
          * @param epot Value of the gravitational potential
          */
-        void set_epot(double epot) { _epot = epot; }
+        void set_epot(double epot) {
+            _epot = epot;
+        }
 
         /**
          * @brief Set the computational cost
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) { _comp_cost = comp_cost; }
+        void set_comp_cost(unsigned int comp_cost) {
+            _comp_cost = comp_cost;
+        }
 
         /**
          * @brief Add relevant data to the given communication stream to send
@@ -820,35 +850,45 @@ class BHGravityWalker : public PeriodicTreeWalker {
          *
          * @return Position of the external Particle
          */
-        Vec get_position() { return _pos; }
+        Vec get_position() {
+            return _pos;
+        }
 
         /**
          * @brief Get the softening length of the external Particle
          *
          * @return Softening length of the external Particle
          */
-        double get_hsoft() { return _hsoft; }
+        double get_hsoft() {
+            return _hsoft;
+        }
 
         /**
          * @brief Get the type of the external Particle
          *
          * @return Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM)
          */
-        ParticleType get_type() { return _type; }
+        ParticleType get_type() {
+            return _type;
+        }
 
         /**
          * @brief Set the gravitational acceleration
          *
          * @param a Value of the gravitational acceleration
          */
-        void set_a(Vec a) { _a = a; }
+        void set_a(Vec a) {
+            _a = a;
+        }
 
         /**
          * @brief Set the computational cost
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) { _comp_cost = comp_cost; }
+        void set_comp_cost(unsigned int comp_cost) {
+            _comp_cost = comp_cost;
+        }
 
         /**
          * @brief Add relevant data to the given communication buffer to send
@@ -1032,35 +1072,45 @@ class BHPotentialWalker : public PeriodicTreeWalker {
          *
          * @return Position of the external Particle
          */
-        Vec get_position() { return _pos; }
+        Vec get_position() {
+            return _pos;
+        }
 
         /**
          * @brief Get the softening length of the external Particle
          *
          * @return Softening length of the external Particle
          */
-        double get_hsoft() { return _hsoft; }
+        double get_hsoft() {
+            return _hsoft;
+        }
 
         /**
          * @brief Get the type of the external Particle
          *
          * @return Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM)
          */
-        ParticleType get_type() { return _type; }
+        ParticleType get_type() {
+            return _type;
+        }
 
         /**
          * @brief Set the gravitational potential
          *
          * @param epot Value of the gravitational potential
          */
-        void set_epot(double epot) { _epot = epot; }
+        void set_epot(double epot) {
+            _epot = epot;
+        }
 
         /**
          * @brief Set the computational cost
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) { _comp_cost = comp_cost; }
+        void set_comp_cost(unsigned int comp_cost) {
+            _comp_cost = comp_cost;
+        }
 
         /**
          * @brief Add relevant data to the given communication buffer to export
@@ -1207,14 +1257,18 @@ class ConstantPotentialGravityWalker : public PeriodicTreeWalker {
      *
      * @param import Dummy import imported from another MPI-process
      */
-    ConstantPotentialGravityWalker(Import& import) { _p = NULL; }
+    ConstantPotentialGravityWalker(Import& import) {
+        _p = NULL;
+    }
 
     /**
      * @brief Get the acceleration calculated by the treewalk
      *
      * @return The resulting acceleration
      */
-    Vec get_acceleration() { return _a; }
+    Vec get_acceleration() {
+        return _a;
+    }
 
     /**
      * @brief Dummy splitnode function
@@ -1222,7 +1276,9 @@ class ConstantPotentialGravityWalker : public PeriodicTreeWalker {
      * @param node TreeNode on which we operate
      * @return False, since we do not walk the tree
      */
-    bool splitnode(TreeNode* node) { return false; }
+    bool splitnode(TreeNode* node) {
+        return false;
+    }
 
     /**
      * @brief Dummy nodeaction
@@ -1251,21 +1307,27 @@ class ConstantPotentialGravityWalker : public PeriodicTreeWalker {
      * @param pseudonode PseudoNode on which we operate
      * @return False, since we do not walk the tree
      */
-    bool export_to_pseudonode(PseudoNode* pseudonode) { return false; }
+    bool export_to_pseudonode(PseudoNode* pseudonode) {
+        return false;
+    }
 
     /**
      * @brief Set the position used for the treewalk
      *
      * @param position New position
      */
-    void set_position(Vec position) { _position = position; }
+    void set_position(Vec position) {
+        _position = position;
+    }
 
     /**
      * @brief Get the position of the treewalk
      *
      * @return Position used for the treewalk
      */
-    Vec get_position() { return _position; }
+    Vec get_position() {
+        return _position;
+    }
 
     /**
      * @brief Dummy periodic splitnode function
@@ -1317,7 +1379,9 @@ class ConstantPotentialGravityWalker : public PeriodicTreeWalker {
      * @return An dummy Export that should not be used for anything, but is
      * there to make the code compile
      */
-    Export get_export() { return Export(); }
+    Export get_export() {
+        return Export();
+    }
 };
 
 #endif

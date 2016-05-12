@@ -69,42 +69,54 @@ UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time) {
   *
   * @returns The length Unit
   */
-Unit UnitSet::get_length_unit() { return _unit_position; }
+Unit UnitSet::get_length_unit() {
+    return _unit_position;
+}
 
 /**
   * @brief Get the density unit
   *
   * @returns The density Unit
   */
-Unit UnitSet::get_density_unit() { return _unit_density; }
+Unit UnitSet::get_density_unit() {
+    return _unit_density;
+}
 
 /**
   * @brief Get the velocity unit
   *
   * @returns The velocity Unit
   */
-Unit UnitSet::get_velocity_unit() { return _unit_velocity; }
+Unit UnitSet::get_velocity_unit() {
+    return _unit_velocity;
+}
 
 /**
   * @brief Get the pressure unit
   *
   * @returns The pressure Unit
   */
-Unit UnitSet::get_pressure_unit() { return _unit_pressure; }
+Unit UnitSet::get_pressure_unit() {
+    return _unit_pressure;
+}
 
 /**
   * @brief Get the time unit
   *
   * @returns The time Unit
   */
-Unit UnitSet::get_time_unit() { return _unit_time; }
+Unit UnitSet::get_time_unit() {
+    return _unit_time;
+}
 
 /**
   * @brief Get the mass unit
   *
   * @returns The mass Unit
   */
-Unit UnitSet::get_mass_unit() { return _unit_mass; }
+Unit UnitSet::get_mass_unit() {
+    return _unit_mass;
+}
 
 /**
   * @brief Get the unit for the given quantity

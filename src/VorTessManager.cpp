@@ -138,7 +138,9 @@ unsigned int VorTessManager::update(unsigned long currentTime) {
  *
  * Currently only done for the old algorithm.
  */
-void VorTessManager::update_Ws() { _tesselation->update_Ws(); }
+void VorTessManager::update_Ws() {
+    _tesselation->update_Ws();
+}
 
 /**
  * @brief Calculate characteristic lengths for the active cells of the
@@ -163,7 +165,9 @@ void VorTessManager::set_hs(unsigned long currentTime) {
  *
  * Currently only done for the old algorithm.
  */
-void VorTessManager::update_gradients() { _tesselation->update_gradients(); }
+void VorTessManager::update_gradients() {
+    _tesselation->update_gradients();
+}
 
 /**
  * @brief Communicate timesteps between MPI processes
@@ -214,7 +218,9 @@ void VorTessManager::hydro(TimeLine& timeline, RiemannSolver& solver,
  *
  * Currently only done for the old algorithm.
  */
-void VorTessManager::update_dQs() { _tesselation->update_dQs(); }
+void VorTessManager::update_dQs() {
+    _tesselation->update_dQs();
+}
 
 /**
  * @brief Print the tesselation to the given stream in a format that can be
@@ -420,7 +426,9 @@ VorTessManager::VorTessManager(ParticleVector& particles, bool periodic,
  *
  * Clean up the FixedGrid.
  */
-VorTessManager::~VorTessManager() { delete _fixedgrid; }
+VorTessManager::~VorTessManager() {
+    delete _fixedgrid;
+}
 
 /**
  * @brief Reset the tesselation

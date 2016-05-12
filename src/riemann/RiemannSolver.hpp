@@ -63,6 +63,33 @@ class RiemannSolver {
                               double& mach, bool reflective = false) = 0;
 
     /**
+     * @brief Solve the Riemann problem and return the flux directly
+     *
+     * @param WL Left StateVector
+     * @param WR Right StateVector
+     * @param n Interface normal
+     * @param v Interface velocity
+     * @param reflective Flag indicating if the right state should be a
+     * reflective copy of the left state
+     * @return Flux along the interface normal
+     */
+    virtual StateVector solve_for_flux(StateVector& WL, StateVector& WR, Vec& n,
+                                       Vec& v, bool reflective = false) = 0;
+
+    /**
+     * @brief Convert gradients to time derivatives using the Euler equations in
+     * primitive form
+     *
+     * These can be used in the MUSCL-Hancock prediction step.
+     *
+     * @param W Primitive variables
+     * @param gradients Spatial derivatives of the primitive variables
+     * @return Time derivatives of the primitive variables
+     */
+    virtual StateVector get_time_derivative(const StateVector& W,
+                                            const StateVector* gradients) = 0;
+
+    /**
      * @brief Get the hydrodynamical soundspeed for the given StateVector
      *
      * @param W Given StateVector

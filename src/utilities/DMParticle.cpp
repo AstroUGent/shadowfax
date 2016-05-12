@@ -32,21 +32,27 @@ using namespace std;
 /**
   * \brief Construct a default DMParticle with zero mass
   */
-DMParticle::DMParticle() : Particle() { _mass = 0.; }
+DMParticle::DMParticle() : Particle() {
+    _mass = 0.;
+}
 
 /**
   * \brief Construct a DMParticle with given position and zero mass
   *
   * @param pos Position of the particle
   */
-DMParticle::DMParticle(Vec pos) : Particle(pos) { _mass = 0.; }
+DMParticle::DMParticle(Vec pos) : Particle(pos) {
+    _mass = 0.;
+}
 
 /**
   * \brief Set the mass of the dark matter particle
   *
   * @param mass The mass of the dark matter particle
   */
-void DMParticle::set_mass(double mass) { _mass = mass; }
+void DMParticle::set_mass(double mass) {
+    _mass = mass;
+}
 
 /**
   * \brief Construct a DMParticle from an MPI buffer (for parallellization

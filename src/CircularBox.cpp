@@ -148,7 +148,9 @@ void CircularBox::get_bounding_box(double* box) {
  *
  * @return 2 times the radius of the sphere
  */
-double CircularBox::get_box_width() { return 2 * _radius; }
+double CircularBox::get_box_width() {
+    return 2 * _radius;
+}
 
 /**
   * @brief Calculate the key for the given coordinates.
@@ -160,7 +162,9 @@ double CircularBox::get_box_width() { return 2 * _radius; }
   * @return The hilbert key for the given coordinates, taking into account the
   * size of the internal volume
   */
-unsigned long CircularBox::get_key(Vec& coords) { return 0; }
+unsigned long CircularBox::get_key(Vec& coords) {
+    return 0;
+}
 
 /**
   * @brief Keep the given particle inside the CircularBox, using periodicity.

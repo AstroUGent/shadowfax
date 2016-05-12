@@ -80,7 +80,9 @@ VorGen::VorGen(double x, double y) {
  *
  * Does nothing really...
  */
-VorGen::~VorGen() { _tetrahedra.clear(); }
+VorGen::~VorGen() {
+    _tetrahedra.clear();
+}
 
 // deprecated
 /**
@@ -110,7 +112,9 @@ void VorGen::add_tetrahedron(Simplex* tetrahedron) {
  *
  * @param index Index of a Simplex in the DelTess simplex list
  */
-void VorGen::add_simplex(unsigned int index) { _simplices.push_back(index); }
+void VorGen::add_simplex(unsigned int index) {
+    _simplices.push_back(index);
+}
 
 /**
  * @brief Remove a tetrahedron from the list
@@ -152,14 +156,18 @@ void VorGen::remove_simplex(unsigned int index) {
  *
  * @return Simplex std::list
  */
-list<Simplex*> VorGen::get_tetrahedra() { return _tetrahedra; }
+list<Simplex*> VorGen::get_tetrahedra() {
+    return _tetrahedra;
+}
 
 /**
  * @brief Get the simplex indices
  *
  * @return std::list with simplex indices
  */
-list<unsigned int> VorGen::get_simplices() { return _simplices; }
+list<unsigned int> VorGen::get_simplices() {
+    return _simplices;
+}
 
 /**
  * @brief Print the Point (in ascii) to the given stream
@@ -184,28 +192,36 @@ void VorGen::print(ostream& stream) {
  *
  * @param cell VorCell associated with this generator
  */
-void VorGen::set_cell(VorCell* cell) { _cell = cell; }
+void VorGen::set_cell(VorCell* cell) {
+    _cell = cell;
+}
 
 /**
  * @brief Access the VorCell of this point
  *
  * @return VorCell associated with this generator
  */
-VorCell* VorGen::get_cell() { return _cell; }
+VorCell* VorGen::get_cell() {
+    return _cell;
+}
 
 /**
  * @brief Set the GasParticle associated with this point
  *
  * @param particle GasParticle associated with this generator
  */
-void VorGen::set_particle(GasParticle* particle) { _particle = particle; }
+void VorGen::set_particle(GasParticle* particle) {
+    _particle = particle;
+}
 
 /**
  * @brief Get the GasParticle associated with this point
  *
  * @return GasParticle associated with this generator
  */
-GasParticle* VorGen::get_particle() { return _particle; }
+GasParticle* VorGen::get_particle() {
+    return _particle;
+}
 
 /**
  * @brief Set the index of the particle associated with this generator in the
@@ -213,7 +229,9 @@ GasParticle* VorGen::get_particle() { return _particle; }
  *
  * @param index Index of a particle in the ParticleVector
  */
-void VorGen::set_particle_id(unsigned int index) { _particle_index = index; }
+void VorGen::set_particle_id(unsigned int index) {
+    _particle_index = index;
+}
 
 /**
  * @brief Get the index of the particle associated with this generator in the
@@ -221,42 +239,54 @@ void VorGen::set_particle_id(unsigned int index) { _particle_index = index; }
  *
  * @return Index of a particle in the ParticleVector
  */
-unsigned int VorGen::get_particle_id() { return _particle_index; }
+unsigned int VorGen::get_particle_id() {
+    return _particle_index;
+}
 
 /**
  * @brief Deprecated
  *
  * @param mirror Deprecated
  */
-void VorGen::set_mirror(VorGen* mirror) { _mirror = mirror; }
+void VorGen::set_mirror(VorGen* mirror) {
+    _mirror = mirror;
+}
 
 /**
  * @brief Deprecated
  *
  * @return Deprecated
  */
-VorGen* VorGen::get_mirror() { return _mirror; }
+VorGen* VorGen::get_mirror() {
+    return _mirror;
+}
 
 /**
  * @brief Set the search radius for the DelTess completion
  *
  * @param sr Search radius for the DelTess completion
  */
-void VorGen::set_search_radius(double sr) { _sr = sr; }
+void VorGen::set_search_radius(double sr) {
+    _sr = sr;
+}
 
 /**
  * @brief Get the search radius for the DelTess completion
  *
  * @return Search radius for the DelTess completion
  */
-double VorGen::get_search_radius() { return _sr; }
+double VorGen::get_search_radius() {
+    return _sr;
+}
 
 /**
  * @brief Signal a mirror copy of this point
  *
  * @param casus Index of the boundary at which this point was mirrored
  */
-void VorGen::mirror(unsigned int casus) { _mirrored += 1 << casus; }
+void VorGen::mirror(unsigned int casus) {
+    _mirrored += 1 << casus;
+}
 
 /**
  * @brief Check if this point was mirror copied for the given boundary
@@ -265,7 +295,9 @@ void VorGen::mirror(unsigned int casus) { _mirrored += 1 << casus; }
  * @return True if the point has a mirror copy for the given boundary, false
  * otherwise
  */
-bool VorGen::mirrored(unsigned int casus) { return (_mirrored >> casus) & 1; }
+bool VorGen::mirrored(unsigned int casus) {
+    return (_mirrored >> casus) & 1;
+}
 
 /**
  * @brief Set the ID of this point
@@ -277,54 +309,70 @@ bool VorGen::mirrored(unsigned int casus) { return (_mirrored >> casus) & 1; }
  *
  * @param id Index of the point
  */
-void VorGen::set_id(unsigned int id) { _mirrored = id; }
+void VorGen::set_id(unsigned int id) {
+    _mirrored = id;
+}
 
 /**
  * @brief Get the index of this point
  *
  * @return Index of the point
  */
-unsigned int VorGen::get_id() { return _mirrored; }
+unsigned int VorGen::get_id() {
+    return _mirrored;
+}
 
 /**
  * @brief Clear the Simplex list
  */
-void VorGen::reset_simplices() { _tetrahedra.clear(); }
+void VorGen::reset_simplices() {
+    _tetrahedra.clear();
+}
 
 /**
  * @brief Get the position of this point
  *
  * @return Position of the point
  */
-Vec VorGen::get_position() { return _p; }
+Vec VorGen::get_position() {
+    return _p;
+}
 
 /**
  * @brief Set the ID of the GasParticle associated to this point
  *
  * @param id ID of the GasParticle associated to this generator
  */
-void VorGen::set_original(unsigned long id) { _original = id; }
+void VorGen::set_original(unsigned long id) {
+    _original = id;
+}
 
 /**
  * @brief Get the ID of the GasParticle associated to this point
  *
  * @return ID of the GasParticle associated to this generator
  */
-unsigned long VorGen::get_original() { return _original; }
+unsigned long VorGen::get_original() {
+    return _original;
+}
 
 /**
  * @brief Set the rank of the process that holds the original copy of this point
  *
  * @param process MPI process that holds the original copy of this generator
  */
-void VorGen::set_process(unsigned int process) { _process = process; }
+void VorGen::set_process(unsigned int process) {
+    _process = process;
+}
 
 /**
  * @brief Get the rank of the process that holds the original copy of this point
  *
  * @return MPI process that holds the original copy of this generator
  */
-unsigned int VorGen::get_process() { return _process; }
+unsigned int VorGen::get_process() {
+    return _process;
+}
 
 /**
  * @brief Set the coordinates of this point, rescaled to the range [1,2] (for
@@ -332,7 +380,9 @@ unsigned int VorGen::get_process() { return _process; }
  *
  * @param p12 Coordinates of the point in the range [1,2]
  */
-void VorGen::set_p12(Vec p12) { _p12 = p12; }
+void VorGen::set_p12(Vec p12) {
+    _p12 = p12;
+}
 
 /**
  * @brief Get the coordinates of this point, rescaled to the range [1,2] (for
@@ -340,21 +390,29 @@ void VorGen::set_p12(Vec p12) { _p12 = p12; }
  *
  * @return Coordinates of the point in the range [1,2]
  */
-Vec& VorGen::get_p12() { return _p12; }
+Vec& VorGen::get_p12() {
+    return _p12;
+}
 
 /**
  * @brief Flag this VorGen
  */
-void VorGen::flag() { _flag = true; }
+void VorGen::flag() {
+    _flag = true;
+}
 
 /**
  * @brief Unflag this VorGen
  */
-void VorGen::unflag() { _flag = false; }
+void VorGen::unflag() {
+    _flag = false;
+}
 
 /**
  * @brief Check if this VorGen is flagged
  *
  * @return True if the VorGen is flagged
  */
-bool VorGen::flagged() { return _flag; }
+bool VorGen::flagged() {
+    return _flag;
+}

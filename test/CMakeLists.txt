@@ -45,8 +45,6 @@ endmacro(add_unit_test)
 set(TESTRIEMANNSOLVER_SOURCES
     myAssert.hpp
     testRiemannSolver.cpp
-    ../src/ApproximateSolver.cpp
-    ../src/ExactRiemannSolver.cpp
     ../src/MPIGlobal.cpp
     ../src/ProgramLog.cpp
     )
@@ -54,7 +52,8 @@ set(TESTRIEMANNSOLVER_SOURCES
 add_unit_test(NAME testRiemannSolver
               SOURCES ${TESTRIEMANNSOLVER_SOURCES}
               NDIM 3
-              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d)
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} riemann3d
+              utilities3d)
 
 # ExArith test
 set(TESTEXARITH_SOURCES

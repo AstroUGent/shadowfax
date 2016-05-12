@@ -162,7 +162,9 @@ void Block::add_data(unsigned int x, unsigned int y, double data) {
   *
   * @return A reference to the internal data buffer
   */
-const vector<vector<double> >& Block::get_data() { return _data; }
+const vector<vector<double> >& Block::get_data() {
+    return _data;
+}
 
 /**
   * @brief Access a column of the internal data buffer
@@ -172,7 +174,9 @@ const vector<vector<double> >& Block::get_data() { return _data; }
   * @return A c-type void pointer to the buffer underlying the specified column,
   * which can be used to read from or write to the column
   */
-const void* Block::get_buffer(unsigned int index) { return &_data[index][0]; }
+const void* Block::get_buffer(unsigned int index) {
+    return &_data[index][0];
+}
 
 /**
   * @brief Get the Unit associated with a column in the Block
@@ -180,21 +184,27 @@ const void* Block::get_buffer(unsigned int index) { return &_data[index][0]; }
   * @param index The index of the column in the header list
   * @return A reference to the unit assiociated to the given column
   */
-Unit& Block::get_unit(unsigned int index) { return _units[index]; }
+Unit& Block::get_unit(unsigned int index) {
+    return _units[index];
+}
 
 /**
   * @brief Access the name of the Block
   *
   * @return A reference to the name of the Block
   */
-const string& Block::get_name() { return _name; }
+const string& Block::get_name() {
+    return _name;
+}
 
 /**
   * @brief Access the header list
   *
   * @return A reference to the header list of the Block
   */
-const vector<string>& Block::get_headers() { return _headers; }
+const vector<string>& Block::get_headers() {
+    return _headers;
+}
 
 /**
   * @brief Access the dimensions list. The dimension of a given column is the
@@ -202,14 +212,18 @@ const vector<string>& Block::get_headers() { return _headers; }
   *
   * @return A reference to the dimensions list of the Block
   */
-const vector<unsigned int>& Block::get_dimensions() { return _dimensions; }
+const vector<unsigned int>& Block::get_dimensions() {
+    return _dimensions;
+}
 
 /**
   * @brief Get information on the number of cells in the Block
   *
   * @return The number of cells in one column of the Block
   */
-unsigned int Block::number_of_lines() { return _data[0].size(); }
+unsigned int Block::number_of_lines() {
+    return _data[0].size();
+}
 
 /**
   * @brief Access a row of the Block
@@ -231,4 +245,6 @@ const vector<double> Block::get_line(unsigned int index) {
   * @return The number of cells in a single column of the Block, taking into
   * account the number of dimensions of the columns
   */
-unsigned int Block::get_size() { return _data[0].size() / _dimensions[0]; }
+unsigned int Block::get_size() {
+    return _data[0].size() / _dimensions[0];
+}

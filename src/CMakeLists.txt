@@ -30,6 +30,7 @@ if(DO_SHADOWFAX)
     CircularBox.cpp
     CubicBox.cpp
     DelTess.cpp
+    DelTess_mpi.cpp
     DelTessCheck.cpp
     ExactRiemannSolver.cpp
     ExArith.cpp
@@ -144,6 +145,7 @@ if(DO_ICMAKER)
     CircularBox.cpp
     CubicBox.cpp
     DelTess.cpp
+    DelTess_mpi.cpp
     DelTessCheck.cpp
     ExArith.cpp
     GadgetSnapshotWriter.cpp
@@ -210,6 +212,7 @@ if(DO_VTKMAKER)
     add_executable(${VTKMAKERNAME}
     CubicBox.cpp
     DelTess.cpp
+    DelTess_mpi.cpp
     ExArith.cpp
     GadgetSnapshotReader.cpp
     GadgetSnapshotWriter.cpp

@@ -570,75 +570,75 @@ void GasParticle::update_Q() {
  */
 void GasParticle::set_paq(unsigned int index, double paq) { _W.set_paq(paq); }
 
-/**
- * @brief Save the particle properties to the given Block for output
- *
- * @param block Block to write to
- */
-void GasParticle::save_props(Block& block) {
-    vector<double> props;
+///**
+// * @brief Save the particle properties to the given Block for output
+// *
+// * @param block Block to write to
+// */
+// void GasParticle::save_props(Block& block) {
+//    vector<double> props;
 
-    props.push_back(_id);
-    // sometimes, order DOES matter
-    for(unsigned int i = 0; i < ndim_ + 2; i++) {
-        props.push_back(_W[i]);
-    }
-    props.push_back(_Q[0]);
+//    props.push_back(_id);
+//    // sometimes, order DOES matter
+//    for(unsigned int i = 0; i < ndim_ + 2; i++) {
+//        props.push_back(_W[i]);
+//    }
+//    props.push_back(_Q[0]);
 
-    block.add_data(props);
-}
+//    block.add_data(props);
+//}
 
-/**
- * @brief Save the mesh information of this particle to the given Block for
- * output
- *
- * @param block Block to write to
- */
-void GasParticle::save_grid(Block& block) {
-    vector<double> pos;
-    pos.push_back(_x[0]);
-    pos.push_back(_x[1]);
-#if ndim_ == 3
-    pos.push_back(_x[2]);
-#else
-    pos.push_back(0.);
-#endif
-    block.add_data(pos);
-}
+///**
+// * @brief Save the mesh information of this particle to the given Block for
+// * output
+// *
+// * @param block Block to write to
+// */
+// void GasParticle::save_grid(Block& block) {
+//    vector<double> pos;
+//    pos.push_back(_x[0]);
+//    pos.push_back(_x[1]);
+//#if ndim_ == 3
+//    pos.push_back(_x[2]);
+//#else
+//    pos.push_back(0.);
+//#endif
+//    block.add_data(pos);
+//}
 
-/**
- * @brief Save the particle properties to the given Block for Gadget output
- *
- * @deprecated No longer used
- *
- * @param block Block to write to
- */
-void GasParticle::save_props_gadget(Block& block) {
-    vector<double> props;
-    props.push_back(_x[0]);
-    props.push_back(_x[1]);
-#if ndim_ == 3
-    props.push_back(_x[2]);
-#endif
+///**
+// * @brief Save the particle properties to the given Block for Gadget output
+// *
+// * @deprecated No longer used
+// *
+// * @param block Block to write to
+// */
+// void GasParticle::save_props_gadget(Block& block) {
+//    vector<double> props;
+//    props.push_back(_x[0]);
+//    props.push_back(_x[1]);
+//#if ndim_ == 3
+//    props.push_back(_x[2]);
+//#endif
 
-    props.push_back(_W.rho());
-    props.push_back(0.);
-    props.push_back(0.);
-    props.push_back(_id);
-    props.push_back(_W.p());
-    props.push_back(0.);
-    props.push_back(0.);
-    props.push_back(0.);
-    props.push_back(0.);
-    props.push_back(_Q.e());
+//    props.push_back(_W.rho());
+//    props.push_back(0.);
+//    props.push_back(0.);
+//    props.push_back(_id);
+//    props.push_back(_W.p());
+//    props.push_back(0.);
+//    props.push_back(0.);
+//    props.push_back(0.);
+//    props.push_back(0.);
+//    props.push_back(_Q.e());
 
-    props.push_back(_v[0]);
-    props.push_back(_v[1]);
-#if ndim_ == 3
-    props.push_back(_v[2]);
-#endif
-    block.add_row(props);
-}
+//    props.push_back(_v[0]);
+//    props.push_back(_v[1]);
+//#if ndim_ == 3
+//    props.push_back(_v[2]);
+//#endif
+//    block.add_row(props);
+//}
 
 /**
  * @brief Set the maximal Mach number for this particle

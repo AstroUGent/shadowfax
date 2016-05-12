@@ -132,6 +132,8 @@ foreach(NDIM ${NDIMS})
     add_subdirectory(src)
 endforeach(NDIM)
 
+add_subdirectory(test)
+
 # copy the testsuite
 message(STATUS "Copying testsuite...")
 file(GLOB_RECURSE TESTSUITE_FILES

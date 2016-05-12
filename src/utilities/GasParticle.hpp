@@ -236,10 +236,10 @@ class GasParticle : public Particle {
 
     void set_paq(unsigned int index, double paq);
 
-    void save_props(Block& block);
-    void save_grid(Block& block);
+    //    void save_props(Block& block);
+    //    void save_grid(Block& block);
 
-    void save_props_gadget(Block& block);
+    //    void save_props_gadget(Block& block);
 
     /**
       * \brief Set the gravitational acceleration of this particle

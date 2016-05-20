@@ -463,6 +463,15 @@ double HLLCRiemannSolver::get_soundspeed(const StateVector& W) {
 }
 
 /**
+ * @brief Test the Riemann solver on 6 problems with known solutions
+ */
+void HLLCRiemannSolver::test() {
+
+  cout <<  "This test is empty ! Implement me !" << endl;
+
+}
+
+/**
  * @brief Convert primitive to conserved variables
  *
  * @warning Dummy!

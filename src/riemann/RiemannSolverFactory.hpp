@@ -29,6 +29,7 @@
 
 #include "ApproximateSolver.hpp"
 #include "ExactRiemannSolver.hpp"
+#include "HLLCRiemannSolver.hpp"
 #include <istream>
 
 #include "RestartFile.hpp"

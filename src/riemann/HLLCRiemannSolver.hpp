@@ -23,6 +23,8 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
+#ifndef HLLCRIEMANNSOLVER_HPP
+#define HLLCRIEMANNSOLVER_HPP
 
 #include "RiemannSolver.hpp"  // for RiemannSolver
 #include "StateVector.hpp"    // for StateVector
@@ -69,6 +71,8 @@ class HLLCRiemannSolver : public RiemannSolver {
 
     virtual double get_soundspeed(const StateVector& W);
 
+    void test();
+  
     virtual StateVector get_Q(double volume, const StateVector& W);
 
     virtual StateVector get_W(double volume, StateVector& Q,
@@ -84,3 +88,5 @@ class HLLCRiemannSolver : public RiemannSolver {
 
     virtual unsigned long get_neval();
 };
+
+#endif  // HLLCRIEMANNSOLVER_HPP

@@ -65,6 +65,7 @@ if(DO_SHADOWFAX)
     VorTess.cpp
     VorTessManager.cpp
 
+    CoolingLocation.hpp
     DelCont.hpp
     DelTess.hpp
     Error.hpp
@@ -100,6 +101,10 @@ if(DO_SHADOWFAX)
     VorTess.hpp
     VorTessManager.hpp
     )
+
+    #add the location of the cooling tables
+    configure_file(${PROJECT_SOURCE_DIR}/src/CoolingLocation.hpp.in
+                   ${PROJECT_BINARY_DIR}/inc/CoolingLocation.hpp)
 
     # create a new version file if one of the source files changes
     # this way, we will always have the correct compilation time in our

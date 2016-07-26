@@ -173,6 +173,39 @@ set(TESTNDIRREGTABLE_FILES
     gentabs2.py
     )
 
+#GasCooling test
+set(TESTGASCOOLING_SOURCES
+    testGasCooling.cpp
+
+    ../src/GasCooling.cpp
+    ../src/CoolingTable.cpp
+    ../src/NDIrregTable.cpp
+    ../src/NDTable.cpp
+    ../src/ParameterFile.cpp
+    ../src/utilities/GasParticle.cpp
+    ../src/utilities/Particle.cpp
+    ../src/utilities/Hilbert.cpp
+    ../src/utilities/HelperFunctions.cpp
+    ../src/MPIGlobal.cpp
+    ../src/Physics.cpp
+    ../src/VorGen.cpp
+    ../src/io/UnitSet.cpp
+    ../src/utilities/Timer.cpp
+    )
+
+set(TESTGASCOOLING_FILES
+    testGasCooling.sh
+    difcool.py
+    )
+
+
+add_unit_test_bash(NAME testGasCooling
+              SCRIPT testGasCooling.sh
+              SOURCES ${TESTGASCOOLING_SOURCES}
+              NDIM 3
+              FILES ${TESTGASCOOLING_FILES}
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

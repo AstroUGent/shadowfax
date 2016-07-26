@@ -214,6 +214,9 @@ void ParticleVector::sort() {
         }
     }
 
+    // save the local min and max keys before sorting on type
+    unsigned long loc_min = _particles[0]->get_key();
+    unsigned long loc_max = _particles.back()->get_key();
     // make sure the particles are ordered per type
     // particles of the same type should keep their relative ordering if we use
     // stable_sort
@@ -248,8 +251,6 @@ void ParticleVector::sort() {
 
     unsigned long maxkey = 1;
     maxkey <<= 61;
-    unsigned long loc_min = _particles[0]->get_key();
-    unsigned long loc_max = _particles.back()->get_key();
     vector<unsigned long> glo_min(MPIGlobal::size);
     vector<unsigned long> glo_max(MPIGlobal::size);
     MyMPI_Allgather(&loc_min, 1, MPI_UNSIGNED_LONG, &glo_min[0], 1,

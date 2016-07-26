@@ -41,6 +41,32 @@ macro(add_unit_test)
     set(TESTNAMES ${TESTNAMES} ${TEST_NAME})
 endmacro(add_unit_test)
 
+macro(add_unit_test_bash)
+    set(oneValueArgs NAME NDIM SCRIPT)
+    set(multiValueArgs SOURCES LIBS FILES)
+    find_program(BASH_PROGRAM bash)
+    cmake_parse_arguments(TEST "${options}" "${oneValueArgs}"
+                               "${multiValueArgs}" ${ARGN})
+    message(STATUS "generating " ${TEST_NAME})
+    add_executable(${TEST_NAME} EXCLUDE_FROM_ALL ${TEST_SOURCES})
+    set_target_properties(${TEST_NAME} PROPERTIES
+                          COMPILE_FLAGS -Dndim_=${TEST_NDIM})
+    set_target_properties(${TEST_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                          ${PROJECT_BINARY_DIR}/rundir/test)
+    target_link_libraries(${TEST_NAME} ${TEST_LIBS})
+    foreach(TEST_FILE ${TEST_FILES})
+        message(STATUS ${TEST_FILE})
+        configure_file(${TEST_FILE}
+                       ${PROJECT_BINARY_DIR}/rundir/test/${TEST_FILE}
+                       COPYONLY)
+    endforeach(TEST_FILE ${TEST_FILES})
+    add_test(NAME ${TEST_NAME}
+             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/rundir/test
+             COMMAND ${BASH_PROGRAM} ${TEST_SCRIPT})
+
+    set(TESTNAMES ${TESTNAMES} ${TEST_NAME})
+endmacro(add_unit_test_bash)
+
 # RiemannSolver test
 set(TESTRIEMANNSOLVER_SOURCES
     myAssert.hpp
@@ -110,6 +136,42 @@ add_unit_test(NAME testUnit
               SOURCES ${TESTUNIT_SOURCES}
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
+
+
+#NDTable test
+set(TESTNDTABLE_SOURCES
+    testNDTable.cpp
+    ../src/NDTable.cpp
+    ../src/MPIGlobal.cpp
+    ../src/io/UnitSet.cpp
+    ../src/utilities/Timer.cpp
+    )
+
+set(TESTNDTABLE_FILES
+    testND.sh
+    gentabs.py
+    )
+
+add_unit_test_bash(NAME testNDTable
+              SCRIPT testND.sh
+              SOURCES ${TESTNDTABLE_SOURCES}
+              NDIM 2
+              FILES ${TESTNDTABLE_FILES}
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
+
+#NDIrregTable test
+set(TESTNDIRREGTABLE_SOURCES
+    testNDIrregTable.cpp
+    ../src/NDIrregTable.cpp
+    ../src/MPIGlobal.cpp
+    ../src/io/UnitSet.cpp
+    ../src/utilities/Timer.cpp
+    )
+
+set(TESTNDIRREGTABLE_FILES
+    testNDIrreg.sh
+    gentabs2.py
+    )
 
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}

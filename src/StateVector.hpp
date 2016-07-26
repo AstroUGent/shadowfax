@@ -28,9 +28,16 @@
 
 #define GAMMA 1.66667
 
+#include "MPIMethods.hpp"  // for MyMPI_Pack, MyMPI_Unpack
 #include "Vec.hpp"
 // for std::max and std::min
 #include <algorithm>
+
+// number of advected quantities
+#define NUM_PAQ 3
+// names for advected quantities used in snapshot and IC files
+#define PAQ_NAMES \
+    { "Dye", "Fe", "Mg" }
 
 #if ndim_ == 3
 /**
@@ -45,7 +52,7 @@
 class StateVector {
   protected:
     /**
-     * \brief Contents of the state vector
+     * @brief Contents of the state vector
      *
      * We use a union with an array to be able to index the elements.
      *
@@ -57,45 +64,92 @@ class StateVector {
      * they use the same memory!
      */
     union {
-        /*! \brief Auxiliary array to help indexing the contents of this
+        /*! @brief Auxiliary array to help indexing the contents of this
          *  vector */
         double _c[5];
-        /*! \brief Primitive variables */
+        /*! @brief Primitive variables */
         struct {
-            /*! \brief Density */
+            /*! @brief Density */
             double _rho;
-            /*! \brief x-component of the velocity */
+            /*! @brief x-component of the velocity */
             double _vx;
-            /*! \brief y-component of the velocity */
+            /*! @brief y-component of the velocity */
             double _vy;
-            /*! \brief z-component of the velocity */
+            /*! @brief z-component of the velocity */
             double _vz;
-            /*! \brief Pressure */
+            /*! @brief Pressure */
             double _p;
         };
-        /*! \brief Conserved variables */
+        /*! @brief Conserved variables */
         struct {
-            /*! \brief Mass */
+            /*! @brief Mass */
             double _m;
-            /*! \brief x-component of the momentum */
+            /*! @brief x-component of the momentum */
             double _px;
-            /*! \brief y-component of the momentum */
+            /*! @brief y-component of the momentum */
             double _py;
-            /*! \brief z-component of the momentum */
+            /*! @brief z-component of the momentum */
             double _pz;
-            /*! \brief Energy */
+            /*! @brief Energy */
             double _e;
         };
     };
 
-    /*! \brief Passively Advected Quantity that is advected with the flow */
+    /*! @brief Entropy that is advected with the flow and used as alternative
+     * for the total energy */
     double _paq;
+
+    /*! @brief List with extra advected quantities */
+    union {
+        /*! @brief Auxiliary array to help indexing the contents of this
+         *  vector */
+        double _a[NUM_PAQ];
+        /*! @brief Common names for advected quantities */
+        struct {
+            /*! @brief Dye for the Kelvin-Helmholtz test */
+            double _dye;
+            /*! @brief Iron metallicity */
+            double _Fe;
+            /*! @brief Magnesium metallicity */
+            double _Mg;
+        };
+    };
 
   public:
     /**
+     * @brief MPI constructor
+     *
+     * @param buffer MPI buffer to read from
+     * @param bufsize Buffer size
+     * @param position Current position in the buffer (is updated)
+     */
+    inline StateVector(void* buffer, int bufsize, int* position) {
+        MyMPI_Unpack(buffer, bufsize, position, _c, 5, MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_paq, 1, MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, _a, NUM_PAQ, MPI_DOUBLE);
+    }
+
+    /**
+     * @brief Dump data to the given MPI buffer for communication
+     *
+     * @param buffer MPI buffer to write to
+     * @param bufsize Buffer size
+     * @param position Current position in the buffer (is updated)
+     */
+    inline void pack_data(void* buffer, int bufsize, int* position) {
+        MyMPI_Pack(_c, 5, MPI_DOUBLE, buffer, bufsize, position);
+        MyMPI_Pack(&_paq, 1, MPI_DOUBLE, buffer, bufsize, position);
+        MyMPI_Pack(_a, NUM_PAQ, MPI_DOUBLE, buffer, bufsize, position);
+    }
+
+    /**
      * @brief Empty constructor
      */
-    inline StateVector() : _rho(0), _vx(0), _vy(0), _vz(0), _p(0), _paq(0) {}
+    inline StateVector() : _rho(0), _vx(0), _vy(0), _vz(0), _p(0), _paq(0) {
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = 0.;
+        }
+    }
 
     /**
      * @brief Single value constructor
@@ -106,7 +160,11 @@ class StateVector {
      */
     inline StateVector(double singleVal)
             : _rho(singleVal), _vx(singleVal), _vy(singleVal), _vz(singleVal),
-              _p(singleVal), _paq(singleVal) {}
+              _p(singleVal), _paq(singleVal) {
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = singleVal;
+        }
+    }
 
     /**
      * @brief Constructor
@@ -118,7 +176,11 @@ class StateVector {
      * @param p Pressure/energy
      */
     inline StateVector(double rho, double vx, double vy, double vz, double p)
-            : _rho(rho), _vx(vx), _vy(vy), _vz(vz), _p(p), _paq(0) {}
+            : _rho(rho), _vx(vx), _vy(vy), _vz(vz), _p(p), _paq(0) {
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = 0.;
+        }
+    }
 
     /**
      * @brief Set the elements of the state vector to the given values
@@ -237,6 +299,33 @@ class StateVector {
     }
 
     /**
+     * @brief Set the dye for the Kelvin-Helmholtz test
+     *
+     * @param dye Dye concentration
+     */
+    inline void set_dye(double dye) {
+        _dye = dye;
+    }
+
+    /**
+     * @brief Set the iron metallicity
+     *
+     * @param Fe Iron metallicity
+     */
+    inline void set_Fe(double Fe) {
+        _Fe = Fe;
+    }
+
+    /**
+     * @brief Set the magnesium metallicity
+     *
+     * @param Mg Magnesium metallicity
+     */
+    inline void set_Mg(double Mg) {
+        _Mg = Mg;
+    }
+
+    /**
      * @brief Get the density
      *
      * @return Density
@@ -336,6 +425,53 @@ class StateVector {
     }
 
     /**
+     * @brief Get the dye for the Kelvin-Helmholtz test
+     *
+     * @return Dye concentration
+     */
+    inline double dye() const {
+        return _dye;
+    }
+
+    /**
+     * @brief Get the iron metallicity
+     *
+     * @return Iron metallicity
+     */
+    inline double Fe() const {
+        return _Fe;
+    }
+
+    /**
+     * @brief Get the magnesium metallicity
+     *
+     * @return Magnesium metallicity
+     */
+    inline double Mg() const {
+        return _Mg;
+    }
+
+    /**
+     * @brief Get the advected quantity with the given index
+     *
+     * @param i Index in the range [0, NUM_PAQ[
+     * @return Corresponding advected quantity
+     */
+    inline double paq(unsigned int i) const {
+        return _a[i];
+    }
+
+    /**
+     * @brief Access the advected quantity with the given index
+     *
+     * @param i Index in the range [0, NUM_PAQ[
+     * @return Corresponding advected quantity
+     */
+    inline double& paq(unsigned int i) {
+        return _a[i];
+    }
+
+    /**
      * @brief Add another state vector to this one
      *
      * @param v StateVector to add
@@ -348,6 +484,9 @@ class StateVector {
         _pz += v._pz;
         _e += v._e;
         _paq += v._paq;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] += v._a[i];
+        }
         return *this;
     }
 
@@ -364,6 +503,9 @@ class StateVector {
         _pz -= v._pz;
         _e -= v._e;
         _paq -= v._paq;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] -= v._a[i];
+        }
         return *this;
     }
 
@@ -407,6 +549,9 @@ class StateVector {
         _pz *= s;
         _e *= s;
         _paq *= s;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] *= s;
+        }
         return *this;
     }
 
@@ -423,6 +568,9 @@ class StateVector {
         _pz /= s;
         _e /= s;
         _paq /= s;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] /= s;
+        }
         return *this;
     }
 
@@ -440,6 +588,9 @@ class StateVector {
         _pz *= v._pz;
         _e *= v._e;
         _paq *= v._paq;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] *= v._a[i];
+        }
         return *this;
     }
 
@@ -484,6 +635,13 @@ class StateVector {
         } else {
             _paq = 1;
         }
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            if(v._a[i]) {
+                _a[i] /= v._a[i];
+            } else {
+                _a[i] = 1.;
+            }
+        }
         return *this;
     }
 
@@ -501,6 +659,9 @@ class StateVector {
         _pz = std::max(_pz, v._pz);
         _e = std::max(_e, v._e);
         _paq = std::max(_paq, v._paq);
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = std::max(_a[i], v._a[i]);
+        }
         return *this;
     }
 
@@ -518,6 +679,9 @@ class StateVector {
         _pz = std::min(_pz, v._pz);
         _e = std::min(_e, v._e);
         _paq = std::min(_paq, v._paq);
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = std::min(_a[i], v._a[i]);
+        }
         return *this;
     }
 
@@ -531,6 +695,9 @@ class StateVector {
         _vz = 0;
         _p = 0;
         _paq = 0;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = 0.;
+        }
     }
 
     /**
@@ -566,7 +733,7 @@ class StateVector {
 class StateVector {
   protected:
     /**
-     * \brief Contents of the state vector
+     * @brief Contents of the state vector
      *
      * We use a union with an array to be able to index the elements.
      *
@@ -578,41 +745,88 @@ class StateVector {
      * they use the same memory!
      */
     union {
-        /*! \brief Auxiliary array to help indexing the contents of this
+        /*! @brief Auxiliary array to help indexing the contents of this
          *  vector */
         double _c[4];
-        /*! \brief Primitive variables */
+        /*! @brief Primitive variables */
         struct {
-            /*! \brief Density */
+            /*! @brief Density */
             double _rho;
-            /*! \brief x-component of the velocity */
+            /*! @brief x-component of the velocity */
             double _vx;
-            /*! \brief y-component of the velocity */
+            /*! @brief y-component of the velocity */
             double _vy;
-            /*! \brief Pressure */
+            /*! @brief Pressure */
             double _p;
         };
-        /*! \brief Conserved variables */
+        /*! @brief Conserved variables */
         struct {
-            /*! \brief Mass */
+            /*! @brief Mass */
             double _m;
-            /*! \brief x-component of the momentum */
+            /*! @brief x-component of the momentum */
             double _px;
-            /*! \brief y-component of the momentum */
+            /*! @brief y-component of the momentum */
             double _py;
-            /*! \brief Energy */
+            /*! @brief Energy */
             double _e;
         };
     };
 
-    /*! \brief Passively Advected Quantity that is advected with the flow */
+    /*! @brief Entropy that is advected with the flow and used as alternative
+     * for the total energy */
     double _paq;
+
+    /*! @brief List with extra advected quantities */
+    union {
+        /*! @brief Auxiliary array to help indexing the contents of this
+         *  vector */
+        double _a[NUM_PAQ];
+        /*! @brief Common names for advected quantities */
+        struct {
+            /*! @brief Dye for the Kelvin-Helmholtz test */
+            double _dye;
+            /*! @brief Iron metallicity */
+            double _Fe;
+            /*! @brief Iron metallicity */
+            double _Mg;
+        };
+    };
 
   public:
     /**
+     * @brief MPI constructor
+     *
+     * @param buffer MPI buffer to read from
+     * @param bufsize Buffer size
+     * @param position Current position in the buffer (is updated)
+     */
+    inline StateVector(void* buffer, int bufsize, int* position) {
+        MyMPI_Unpack(buffer, bufsize, position, _c, 5, MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_paq, 1, MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, _a, NUM_PAQ, MPI_DOUBLE);
+    }
+
+    /**
+     * @brief Dump data to the given MPI buffer for communication
+     *
+     * @param buffer MPI buffer to write to
+     * @param bufsize Buffer size
+     * @param position Current position in the buffer (is updated)
+     */
+    inline void pack_data(void* buffer, int bufsize, int* position) {
+        MyMPI_Pack(_c, 5, MPI_DOUBLE, buffer, bufsize, position);
+        MyMPI_Pack(&_paq, 1, MPI_DOUBLE, buffer, bufsize, position);
+        MyMPI_Pack(_a, NUM_PAQ, MPI_DOUBLE, buffer, bufsize, position);
+    }
+
+    /**
      * @brief Empty constructor
      */
-    inline StateVector() : _rho(0), _vx(0), _vy(0), _p(0), _paq(0) {}
+    inline StateVector() : _rho(0), _vx(0), _vy(0), _p(0), _paq(0) {
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = 0.;
+        }
+    }
 
     /**
      * @brief Single value constructor
@@ -623,7 +837,11 @@ class StateVector {
      */
     inline StateVector(double singleVal)
             : _rho(singleVal), _vx(singleVal), _vy(singleVal), _p(singleVal),
-              _paq(singleVal) {}
+              _paq(singleVal) {
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = singleVal;
+        }
+    }
 
     /**
      * @brief Constructor
@@ -634,7 +852,11 @@ class StateVector {
      * @param p Pressure/energy
      */
     inline StateVector(double rho, double vx, double vy, double p)
-            : _rho(rho), _vx(vx), _vy(vy), _p(p), _paq(0) {}
+            : _rho(rho), _vx(vx), _vy(vy), _p(p), _paq(0) {
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = 0.;
+        }
+    }
 
     /**
      * @brief Set the elements of the state vector to the given values
@@ -733,6 +955,33 @@ class StateVector {
     }
 
     /**
+     * @brief Set the dye for the Kelvin-Helmholtz test
+     *
+     * @param dye Dye concentration
+     */
+    inline void set_dye(double dye) {
+        _dye = dye;
+    }
+
+    /**
+     * @brief Set the iron metallicity
+     *
+     * @param Fe Iron metallicity
+     */
+    inline void set_Fe(double Fe) {
+        _Fe = Fe;
+    }
+
+    /**
+     * @brief Set the magnesium metallicity
+     *
+     * @param Mg Magnesium metallicity
+     */
+    inline void set_Mg(double Mg) {
+        _Mg = Mg;
+    }
+
+    /**
      * @brief Get the density
      *
      * @return Density
@@ -814,6 +1063,53 @@ class StateVector {
     }
 
     /**
+     * @brief Get the dye for the Kelvin-Helmholtz test
+     *
+     * @return Dye concentration
+     */
+    inline double dye() const {
+        return _dye;
+    }
+
+    /**
+     * @brief Get the iron metallicity
+     *
+     * @return Iron metallicity
+     */
+    inline double Fe() const {
+        return _Fe;
+    }
+
+    /**
+     * @brief Get the magnesium metallicity
+     *
+     * @return Magnesium metallicity
+     */
+    inline double Mg() const {
+        return _Mg;
+    }
+
+    /**
+     * @brief Get the advected quantity with the given index
+     *
+     * @param i Index in the range [0, NUM_PAQ[
+     * @return Corresponding advected quantity
+     */
+    inline double paq(unsigned int i) const {
+        return _a[i];
+    }
+
+    /**
+     * @brief Access the advected quantity with the given index
+     *
+     * @param i Index in the range [0, NUM_PAQ[
+     * @return Corresponding advected quantity
+     */
+    inline double& paq(unsigned int i) {
+        return _a[i];
+    }
+
+    /**
      * @brief Add another state vector to this one
      *
      * @param v StateVector to add
@@ -825,6 +1121,9 @@ class StateVector {
         _py += v._py;
         _e += v._e;
         _paq += v._paq;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] += v._a[i];
+        }
         return *this;
     }
 
@@ -840,6 +1139,9 @@ class StateVector {
         _py -= v._py;
         _e -= v._e;
         _paq -= v._paq;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] -= v._a[i];
+        }
         return *this;
     }
 
@@ -880,6 +1182,9 @@ class StateVector {
         _py *= s;
         _e *= s;
         _paq *= s;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] *= s;
+        }
         return *this;
     }
 
@@ -895,6 +1200,9 @@ class StateVector {
         _py /= s;
         _e /= s;
         _paq /= s;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] /= s;
+        }
         return *this;
     }
 
@@ -911,6 +1219,9 @@ class StateVector {
         _py *= v._py;
         _e *= v._e;
         _paq *= v._paq;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] *= v._a[i];
+        }
         return *this;
     }
 
@@ -950,6 +1261,13 @@ class StateVector {
         } else {
             _paq = 1;
         }
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            if(v._a[i]) {
+                _a[i] /= v._a[i];
+            } else {
+                _a[i] = 1.;
+            }
+        }
         return *this;
     }
 
@@ -966,6 +1284,9 @@ class StateVector {
         _py = std::max(_py, v._py);
         _e = std::max(_e, v._e);
         _paq = std::max(_paq, v._paq);
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = std::max(_a[i], v._a[i]);
+        }
         return *this;
     }
 
@@ -982,6 +1303,9 @@ class StateVector {
         _py = std::min(_py, v._py);
         _e = std::min(_e, v._e);
         _paq = std::min(_paq, v._paq);
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = std::min(_a[i], v._a[i]);
+        }
         return *this;
     }
 
@@ -994,6 +1318,9 @@ class StateVector {
         _vy = 0;
         _p = 0;
         _paq = 0;
+        for(unsigned int i = 0; i < NUM_PAQ; i++) {
+            _a[i] = 0.;
+        }
     }
 
     /**

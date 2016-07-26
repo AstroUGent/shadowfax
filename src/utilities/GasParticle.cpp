@@ -735,15 +735,16 @@ GasParticle::GasParticle(void* buffer, int bufsize, int* position)
         : Particle(buffer, bufsize, position) {
     MyMPI_Unpack(buffer, bufsize, position, &_a_grav_old[0], ndim_, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_csnd, 1, MPI_DOUBLE);
-    MyMPI_Unpack(buffer, bufsize, position, &_old_Q[0], ndim_ + 3, MPI_DOUBLE);
+    _old_Q = StateVector(buffer, bufsize, position);
     MyMPI_Unpack(buffer, bufsize, position, &_h, 1, MPI_DOUBLE);
-    MyMPI_Unpack(buffer, bufsize, position, &_W[0], ndim_ + 3, MPI_DOUBLE);
-    MyMPI_Unpack(buffer, bufsize, position, &_Q[0], ndim_ + 3, MPI_DOUBLE);
-    MyMPI_Unpack(buffer, bufsize, position, &_dQ[0], ndim_ + 3, MPI_DOUBLE);
+    _W = StateVector(buffer, bufsize, position);
+    _Q = StateVector(buffer, bufsize, position);
+    _dQ = StateVector(buffer, bufsize, position);
     MyMPI_Unpack(buffer, bufsize, position, &_delta_E_grav[0], ndim_,
                  MPI_DOUBLE);
-    MyMPI_Unpack(buffer, bufsize, position, &_gradientvecs[0],
-                 ndim_ * (ndim_ + 3), MPI_DOUBLE);
+    for(unsigned int i = 0; i < ndim_; i++) {
+        _gradientvecs[i] = StateVector(buffer, bufsize, position);
+    }
     MyMPI_Unpack(buffer, bufsize, position, &_max_radius, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_centroid[0], ndim_, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_total_area, 1, MPI_DOUBLE);
@@ -770,14 +771,15 @@ void GasParticle::pack_data(void* buffer, int bufsize, int* position) {
     Particle::pack_data(buffer, bufsize, position);
     MyMPI_Pack(&_a_grav_old[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_csnd, 1, MPI_DOUBLE, buffer, bufsize, position);
-    MyMPI_Pack(&_old_Q[0], ndim_ + 3, MPI_DOUBLE, buffer, bufsize, position);
+    _old_Q.pack_data(buffer, bufsize, position);
     MyMPI_Pack(&_h, 1, MPI_DOUBLE, buffer, bufsize, position);
-    MyMPI_Pack(&_W[0], ndim_ + 3, MPI_DOUBLE, buffer, bufsize, position);
-    MyMPI_Pack(&_Q[0], ndim_ + 3, MPI_DOUBLE, buffer, bufsize, position);
-    MyMPI_Pack(&_dQ[0], ndim_ + 3, MPI_DOUBLE, buffer, bufsize, position);
+    _W.pack_data(buffer, bufsize, position);
+    _Q.pack_data(buffer, bufsize, position);
+    _dQ.pack_data(buffer, bufsize, position);
     MyMPI_Pack(&_delta_E_grav[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
-    MyMPI_Pack(&_gradientvecs[0], ndim_ * (ndim_ + 3), MPI_DOUBLE, buffer,
-               bufsize, position);
+    for(unsigned int i = 0; i < ndim_; i++) {
+        _gradientvecs[i].pack_data(buffer, bufsize, position);
+    }
     MyMPI_Pack(&_max_radius, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_centroid[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_total_area, 1, MPI_DOUBLE, buffer, bufsize, position);

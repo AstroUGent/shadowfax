@@ -1649,8 +1649,7 @@ void DelTess::update_Ws() {
             StateVector W =
                     _exports[(MPIGlobal::rank + 1 + i) % MPIGlobal::size]
                             [si]->get_Wvec();
-            MyMPI_Pack(&W[0], ndim_ + 2, MPI_DOUBLE,
-                       &MPIGlobal::sendbuffer[buffers[i]], bufsize, &send_pos);
+            W.pack_data(&MPIGlobal::sendbuffer[buffers[i]], bufsize, &send_pos);
         }
         allflag[i] = (sendsizes[i] <= maxsize);
         // if allflagsum equals MPIGlobal::size-1, all data has been sent
@@ -1679,9 +1678,8 @@ void DelTess::update_Ws() {
                         StateVector W = _exports[(MPIGlobal::rank + 1 + j) %
                                                  MPIGlobal::size]
                                                 [si]->get_Wvec();
-                        MyMPI_Pack(&W[0], ndim_ + 2, MPI_DOUBLE,
-                                   &MPIGlobal::sendbuffer[buffers[j]], bufsize,
-                                   &send_pos);
+                        W.pack_data(&MPIGlobal::sendbuffer[buffers[j]], bufsize,
+                                    &send_pos);
                     }
                     allflag[j] = (sendsizes[j] <= (numsend[j] + 1) * maxsize);
                     allflagsum += allflag[j];
@@ -1724,10 +1722,8 @@ void DelTess::update_Ws() {
             recv_pos = 0;
             unsigned int j = numreceived[freebuffer];
             while(recv_pos < nelements - 4) {
-                StateVector W;
-                MyMPI_Unpack(&MPIGlobal::recvbuffer[buffers[freebuffer]],
-                             nelements, &recv_pos, &W[0], ndim_ + 2,
-                             MPI_DOUBLE);
+                StateVector W(&MPIGlobal::recvbuffer[buffers[freebuffer]],
+                              nelements, &recv_pos);
                 _ghosts[index][j]->set_W(W);
                 j++;
             }
@@ -1755,9 +1751,8 @@ void DelTess::update_Ws() {
                         StateVector W = _exports[(MPIGlobal::rank + 1 + j) %
                                                  MPIGlobal::size]
                                                 [si]->get_Wvec();
-                        MyMPI_Pack(&W[0], ndim_ + 2, MPI_DOUBLE,
-                                   &MPIGlobal::sendbuffer[buffers[j]], bufsize,
-                                   &send_pos);
+                        W.pack_data(&MPIGlobal::sendbuffer[buffers[j]], bufsize,
+                                    &send_pos);
                     }
                     allflag[j] = (sendsizes[j] <= (numsend[j] + 1) * maxsize);
                     allflagsum += allflag[j];
@@ -1833,8 +1828,10 @@ void DelTess::update_gradients() {
                                [si]->get_vorgen()
                                        ->get_particle()
                                        ->get_total_area();
-            MyMPI_Pack(&gradients[0][0], ndim_ * (ndim_ + 2), MPI_DOUBLE,
-                       &MPIGlobal::sendbuffer[buffers[i]], bufsize, &send_pos);
+            for(unsigned int j = 0; j < ndim_; j++) {
+                gradients[j].pack_data(&MPIGlobal::sendbuffer[buffers[i]],
+                                       bufsize, &send_pos);
+            }
             MyMPI_Pack(&v[0], ndim_, MPI_DOUBLE,
                        &MPIGlobal::sendbuffer[buffers[i]], bufsize, &send_pos);
             MyMPI_Pack(&A, 1, MPI_DOUBLE, &MPIGlobal::sendbuffer[buffers[i]],
@@ -1879,10 +1876,11 @@ void DelTess::update_gradients() {
                                            [si]->get_vorgen()
                                                    ->get_particle()
                                                    ->get_total_area();
-                        MyMPI_Pack(&gradients[0][0], ndim_ * (ndim_ + 2),
-                                   MPI_DOUBLE,
-                                   &MPIGlobal::sendbuffer[buffers[j]], bufsize,
-                                   &send_pos);
+                        for(unsigned int k = 0; k < ndim_; k++) {
+                            gradients[k].pack_data(
+                                    &MPIGlobal::sendbuffer[buffers[j]], bufsize,
+                                    &send_pos);
+                        }
                         MyMPI_Pack(&v[0], ndim_, MPI_DOUBLE,
                                    &MPIGlobal::sendbuffer[buffers[j]], bufsize,
                                    &send_pos);
@@ -1932,9 +1930,11 @@ void DelTess::update_gradients() {
             unsigned int j = numreceived[freebuffer];
             while(recv_pos < nelements - 4) {
                 StateVector gradients[ndim_];
-                MyMPI_Unpack(&MPIGlobal::recvbuffer[buffers[freebuffer]],
-                             nelements, &recv_pos, &gradients[0][0],
-                             ndim_ * (ndim_ + 2), MPI_DOUBLE);
+                for(unsigned int k = 0; k < ndim_; k++) {
+                    gradients[k] = StateVector(
+                            &MPIGlobal::recvbuffer[buffers[freebuffer]],
+                            nelements, &recv_pos);
+                }
                 _ghosts[index][j]->set_gradients(gradients);
                 Vec v;
                 MyMPI_Unpack(&MPIGlobal::recvbuffer[buffers[freebuffer]],
@@ -1987,10 +1987,11 @@ void DelTess::update_gradients() {
                                            [si]->get_vorgen()
                                                    ->get_particle()
                                                    ->get_total_area();
-                        MyMPI_Pack(&gradients[0][0], ndim_ * (ndim_ + 2),
-                                   MPI_DOUBLE,
-                                   &MPIGlobal::sendbuffer[buffers[j]], bufsize,
-                                   &send_pos);
+                        for(unsigned int k = 0; k < ndim_; k++) {
+                            gradients[k].pack_data(
+                                    &MPIGlobal::sendbuffer[buffers[j]], bufsize,
+                                    &send_pos);
+                        }
                         MyMPI_Pack(&v[0], ndim_, MPI_DOUBLE,
                                    &MPIGlobal::sendbuffer[buffers[j]], bufsize,
                                    &send_pos);

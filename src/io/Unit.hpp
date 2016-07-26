@@ -26,14 +26,11 @@
 #ifndef UNIT_HPP
 #define UNIT_HPP
 
-#include <istream>
-#include <ostream>
-#include <string>
-
-#include "RestartFile.hpp"
+#include "RestartFile.hpp"  // for RestartFile
+#include <string>           // for allocator, string, etc
 
 /**
-  * \brief Basic unit abstraction.
+  * @brief Basic unit abstraction.
   *
   * A unit is defined by a physical quantity, an arbitrary unit name and the
   * SI-value of that unit.
@@ -56,13 +53,13 @@
   */
 class Unit {
   protected:
-    /*! \brief Name of the Unit */
+    /*! @brief Name of the Unit */
     std::string _name;
 
-    /*! \brief Quantity of the Unit, expressed in basic SI quantities */
+    /*! @brief Quantity of the Unit, expressed in basic SI quantities */
     std::string _quantity;
 
-    /*! \brief SI value of the Unit in basic SI units for the quantity of this
+    /*! @brief SI value of the Unit in basic SI units for the quantity of this
      *  Unit */
     double _SI_value;
 
@@ -161,6 +158,116 @@ class Unit {
     }
 
     /**
+     * @brief Determine the new quantity after division of two quantities
+     *
+     * We need to split up the two quantities in their parts and distinguish
+     * between nominator and denumerator. We then reduce the resulting numbers
+     * until we are left with a minimal list of quantities in nominator and
+     * denumerator. This list is used to construct a new quantity.
+     *
+     * @param a Quantity in the nominator
+     * @param b Quantity in the denumerator
+     * @return Reduced quantity
+     */
+    inline std::string quantity_divide(std::string a, std::string b) {
+        std::string names[4] = {"1", "length", "mass", "time"};
+
+        unsigned int mul[4] = {0, 0, 0, 0};
+        unsigned int div[4] = {0, 0, 0, 0};
+        unsigned int pos = 0;
+        bool multiply = true;
+        while(pos < a.length()) {
+            unsigned int i = 0;
+            while(i < 4 && a.find(names[i], pos) > pos) {
+                i++;
+            }
+            if(i == 4) {
+                if(a.find("*", pos) == pos) {
+                    multiply = true;
+                } else {
+                    multiply = false;
+                }
+                pos += 1;
+            } else {
+                if(multiply) {
+                    mul[i]++;
+                } else {
+                    div[i]++;
+                }
+                pos += names[i].length();
+            }
+        }
+        // add quantities in the nominator of b to the denumerator list and
+        // vice versa
+        pos = 0;
+        multiply = true;
+        while(pos < b.length()) {
+            unsigned int i = 0;
+            while(i < 4 && b.find(names[i], pos) > pos) {
+                i++;
+            }
+            if(i == 4) {
+                if(b.find("*", pos) == pos) {
+                    multiply = true;
+                } else {
+                    multiply = false;
+                }
+                pos += 1;
+            } else {
+                if(multiply) {
+                    div[i]++;
+                } else {
+                    mul[i]++;
+                }
+                pos += names[i].length();
+            }
+        }
+
+        // reduce nominator and denumerator
+        unsigned int nummul = 0;
+        for(unsigned int i = 0; i < 4; i++) {
+            while(mul[i] && div[i]) {
+                mul[i]--;
+                div[i]--;
+            }
+            if(i) {
+                nummul += mul[i];
+            }
+        }
+
+        // make sure we always have a minimal nominator
+        if(!nummul) {
+            mul[0] = 1;
+        } else {
+            mul[0] = 0;
+        }
+        if(mul[0] > 1) {
+            mul[0] = 1;
+        }
+
+        // construct the new quantity
+        std::string quantity = "";
+        bool first = true;
+        for(unsigned int i = 0; i < 4; i++) {
+            for(unsigned int j = 0; j < mul[i]; j++) {
+                if(!first) {
+                    quantity += "*";
+                }
+                quantity += names[i];
+                first = false;
+            }
+        }
+        for(unsigned int i = 0; i < 4; i++) {
+            for(unsigned int j = 0; j < div[i]; j++) {
+                quantity += "/";
+                quantity += names[i];
+            }
+        }
+
+        return quantity;
+    }
+
+    /**
       * @brief Divide this Unit by another Unit
       *
       * The name and quantity are just put together with a backslash in between.
@@ -170,10 +277,119 @@ class Unit {
       * @returns Reference to this Unit
       */
     inline Unit& operator/=(Unit u) {
-        _quantity += "/" + u._quantity;
+        _quantity = quantity_divide(_quantity, u._quantity);
         _name += "/" + u._name;
         _SI_value /= u._SI_value;
         return *this;
+    }
+
+    /**
+     * @brief Determine the new quantity after multiplication of two quantities
+     *
+     * We need to split up the two quantities in their parts and distinguish
+     * between nominator and denumerator. We then reduce the resulting numbers
+     * until we are left with a minimal list of quantities in nominator and
+     * denumerator. This list is used to construct a new quantity.
+     *
+     * @param a First quantity
+     * @param b Second quantity
+     * @return Reduced quantity
+     */
+    inline std::string quantity_multiply(std::string a, std::string b) {
+        std::string names[4] = {"1", "length", "mass", "time"};
+
+        unsigned int mul[4] = {0, 0, 0, 0};
+        unsigned int div[4] = {0, 0, 0, 0};
+        unsigned int pos = 0;
+        bool multiply = true;
+        while(pos < a.length()) {
+            unsigned int i = 0;
+            while(i < 4 && a.find(names[i], pos) > pos) {
+                i++;
+            }
+            if(i == 4) {
+                if(a.find("*", pos) == pos) {
+                    multiply = true;
+                } else {
+                    multiply = false;
+                }
+                pos += 1;
+            } else {
+                if(multiply) {
+                    mul[i]++;
+                } else {
+                    div[i]++;
+                }
+                pos += names[i].length();
+            }
+        }
+        // add quantities in the nominator of b to the nominator list
+        pos = 0;
+        multiply = true;
+        while(pos < b.length()) {
+            unsigned int i = 0;
+            while(i < 4 && b.find(names[i], pos) > pos) {
+                i++;
+            }
+            if(i == 4) {
+                if(b.find("*", pos) == pos) {
+                    multiply = true;
+                } else {
+                    multiply = false;
+                }
+                pos += 1;
+            } else {
+                if(multiply) {
+                    mul[i]++;
+                } else {
+                    div[i]++;
+                }
+                pos += names[i].length();
+            }
+        }
+
+        // reduce nominator and denumerator
+        unsigned int nummul = 0;
+        for(unsigned int i = 0; i < 4; i++) {
+            while(mul[i] && div[i]) {
+                mul[i]--;
+                div[i]--;
+            }
+            if(i) {
+                nummul += mul[i];
+            }
+        }
+
+        // make sure we always have a minimal nominator
+        if(!nummul) {
+            mul[0] = 1;
+        } else {
+            mul[0] = 0;
+        }
+        if(mul[0] > 1) {
+            mul[0] = 1;
+        }
+
+        // construct the new quantity
+        std::string quantity = "";
+        bool first = true;
+        for(unsigned int i = 0; i < 4; i++) {
+            for(unsigned int j = 0; j < mul[i]; j++) {
+                if(!first) {
+                    quantity += "*";
+                }
+                quantity += names[i];
+                first = false;
+            }
+        }
+        for(unsigned int i = 0; i < 4; i++) {
+            for(unsigned int j = 0; j < div[i]; j++) {
+                quantity += "/";
+                quantity += names[i];
+            }
+        }
+
+        return quantity;
     }
 
     /**
@@ -186,7 +402,7 @@ class Unit {
       * @returns Reference to this Unit
       */
     inline Unit& operator*=(Unit u) {
-        _quantity += "*" + u._quantity;
+        _quantity = quantity_multiply(_quantity, u._quantity);
         _name += "*" + u._name;
         _SI_value *= u._SI_value;
         return *this;

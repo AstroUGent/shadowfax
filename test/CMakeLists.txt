@@ -99,6 +99,18 @@ add_unit_test(NAME testDelTess3d
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} ${HDF5_LIBRARIES}
                    utilities3d)
 
+# Unit test (for the Unit class)
+set(TESTUNIT_SOURCES
+    testUnit.cpp
+
+    ../src/io/Unit.hpp
+)
+
+add_unit_test(NAME testUnit
+              SOURCES ${TESTUNIT_SOURCES}
+              NDIM 2
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

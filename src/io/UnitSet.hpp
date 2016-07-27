@@ -26,7 +26,8 @@
 #ifndef UNITSET_HPP
 #define UNITSET_HPP
 
-#include "Unit.hpp"
+#include "Unit.hpp"  // for Unit
+#include <string>    // for string
 
 class RestartFile;
 
@@ -34,12 +35,12 @@ class RestartFile;
  * @brief Predefined UnitSet types
  */
 enum UnitType {
-    /*! \brief Default UnitSet: SI-units */
+    /*! @brief Default UnitSet: SI-units */
     UNITS_DEFAULT
 };
 
 /**
-  * \brief Collection of units which are mutually consistent
+  * @brief Collection of units which are mutually consistent
   *
   * In other words: if you divide e.g. the length unit associated with the set
   * by the time unit associated with the set, you arrive at the velocity unit
@@ -47,23 +48,26 @@ enum UnitType {
   */
 class UnitSet {
   private:
-    /*! \brief Length Unit associated with this UnitSet */
+    /*! @brief Length Unit associated with this UnitSet */
     Unit _unit_position;
 
-    /*! \brief Density Unit associated with this UnitSet */
+    /*! @brief Density Unit associated with this UnitSet */
     Unit _unit_density;
 
-    /*! \brief Velocity Unit associated with this UnitSet */
+    /*! @brief Velocity Unit associated with this UnitSet */
     Unit _unit_velocity;
 
-    /*! \brief Pressure Unit associated with this UnitSet */
+    /*! @brief Pressure Unit associated with this UnitSet */
     Unit _unit_pressure;
 
-    /*! \brief Time Unit associated with this UnitSet */
+    /*! @brief Time Unit associated with this UnitSet */
     Unit _unit_time;
 
-    /*! \brief Mass Unit associated with this UnitSet */
+    /*! @brief Mass Unit associated with this UnitSet */
     Unit _unit_mass;
+
+    /*! @brief Acceleration Unit associated with this UnitSet */
+    Unit _unit_acceleration;
 
   public:
     UnitSet(UnitType type = UNITS_DEFAULT);
@@ -77,6 +81,7 @@ class UnitSet {
     Unit get_pressure_unit();
     Unit get_time_unit();
     Unit get_mass_unit();
+    Unit get_acceleration_unit();
 
     Unit get_unit(std::string quantity);
 

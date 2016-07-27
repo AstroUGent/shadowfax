@@ -24,11 +24,10 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "UnitSet.hpp"
-#include <iostream>
 using namespace std;
 
 /**
-  * \brief Default constructor.
+  * @brief Default constructor.
   *
   * The idea would be to make a few predefined sets to make life easier,
   * but currently the only predefined set are the default SI units
@@ -43,10 +42,11 @@ UnitSet::UnitSet(UnitType type) {
     _unit_pressure = Unit("mass/length/time/time", "Pascal", 1.);
     _unit_time = Unit("time", "s", 1.);
     _unit_mass = Unit("mass", "kg", 1.);
+    _unit_acceleration = Unit("length/time/time", "m/s^2", 1.);
 }
 
 /**
-  * \brief Construct a UnitSet from a given length, mass and time Unit
+  * @brief Construct a UnitSet from a given length, mass and time Unit
   *
   * The other units are derived from these using multiplication and division.
   * As a result, all units are mutually consistent.
@@ -62,6 +62,7 @@ UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time) {
     _unit_pressure = unit_mass / unit_length / unit_time / unit_time;
     _unit_time = unit_time;
     _unit_mass = unit_mass;
+    _unit_acceleration = unit_length / unit_time / unit_time;
 }
 
 /**
@@ -119,6 +120,15 @@ Unit UnitSet::get_mass_unit() {
 }
 
 /**
+ * @brief Get the acceleration Unit
+ *
+ * @return The acceleration Unit
+ */
+Unit UnitSet::get_acceleration_unit() {
+    return _unit_acceleration;
+}
+
+/**
   * @brief Get the unit for the given quantity
   *
   * This function only works if the quantity is expressed with the basic
@@ -132,16 +142,17 @@ Unit UnitSet::get_mass_unit() {
   */
 Unit UnitSet::get_unit(string quantity) {
     unsigned int pos = 0;
-    string names[3] = {"length", "mass", "time"};
-    Unit units[3] = {_unit_position, _unit_mass, _unit_time};
+    string names[4] = {"1", "length", "mass", "time"};
+    Unit units[4] = {Unit("1", "unity", 1.), _unit_position, _unit_mass,
+                     _unit_time};
     Unit unit;
     bool multiply = true;
     while(pos < quantity.length()) {
         unsigned int i = 0;
-        while(i < 3 && quantity.find(names[i], pos) > pos) {
+        while(i < 4 && quantity.find(names[i], pos) > pos) {
             i++;
         }
-        if(i == 3) {
+        if(i == 4) {
             if(quantity.find("*", pos) == pos) {
                 multiply = true;
             } else {
@@ -176,6 +187,7 @@ void UnitSet::dump(RestartFile& rfile) {
     _unit_pressure.dump(rfile);
     _unit_time.dump(rfile);
     _unit_mass.dump(rfile);
+    _unit_acceleration.dump(rfile);
 }
 
 /**
@@ -186,4 +198,5 @@ void UnitSet::dump(RestartFile& rfile) {
  */
 UnitSet::UnitSet(RestartFile& rfile)
         : _unit_position(rfile), _unit_density(rfile), _unit_velocity(rfile),
-          _unit_pressure(rfile), _unit_time(rfile), _unit_mass(rfile) {}
+          _unit_pressure(rfile), _unit_time(rfile), _unit_mass(rfile),
+          _unit_acceleration(rfile) {}

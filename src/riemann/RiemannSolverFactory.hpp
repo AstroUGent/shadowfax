@@ -30,9 +30,14 @@
 #include "ApproximateSolver.hpp"
 #include "ExactRiemannSolver.hpp"
 #include "HLLCRiemannSolver.hpp"
+#include "ParameterFile.hpp"
+#include "RestartFile.hpp"
 #include <istream>
 
-#include "RestartFile.hpp"
+#define RIEMANNSOLVERFACTORY_DEFAULT_TYPE "Exact"
+#define RIEMANNSOLVERFACTORY_DEFAULT_GAMMA (5. / 3.)
+#define RIEMANNSOLVERFACTORY_DEFAULT_TOLERANCE 1.e-8
+#define RIEMANNSOLVERFACTORY_DEFAULT_CUTOFF -5.
 
 /**
  * @brief Factory to create and dump Solver instances to a RestartFile
@@ -111,6 +116,25 @@ class RiemannSolverFactory {
                   << std::endl;
         my_exit();
         return NULL;
+    }
+
+    /**
+     * @brief Generate a Riemann solver based on the given parameters
+     *
+     * @param parameters ParameterFile containing the desired parameter values
+     * @return A pointer to a RiemannSolver instance
+     */
+    static RiemannSolver* generate(ParameterFile* parameters) {
+        std::string name = parameters->get_parameter<std::string>(
+                "RiemannSolver.Type", RIEMANNSOLVERFACTORY_DEFAULT_TYPE);
+        double gamma = parameters->get_parameter<double>(
+                "Hydro.Gamma", RIEMANNSOLVERFACTORY_DEFAULT_GAMMA);
+        double tolerance = parameters->get_parameter<double>(
+                "RiemannSolver.Tolerance",
+                RIEMANNSOLVERFACTORY_DEFAULT_TOLERANCE);
+        double cutoff = parameters->get_parameter<double>(
+                "RiemannSolver.CutOff", RIEMANNSOLVERFACTORY_DEFAULT_CUTOFF);
+        return generate(name, gamma, tolerance, cutoff);
     }
 };
 

@@ -26,6 +26,7 @@
 #include "TimeLine.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
+#include "ParameterFile.hpp"
 #include "ProgramLog.hpp"
 #include "RestartFile.hpp"
 #include "SnapshotHandler.hpp"
@@ -109,6 +110,48 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
 
     LOGS("TimeLine created");
 }
+
+/**
+ * @brief ParameterFile constructor
+ *
+ * @param parameters ParameterFile containing the desired parameter values
+ * @param outputdir Output directory (already converted to absolute path)
+ * @param particlevector Reference to the ParticleVector holding all particles
+ * @param units Internal units
+ * @param output_units Output units
+ * @param periodic Flag indicating if the simulation box is periodic
+ * @param cosmology Cosmology used for comoving integration
+ */
+TimeLine::TimeLine(ParameterFile* parameters, std::string outputdir,
+                   ParticleVector& particlevector, UnitSet& units,
+                   UnitSet& output_units, bool periodic)
+        : TimeLine(parameters->get_parameter<double>("Time.MaxTime", -1000.),
+                   parameters->get_parameter<double>(
+                           "Snapshots.SnapTime",
+                           0.1 *
+                                   parameters->get_parameter<double>(
+                                           "Time.MaxTime", -1000.)),
+                   parameters->get_parameter<double>("RiemannSolver.CFL",
+                                                     TIMELINE_DEFAULT_CFL),
+                   parameters->get_parameter<double>("Gravity.Eta",
+                                                     TIMELINE_DEFAULT_GRAVETA),
+                   particlevector,
+                   parameters->get_parameter<string>("Snapshots.Type",
+                                                     TIMELINE_DEFAULT_SNAPTYPE),
+                   outputdir + string("/") +
+                           parameters->get_parameter<string>(
+                                   "Snapshots.BaseName",
+                                   TIMELINE_DEFAULT_BASENAME),
+                   units, output_units,
+                   parameters->check_parameter("Gravity.Gravity"), periodic,
+                   parameters->check_parameter("Time.TreeTime"),
+                   parameters->get_parameter<double>(
+                           "Time.MaxTimeStep", TIMELINE_DEFAULT_MAXTIMESTEP),
+                   parameters->get_parameter<double>(
+                           "Time.MinTimeStep", TIMELINE_DEFAULT_MINTIMESTEP),
+                   parameters->get_parameter<unsigned int>(
+                           "Snapshots.FirstSnap", TIMELINE_DEFAULT_LASTSNAP),
+                   parameters->check_parameter("Snapshots.PerNodeOutput")) {}
 
 /**
   * @brief Get the physical current time on the simulation timeline

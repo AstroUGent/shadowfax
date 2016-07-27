@@ -113,7 +113,9 @@ class ExactRiemannSolver : public RiemannSolver {
      *
      * @return "EXAC"
      */
-    virtual std::string tag() { return "EXAC"; }
+    virtual std::string tag() {
+        return "EXAC";
+    }
 
     StateVector solve(StateVector& WL, StateVector& WR, Vec& n, double& mach,
                       bool reflective = false);
@@ -129,7 +131,9 @@ class ExactRiemannSolver : public RiemannSolver {
      *
      * @return Adiabatic index of the fluid
      */
-    double get_gamma() { return _gamma; }
+    double get_gamma() {
+        return _gamma;
+    }
 
     double get_soundspeed(const StateVector& W);
 

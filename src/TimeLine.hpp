@@ -33,8 +33,19 @@
 #include <string>
 
 class ParticleVector;
+class ParameterFile;
 class UnitSet;
 class RestartFile;
+
+#define TIMELINE_DEFAULT_CFL 0.4
+#define TIMELINE_DEFAULT_GRAVETA 0.017857143
+#define TIMELINE_DEFAULT_SNAPTYPE "Gadget"
+#define TIMELINE_DEFAULT_BASENAME "snapshot"
+#define TIMELINE_DEFAULT_TREETIMEFLAG false
+#define TIMELINE_DEFAULT_MAXTIMESTEP 0.
+#define TIMELINE_DEFAULT_MINTIMESTEP 0.
+#define TIMELINE_DEFAULT_LASTSNAP 0
+#define TIMELINE_DEFAULT_PERNODEOUTPUTFLAG false
 
 /**
   * \brief Class governing the simulation timeline.
@@ -92,9 +103,15 @@ class TimeLine {
     TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
              ParticleVector& particlevector, std::string snaptype,
              std::string snapname, UnitSet& units, UnitSet& output_units,
-             bool gravity, bool periodic, bool treetime = false,
-             double max_timestep = 0., double min_timestep = 0.,
-             unsigned int lastsnap = 0, bool per_node_output = false);
+             bool gravity, bool periodic,
+             bool treetime = TIMELINE_DEFAULT_TREETIMEFLAG,
+             double max_timestep = TIMELINE_DEFAULT_MAXTIMESTEP,
+             double min_timestep = TIMELINE_DEFAULT_MINTIMESTEP,
+             unsigned int lastsnap = TIMELINE_DEFAULT_LASTSNAP,
+             bool per_node_output = TIMELINE_DEFAULT_PERNODEOUTPUTFLAG);
+    TimeLine(ParameterFile* parameters, std::string outputdir,
+             ParticleVector& particlevector, UnitSet& units,
+             UnitSet& output_units, bool periodic);
 
     /**
      * @brief Destructor

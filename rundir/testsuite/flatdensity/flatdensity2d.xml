@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<box>
+  <height>1.0e21</height>
+  <width>1.0e21</width>
+  <origin>
+    <x>0.5e21</x><y>0.5e21</y><z>0.5e21</z>
+  </origin>
+  <regions>
+    <region>
+      <height>1.0e21</height>
+      <width>1.0e21</width>
+      <exponent>10.0</exponent>
+      <origin>
+        <x>0.5e21</x><y>0.5e21</y><z>0.5e21</z>
+      </origin>
+      <hydro>
+        <rho>1e-20</rho><vx>0.</vx><vy>0.</vy><p>1e-11</p>
+      </hydro>
+    </region>
+  </regions>
+</box>

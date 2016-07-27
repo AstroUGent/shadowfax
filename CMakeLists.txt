@@ -21,7 +21,12 @@ project(shadowfax)
 
 # The version number.
 set(SHADOWFAX_VERSION_MAJOR 1)
-set(SHADOWFAX_VERSION_MINOR 1)
+set(SHADOWFAX_VERSION_MINOR 2)
+
+# Variables used throughout the build process
+set(COOLINGTABLE_LOCATION "${PROJECT_BINARY_DIR}/rundir/coolingtables/")
+set(COOLINGTABLE_URL
+    "http://users.ugent.be/~sdrijcke/CoolingHeatingTables.tar.gz")
 
 enable_testing()
 
@@ -35,6 +40,8 @@ add_definitions(-std=c++0x)
 
 set(CMAKE_CXX_FLAGS_PROFILE "-pg -g")
 set(CMAKE_C_FLAGS_PROFILE "-pg -g")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wignored-qualifiers -Werror")
 
 if(NO_SANITIZER)
     set(SANITIZER False)
@@ -154,13 +161,85 @@ foreach(TESTSUITE_FILE ${TESTSUITE_FILES})
 endforeach(TESTSUITE_FILE ${TESTSUITE_FILES})
 
 # doxygen
+macro(add_doc_debug)
+    set(oneValueArgs FOLDER EXTENSION)
+    cmake_parse_arguments(DOC_DEBUG "${options}" "${oneValueArgs}"
+                                    "${multiValueArgs}" ${ARGN})
+    file(GLOB DOC_SRCS "${DOC_DEBUG_FOLDER}/*.${DOC_DEBUG_EXTENSION}")
+    foreach(DOC_SRC ${DOC_SRCS})
+        get_filename_component(DOC_SRC_NAME_UNPARSED ${DOC_SRC} NAME_WE)
+        string(REGEX REPLACE "_" "__" DOC_SRC_NAME ${DOC_SRC_NAME_UNPARSED})
+        set(DOC_HTML_NAME "${DOC_SRC_NAME}_8${DOC_DEBUG_EXTENSION}.html")
+        set(DOC_OUTPUT_NAME ${PROJECT_BINARY_DIR}/doc/html/${DOC_HTML_NAME})
+        if(${DOC_DEBUG_EXTENSION} STREQUAL "cpp")
+            file(GLOB_RECURSE DOC_SRC_EXTRA
+                 "${DOC_DEBUG_FOLDER}/${DOC_SRC_NAME_UNPARSED}.hpp")
+        else(${DOC_DEBUG_EXTENSION} STREQUAL "cpp")
+            file(GLOB_RECURSE DOC_SRC_EXTRA
+                 "${DOC_DEBUG_FOLDER}/${DOC_SRC_NAME_UNPARSED}.cpp")
+        endif(${DOC_DEBUG_EXTENSION} STREQUAL "cpp")
+        set(DOC_SRC "${DOC_SRC};${DOC_SRC_EXTRA}")
+        set(DOC_FILTER
+            "${DOC_SRC_NAME_UNPARSED}.cpp ${DOC_SRC_NAME_UNPARSED}.hpp")
+        set(DOC_COMMAND "doxygen ${PROJECT_BINARY_DIR}/Doxyfile.debug")
+        add_custom_command(
+            OUTPUT ${DOC_OUTPUT_NAME}
+            COMMAND eval "DOXYGEN_INPUT_FILE=\"${DOC_FILTER}\" ${DOC_COMMAND}"
+            DEPENDS ${DOC_SRC}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            VERBATIM)
+        set(DOC_NAMES ${DOC_NAMES} ${DOC_OUTPUT_NAME})
+    endforeach(DOC_SRC ${DOC_SRCS})
+endmacro(add_doc_debug)
+
+macro(add_doc_debug_folder)
+    set(oneValueArgs FOLDER)
+    cmake_parse_arguments(DOC_DEBUG_F "${options}" "${oneValueArgs}"
+                                      "${multiValueArgs}" ${ARGN})
+    add_doc_debug(FOLDER ${DOC_DEBUG_F_FOLDER} EXTENSION "cpp")
+    add_doc_debug(FOLDER ${DOC_DEBUG_F_FOLDER} EXTENSION "hpp")
+endmacro(add_doc_debug_folder)
+
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in
                ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
-add_custom_target(doc
-${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
-WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
+add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/html/index.html
+                   COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+                   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                   COMMENT "Generating API documentation with Doxygen" VERBATIM)
+add_custom_target(doc DEPENDS ${PROJECT_BINARY_DIR}/doc/html/index.html)
+
+configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.debug.in
+               ${PROJECT_BINARY_DIR}/Doxyfile.debug @ONLY)
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/src")
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/src/exact_arithmetics")
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/src/fortune")
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/src/io")
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/src/python")
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/src/riemann")
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/src/utilities")
+add_doc_debug_folder(FOLDER "${PROJECT_SOURCE_DIR}/test")
+add_custom_target(doc_debug DEPENDS ${DOC_NAMES}
+                                    ${PROJECT_BINARY_DIR}/doc/html/index.html)
 endif(DOXYGEN_FOUND)
+
+if(EXISTS ${COOLINGTABLE_LOCATION}RadLoss_0.00_0.00_0.00_1.00e+00.rates)
+    message(STATUS "Cooling tables already present")
+else(EXISTS ${COOLINGTABLE_LOCATION}RadLoss_0.00_0.00_0.00_1.00e+00.rates)
+    message(STATUS "Downloading and unpacking coolingtables...")
+    file(DOWNLOAD ${COOLINGTABLE_URL} ${COOLINGTABLE_LOCATION}cool.tar.gz)
+    execute_process(
+    COMMAND ${CMAKE_COMMAND} -E tar xzf ${COOLINGTABLE_LOCATION}cool.tar.gz
+    WORKING_DIRECTORY ${COOLINGTABLE_LOCATION})
+    file(GLOB COOLINGTABLES ${COOLINGTABLE_LOCATION}RadLoss/*.rates)
+    file(COPY ${COOLINGTABLES} DESTINATION ${COOLINGTABLE_LOCATION})
+    file(REMOVE_RECURSE ${COOLINGTABLE_LOCATION}RadLoss)
+    file(REMOVE ${COOLINGTABLE_LOCATION}README)
+    file(REMOVE ${COOLINGTABLE_LOCATION}cool.tar.gz)
+    configure_file(${PROJECT_SOURCE_DIR}/rundir/coolingtables/filecopy.py
+                   ${COOLINGTABLE_LOCATION}filecopy.py COPYONLY)
+    find_program(PYTHON python)
+    execute_process(COMMAND ${PYTHON} ${COOLINGTABLE_LOCATION}filecopy.py
+                    WORKING_DIRECTORY ${COOLINGTABLE_LOCATION})
+endif(EXISTS ${COOLINGTABLE_LOCATION}RadLoss_0.00_0.00_0.00_1.00e+00.rates)

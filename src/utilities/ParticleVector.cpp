@@ -29,6 +29,7 @@
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
 #include "ParallelSorter.hpp"
+#include "ParameterFile.hpp"
 #include "Particle.hpp"
 #include "RestartFile.hpp"
 #include <fstream>
@@ -64,6 +65,27 @@ ParticleVector::ParticleVector(bool global_timestep, RectangularBox container,
     }
     _sizes[PARTTYPE_COUNTER] = 0;
 }
+
+/**
+ * @brief ParameterFile constructor
+ *
+ * @param parameters ParameterFile containing the desired parameter values
+ * @param container RectangularBox containing the particles
+ * @param periodic Flag indicating whether the box is periodic (true) or
+ * reflective (false)
+ * @param do_ewald Flag indicating if Ewald tables for periodic force
+ * corrections should be used
+ */
+ParticleVector::ParticleVector(ParameterFile* parameters,
+                               RectangularBox container, bool periodic,
+                               bool do_ewald)
+        : ParticleVector(
+                  parameters->check_parameter("Time.GlobalTimestep"), container,
+                  periodic, do_ewald,
+                  parameters->get_parameter<double>(
+                          "Tree.EwaldAlpha", PARTICLEVECTOR_DEFAULT_ALPHA),
+                  parameters->get_parameter<unsigned int>(
+                          "Tree.EwaldSize", PARTICLEVECTOR_DEFAULT_SIZE)) {}
 
 /**
  * @brief Destructor
@@ -425,3 +447,24 @@ ParticleVector::ParticleVector(RestartFile& rfile, RectangularBox& box,
         _particles[i] = new DMParticle(rfile);
     }
 }
+
+/**
+ * @brief ParameterFile restart constructor
+ *
+ * @param rfile RestartFile to read from
+ * @param parameters ParameterFile containing the desired parameter values
+ * @param box Reference to the simulation box
+ * @param periodic Flag indicating if the box is periodic (true) or reflective
+ * (false)
+ * @param do_ewald Flag indicating if precomputed Ewald tables for periodic
+ * force corrections should be loaded
+ */
+ParticleVector::ParticleVector(RestartFile& rfile, ParameterFile* parameters,
+                               RectangularBox& box, bool periodic,
+                               bool do_ewald)
+        : ParticleVector(
+                  rfile, box, periodic, do_ewald,
+                  parameters->get_parameter<double>(
+                          "Tree.EwaldAlpha", PARTICLEVECTOR_DEFAULT_ALPHA),
+                  parameters->get_parameter<unsigned int>(
+                          "Tree.EwaldSize", PARTICLEVECTOR_DEFAULT_SIZE)) {}

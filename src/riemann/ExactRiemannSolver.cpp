@@ -880,7 +880,9 @@ StateVector ExactRiemannSolver::get_flux(const Vec& v, unsigned int index,
  *
  * @return Number of Riemann solver evaluations
  */
-unsigned long ExactRiemannSolver::get_neval() { return _counterTotal; }
+unsigned long ExactRiemannSolver::get_neval() {
+    return _counterTotal;
+}
 
 /**
  * @brief Solve the Riemann problem and return fluxes instead of a half state

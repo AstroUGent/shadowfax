@@ -467,8 +467,7 @@ double HLLCRiemannSolver::get_soundspeed(const StateVector& W) {
  */
 void HLLCRiemannSolver::test() {
 
-  cout <<  "This test is empty ! Implement me !" << endl;
-
+    cout << "This test is empty ! Implement me !" << endl;
 }
 
 /**

@@ -64,6 +64,16 @@
 //#define VARIABLE_SOFTENING
 //#define ENTROPY
 
+#define SIMULATION_DEFAULT_OUTPUTDIR "."
+#define SIMULATION_DEFAULT_RESTARTTIME 3600.
+#define SIMULATION_DEFAULT_UNITS "SI"
+#define SIMULATION_DEFAULT_ICTYPE "Gadget"
+#define SIMULATION_DEFAULT_ICNAME "icfile.hdf5"
+#define SIMULATION_DEFAULT_MAXMEMORY "1 GB"
+#define SIMULATION_DEFAULT_SOFTENING 0.03
+#define SIMULATION_DEFAULT_VORONOITOLERANCE 1.e-9
+#define SIMULATION_DEFAULT_GRAVALPHA 0.005
+
 // for debug purposes
 #include <VorGen.hpp>
 using namespace std;
@@ -290,7 +300,7 @@ void Simulation::main_loop() {
     // since active particles are defined by the endtime being equal to 0,
     // which is no longer true after the time steps are calculated
     _gravitytimer->start();
-    if(_parameterfile->has_gravity()) {
+    if(_gravity) {
         LOGS("Start calculating gravitational potential");
         _particles->get_tree().walk_tree<PotentialWalker>(*_particles, true,
                                                           true, 0);
@@ -359,7 +369,7 @@ void Simulation::main_loop() {
                     }
 
                     _particles->gas(i)->set_velocity(v);
-                    if(_parameterfile->has_gravity()) {
+                    if(_gravity) {
                         _particles->gas(i)->apply_gravity(
                                 0.5 *
                                 _timeline->get_realtime(
@@ -401,11 +411,6 @@ void Simulation::main_loop() {
             _mpitimer->start();
             _voronoi->update_dQs();
             _mpitimer->stop();
-
-            // recalculate the voronoi mesh
-            cout << "setting up new mesh" << endl;
-            _voronoi->reset(&_particles->get_container(), _periodic,
-                            _parameterfile->get_voronoi_tolerance());
         }
         _hydrotimer->start();
         for(unsigned int i = _particles->gassize(); i--;) {
@@ -429,7 +434,7 @@ void Simulation::main_loop() {
             _voronoi->update_positions(_periodic);
         }
         _gravitytimer->start();
-        if(_parameterfile->has_gravity()) {
+        if(_gravity) {
             // half a kick and drift for the N-body particles
             for(unsigned int i = _particles->dmsize(); i--;) {
                 if(_particles->dm(i)->get_starttime() == currentTime) {
@@ -453,17 +458,24 @@ void Simulation::main_loop() {
         _particles->sort();
         unsigned int count = 1;
         if(_particles->gassize()) {
+            LOGS("Recalculating grid...");
+            // we need to do the reset after the sort, since we need the new
+            // number of particles on this process...
+            // recalculate the voronoi mesh
+            cout << "setting up new mesh" << endl;
+            _voronoi->reset(&_particles->get_container(), _periodic);
             count = _voronoi->update(currentTime);
             cout << count << " active particles\n" << endl;
             count = _particles->gassize() - count;
             unsigned int count_glob;
             MyMPI_Allreduce(&count, &count_glob, 1, MPI_INT, MPI_SUM);
             count = count_glob;
+            LOGS("Finished recalculating grid.");
         }
 
 #ifdef VARIABLE_SOFTENING
         _gravitytimer->start();
-        if(_parameterfile->has_gravity()) {
+        if(_gravity) {
             // we set the softening lenghts of the gas before we update the tree
             // values
             for(unsigned int i = _particles->gassize(); i--;) {
@@ -483,7 +495,7 @@ void Simulation::main_loop() {
         }
 
         _gravitytimer->start();
-        if(_parameterfile->has_gravity()) {
+        if(_gravity) {
             LOGS("Start calculating gravitational potential");
             _particles->get_tree().walk_tree<PotentialWalker>(
                     *_particles, true, true, currentTime);
@@ -503,7 +515,7 @@ void Simulation::main_loop() {
             LOGS("Finished calculating gravitational potential");
         }
 
-        if(_parameterfile->has_gravity()) {
+        if(_gravity) {
             // calculate the gravitational forces
             LOGS("Start relative treewalk");
             _particles->get_tree().walk_tree<GravityWalker>(*_particles, true,
@@ -512,7 +524,7 @@ void Simulation::main_loop() {
             for(unsigned int i = _particles->gassize(); i--;) {
                 if(_particles->gas(i)->get_endtime() == currentTime) {
                     _particles->gas(i)->set_old_acceleration(
-                            _parameterfile->get_grav_alpha() *
+                            _grav_alpha *
                             _particles->gas(i)
                                     ->get_gravitational_acceleration()
                                     .norm());
@@ -521,7 +533,7 @@ void Simulation::main_loop() {
             for(unsigned int i = _particles->dmsize(); i--;) {
                 if(_particles->dm(i)->get_endtime() == currentTime) {
                     _particles->dm(i)->set_old_acceleration(
-                            _parameterfile->get_grav_alpha() *
+                            _grav_alpha *
                             _particles->dm(i)
                                     ->get_gravitational_acceleration()
                                     .norm());
@@ -559,7 +571,7 @@ void Simulation::main_loop() {
             LOGS("Finished relative treewalk");
         }
 
-        if(_parameterfile->has_gravity()) {
+        if(_gravity) {
             // update conserved variables with gravitational terms
             for(unsigned int i = _particles->gassize(); i--;) {
                 if(_particles->gas(i)->get_endtime() == currentTime) {
@@ -717,12 +729,21 @@ void Simulation::dump(RestartFile& restartfile) {
 
     _totaltimer.stop();
     restartfile.write(_periodic);
+    restartfile.write(_gravity);
+    if(_gravity) {
+        restartfile.write(_grav_alpha);
+    }
+    restartfile.write(_outputdir);
+    restartfile.write(_restarttime);
 
     _parameterfile->dump(restartfile);
     _logfiles->dump(restartfile);
     RiemannSolverFactory::dump(restartfile, _solver);
     _simulation_units->dump(restartfile);
     _output_units->dump(restartfile);
+
+    _physics->dump(restartfile);
+
     _box->dump(restartfile);
     _particles->dump(restartfile);
     _timeline->dump(restartfile);
@@ -750,33 +771,42 @@ void Simulation::restart(string filename) {
     } else {
         cout << "Using reflective box\n" << endl;
     }
+    restartfile.read(_gravity);
+    if(_gravity) {
+        restartfile.read(_grav_alpha);
+    }
+    restartfile.read(_outputdir);
+    restartfile.read(_restarttime);
 
     _parameterfile = new ParameterFile(restartfile);
 
     // initialize logging (if enabled)
-    LOGINIT(_parameterfile->get_outputdir());
+    LOGINIT(_outputdir);
     LOGS("Parameterfile reconstructed, logfile opened");
 
     _logfiles = new LogFiles(restartfile);
     _solver = RiemannSolverFactory::load(restartfile);
     _simulation_units = new UnitSet(restartfile);
-    _physics =
-            new Physics(*_simulation_units, _parameterfile->has_real_physics());
+    _physics = new Physics(*_simulation_units, _parameterfile);
     LOGS("Simulation UnitSet restarted");
 
     _output_units = new UnitSet(restartfile);
     LOGS("Output UnitSet restarted");
 
+    _physics = new Physics(restartfile);
+
     _box = new RectangularBox(restartfile);
-    _particles = new ParticleVector(restartfile, *_box, _periodic,
-                                    _periodic && _parameterfile->has_gravity(),
-                                    _parameterfile->get_ewald_alpha(),
-                                    _parameterfile->get_ewald_size());
+    _particles = new ParticleVector(restartfile, _parameterfile, *_box,
+                                    _periodic, _periodic && _gravity);
     LOGS("ParticleVector restarted");
     _timeline = new TimeLine(restartfile, *_particles, *_simulation_units,
                              *_output_units);
+
+    unsigned int max_memory = HelperFunctions::machine_readable_bytes(
+            _parameterfile->get_parameter<string>(
+                    "Memory.MaximumSize", SIMULATION_DEFAULT_MAXMEMORY));
     initialize_MPI_buffer(_particles->gassize() + _particles->dmsize(),
-                          _parameterfile->get_max_memory());
+                          max_memory);
     // we only build a voronoi mesh if there is gas in the simulation
     // (obviously...)
     // we need to calculate a tree first, since we cannot read it in
@@ -803,13 +833,12 @@ void Simulation::check_for_restart(bool force_restart) {
     // check if it is time to write a restart file
     // only one process should decide whether or not we write a restart file
     // otherwise, we risk asynchronous restart file writes and a huge mess
-    int check = _restarttimer.interval() > _parameterfile->get_restarttime();
+    int check = _restarttimer.interval() > _restarttime;
     MyMPI_Bcast(&check, 1, MPI_INT, 0);
     if(check || force_restart) {
         cout << "Writing restart file" << endl;
-        RestartFile rfile(
-                _parameterfile->get_outputdir(),
-                _timeline->get_realtime(_timeline->get_integertime()));
+        RestartFile rfile(_outputdir, _timeline->get_realtime(
+                                              _timeline->get_integertime()));
         dump(rfile);
 
         // restart the timer
@@ -825,47 +854,48 @@ void Simulation::check_for_restart(bool force_restart) {
 void Simulation::initialize(string filename) {
     _parameterfile = new ParameterFile(filename);
 
+    string outputdir = _parameterfile->get_parameter<string>(
+            "Snapshots.OutputDir", SIMULATION_DEFAULT_OUTPUTDIR);
+    _outputdir = HelperFunctions::get_absolute_path(outputdir);
+    _restarttime = _parameterfile->get_parameter<double>(
+            "Code.RestartTime", SIMULATION_DEFAULT_RESTARTTIME);
+
     // initialize global program log (if logging is enabled)
-    LOGINIT(_parameterfile->get_outputdir());
+    LOGINIT(_outputdir);
     LOGS("Parameterfile created, programlog opened");
 
-    _logfiles = new LogFiles(_parameterfile->get_outputdir());
-    _solver = RiemannSolverFactory::generate(
-            _parameterfile->get_solver_type(), _parameterfile->get_gamma(),
-            _parameterfile->get_tolerance(), _parameterfile->get_cutoff());
-    _simulation_units =
-            UnitSetGenerator::generate(_parameterfile->get_units_internal());
-    _physics =
-            new Physics(*_simulation_units, _parameterfile->has_real_physics());
+    _logfiles = new LogFiles(_outputdir);
+    _solver = RiemannSolverFactory::generate(_parameterfile);
+    string internal_units = _parameterfile->get_parameter<string>(
+            "Units.InternalUnits", SIMULATION_DEFAULT_UNITS);
+    _simulation_units = UnitSetGenerator::generate(internal_units);
     LOGS("Simulation UnitSet created");
-    _output_units =
-            UnitSetGenerator::generate(_parameterfile->get_units_output());
+    _physics = new Physics(*_simulation_units, _parameterfile);
+    string output_units = _parameterfile->get_parameter<string>(
+            "Units.OutputUnits", SIMULATION_DEFAULT_UNITS);
+    _output_units = UnitSetGenerator::generate(output_units);
     LOGS("Output UnitSet created");
     _box = new RectangularBox();
-    _particles = new ParticleVector(_parameterfile->get_global_timestep(),
-                                    *_box, _periodic,
-                                    _periodic && _parameterfile->has_gravity(),
-                                    _parameterfile->get_ewald_alpha(),
-                                    _parameterfile->get_ewald_size());
+    _particles = new ParticleVector(_parameterfile, *_box, _periodic, true);
     LOGS("ParticleVector created");
-    _timeline = new TimeLine(
-            _parameterfile->get_maxtime(), _parameterfile->get_snaptime(),
-            _parameterfile->get_CFL(), _parameterfile->get_grav_eta(),
-            *_particles, _parameterfile->get_snapshot_type(),
-            _parameterfile->get_outputdir() + string("/") +
-                    _parameterfile->get_basename(),
-            *_simulation_units, *_output_units, _parameterfile->has_gravity(),
-            _periodic, _parameterfile->has_treetime(),
-            _parameterfile->get_max_timestep(),
-            _parameterfile->get_min_timestep(), _parameterfile->get_firstsnap(),
-            _parameterfile->get_per_node_output());
-    double time = load(*_particles, _parameterfile->get_icfile_type(),
-                       _parameterfile->get_icfile(), *_simulation_units);
+    _timeline = new TimeLine(_parameterfile, _outputdir, *_particles,
+                             *_simulation_units, *_output_units, _periodic);
+    string icfile_type = _parameterfile->get_parameter<string>(
+            "IC.Type", SIMULATION_DEFAULT_ICTYPE);
+    string icfile_name = _outputdir + string("/") +
+                         _parameterfile->get_parameter<string>(
+                                 "IC.FileName", SIMULATION_DEFAULT_ICNAME);
+    double time =
+            load(*_particles, icfile_type, icfile_name, *_simulation_units);
+    _gravity = _parameterfile->check_parameter("Gravity.Gravity");
     // make sure the particles know if gravity is on or off
-    _particles->get_header().set_gravity(_parameterfile->has_gravity());
+    _particles->get_header().set_gravity(_gravity);
 
+    unsigned int max_memory = HelperFunctions::machine_readable_bytes(
+            _parameterfile->get_parameter<string>(
+                    "Memory.MaximumSize", SIMULATION_DEFAULT_MAXMEMORY));
     initialize_MPI_buffer(_particles->gassize() + _particles->dmsize(),
-                          _parameterfile->get_max_memory());
+                          max_memory);
 
     _timeline->set_time(time);
 
@@ -883,23 +913,31 @@ void Simulation::initialize(string filename) {
         _particles->dm(i)->set_starttime(_timeline->get_integertime());
     }
 
-    if(_parameterfile->has_gravity()) {
+    if(_gravity) {
+        double hsoft = _parameterfile->get_parameter<double>(
+                "Gravity.Softening", SIMULATION_DEFAULT_SOFTENING);
         for(unsigned int i = _particles->gassize(); i--;) {
-            _particles->gas(i)->set_hsoft(_parameterfile->get_hsoft());
+            _particles->gas(i)->set_hsoft(hsoft);
         }
         for(unsigned int i = _particles->dmsize(); i--;) {
-            _particles->dm(i)->set_hsoft(2.8 * _parameterfile->get_hsoft());
+            _particles->dm(i)->set_hsoft(2.8 * hsoft);
         }
         _particles->get_header().set_gravity(true);
-        _particles->get_header().set_hsoft(_parameterfile->get_hsoft());
+        _particles->get_header().set_hsoft(hsoft);
+
+        _grav_alpha = _parameterfile->get_parameter<double>(
+                "Gravity.Alpha", SIMULATION_DEFAULT_GRAVALPHA);
     }
     LOGS("Particles initialized");
 
     // we only build a voronoi mesh if there is gas in the simulation
     // (obviously...)
     if(_particles->gassize()) {
-        _voronoi = new VorTessManager(*_particles, _periodic,
-                                      _parameterfile->get_voronoi_tolerance());
+        _voronoi = new VorTessManager(
+                *_particles, _periodic,
+                _parameterfile->get_parameter<double>(
+                        "Voronoi.Tolerance",
+                        SIMULATION_DEFAULT_VORONOITOLERANCE));
     }
 
     // convert W ic's to Q
@@ -920,7 +958,7 @@ void Simulation::initialize(string filename) {
     }
 
 #ifdef VARIABLE_SOFTENING
-    if(_parameterfile->has_gravity()) {
+    if(_gravity) {
         // do this before recalculating the tree (since hmax has to be updated)
         for(unsigned int i = _particles->gassize(); i--;) {
             double hsoft = 0.75 * _voronoi->get_volume(i) / M_PI;
@@ -933,7 +971,7 @@ void Simulation::initialize(string filename) {
     // this method will recalculate the masses and velocities for all nodes
     _particles->get_tree().set_velocities();
 
-    if(_parameterfile->has_gravity()) {
+    if(_gravity) {
         // gravity:
         // we first calculate accelerations using a Barnes-Hut treewalk
         // we then use this estimate for the acceleration to walk the
@@ -959,14 +997,14 @@ void Simulation::initialize(string filename) {
                     acorr);
 #endif
             _particles->gas(i)->set_old_acceleration(
-                    _parameterfile->get_grav_alpha() *
+                    _grav_alpha *
                     _particles->gas(i)
                             ->get_gravitational_acceleration()
                             .norm());
         }
         for(unsigned int i = _particles->dmsize(); i--;) {
             _particles->dm(i)->set_old_acceleration(
-                    _parameterfile->get_grav_alpha() *
+                    _grav_alpha *
                     _particles->dm(i)->get_gravitational_acceleration().norm());
         }
 
@@ -978,14 +1016,14 @@ void Simulation::initialize(string filename) {
         // set old acceleration before multiplying by G
         for(unsigned int i = _particles->gassize(); i--;) {
             _particles->gas(i)->set_old_acceleration(
-                    _parameterfile->get_grav_alpha() *
+                    _grav_alpha *
                     _particles->gas(i)
                             ->get_gravitational_acceleration()
                             .norm());
         }
         for(unsigned int i = _particles->dmsize(); i--;) {
             _particles->dm(i)->set_old_acceleration(
-                    _parameterfile->get_grav_alpha() *
+                    _grav_alpha *
                     _particles->dm(i)->get_gravitational_acceleration().norm());
         }
 

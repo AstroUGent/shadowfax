@@ -411,14 +411,18 @@ StateVector TRRSSolver::get_flux(const Vec& v, unsigned int index,
  *
  * @return Adiabatic index
  */
-double TRRSSolver::get_gamma() { return _gamma; }
+double TRRSSolver::get_gamma() {
+    return _gamma;
+}
 
 /**
  * @brief Get number of Riemann solver evaluations
  *
  * @return Number of Riemann solver evaluations
  */
-unsigned long TRRSSolver::get_neval() { return _counter; }
+unsigned long TRRSSolver::get_neval() {
+    return _counter;
+}
 
 /**
  * @brief Dump the solver to the given RestartFile

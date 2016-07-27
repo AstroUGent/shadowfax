@@ -162,3 +162,18 @@ std::string HelperFunctions::make_hdf5_file(std::string name) {
         return name;
     }
 }
+
+/**
+ * @brief Convert the given (possibly relative) path to an absolute path
+ *
+ * @param relative_path General path that can be relative
+ * @return Absolute path
+ */
+std::string HelperFunctions::get_absolute_path(std::string relative_path) {
+    char* result = realpath(relative_path.c_str(), NULL);
+    string absolute_path(result);
+    // memory allocation is done using alloc, so we have to call free and not
+    // delete
+    free(result);
+    return absolute_path;
+}

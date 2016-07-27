@@ -76,7 +76,9 @@ class TRRSSolver : public RiemannSolver {
      *
      * @return "TRRS", because this is a TRRSSolver
      */
-    virtual std::string tag() { return "TRRS"; }
+    virtual std::string tag() {
+        return "TRRS";
+    }
 
     virtual StateVector solve(StateVector& WL, StateVector& WR, Vec& n,
                               double& mach0, bool reflective = false);

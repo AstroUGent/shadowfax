@@ -36,6 +36,12 @@
 class RectangularBox;
 class GasParticle;
 class DMParticle;
+class ParameterFile;
+
+#define PARTICLEVECTOR_DEFAULT_PERIODICFLAG false
+#define PARTICLEVECTOR_DEFAULT_EWALDFLAG false
+#define PARTICLEVECTOR_DEFAULT_ALPHA 2.
+#define PARTICLEVECTOR_DEFAULT_SIZE 64
 
 /**
  * @brief Specialized container to store the particles of the simulation
@@ -99,8 +105,13 @@ class ParticleVector {
 
   public:
     ParticleVector(bool global_timestep, RectangularBox container,
-                   bool periodic = false, bool do_ewald = false,
-                   double alpha = 2., unsigned int size = 64);
+                   bool periodic = PARTICLEVECTOR_DEFAULT_PERIODICFLAG,
+                   bool do_ewald = PARTICLEVECTOR_DEFAULT_EWALDFLAG,
+                   double alpha = PARTICLEVECTOR_DEFAULT_ALPHA,
+                   unsigned int size = PARTICLEVECTOR_DEFAULT_SIZE);
+    ParticleVector(ParameterFile* parameters, RectangularBox container,
+                   bool periodic = PARTICLEVECTOR_DEFAULT_PERIODICFLAG,
+                   bool do_ewald = PARTICLEVECTOR_DEFAULT_EWALDFLAG);
     ~ParticleVector();
 
     void add_gas_particle(GasParticle* particle);
@@ -251,8 +262,14 @@ class ParticleVector {
 
     void dump(RestartFile& rfile);
     ParticleVector(RestartFile& rfile, RectangularBox& box,
-                   bool periodic = false, bool do_ewald = false,
-                   double alpha = 2., unsigned int size = 64);
+                   bool periodic = PARTICLEVECTOR_DEFAULT_PERIODICFLAG,
+                   bool do_ewald = PARTICLEVECTOR_DEFAULT_EWALDFLAG,
+                   double alpha = PARTICLEVECTOR_DEFAULT_ALPHA,
+                   unsigned int size = PARTICLEVECTOR_DEFAULT_SIZE);
+    ParticleVector(RestartFile& rfile, ParameterFile* parameters,
+                   RectangularBox& box,
+                   bool periodic = PARTICLEVECTOR_DEFAULT_PERIODICFLAG,
+                   bool do_ewald = PARTICLEVECTOR_DEFAULT_EWALDFLAG);
 };
 
 #endif  // PARTICLEVECTOR_HPP

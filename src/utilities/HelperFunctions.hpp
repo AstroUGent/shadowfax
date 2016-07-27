@@ -30,7 +30,7 @@
 #include <string>
 
 /**
- * \brief General auxiliary functions
+ * @brief General auxiliary functions
  */
 namespace HelperFunctions {
 std::string human_readable_bytes(unsigned int bytes);
@@ -42,6 +42,8 @@ std::string human_readable_long(unsigned long num);
 
 std::string make_hdf5_file(std::string name);
 
+std::string get_absolute_path(std::string relative_path);
+
 /**
  * @brief Generate a random double precision floating point value in the range
  * [0, 1[
@@ -50,6 +52,17 @@ std::string make_hdf5_file(std::string name);
  */
 inline double rand_double() {
     return ((double)rand()) / ((double)RAND_MAX);
+}
+
+/**
+ * @brief Generate a random value from the given range
+ *
+ * @param min Lower limit of the range
+ * @param max Upper limit of the range
+ * @return Random value in the range
+ */
+inline double rand_value(double min, double max) {
+    return min + rand_double() * (max - min);
 }
 
 /**

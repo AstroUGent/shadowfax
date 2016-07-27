@@ -26,7 +26,11 @@
 #ifndef PHYSICS_HPP
 #define PHYSICS_HPP
 
+class ParameterFile;
+class RestartFile;
 class UnitSet;
+
+#define PHYSICS_DEFAULT_MEANMOLWEIGHT 1.219512195
 
 /**
  * @brief Physical constants used in the simulation
@@ -36,13 +40,24 @@ class UnitSet;
  */
 class Physics {
   private:
-    /*! \brief The gravitational constant G */
+    /*! @brief The gravitational constant G */
     double _G;
+    /*! @brief The Hubble constant, assuming a value of 100 km/s/Mpc */
+    double _H0;
+    /*! @brief Mean molecular weight */
+    double _mean_mol_weight;
 
   public:
-    Physics(UnitSet& units, bool real_units = true);
+    Physics(UnitSet& units, bool real_units = true,
+            double mean_mol_weight = PHYSICS_DEFAULT_MEANMOLWEIGHT);
+    Physics(UnitSet& units, ParameterFile* parameters);
 
     double get_gravitational_constant();
+    double get_Hubble_constant();
+    double get_mean_mol_weight();
+
+    void dump(RestartFile& rfile);
+    Physics(RestartFile& rfile);
 };
 
 #endif  // PHYSICS_HPP

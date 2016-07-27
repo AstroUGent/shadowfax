@@ -55,6 +55,19 @@ class Simulation {
      *  reflective (false) */
     bool _periodic;
 
+    /*! @brief Flag indicating if gravity is on or off */
+    bool _gravity;
+
+    /*! @brief Gravitational integration factor that should be put in another
+     *  class in the near future */
+    double _grav_alpha;
+
+    /*! @brief Restart interval */
+    double _restarttime;
+
+    /*! @brief Output directory, because it is used in various places */
+    std::string _outputdir;
+
     /*! \brief ParameterFile containing simulation parameters */
     ParameterFile* _parameterfile;
 

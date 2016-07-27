@@ -48,3 +48,13 @@
             abort();                                     \
         }                                                \
     }
+
+#define assert_values_approx(a, b, accuracy, message)                 \
+    if(b != 0.) {                                                     \
+        if(fabs(a - b) / fabs(b) > accuracy) {                        \
+            std::cerr << message << std::endl;                        \
+            std::cerr << a << " and " << b << " differ by more than " \
+                      << accuracy * 100. << "%" << std::endl;         \
+            abort();                                                  \
+        }                                                             \
+    }

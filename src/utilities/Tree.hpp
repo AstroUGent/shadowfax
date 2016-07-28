@@ -197,23 +197,34 @@ class NodeInfo {
  */
 class Node {
   protected:
-    /*! \brief Flag used to keep track of relevant node information */
-    unsigned int _flag;
+    /*! \brief Flag used to check if this Node contains a Leaf */
+    unsigned int _flag_leaf : 1;
+
+    /*! \brief Flag used to check if this Node is the last child of its
+     *  parent */
+    unsigned int _flag_last : 1;
+
+    /*! \brief Flag used to check if this Node is a PseudoNode */
+    unsigned int _flag_pseudo : 1;
+
+    /*! \brief Flag used to check if this Node has only children on the local
+     *  MPI process */
+    unsigned int _flag_local : 1;
 
   public:
     /**
      * @brief Constructor
      *
-     * The first bit in the internal flag is 1 if the node is a leaf and 0
-     * otherwise. The second bit is 1 if the node is the last child of its
-     * parent. The second bit is 1 for a pseudonode of the tree. The third bit
-     * at last is 1 for nodes that have descendants that are pseudonodes.
+     * As Peter Camps suggested, we have replaced a single unsigned int member
+     * flag by different single bit members that are packed together by the
+     * compiler.
      *
      * @param is_leaf True if the node is a leaf of the tree, false otherwise
      * @param is_pseudo True if the node is a pseudonode of the tree
      */
-    Node(bool is_leaf, bool is_pseudo = false) : _flag(is_leaf) {
-        _flag |= (is_pseudo << 2);
+    Node(bool is_leaf, bool is_pseudo = false) : _flag_leaf(is_leaf), _flag_pseudo(is_pseudo) {
+        _flag_last = false;
+        _flag_local = false;
     }
 
     virtual ~Node() {}
@@ -224,7 +235,7 @@ class Node {
      * @return True if the node is a Leaf
      */
     inline bool is_leaf() {
-        return (_flag & 1);
+        return _flag_leaf;
     }
 
     /**
@@ -233,7 +244,7 @@ class Node {
      * @return True if the node is the last child of its parent
      */
     inline bool is_last() {
-        return (_flag >> 1) & 1;
+        return _flag_last;
     }
 
     /**
@@ -242,7 +253,7 @@ class Node {
      * @return True if the node is a PseudoNode
      */
     inline bool is_pseudo() {
-        return (_flag >> 2) & 1;
+        return _flag_pseudo;
     }
 
     /**
@@ -251,7 +262,7 @@ class Node {
      * @return True if none of the descendants of the node is a PseudoNode
      */
     inline bool is_local() {
-        return !((_flag >> 3) & 1);
+        return _flag_local;
     }
 
     /**

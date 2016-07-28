@@ -29,6 +29,7 @@ if(DO_SHADOWFAX)
 
     set(SHADOWFAXSOURCES
     CircularBox.cpp
+    CoolingTable.cpp
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
@@ -37,11 +38,14 @@ if(DO_SHADOWFAX)
     FixedGrid.cpp
     GadgetSnapshotReader.cpp
     GadgetSnapshotWriter.cpp
+    GasCooling.cpp
     GravityWalker.cpp
     Image.cpp
     Line.cpp
     LogFiles.cpp
     MPIGlobal.cpp
+    NDIrregTable.cpp
+    NDTable.cpp
     NgbSearch.cpp
     ParameterFile.cpp
     Physics.hpp
@@ -66,6 +70,7 @@ if(DO_SHADOWFAX)
     VorTessManager.cpp
 
     CoolingLocation.hpp
+    CoolingTable.hpp
     DelCont.hpp
     DelTess.hpp
     Error.hpp
@@ -73,12 +78,15 @@ if(DO_SHADOWFAX)
     FixedGrid.hpp
     GadgetSnapshotReader.hpp
     GadgetSnapshotWriter.hpp
+    GasCooling.hpp
     GravityWalker.hpp
     Image.hpp
     Line.hpp
     LogFiles.hpp
     MPIGlobal.hpp
     MPIMethods.hpp
+    NDIrregTable.hpp
+    NDTable.hpp
     ParameterFile.hpp
     Physics.cpp
     Plane.hpp

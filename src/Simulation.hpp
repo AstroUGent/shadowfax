@@ -40,6 +40,7 @@ class VorTessManager;
 class RestartFile;
 class LogFiles;
 class Physics;
+class GasCooling;
 
 /**
   * \brief The main class for actual simulations
@@ -118,6 +119,10 @@ class Simulation {
 
     /*! \brief Timer used to determine when it is time to do restart dumps */
     Timer _restarttimer;
+
+    /*! @brief GasCooling object used to calculate cooling rate of gas particles
+     */
+    GasCooling* _gascooling;
 
     void main_loop();
 

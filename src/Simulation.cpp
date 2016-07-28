@@ -24,8 +24,10 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Simulation.hpp"
+#include "CoolingLocation.hpp"
 #include "DelCont.hpp"
 #include "ExArith.hpp"
+#include "GasCooling.hpp"
 #include "GravityWalker.hpp"
 #include "LogFiles.hpp"
 #include "MPIGlobal.hpp"
@@ -215,6 +217,7 @@ Simulation::~Simulation() {
     delete _mpitimer;
     delete _hydrotimer;
     delete _gravitytimer;
+    delete _gascooling;
     cout << "Total program time: " << _totaltimer.stop() << " seconds" << endl;
 }
 
@@ -406,6 +409,20 @@ void Simulation::main_loop() {
             // do the actual integration by calculating fluxes between cells
             LOGS("Starting flux exchange");
             _voronoi->hydro(*_timeline, *_solver, *_particles);
+
+            // Perform cooling
+            if(_gascooling) {
+                StateVector state = StateVector(0);
+                for(unsigned int i = 0; i < _particles->gassize(); ++i) {
+                    if(_particles->gas(i)->get_starttime() == currentTime) {
+                        double dE =
+                                _gascooling->calc_cooling(_particles->gas(i));
+                        state.set_e(dE);
+                        _particles->gas(i)->increase_dQ(state);
+                    }
+                }
+            }
+
             LOGS("Finished flux exchange");
             // exchange fluxes between processes (and gravititional fluxes)
             _mpitimer->start();
@@ -744,6 +761,10 @@ void Simulation::dump(RestartFile& restartfile) {
 
     _physics->dump(restartfile);
 
+    if(_gascooling){
+        _gascooling->dump(restartfile);
+    }
+
     _box->dump(restartfile);
     _particles->dump(restartfile);
     _timeline->dump(restartfile);
@@ -787,8 +808,15 @@ void Simulation::restart(string filename) {
     _logfiles = new LogFiles(restartfile);
     _solver = RiemannSolverFactory::load(restartfile);
     _simulation_units = new UnitSet(restartfile);
-    _physics = new Physics(*_simulation_units, _parameterfile);
     LOGS("Simulation UnitSet restarted");
+
+    _physics = new Physics(*_simulation_units, _parameterfile);
+
+    if(_parameterfile->check_parameter("Physics.Cooling")) {
+        _gascooling = new GasCooling(restartfile);
+    } else {
+        _gascooling = NULL;
+    }
 
     _output_units = new UnitSet(restartfile);
     LOGS("Output UnitSet restarted");
@@ -870,7 +898,16 @@ void Simulation::initialize(string filename) {
             "Units.InternalUnits", SIMULATION_DEFAULT_UNITS);
     _simulation_units = UnitSetGenerator::generate(internal_units);
     LOGS("Simulation UnitSet created");
+
     _physics = new Physics(*_simulation_units, _parameterfile);
+
+    if(_parameterfile->check_parameter("Physics.Cooling")) {
+        _gascooling = new GasCooling(COOLING_LOCATION, _simulation_units,
+                                     _parameterfile, _physics);
+    } else {
+        _gascooling = NULL;
+    }
+
     string output_units = _parameterfile->get_parameter<string>(
             "Units.OutputUnits", SIMULATION_DEFAULT_UNITS);
     _output_units = UnitSetGenerator::generate(output_units);

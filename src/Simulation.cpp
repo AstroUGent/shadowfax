@@ -761,7 +761,7 @@ void Simulation::dump(RestartFile& restartfile) {
 
     _physics->dump(restartfile);
 
-    if(_gascooling){
+    if(_gascooling) {
         _gascooling->dump(restartfile);
     }
 

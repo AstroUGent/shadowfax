@@ -77,6 +77,8 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
     _snapshotwriter = SnapshotWriterFactory::generate(
             snaptype, snapname, units, output_units, lastsnap, per_node_output);
     _maxtime = maxtime;
+    _mintime = 0.;
+    _tottime = _maxtime - _mintime;
     _integer_maxtime = 1;
     _integer_maxtime <<= 60;
     _current_time = 0;
@@ -159,16 +161,7 @@ TimeLine::TimeLine(ParameterFile* parameters, std::string outputdir,
   * @returns The physical (floating point) time of the simulation
   */
 double TimeLine::get_time() {
-    return _current_time * _maxtime / (double)_integer_maxtime;
-}
-
-/**
-  * @brief Get the internal (integer) time of the TimeLine
-  *
-  * @returns A 64-bit representing the current internal time
-  */
-unsigned long TimeLine::get_integertime() {
-    return _current_time;
+    return get_realtime(_current_time);
 }
 
 /**
@@ -209,7 +202,8 @@ void TimeLine::set_time(unsigned long time) {
  * @param time Floating point time
  */
 void TimeLine::set_time(double time) {
-    _current_time = (unsigned long)(time * _integer_maxtime / _maxtime);
+    _current_time =
+            (unsigned long)((time - _mintime) * _integer_maxtime / _tottime);
 }
 
 /**
@@ -251,7 +245,7 @@ unsigned long TimeLine::calculate_timestep() {
         }
     }
 
-    unsigned long Smax = _integer_maxtime;
+    unsigned long Smax = _max_timestep;
     unsigned long Smin = Smax;
     double eta = _grav_eta;
     // put them in a power of two hierarchy
@@ -270,11 +264,16 @@ unsigned long TimeLine::calculate_timestep() {
                 }
             }
             unsigned long S2;
-            if(get_realtime(Smax) < S) {
+            if(get_realtime_interval(Smax) < S) {
                 S2 = Smax;
+                Smin = std::min(S2, Smin);
+                if(!_particles.global_timestep()) {
+                    _particles.gas(i)->set_timestep(S2);
+                    _particles.gas(i)->set_real_timestep(get_realtime(S2));
+                }
             } else {
                 S2 = _integer_maxtime;
-                while(get_realtime(S2) > S) {
+                while(get_realtime_interval(S2) > S) {
                     S2 >>= 1;
                 }
 
@@ -292,6 +291,7 @@ unsigned long TimeLine::calculate_timestep() {
                 Smin = std::min(S2, Smin);
                 if(!_particles.global_timestep()) {
                     _particles.gas(i)->set_timestep(S2);
+                    _particles.gas(i)->set_real_timestep(get_realtime(S2));
                 }
             }
         }
@@ -310,7 +310,7 @@ unsigned long TimeLine::calculate_timestep() {
             double eps = _particles.dm(i)->get_hsoft();
             double dt = sqrt(2. * eps * eta / a);
             tidt = std::min(
-                    tidt, (unsigned long)((dt / _maxtime) * _integer_maxtime));
+                    tidt, (unsigned long)((dt / _tottime) * _integer_maxtime));
         }
         // make the timestep a power of 2 subdivision of the total simulation
         // time
@@ -347,6 +347,7 @@ unsigned long TimeLine::calculate_timestep() {
     if(_particles.global_timestep()) {
         for(unsigned int i = _particles.gassize(); i--;) {
             _particles.gas(i)->set_timestep(Smin_glob);
+            _particles.gas(i)->set_real_timestep(get_realtime(Smin_glob));
         }
         for(unsigned int i = _particles.dmsize(); i--;) {
             _particles.dm(i)->set_timestep(Smin_glob);
@@ -413,17 +414,6 @@ unsigned long TimeLine::calculate_gravitational_timestep() {
 }
 
 /**
- * @brief Convert the given integer time to physical time
- *
- * @param integer_time Integer time on the integer timeline
- * @return Floating point physical time
- */
-double TimeLine::get_realtime(unsigned long integer_time) {
-    double t = (double)integer_time / (double)_integer_maxtime;
-    return _maxtime * t;
-}
-
-/**
  * @brief Set the system timestep
  *
  * @param timestep New value for the system timestep
@@ -442,15 +432,6 @@ unsigned long TimeLine::get_timestep() {
 }
 
 /**
- * @brief Check if gravity is switched on
- *
- * @return True if gravity is on, false otherwise
- */
-bool TimeLine::has_gravity() {
-    return _gravity;
-}
-
-/**
  * @brief Dump the timeline to the given RestartFile
  *
  * @param rfile RestartFile to write to
@@ -458,6 +439,8 @@ bool TimeLine::has_gravity() {
 void TimeLine::dump(RestartFile& rfile) {
     SnapshotWriterFactory::dump(rfile, _snapshotwriter);
     rfile.write(_maxtime);
+    rfile.write(_mintime);
+    rfile.write(_tottime);
     rfile.write(_integer_maxtime);
     rfile.write(_current_time);
     rfile.write(_timestep);
@@ -489,6 +472,8 @@ TimeLine::TimeLine(RestartFile& rfile, ParticleVector& particlevector,
         : _particles(particlevector) {
     _snapshotwriter = SnapshotWriterFactory::load(rfile, units, output_units);
     rfile.read(_maxtime);
+    rfile.read(_mintime);
+    rfile.read(_tottime);
     rfile.read(_integer_maxtime);
     rfile.read(_current_time);
     rfile.read(_timestep);

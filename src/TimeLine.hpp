@@ -61,6 +61,10 @@ class TimeLine {
   private:
     /*! \brief End time of the simulation */
     double _maxtime;
+    /*! @brief Start time of the simulation */
+    double _mintime;
+    /*! @brief Total simulation interval */
+    double _tottime;
     /*! \brief End time on the integer timeline */
     unsigned long _integer_maxtime;
     /*! \brief Current time on the integer timeline */
@@ -126,12 +130,42 @@ class TimeLine {
     }
 
     double get_time();
-    unsigned long get_integertime();
+
+    /**
+      * @brief Get the internal (integer) time of the TimeLine
+      *
+      * @returns A 64-bit representing the current internal time
+      */
+    unsigned long get_integertime() {
+        return _current_time;
+    }
+
     bool step_forward();
     void set_time(unsigned long time);
     void set_time(double time);
 
-    double get_realtime(unsigned long integer_time);
+    /**
+     * @brief Convert the given integer time to physical time
+     *
+     * @param integer_time Integer time on the integer timeline
+     * @return Floating point physical time
+     */
+    double get_realtime(unsigned long integer_time) {
+        double t = (double)integer_time / (double)_integer_maxtime;
+        return _tottime * t + _mintime;
+    }
+
+    /**
+     * @brief Convert the given integer time interval to a physical time
+     * interval
+     *
+     * @param integer_interval Integer time interval
+     * @return Physical time interval
+     */
+    double get_realtime_interval(unsigned long integer_interval) {
+        double dt = (double)integer_interval / (double)_integer_maxtime;
+        return _tottime * dt;
+    }
 
     void set_timestep(unsigned long timestep);
     unsigned long get_timestep();
@@ -139,8 +173,14 @@ class TimeLine {
     unsigned long calculate_timestep();
     unsigned long calculate_gravitational_timestep();
 
-    // temporary fix to access gravity in VorFace
-    bool has_gravity();
+    /**
+     * @brief Check if gravity is switched on
+     *
+     * @return True if gravity is on, false otherwise
+     */
+    bool has_gravity() {
+        return _gravity;
+    }
 
     void dump(RestartFile& rfile);
     TimeLine(RestartFile& rfile, ParticleVector& particlevector, UnitSet& units,

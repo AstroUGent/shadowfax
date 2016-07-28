@@ -333,7 +333,7 @@ void Simulation::main_loop() {
     // snapshots are written by the timeline at appropriate times
     while(_timeline->step_forward()) {
         cout << "t = " << _timeline->get_time()
-             << ", dt = " << _timeline->get_realtime(dt) << endl;
+             << ", dt = " << _timeline->get_realtime_interval(dt) << endl;
 
         unsigned long currentTime = _timeline->get_integertime();
         if(_particles->gassize()) {
@@ -342,7 +342,7 @@ void Simulation::main_loop() {
                     StateVector Wgas = _particles->gas(i)->get_Wvec();
 
                     Wgas += 0.5 *
-                            _timeline->get_realtime(
+                            _timeline->get_realtime_interval(
                                     _particles->gas(i)->get_endtime() -
                                     _particles->gas(i)->get_starttime()) *
                             _particles->gas(i)
@@ -353,7 +353,7 @@ void Simulation::main_loop() {
 
                     if(!_periodic) {
                         // make sure the particle stays inside the box
-                        double dt = _timeline->get_realtime(
+                        double dt = _timeline->get_realtime_interval(
                                 _particles->gas(i)->get_endtime() -
                                 _particles->gas(i)->get_starttime());
                         Vec newx = _particles->gas(i)->get_position() + dt * v;
@@ -372,7 +372,7 @@ void Simulation::main_loop() {
                     if(_gravity) {
                         _particles->gas(i)->apply_gravity(
                                 0.5 *
-                                _timeline->get_realtime(
+                                _timeline->get_realtime_interval(
                                         _particles->gas(i)->get_endtime() -
                                         _particles->gas(i)->get_starttime()));
                     }
@@ -419,7 +419,7 @@ void Simulation::main_loop() {
         for(unsigned int i = 0; i < _particles->gassize(); i++) {
 #ifndef STATIC
             // move the mesh generators
-            _particles->gas(i)->drift(_timeline->get_realtime(dt));
+            _particles->gas(i)->drift(_timeline->get_realtime_interval(dt));
 #endif
             // add the calculated flux for this cell to its conserved quantities
             _particles->gas(i)->update_Q();
@@ -442,7 +442,7 @@ void Simulation::main_loop() {
                             _particles->dm(i)
                                     ->get_gravitational_acceleration() *
                             0.5 *
-                            _timeline->get_realtime(
+                            _timeline->get_realtime_interval(
                                     _particles->dm(i)->get_endtime() -
                                     _particles->dm(i)->get_starttime()));
                 }
@@ -577,7 +577,7 @@ void Simulation::main_loop() {
                 if(_particles->gas(i)->get_endtime() == currentTime) {
                     _particles->gas(i)->apply_gravity(
                             0.5 *
-                            _timeline->get_realtime(
+                            _timeline->get_realtime_interval(
                                     _particles->gas(i)->get_endtime() -
                                     _particles->gas(i)->get_starttime()));
                 }
@@ -590,7 +590,7 @@ void Simulation::main_loop() {
                             _particles->dm(i)
                                     ->get_gravitational_acceleration() *
                             0.5 *
-                            _timeline->get_realtime(
+                            _timeline->get_realtime_interval(
                                     _particles->dm(i)->get_endtime() -
                                     _particles->dm(i)->get_starttime()));
                 }

@@ -1102,11 +1102,11 @@ unsigned int TreeNode::finalize(Node* sibling, bool last) {
             _center_of_mass[k] = center_of_mass[k] / mass;
         }
     }
-    _flag |= (last << 1);
+    _flag_last = last;
 
     // if the node contains pseudonodes on a lower level, set the appropriate
     // flag
-    _flag |= ((!only_local) << 3);
+   _flag_local = !only_local;
 
     _sibling = sibling;
     _child = child;
@@ -1507,7 +1507,7 @@ Particle* Leaf::get_particle() {
  */
 unsigned int Leaf::finalize(Node* sibling, bool last) {
     _sibling = sibling;
-    _flag |= (last << 1);
+    _flag_last = last;
     return 0;
 }
 
@@ -1555,7 +1555,7 @@ PseudoNode::PseudoNode(Box box, unsigned int src, unsigned long key)
     _cmax = 0.;
     _total_mass = 0.;
     // flag this node as not local
-    _flag |= 8;
+    _flag_local = true;
 }
 
 /**
@@ -1579,7 +1579,7 @@ PseudoNode::~PseudoNode() {
  */
 unsigned int PseudoNode::finalize(Node* sibling, bool last) {
     _sibling = sibling;
-    _flag |= (last << 1);
+    _flag_last = last;
     return 0;
 }
 

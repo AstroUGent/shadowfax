@@ -55,6 +55,7 @@
 #include "utilities/GasParticle.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/ParticleVector.hpp"
+#include "utilities/StarParticle.hpp"
 #include "utilities/Timer.hpp"
 #include "utilities/Tree.hpp"
 #include "utilities/TreeWalker.hpp"
@@ -464,9 +465,33 @@ void Simulation::main_loop() {
                                     _particles->dm(i)->get_starttime()));
                 }
                 _particles->dm(i)->move(_timeline->get_realtime(dt));
+                _particles->get_container().keep_inside(_particles->dm(i));
+            }
+            for(unsigned int i = _particles->starsize(); i--;) {
+                double timestep;
+                if(_particles->star(i)->get_starttime() == currentTime) {
+                    timestep = 0.5 *
+                               _timeline->get_realtime_interval(
+                                       _particles->star(i)->get_endtime() -
+                                       _particles->star(i)->get_starttime());
+                    _particles->star(i)->accelerate(
+                            _particles->star(i)
+                                    ->get_gravitational_acceleration() *
+                            timestep);
+                }
+                timestep = _timeline->get_realtime_interval(dt);
+                _particles->star(i)->move(timestep);
+                _particles->get_container().keep_inside(_particles->star(i));
             }
         }
         _gravitytimer->stop();
+
+        for(unsigned int i = _particles->starsize(); i--;) {
+            // update star age
+            _particles->star(i)->set_age(_particles->star(i)->get_age() +
+                                         _timeline->get_realtime_interval(dt));
+        }
+
         LOGS("Did second kick");
         currentTime += dt;
         _timeline->set_timestep(dt);
@@ -529,6 +554,12 @@ void Simulation::main_loop() {
                         _physics->get_gravitational_constant() *
                         p->get_gravitational_potential());
             }
+            for(unsigned int i = 0; i < _particles->starsize(); i++) {
+                StarParticle* p = _particles->star(i);
+                p->set_gravitational_potential(
+                        _physics->get_gravitational_constant() *
+                        p->get_gravitational_potential());
+            }
             LOGS("Finished calculating gravitational potential");
         }
 
@@ -556,6 +587,15 @@ void Simulation::main_loop() {
                                     .norm());
                 }
             }
+            for(unsigned int i = _particles->starsize(); i--;) {
+                if(_particles->star(i)->get_endtime() == currentTime) {
+                    _particles->star(i)->set_old_acceleration(
+                            _grav_alpha *
+                            _particles->star(i)
+                                    ->get_gravitational_acceleration()
+                                    .norm());
+                }
+            }
             // multiply with G
             for(unsigned int i = 0; i < _particles->gassize(); i++) {
                 _particles->gas(i)->set_gravitational_acceleration(
@@ -569,6 +609,14 @@ void Simulation::main_loop() {
                 _particles->dm(i)->set_gravitational_acceleration(
                         _physics->get_gravitational_constant() *
                         _particles->dm(i)->get_gravitational_acceleration());
+            }
+            for(unsigned int i = 0; i < _particles->starsize(); i++) {
+                if(_particles->star(i)->get_endtime() == currentTime) {
+                    _particles->star(i)->set_gravitational_acceleration(
+                            _physics->get_gravitational_constant() *
+                            _particles->star(i)
+                                    ->get_gravitational_acceleration());
+                }
             }
 
             if(_particles->gassize()) {
@@ -610,6 +658,19 @@ void Simulation::main_loop() {
                             _timeline->get_realtime_interval(
                                     _particles->dm(i)->get_endtime() -
                                     _particles->dm(i)->get_starttime()));
+                }
+            }
+            for(unsigned int i = _particles->starsize(); i--;) {
+                if(_particles->star(i)->get_endtime() == currentTime) {
+                    double timestep;
+                    timestep = 0.5 *
+                               _timeline->get_realtime_interval(
+                                       _particles->star(i)->get_endtime() -
+                                       _particles->star(i)->get_starttime());
+                    _particles->star(i)->accelerate(
+                            _particles->star(i)
+                                    ->get_gravitational_acceleration() *
+                            timestep);
                 }
             }
             LOGS("Did gravitational kick");
@@ -949,6 +1010,9 @@ void Simulation::initialize(string filename) {
     for(unsigned int i = _particles->dmsize(); i--;) {
         _particles->dm(i)->set_starttime(_timeline->get_integertime());
     }
+    for(unsigned int i = _particles->starsize(); i--;) {
+        _particles->star(i)->set_starttime(_timeline->get_integertime());
+    }
 
     if(_gravity) {
         double hsoft = _parameterfile->get_parameter<double>(
@@ -958,6 +1022,9 @@ void Simulation::initialize(string filename) {
         }
         for(unsigned int i = _particles->dmsize(); i--;) {
             _particles->dm(i)->set_hsoft(2.8 * hsoft);
+        }
+        for(unsigned int i = _particles->starsize(); i--;) {
+            _particles->star(i)->set_hsoft(2.8 * hsoft);
         }
         _particles->get_header().set_gravity(true);
         _particles->get_header().set_hsoft(hsoft);
@@ -1044,6 +1111,13 @@ void Simulation::initialize(string filename) {
                     _grav_alpha *
                     _particles->dm(i)->get_gravitational_acceleration().norm());
         }
+        for(unsigned int i = _particles->starsize(); i--;) {
+            _particles->star(i)->set_old_acceleration(
+                    _grav_alpha *
+                    _particles->star(i)
+                            ->get_gravitational_acceleration()
+                            .norm());
+        }
 
         // relative criterion
         LOGS("Starting relative gravity walk");
@@ -1063,6 +1137,13 @@ void Simulation::initialize(string filename) {
                     _grav_alpha *
                     _particles->dm(i)->get_gravitational_acceleration().norm());
         }
+        for(unsigned int i = _particles->starsize(); i--;) {
+            _particles->star(i)->set_old_acceleration(
+                    _grav_alpha *
+                    _particles->star(i)
+                            ->get_gravitational_acceleration()
+                            .norm());
+        }
 
         // multiply with G
         for(unsigned int i = 0; i < _particles->gassize(); i++) {
@@ -1076,6 +1157,11 @@ void Simulation::initialize(string filename) {
             _particles->dm(i)->set_gravitational_acceleration(
                     _physics->get_gravitational_constant() *
                     _particles->dm(i)->get_gravitational_acceleration());
+        }
+        for(unsigned int i = 0; i < _particles->starsize(); i++) {
+            _particles->star(i)->set_gravitational_acceleration(
+                    _physics->get_gravitational_constant() *
+                    _particles->star(i)->get_gravitational_acceleration());
         }
         LOGS("Finished relative gravity walk");
         if(_particles->gassize()) {

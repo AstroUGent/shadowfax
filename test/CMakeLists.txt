@@ -220,6 +220,21 @@ add_unit_test(NAME testGSL
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} utilities2d)
 
+# Cosmology test
+set(TESTCOSMOLOGY_SOURCES
+    testCosmology.cpp
+
+    ../src/Cosmology.cpp
+    ../src/Cosmology.hpp
+    ../src/GSL.cpp
+    ../src/MPIGlobal.cpp
+)
+
+add_unit_test(NAME testCosmology
+              SOURCES ${TESTCOSMOLOGY_SOURCES}
+              NDIM 2
+              LIBS ${MPI_CXX_LIBRARIES} utilities2d)
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

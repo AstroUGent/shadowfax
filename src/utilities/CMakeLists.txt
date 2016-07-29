@@ -16,6 +16,11 @@
 # along with Shadowfax. If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/data)
+set(EWALDTABLE_LOCATION ${CMAKE_BINARY_DIR}/data/)
+configure_file(EwaldTableLocation.hpp.in
+               ${CMAKE_BINARY_DIR}/inc/EwaldTableLocation.hpp @ONLY)
+
 add_library(${UTILNAME}
 Box.hpp
 Cuboid.hpp
@@ -23,6 +28,7 @@ DMParticle.cpp
 DMParticle.hpp
 EwaldTable.cpp
 EwaldTable.hpp
+EwaldTableLocation.hpp.in
 GasParticle.cpp
 GasParticle.hpp
 HelperFunctions.cpp

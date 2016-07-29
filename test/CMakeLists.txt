@@ -206,6 +206,20 @@ add_unit_test_bash(NAME testGasCooling
               FILES ${TESTGASCOOLING_FILES}
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
 
+# GSL test
+set(TESTGSL_SOURCES
+    testGSL.cpp
+
+    ../src/GSL.cpp
+    ../src/GSL.hpp
+    ../src/MPIGlobal.cpp
+)
+
+add_unit_test(NAME testGSL
+              SOURCES ${TESTGSL_SOURCES}
+              NDIM 2
+              LIBS ${MPI_CXX_LIBRARIES} utilities2d)
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

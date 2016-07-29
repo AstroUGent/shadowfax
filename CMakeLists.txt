@@ -1,6 +1,7 @@
 ################################################################################
 # This file is part of Shadowfax
 # Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+#               2016 Bert Vandenbroucke
 #
 # Shadowfax is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -121,6 +122,12 @@ else(ONLY_SIMULATION_PROGRAM)
     set(DO_ICMAKER True)
     set(DO_VTKMAKER True)
 endif(ONLY_SIMULATION_PROGRAM)
+
+if(GIZMO)
+    set(DO_GIZMO True)
+else(GIZMO)
+    set(DO_GIZMO False)
+endif(GIZMO)
 
 # put executable in the rundirs
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/rundir)

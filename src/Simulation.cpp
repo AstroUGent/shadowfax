@@ -38,6 +38,7 @@
 #include "RestartFile.hpp"
 #include "SnapshotReaderFactory.hpp"
 #include "StarFormationParticleConverter.hpp"
+#include "StellarFeedback.hpp"
 #include "TimeLine.hpp"
 #include "Vec.hpp"
 #include "VorCell.hpp"
@@ -199,6 +200,7 @@ Simulation::Simulation(int argc, char** argv) {
 Simulation::~Simulation() {
     delete _physics;
     delete _starformation_converter;
+    delete _stellar_feedback;
     delete _parameterfile;
     delete _logfiles;
     delete _solver;
@@ -301,6 +303,13 @@ void Simulation::main_loop() {
     _mpitimer = new Timer();
     _hydrotimer = new Timer();
     _gravitytimer = new Timer();
+
+    if(_parameterfile->check_parameter("Physics.StellarFeedback")) {
+        double test[2 * ndim_];
+        _box->get_bounding_box(test);
+        _stellar_feedback->set_radius(
+                *max_element(test + ndim_, test + ndim_ * 2 - 1) / 10.);
+    }
 
     // we have to calculate the potential before we calculate the time steps,
     // since active particles are defined by the endtime being equal to 0,
@@ -431,6 +440,22 @@ void Simulation::main_loop() {
             _mpitimer->start();
             _voronoi->update_dQs();
             _mpitimer->stop();
+
+            // add stellar feedback
+            // we do it here since we might need neighbour information stored
+            // in the voronoi mesh, and because we do not want to interfere with
+            // the hydro this step
+            if(_stellar_feedback) {
+                for(unsigned int i = 0; i < _particles->starsize(); i++) {
+                    if(_particles->star(i)->get_starttime() == currentTime) {
+                        _stellar_feedback->do_feedback(
+                                _particles->star(i), *_particles,
+                                _timeline->get_realtime_interval(
+                                        _particles->star(i)->get_endtime() -
+                                        _particles->star(i)->get_starttime()));
+                    }
+                }
+            }
         }
         _hydrotimer->start();
         for(unsigned int i = _particles->gassize(); i--;) {
@@ -833,6 +858,10 @@ void Simulation::dump(RestartFile& restartfile) {
         _starformation_converter->dump(restartfile);
     }
 
+    if(_stellar_feedback) {
+        _stellar_feedback->dump(restartfile);
+    }
+
     if(_gascooling) {
         _gascooling->dump(restartfile);
     }
@@ -892,6 +921,12 @@ void Simulation::restart(string filename) {
                 new StarFormationParticleConverter(restartfile);
     } else {
         _starformation_converter = NULL;
+    }
+
+    if(_parameterfile->check_parameter("Physics.StellarFeedback")) {
+        _stellar_feedback = new StellarFeedback(restartfile);
+    } else {
+        _stellar_feedback = NULL;
     }
 
     if(_parameterfile->check_parameter("Physics.Cooling")) {
@@ -983,6 +1018,12 @@ void Simulation::initialize(string filename) {
                 _parameterfile, _simulation_units, _physics);
     } else {
         _starformation_converter = NULL;
+    }
+
+    if(_parameterfile->check_parameter("Physics.StellarFeedback")) {
+        _stellar_feedback = new StellarFeedback(_parameterfile);
+    } else {
+        _stellar_feedback = NULL;
     }
 
     if(_parameterfile->check_parameter("Physics.Cooling")) {

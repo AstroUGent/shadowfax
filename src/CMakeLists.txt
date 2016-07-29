@@ -63,6 +63,7 @@ if(DO_SHADOWFAX)
     Simulation.cpp
     SnapshotHandler.cpp
     StarFormationParticleConverter.cpp
+    StellarFeedback.cpp
     TimeLine.cpp
     TimeStepWalker.cpp
     VorCell.cpp
@@ -89,6 +90,7 @@ if(DO_SHADOWFAX)
     MPIMethods.hpp
     NDIrregTable.hpp
     NDTable.hpp
+    NgbSearch.hpp
     ParameterFile.hpp
     Physics.cpp
     Plane.hpp
@@ -103,6 +105,7 @@ if(DO_SHADOWFAX)
     SnapshotWriterFactory.hpp
     StarFormationParticleConverter.hpp
     StateVector.hpp
+    StellarFeedback.hpp
     TimeLine.hpp
     TimeStepWalker.hpp
     Vec.hpp

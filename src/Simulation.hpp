@@ -38,6 +38,7 @@ class UnitSet;
 class RectangularBox;
 class ParticleVector;
 class StarFormationParticleConverter;
+class StellarFeedback;
 class TimeLine;
 class VorTessManager;
 class RestartFile;
@@ -101,6 +102,9 @@ class Simulation {
 
     /*! @brief StarFormationParticleConverter used for star formation */
     StarFormationParticleConverter* _starformation_converter;
+
+    /*! @brief StarFormationParticleConverter used for star formation */
+    StellarFeedback* _stellar_feedback;
 
     /*! \brief VorTessManager used to calculate the Voronoi grid used for the
      *  hydrodynamical integration */

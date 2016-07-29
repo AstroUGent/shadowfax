@@ -222,7 +222,8 @@ class Node {
      * @param is_leaf True if the node is a leaf of the tree, false otherwise
      * @param is_pseudo True if the node is a pseudonode of the tree
      */
-    Node(bool is_leaf, bool is_pseudo = false) : _flag_leaf(is_leaf), _flag_pseudo(is_pseudo) {
+    Node(bool is_leaf, bool is_pseudo = false)
+            : _flag_leaf(is_leaf), _flag_pseudo(is_pseudo) {
         _flag_last = false;
         _flag_local = false;
     }

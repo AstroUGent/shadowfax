@@ -1106,7 +1106,7 @@ unsigned int TreeNode::finalize(Node* sibling, bool last) {
 
     // if the node contains pseudonodes on a lower level, set the appropriate
     // flag
-   _flag_local = !only_local;
+    _flag_local = !only_local;
 
     _sibling = sibling;
     _child = child;

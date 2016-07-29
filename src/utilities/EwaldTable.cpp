@@ -26,6 +26,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "EwaldTable.hpp"
+#include "EwaldTableLocation.hpp"
 #include <fstream>
 #include <iostream>
 using namespace std;
@@ -130,7 +131,8 @@ void EwaldTable::set_boxsize(double L) {
   */
 bool EwaldTable::read_table() {
 #if ndim_ == 3
-    ifstream file("ewaldtable3d.dat", ios::in | ios::binary);
+    string path = string(EWALDTABLE_LOCATION) + string("ewaldtable3d.dat");
+    ifstream file(path, ios::in | ios::binary);
     if(file) {
         for(unsigned int i = _size + 1; i--;) {
             for(unsigned int j = _size + 1; j--;) {
@@ -149,7 +151,8 @@ bool EwaldTable::read_table() {
         return false;
     }
 #else
-    ifstream file("ewaldtable2d.dat", ios::in | ios::binary);
+    string path = string(EWALDTABLE_LOCATION) + string("ewaldtable2d.dat");
+    ifstream file(path, ios::in | ios::binary);
     if(file) {
         for(unsigned int i = _size + 1; i--;) {
             for(unsigned int j = _size + 1; j--;) {
@@ -220,7 +223,8 @@ void EwaldTable::construct() {
             }
         }
     }
-    ofstream file("ewaldtable3d.dat", ios::out | ios::binary);
+    string path = string(EWALDTABLE_LOCATION) + string("ewaldtable3d.dat");
+    ofstream file(path, ios::out | ios::binary);
     for(unsigned int i = _size + 1; i--;) {
         for(unsigned int j = _size + 1; j--;) {
             for(unsigned int k = _size + 1; k--;) {
@@ -268,7 +272,8 @@ void EwaldTable::construct() {
             }
         }
     }
-    ofstream file("ewaldtable2d.dat", ios::out | ios::binary);
+    string path = string(EWALDTABLE_LOCATION) + string("ewaldtable2d.dat");
+    ofstream file(path, ios::out | ios::binary);
     for(unsigned int i = _size + 1; i--;) {
         for(unsigned int j = _size + 1; j--;) {
             file.write(reinterpret_cast<char*>(&_f[i][j][0]),

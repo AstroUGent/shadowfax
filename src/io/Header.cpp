@@ -427,7 +427,8 @@ double Header::hsoft() {
  */
 void Header::pack_data(void* buffer, int bufsize, int* position) {
     MyMPI_Pack(&_npart, 1, MPI_UNSIGNED, buffer, bufsize, position);
-    MyMPI_Pack(&_npartspec[0], PARTTYPE_COUNTER, MPI_UNSIGNED, buffer, bufsize, position);
+    MyMPI_Pack(&_npartspec[0], PARTTYPE_COUNTER, MPI_UNSIGNED, buffer, bufsize,
+               position);
     MyMPI_Pack(&_ndim, 1, MPI_UNSIGNED, buffer, bufsize, position);
     MyMPI_Pack(&_box[0], ndim_ + ndim_, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_time, 1, MPI_DOUBLE, buffer, bufsize, position);
@@ -449,7 +450,8 @@ void Header::pack_data(void* buffer, int bufsize, int* position) {
  */
 Header::Header(void* buffer, int bufsize, int* position) {
     MyMPI_Unpack(buffer, bufsize, position, &_npart, 1, MPI_UNSIGNED);
-    MyMPI_Unpack(buffer, bufsize, position, &_npartspec[0], PARTTYPE_COUNTER, MPI_UNSIGNED);
+    MyMPI_Unpack(buffer, bufsize, position, &_npartspec[0], PARTTYPE_COUNTER,
+                 MPI_UNSIGNED);
     MyMPI_Unpack(buffer, bufsize, position, &_ndim, 1, MPI_UNSIGNED);
     MyMPI_Unpack(buffer, bufsize, position, &_box[0], ndim_ + ndim_,
                  MPI_DOUBLE);

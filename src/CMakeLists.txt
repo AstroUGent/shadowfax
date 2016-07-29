@@ -279,6 +279,7 @@ if(DO_GIZMO)
     GadgetSnapshotReader.cpp
     GadgetSnapshotWriter.cpp
     GIZMO.cpp
+    Image.cpp
     Line.cpp
     MPIGlobal.cpp
     NgbSearch.cpp

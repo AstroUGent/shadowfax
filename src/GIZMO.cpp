@@ -24,9 +24,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "GIZMO.hpp"
-#include "DelCont.hpp"                // for RectangularBox
-#include "Error.hpp"                  // for my_exit
-#include "MPIMethods.hpp"             // for MyMPI_Finalize, MyMPI_Init
+#include "DelCont.hpp"     // for RectangularBox
+#include "Error.hpp"       // for my_exit
+#include "MPIMethods.hpp"  // for MyMPI_Finalize, MyMPI_Init
 #include "NgbSearch.hpp"
 #include "SnapshotHandler.hpp"        // for SnapshotReader
 #include "SnapshotReaderFactory.hpp"  // for SnapshotReaderFactory
@@ -325,10 +325,10 @@ GIZMO::GIZMO(int argc, char** argv) {
         for(unsigned int i = 0; i < particles.gassize(); i++) {
             if(todo[i]) {
                 GasParticle* pi = particles.gas(i);
-                vector<GasParticle*> ngbs;
                 vector<bool> exports;
-                particles.get_tree().get_neighbours_periodic(
-                        pi->get_position(), h[i], ngbs, exports);
+                NgbSearch ngbsearch(pi->get_position(), h[i], exports);
+                particles.get_tree().walk_tree(ngbsearch);
+                vector<GasParticle*> ngbs = ngbsearch.get_ngbs();
                 double nngb = 0.;
                 double dw_du = 0.;
                 matrix[6 * i] = 0.;
@@ -419,10 +419,10 @@ GIZMO::GIZMO(int argc, char** argv) {
         vector<double> Atot(particles.gassize(), 0.);
         for(unsigned int i = 0; i < particles.gassize(); i++) {
             GasParticle* pi = particles.gas(i);
-            vector<GasParticle*> ngbs;
             vector<bool> exports;
-            particles.get_tree().get_neighbours_periodic(pi->get_position(),
-                                                         h[i], ngbs, exports);
+            NgbSearch ngbsearch(pi->get_position(), h[i], exports);
+            particles.get_tree().walk_tree(ngbsearch);
+            vector<GasParticle*> ngbs = ngbsearch.get_ngbs();
             for(unsigned int j = 0; j < ngbs.size(); j++) {
                 GasParticle* pj = ngbs[j];
                 if(pi == pj) {
@@ -633,10 +633,10 @@ GIZMO::GIZMO(int argc, char** argv) {
             for(unsigned int i = 0; i < particles.gassize(); i++) {
                 if(todo[i]) {
                     GasParticle* pi = particles.gas(i);
-                    vector<GasParticle*> ngbs;
                     vector<bool> exports;
-                    particles.get_tree().get_neighbours_periodic(
-                            pi->get_position(), h[i], ngbs, exports);
+                    NgbSearch ngbsearch(pi->get_position(), h[i], exports);
+                    particles.get_tree().walk_tree(ngbsearch);
+                    vector<GasParticle*> ngbs = ngbsearch.get_ngbs();
                     double nngb = 0.;
                     double dw_du = 0.;
                     matrix[6 * i] = 0.;

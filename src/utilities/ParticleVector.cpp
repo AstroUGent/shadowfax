@@ -32,6 +32,7 @@
 #include "ParameterFile.hpp"
 #include "Particle.hpp"
 #include "RestartFile.hpp"
+#include "StarParticle.hpp"
 #include <fstream>
 using namespace std;
 
@@ -135,6 +136,7 @@ void ParticleVector::finalize() {
     MyMPI_Allreduce(_sizes, globsizes, PARTTYPE_COUNTER, MPI_UNSIGNED, MPI_SUM);
     _header.set_ngaspart(globsizes[PARTTYPE_GAS]);
     _header.set_ndmpart(globsizes[PARTTYPE_DM]);
+    _header.set_nstarpart(globsizes[PARTTYPE_STAR]);
 }
 
 /**
@@ -170,6 +172,24 @@ void ParticleVector::add_DM_particle(DMParticle* particle) {
         _offsets[i]++;
     }
     _sizes[PARTTYPE_DM]++;
+    _sizes[PARTTYPE_COUNTER]++;
+}
+
+/**
+ * @brief Add the given StarParticle to the dark matter particle list
+ *
+ * @param particle StarParticle to add
+ */
+void ParticleVector::add_star_particle(StarParticle* particle) {
+    particle->set_key(_container.get_key(particle->get_position()));
+    _particles.insert(_particles.begin() + _offsets[PARTTYPE_STAR] +
+                              _sizes[PARTTYPE_STAR],
+                      particle);
+    // shift the offsets of all particles of other types
+    for(int i = PARTTYPE_STAR + 1; i < PARTTYPE_COUNTER; i++) {
+        _offsets[i]++;
+    }
+    _sizes[PARTTYPE_STAR]++;
     _sizes[PARTTYPE_COUNTER]++;
 }
 
@@ -359,6 +379,21 @@ void ParticleVector::print_local_particles(string filename) {
             ofile << "\n";
         }
     }
+
+    // star particles
+    if(_sizes[PARTTYPE_STAR]) {
+        ofile << "#dm\n";
+
+        for(unsigned int i = _offsets[PARTTYPE_STAR]; i < _sizes[PARTTYPE_STAR];
+            i++) {
+            Particle* p = _particles[i];
+            ofile << p->x() << "\t" << p->y();
+#if ndim_ == 3
+            ofile << "\t" << p->z();
+#endif
+            ofile << "\n";
+        }
+    }
 }
 
 /**
@@ -407,6 +442,12 @@ void ParticleVector::dump(RestartFile& rfile) {
         i < _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM]; i++) {
         _particles[i]->dump(rfile);
     }
+    vsize = _sizes[PARTTYPE_STAR];
+    rfile.write(vsize);
+    for(unsigned int i = _offsets[PARTTYPE_STAR];
+        i < _offsets[PARTTYPE_STAR] + _sizes[PARTTYPE_STAR]; i++) {
+        _particles[i]->dump(rfile);
+    }
 }
 
 /**
@@ -445,6 +486,15 @@ ParticleVector::ParticleVector(RestartFile& rfile, RectangularBox& box,
     for(unsigned int i = _offsets[PARTTYPE_DM];
         i < _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM]; i++) {
         _particles[i] = new DMParticle(rfile);
+    }
+    rfile.read(vsize);
+    _sizes[PARTTYPE_STAR] = vsize;
+    _sizes[PARTTYPE_COUNTER] += vsize;
+    _offsets[PARTTYPE_STAR] = _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM];
+    _particles.resize(_sizes[PARTTYPE_COUNTER], NULL);
+    for(unsigned int i = _offsets[PARTTYPE_STAR];
+        i < _offsets[PARTTYPE_STAR] + _sizes[PARTTYPE_STAR]; i++) {
+        _particles[i] = new StarParticle(rfile);
     }
 }
 

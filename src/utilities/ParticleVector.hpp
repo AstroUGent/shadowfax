@@ -37,6 +37,7 @@ class RectangularBox;
 class GasParticle;
 class DMParticle;
 class ParameterFile;
+class StarParticle;
 
 #define PARTICLEVECTOR_DEFAULT_PERIODICFLAG false
 #define PARTICLEVECTOR_DEFAULT_EWALDFLAG false
@@ -116,6 +117,7 @@ class ParticleVector {
 
     void add_gas_particle(GasParticle* particle);
     void add_DM_particle(DMParticle* particle);
+    void add_star_particle(StarParticle* particle);
     void construct_tree();
     void sort();
 
@@ -140,6 +142,15 @@ class ParticleVector {
      */
     unsigned int dmsize() {
         return _sizes[PARTTYPE_DM];
+    }
+
+    /**
+     * @brief Get the size of the star particle list
+     *
+     * @return Size of the local star particle list
+     */
+    unsigned int starsize() {
+        return _sizes[PARTTYPE_STAR];
     }
 
     /**
@@ -177,6 +188,23 @@ class ParticleVector {
     }
 
     /**
+     * @brief Resize the star particle list
+     *
+     * @param size New size for the star particle list
+     */
+    void resizestar(unsigned int size) {
+        _sizes[PARTTYPE_STAR] = size;
+        _sizes[PARTTYPE_COUNTER] = 0;
+        for(int type = 0; type < PARTTYPE_COUNTER; type++) {
+            _sizes[PARTTYPE_COUNTER] += _sizes[type];
+        }
+        _particles.resize(_sizes[PARTTYPE_COUNTER]);
+        for(int type = PARTTYPE_STAR + 1; type < PARTTYPE_COUNTER; type++) {
+            _offsets[type] = _offsets[type - 1] + _sizes[type - 1];
+        }
+    }
+
+    /**
      * @brief Access the ith element of the gas particle list
      *
      * @param i unsigned integer index of the requested gas particle in the list
@@ -195,6 +223,17 @@ class ParticleVector {
      */
     DMParticle*& dm(unsigned int i) {
         return (DMParticle*&)_particles[_offsets[PARTTYPE_DM] + i];
+    }
+
+    /**
+     * @brief Access the ith element of the star particle list
+     *
+     * @param i unsigned integer index of the requested star particle in the
+     * list
+     * @return Reference to the ith star particle in the list
+     */
+    StarParticle*& star(unsigned int i) {
+        return (StarParticle*&)_particles[_offsets[PARTTYPE_STAR] + i];
     }
 
     /**
@@ -224,6 +263,16 @@ class ParticleVector {
     DMParticle*& dmback() {
         return (DMParticle*&)
                 _particles[_offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM] - 1];
+    }
+
+    /**
+     * @brief Get a reference to the last dark matter particle in the list
+     *
+     * @return Reference to the last dark matter particle in the list
+     */
+    StarParticle*& starback() {
+        return (StarParticle*&)
+                _particles[_offsets[PARTTYPE_STAR] + _sizes[PARTTYPE_STAR] - 1];
     }
 
     /**

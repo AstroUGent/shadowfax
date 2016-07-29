@@ -36,6 +36,8 @@ ParticleFactory.hpp
 ParticleTypes.hpp
 ParticleVector.cpp
 ParticleVector.hpp
+StarParticle.cpp
+StarParticle.hpp
 Timer.cpp
 Timer.hpp
 Tree.cpp

@@ -26,6 +26,7 @@
 #ifndef HEADER_HPP
 #define HEADER_HPP
 
+#include "utilities/ParticleTypes.hpp"
 #include <ostream>
 
 class RestartFile;
@@ -46,7 +47,7 @@ class Header {
     unsigned int _npart;
 
     /*! \brief The total number of gas and dm particles in the simulation */
-    unsigned int _npartspec[2];
+    unsigned int _npartspec[PARTTYPE_COUNTER];
 
     /*! \brief The number of dimensions of the simulation (2 or 3) */
     unsigned int _ndim;
@@ -90,6 +91,7 @@ class Header {
 
     void set_ngaspart(unsigned int npart);
     void set_ndmpart(unsigned int npart);
+    void set_nstarpart(unsigned int npart);
     void set_box(double* box);
     void set_time(double time);
     void set_global_timestep(bool global_timestep);
@@ -112,6 +114,7 @@ class Header {
     unsigned int npart();
     unsigned int ngaspart();
     unsigned int ndmpart();
+    unsigned int nstarpart();
     void box(double* box);
     double time();
     bool global_timestep();

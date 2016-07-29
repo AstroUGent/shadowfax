@@ -614,17 +614,6 @@ void SpecificICGenerator::add_DM_plummer(ParticleVector& grid) {
         Vec velocity(vrad * cosp, vrad * sinp);
 #endif
 
-        for(unsigned int j = ndim_; j--;) {
-            double temp = position[j] * 10000.;
-            temp = floor(temp);
-            temp /= 10000.;
-            position[j] = temp;
-            temp = velocity[j] * 10000.;
-            temp = floor(temp);
-            temp /= 10000.;
-            velocity[j] = temp;
-        }
-
         float mass = (float)(M / ((double)_ndmpart));
         grid.add_DM_particle(new DMParticle(position));
         // accelerating from 0 to velocity is the same as setting the velocity

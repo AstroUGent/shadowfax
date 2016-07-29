@@ -122,6 +122,12 @@ else(ONLY_SIMULATION_PROGRAM)
     set(DO_VTKMAKER True)
 endif(ONLY_SIMULATION_PROGRAM)
 
+if(TENET)
+    set(DO_TENET True)
+else(TENET)
+    set(DO_TENET False)
+endif(TENET)
+
 # put executable in the rundirs
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/rundir)
 

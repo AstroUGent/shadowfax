@@ -260,3 +260,37 @@ if(DO_VTKMAKER)
     target_link_libraries(${VTKMAKERNAME} ${HDF5_LIBRARIES})
     target_link_libraries(${VTKMAKERNAME} ${ALL_Boost_LIBRARIES})
 endif(DO_VTKMAKER)
+
+if(DO_TENET)
+    set(TENETNAME myTenet${NDIM}d)
+
+    add_executable(${TENETNAME}
+    Legendre.cpp
+    MPIGlobal.cpp
+    ProgramLog.cpp
+    Tenet.cpp
+    TenetCell.cpp
+    utilities/HelperFunctions.cpp
+    utilities/Timer.cpp
+
+    Legendre.hpp
+    RungeKutta.hpp
+    RungeKuttaFlux.hpp
+    Tenet.hpp
+    TenetBasisFunctions.hpp
+    TenetCell.hpp
+    TenetCellWeights.hpp
+    TenetGrid.hpp
+    TenetMinModSlopeLimiter.hpp
+    TenetRungeKuttaFlux.hpp
+    TenetSlopeLimiter.hpp
+    TenetSystemState.hpp
+    )
+    set_target_properties(${TENETNAME} PROPERTIES
+                          COMPILE_FLAGS "-Dndim_=${NDIM}")
+
+    target_link_libraries(${TENETNAME} ${RIEMANNNAME})
+    target_link_libraries(${TENETNAME} ${MPI_CXX_LIBRARIES})
+    target_link_libraries(${TENETNAME} ${MPI_C_LIBRARIES})
+
+endif(DO_TENET)

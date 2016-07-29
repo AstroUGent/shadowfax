@@ -35,6 +35,7 @@
 #include "utilities/DMParticle.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"
+#include "utilities/StarParticle.hpp"
 using namespace std;
 
 /**
@@ -122,7 +123,6 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
  * @param units Internal units
  * @param output_units Output units
  * @param periodic Flag indicating if the simulation box is periodic
- * @param cosmology Cosmology used for comoving integration
  */
 TimeLine::TimeLine(ParameterFile* parameters, std::string outputdir,
                    ParticleVector& particlevector, UnitSet& units,
@@ -224,7 +224,7 @@ unsigned long TimeLine::calculate_timestep() {
         }
         // determine hydro timesteps
         _particles.get_tree().walk_tree<TimeStepWalker>(
-                _particles, true, false, _current_time + _timestep);
+                _particles, true, false, false, _current_time + _timestep);
     } else {
         for(unsigned int i = 0; i < _particles.gassize(); i++) {
             if(_particles.gas(i)->get_endtime() == _current_time + _timestep) {
@@ -340,6 +340,53 @@ unsigned long TimeLine::calculate_timestep() {
         Smin = std::min(pidt, Smin);
     }
 
+    for(unsigned int i = _particles.starsize(); i--;) {
+        if(_particles.star(i)->get_endtime() != _current_time + _timestep) {
+            continue;
+        }
+        numactive++;
+        double a = _particles.star(i)->get_gravitational_acceleration().norm();
+        // if the acceleration is 0, timestep is formally infinite, so we set it
+        // to the maximal timestep
+        unsigned long tidt = Smax;
+        if(a) {
+            double eps = _particles.star(i)->get_hsoft();
+            double dt = sqrt(2. * eps * eta / a);
+            // the line below is necessary to avoid an overflow when converting
+            // to unsigned long
+            dt = std::min(_tottime, dt);
+            tidt = std::min(
+                    tidt, (unsigned long)((dt / _tottime) * _integer_maxtime));
+        }
+        // make the timestep a power of 2 subdivision of the total simulation
+        // time
+        unsigned long pidt = _integer_maxtime;
+        while(tidt < pidt) {
+            pidt >>= 1;
+        }
+
+        if(!pidt) {
+            cerr << "Timestep 0!" << endl;
+            my_exit();
+        }
+
+        // if the timestep wants to increase, make sure it synchronizes
+        while((_integer_maxtime - _particles.star(i)->get_endtime()) % pidt) {
+            pidt >>= 1;
+        }
+        pidt = std::max(pidt, _min_timestep);
+        pidt = std::min(pidt, _max_timestep);
+        if(!_particles.global_timestep()) {
+            // increase particle timestep
+            _particles.star(i)->set_starttime(
+                    _particles.star(i)->get_endtime());
+            _particles.star(i)->set_endtime(_particles.star(i)->get_endtime() +
+                                            pidt);
+        }
+        // set global timestep to smallest timestep of all particles
+        Smin = std::min(pidt, Smin);
+    }
+
     _particles.set_numactive(numactive);
 
     unsigned long Smin_glob;
@@ -351,6 +398,9 @@ unsigned long TimeLine::calculate_timestep() {
         }
         for(unsigned int i = _particles.dmsize(); i--;) {
             _particles.dm(i)->set_timestep(Smin_glob);
+        }
+        for(unsigned int i = _particles.starsize(); i--;) {
+            _particles.star(i)->set_timestep(Smin_glob);
         }
     }
 

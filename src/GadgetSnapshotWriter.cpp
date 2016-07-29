@@ -31,6 +31,7 @@
 #include "io/UnitSetGenerator.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/ParticleVector.hpp"
+#include "utilities/StarParticle.hpp"
 using namespace std;
 
 /**
@@ -117,26 +118,33 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
     // collect data over all processes
     unsigned int ngaspart_loc = particles.gassize();
     unsigned int ndmpart_loc = particles.dmsize();
+    unsigned int nstarpart_loc = particles.starsize();
     vector<unsigned int> gassizes(size);
     vector<unsigned int> dmsizes(size);
+    vector<unsigned int> starsizes(size);
     MyMPI_Allgather(&ngaspart_loc, 1, MPI_UNSIGNED, &gassizes[0], 1,
                     MPI_UNSIGNED, comm);
     MyMPI_Allgather(&ndmpart_loc, 1, MPI_UNSIGNED, &dmsizes[0], 1, MPI_UNSIGNED,
                     comm);
+    MyMPI_Allgather(&nstarpart_loc, 1, MPI_UNSIGNED, &starsizes[0], 1,
+                    MPI_UNSIGNED, comm);
 
     // make size vectors cumulative
     for(unsigned int i = 1; i < gassizes.size(); i++) {
         gassizes[i] += gassizes[i - 1];
         dmsizes[i] += dmsizes[i - 1];
+        starsizes[i] += starsizes[i - 1];
     }
 
-    unsigned int ngas_glob, ndm_glob;
+    unsigned int ngas_glob, ndm_glob, nstar_glob;
     if(_per_node_output) {
         MyMPI_Allreduce(&ngaspart_loc, &ngas_glob, 1, MPI_UNSIGNED, MPI_SUM);
         MyMPI_Allreduce(&ndmpart_loc, &ndm_glob, 1, MPI_UNSIGNED, MPI_SUM);
+        MyMPI_Allreduce(&nstarpart_loc, &nstar_glob, 1, MPI_UNSIGNED, MPI_SUM);
     } else {
         ngas_glob = gassizes.back();
         ndm_glob = dmsizes.back();
+        nstar_glob = starsizes.back();
     }
 
     for(int irank = 0; irank < size; irank++) {
@@ -186,9 +194,11 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
                 vector<unsigned int> numpart(6, 0);
                 numpart[0] = gassizes.back();
                 numpart[1] = dmsizes.back();
+                numpart[4] = starsizes.back();
                 vector<unsigned int> numpart_tot(6, 0);
                 numpart_tot[0] = ngas_glob;
                 numpart_tot[1] = ndm_glob;
+                numpart_tot[4] = nstar_glob;
                 vector<unsigned int> numpart_highword(6, 0);
                 unsigned int periodic = particles.get_local_header().periodic();
                 unsigned int gravity = particles.get_local_header().gravity();
@@ -456,6 +466,113 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
                     dataset = H5Dopen(group, "ParticleIDs");
                     HDF5tools::write_dataset_scalar_chunk(
                             dataset, HDF5types::ULONG, dmsizes[rank - 1], ids);
+                    status = H5Dclose(dataset);
+
+                    status = H5Gclose(group);
+                }
+            }
+
+            // star particles
+            if(starsizes.back()) {
+                vector<double> coords(particles.starsize() * 3, 0.);
+                vector<double> masses(particles.starsize(), 0.);
+                vector<float> velocity(particles.starsize() * 3, 0.);
+                vector<unsigned long> ids(particles.starsize(), 0);
+                vector<double> ages(particles.starsize(), 0.);
+                for(unsigned int i = 0; i < particles.starsize(); i++) {
+                    coords[3 * i] = length_converter.convert(
+                            particles.star(i)->x() - box[0]);
+                    coords[3 * i + 1] = length_converter.convert(
+                            particles.star(i)->y() - box[1]);
+                    coords[3 * i + 2] = length_converter.convert(
+                            particles.star(i)->z() - box[2]);
+                    masses[i] = mass_converter.convert(
+                            particles.star(i)->get_mass());
+                    velocity[3 * i] =
+                            velocity_converter.convert(particles.star(i)->vx());
+                    velocity[3 * i + 1] =
+                            velocity_converter.convert(particles.star(i)->vy());
+                    velocity[3 * i + 2] =
+                            velocity_converter.convert(particles.star(i)->vz());
+                    ids[i] = particles.star(i)->id();
+                    ages[i] = time_converter.convert(
+                            particles.star(i)->get_age());
+                }
+                // write particle data
+                if(!rank) {
+                    // process 0 creates the group and datasets
+                    // the datasets that are created have the size of the total
+                    // data over all processes
+                    hid_t group = H5Gcreate(file, "PartType4", -1);
+
+                    hid_t dataset = HDF5tools::create_dataset_vector(
+                            group, "Coordinates", HDF5types::DOUBLE,
+                            starsizes.back());
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::DOUBLE, 0, coords);
+                    status = H5Dclose(dataset);
+
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "Masses", HDF5types::DOUBLE,
+                            starsizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::DOUBLE, 0, masses);
+                    status = H5Dclose(dataset);
+
+                    dataset = HDF5tools::create_dataset_vector(
+                            group, "Velocities", HDF5types::FLOAT,
+                            starsizes.back());
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::FLOAT, 0, velocity);
+                    status = H5Dclose(dataset);
+
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "ParticleIDs", HDF5types::ULONG,
+                            starsizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::ULONG, 0, ids);
+                    status = H5Dclose(dataset);
+
+                    dataset = HDF5tools::create_dataset_scalar(
+                            group, "Ages", HDF5types::DOUBLE, starsizes.back());
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::DOUBLE, 0, ages);
+                    status = H5Dclose(dataset);
+
+                    status = H5Gclose(group);
+                } else {
+                    // processes other than 0 open the group and datasets
+                    // datasets are appended to in rank order
+                    hid_t group = H5Gopen(file, "PartType4");
+
+                    hid_t dataset = H5Dopen(group, "Coordinates");
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::DOUBLE, starsizes[rank - 1],
+                            coords);
+                    status = H5Dclose(dataset);
+
+                    dataset = H5Dopen(group, "Masses");
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::DOUBLE, starsizes[rank - 1],
+                            masses);
+                    status = H5Dclose(dataset);
+
+                    dataset = H5Dopen(group, "Velocities");
+                    HDF5tools::write_dataset_vector_chunk(
+                            dataset, HDF5types::FLOAT, starsizes[rank - 1],
+                            velocity);
+                    status = H5Dclose(dataset);
+
+                    dataset = H5Dopen(group, "ParticleIDs");
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::ULONG, starsizes[rank - 1],
+                            ids);
+                    status = H5Dclose(dataset);
+
+                    dataset = H5Dopen(group, "Ages");
+                    HDF5tools::write_dataset_scalar_chunk(
+                            dataset, HDF5types::DOUBLE, starsizes[rank - 1],
+                            ages);
                     status = H5Dclose(dataset);
 
                     status = H5Gclose(group);

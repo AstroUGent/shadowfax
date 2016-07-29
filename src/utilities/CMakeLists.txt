@@ -38,10 +38,13 @@ Hilbert.hpp
 ParallelSorter.hpp
 Particle.cpp
 Particle.hpp
+ParticleConverter.hpp
 ParticleFactory.hpp
 ParticleTypes.hpp
 ParticleVector.cpp
 ParticleVector.hpp
+StarParticle.cpp
+StarParticle.hpp
 Timer.cpp
 Timer.hpp
 Tree.cpp

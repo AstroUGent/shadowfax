@@ -23,9 +23,14 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "utilities/Particle.hpp"
-#include "utilities/Tree.hpp"
-#include "utilities/TreeWalker.hpp"
+#include "NgbSearch.hpp"
+#include "Vec.hpp"                      // for Vec, operator-
+#include "utilities/GasParticle.hpp"    // for GasParticle
+#include "utilities/Particle.hpp"       // for Particle
+#include "utilities/ParticleTypes.hpp"  // for ParticleType::PARTTYPE_GAS
+#include "utilities/Tree.hpp"           // for Leaf, PseudoNode, TreeNode
+#include <cstddef>                      // for NULL
+#include <vector>                       // for vector, vector<>::reference
 using namespace std;
 
 /**

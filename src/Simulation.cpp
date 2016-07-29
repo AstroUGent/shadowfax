@@ -307,7 +307,7 @@ void Simulation::main_loop() {
     if(_gravity) {
         LOGS("Start calculating gravitational potential");
         _particles->get_tree().walk_tree<PotentialWalker>(*_particles, true,
-                                                          true, 0);
+                                                          true, true, 0);
         // multiply with G
         for(unsigned int i = 0; i < _particles->gassize(); i++) {
             GasParticle* p = _particles->gas(i);
@@ -540,7 +540,7 @@ void Simulation::main_loop() {
         if(_gravity) {
             LOGS("Start calculating gravitational potential");
             _particles->get_tree().walk_tree<PotentialWalker>(
-                    *_particles, true, true, currentTime);
+                    *_particles, true, true, true, currentTime);
             // multiply with G
             for(unsigned int i = 0; i < _particles->gassize(); i++) {
                 GasParticle* p = _particles->gas(i);
@@ -566,8 +566,8 @@ void Simulation::main_loop() {
         if(_gravity) {
             // calculate the gravitational forces
             LOGS("Start relative treewalk");
-            _particles->get_tree().walk_tree<GravityWalker>(*_particles, true,
-                                                            true, currentTime);
+            _particles->get_tree().walk_tree<GravityWalker>(
+                    *_particles, true, true, true, currentTime);
             // set old acceleration before multiplying with G
             for(unsigned int i = _particles->gassize(); i--;) {
                 if(_particles->gas(i)->get_endtime() == currentTime) {
@@ -1084,7 +1084,7 @@ void Simulation::initialize(string filename) {
         // Barnes-Hut
         LOGS("Starting Barnes-Hut gravity walk");
         _particles->get_tree().walk_tree<BHGravityWalker>(*_particles, true,
-                                                          true, 0);
+                                                          true, true, 0);
 
         // no multiplication by G needed, since it is already included in
         // Springel's relative criterion
@@ -1122,7 +1122,7 @@ void Simulation::initialize(string filename) {
         // relative criterion
         LOGS("Starting relative gravity walk");
         _particles->get_tree().walk_tree<GravityWalker>(*_particles, true, true,
-                                                        0);
+                                                        true, 0);
 
         // set old acceleration before multiplying by G
         for(unsigned int i = _particles->gassize(); i--;) {

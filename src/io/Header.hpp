@@ -46,7 +46,8 @@ class Header {
     /*! \brief The total number of particles in the simulation */
     unsigned int _npart;
 
-    /*! \brief The total number of gas and dm particles in the simulation */
+    /*! \brief The total number of gas, dm, and star particles in the
+     *  simulation */
     unsigned int _npartspec[PARTTYPE_COUNTER];
 
     /*! \brief The number of dimensions of the simulation (2 or 3) */

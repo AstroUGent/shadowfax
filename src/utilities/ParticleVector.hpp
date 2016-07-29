@@ -37,6 +37,7 @@ class RectangularBox;
 class GasParticle;
 class DMParticle;
 class ParameterFile;
+class ParticleConverter;
 class StarParticle;
 
 #define PARTICLEVECTOR_DEFAULT_PERIODICFLAG false
@@ -308,6 +309,8 @@ class ParticleVector {
 
     void set_numactive(unsigned int numactive);
     unsigned int get_numactive();
+
+    void convert(ParticleConverter& converter, unsigned long current_time);
 
     void dump(RestartFile& rfile);
     ParticleVector(RestartFile& rfile, RectangularBox& box,

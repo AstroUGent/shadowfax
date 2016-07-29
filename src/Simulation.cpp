@@ -37,6 +37,7 @@
 #include "ProgramLog.hpp"
 #include "RestartFile.hpp"
 #include "SnapshotReaderFactory.hpp"
+#include "StarFormationParticleConverter.hpp"
 #include "TimeLine.hpp"
 #include "Vec.hpp"
 #include "VorCell.hpp"
@@ -197,6 +198,7 @@ Simulation::Simulation(int argc, char** argv) {
  */
 Simulation::~Simulation() {
     delete _physics;
+    delete _starformation_converter;
     delete _parameterfile;
     delete _logfiles;
     delete _solver;
@@ -495,6 +497,11 @@ void Simulation::main_loop() {
         LOGS("Did second kick");
         currentTime += dt;
         _timeline->set_timestep(dt);
+
+        // before we sort, we can convert particles
+        if(_starformation_converter) {
+            _particles->convert(*_starformation_converter, currentTime);
+        }
 
         // this does a new domain decomposition and recalculates the tree
         _particles->sort();
@@ -822,6 +829,10 @@ void Simulation::dump(RestartFile& restartfile) {
 
     _physics->dump(restartfile);
 
+    if(_starformation_converter) {
+        _starformation_converter->dump(restartfile);
+    }
+
     if(_gascooling) {
         _gascooling->dump(restartfile);
     }
@@ -871,18 +882,23 @@ void Simulation::restart(string filename) {
     _simulation_units = new UnitSet(restartfile);
     LOGS("Simulation UnitSet restarted");
 
-    _physics = new Physics(*_simulation_units, _parameterfile);
+    _output_units = new UnitSet(restartfile);
+    LOGS("Output UnitSet restarted");
+
+    _physics = new Physics(restartfile);
+
+    if(_parameterfile->check_parameter("Physics.StarFormation")) {
+        _starformation_converter =
+                new StarFormationParticleConverter(restartfile);
+    } else {
+        _starformation_converter = NULL;
+    }
 
     if(_parameterfile->check_parameter("Physics.Cooling")) {
         _gascooling = new GasCooling(restartfile);
     } else {
         _gascooling = NULL;
     }
-
-    _output_units = new UnitSet(restartfile);
-    LOGS("Output UnitSet restarted");
-
-    _physics = new Physics(restartfile);
 
     _box = new RectangularBox(restartfile);
     _particles = new ParticleVector(restartfile, _parameterfile, *_box,
@@ -961,6 +977,13 @@ void Simulation::initialize(string filename) {
     LOGS("Simulation UnitSet created");
 
     _physics = new Physics(*_simulation_units, _parameterfile);
+
+    if(_parameterfile->check_parameter("Physics.StarFormation")) {
+        _starformation_converter = new StarFormationParticleConverter(
+                _parameterfile, _simulation_units, _physics);
+    } else {
+        _starformation_converter = NULL;
+    }
 
     if(_parameterfile->check_parameter("Physics.Cooling")) {
         _gascooling = new GasCooling(COOLING_LOCATION, _simulation_units,

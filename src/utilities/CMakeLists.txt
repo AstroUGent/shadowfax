@@ -38,6 +38,7 @@ Hilbert.hpp
 ParallelSorter.hpp
 Particle.cpp
 Particle.hpp
+ParticleConverter.hpp
 ParticleFactory.hpp
 ParticleTypes.hpp
 ParticleVector.cpp

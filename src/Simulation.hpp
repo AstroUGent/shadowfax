@@ -1,6 +1,8 @@
 /*******************************************************************************
  * This file is part of Shadowfax
  * Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+ *               2016 Yorick Van Den Bossche (yorick.vandenbossche@ugent.be)
+ *                    Bert Vandenbroucke
  *
  * Shadowfax is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +37,7 @@ class RiemannSolver;
 class UnitSet;
 class RectangularBox;
 class ParticleVector;
+class StarFormationParticleConverter;
 class TimeLine;
 class VorTessManager;
 class RestartFile;
@@ -95,6 +98,9 @@ class Simulation {
 
     /*! \brief Physical constants used during the simulation */
     Physics* _physics;
+
+    /*! @brief StarFormationParticleConverter used for star formation */
+    StarFormationParticleConverter* _starformation_converter;
 
     /*! \brief VorTessManager used to calculate the Voronoi grid used for the
      *  hydrodynamical integration */

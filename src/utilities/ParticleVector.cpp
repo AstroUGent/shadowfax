@@ -31,6 +31,7 @@
 #include "ParallelSorter.hpp"
 #include "ParameterFile.hpp"
 #include "Particle.hpp"
+#include "ParticleConverter.hpp"
 #include "RestartFile.hpp"
 #include "StarParticle.hpp"
 #include <fstream>
@@ -421,6 +422,40 @@ void ParticleVector::set_numactive(unsigned int numactive) {
  */
 unsigned int ParticleVector::get_numactive() {
     return _numactive;
+}
+
+/**
+ * @brief Subject all particles to the given ParticleConverter
+ *
+ * @param converter Reference to a ParticleConverter implementation
+ * @param current_time Current simulation time
+ */
+void ParticleVector::convert(ParticleConverter& converter,
+                             unsigned long current_time) {
+    if(converter.do_conversion(PARTTYPE_GAS)) {
+        for(unsigned int i = _offsets[PARTTYPE_GAS];
+            i < _offsets[PARTTYPE_GAS] + _sizes[PARTTYPE_GAS]; i++) {
+            if(_particles[i]->get_endtime() == current_time) {
+                _particles[i] = converter.convert(_particles[i]);
+            }
+        }
+    }
+    if(converter.do_conversion(PARTTYPE_DM)) {
+        for(unsigned int i = _offsets[PARTTYPE_DM];
+            i < _offsets[PARTTYPE_DM] + _sizes[PARTTYPE_DM]; i++) {
+            if(_particles[i]->get_endtime() == current_time) {
+                _particles[i] = converter.convert(_particles[i]);
+            }
+        }
+    }
+    if(converter.do_conversion(PARTTYPE_STAR)) {
+        for(unsigned int i = _offsets[PARTTYPE_STAR];
+            i < _offsets[PARTTYPE_STAR] + _sizes[PARTTYPE_STAR]; i++) {
+            if(_particles[i]->get_endtime() == current_time) {
+                _particles[i] = converter.convert(_particles[i]);
+            }
+        }
+    }
 }
 
 /**

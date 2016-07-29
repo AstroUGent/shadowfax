@@ -206,6 +206,33 @@ add_unit_test_bash(NAME testGasCooling
               FILES ${TESTGASCOOLING_FILES}
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
 
+# Legendre test
+set(TESTLEGENDRE_SOURCES
+    testLegendre.cpp
+    ../src/Legendre.cpp
+    ../src/utilities/Timer.cpp
+
+    ../src/Legendre.hpp
+)
+
+add_unit_test(NAME testLegendre
+              SOURCES ${TESTLEGENDRE_SOURCES}
+              NDIM 3
+              LIBS ${MPI_CXX_LIBRARIES})
+
+# Runge-Kutta test
+set(TESTRK_SOURCES
+    testRungeKutta.cpp
+
+    ../src/RungeKutta.hpp
+    ../src/RungeKuttaFlux.hpp
+)
+
+add_unit_test(NAME testRungeKutta
+              SOURCES ${TESTRK_SOURCES}
+              NDIM 2)
+
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

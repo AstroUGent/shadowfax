@@ -33,6 +33,7 @@
 #include "io/UnitSet.hpp"
 #include "io/UnitSetGenerator.hpp"
 #include "utilities/ParticleVector.hpp"
+#include "utilities/StarParticle.hpp"
 #include <fstream>
 using namespace std;
 
@@ -149,6 +150,7 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
                             group, "NumPart_ThisFile", HDF5types::UINT);
             header.set_ngaspart(numpart[0]);
             header.set_ndmpart(numpart[1]);
+            header.set_nstarpart(numpart[4]);
 
             // time - can be both float or double
             if(HDF5tools::attribute_has_type(group, "Time", HDF5types::FLOAT)) {
@@ -454,6 +456,133 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
                                            velocity[3 * i + 2]);
                     particles.dm(i)->set_id(ids[i]);
                     particles.dm(i)->set_mass(masses[i]);
+                }
+
+                status = H5Gclose(group);
+
+                if(status < 0) {
+                    cerr << "ERROR!" << endl;
+                }
+            }
+
+            // stars
+            if(header.nstarpart()) {
+                unsigned int nstarpart = header.nstarpart();
+                // npart_other is equal to the number of particles on ranks
+                // lower than the current rank
+                // if ngaspart is not a multiple of MPIGlobal::size, npart_local
+                // will be too large for the process with the highest rank and
+                // we correct for this
+                unsigned int npart_local = nstarpart / MPIGlobal::size +
+                                           ((nstarpart % MPIGlobal::size) > 0);
+                unsigned int npart_other = MPIGlobal::rank * npart_local;
+                while(npart_other + npart_local > nstarpart) {
+                    npart_local--;
+                }
+                nstarpart = npart_local;
+                particles.resizestar(nstarpart);
+                // need: coordinates, velocities, density, pressure, id
+
+                vector<double> coords(nstarpart * 3, 0.);
+                vector<double> masses(nstarpart, 0.);
+                vector<double> velocity(nstarpart * 3, 0.);
+                vector<unsigned int> ids(nstarpart, 0);
+                vector<double> ages(nstarpart, 0.);
+
+                group = H5Gopen(file, "/PartType4");
+
+                // coordinates
+                if(HDF5tools::dataset_has_type(group, "Coordinates",
+                                               HDF5types::DOUBLE)) {
+                    coords = HDF5tools::read_dataset_vector_chunk<double>(
+                            group, npart_other, nstarpart, "Coordinates",
+                            HDF5types::DOUBLE);
+                } else {
+                    vector<float> fcoords =
+                            HDF5tools::read_dataset_vector_chunk<float>(
+                                    group, npart_other, nstarpart,
+                                    "Coordinates", HDF5types::FLOAT);
+                    for(unsigned int i = 0; i < fcoords.size(); i++) {
+                        coords[i] = fcoords[i];
+                    }
+                }
+                // convert units
+                for(unsigned int i = 0; i < coords.size(); i++) {
+                    coords[i] = length_converter.convert(coords[i]);
+                }
+
+                // velocities
+                vector<float> fvelocity =
+                        HDF5tools::read_dataset_vector_chunk<float>(
+                                group, npart_other, nstarpart, "Velocities",
+                                HDF5types::FLOAT);
+                for(unsigned int i = 0; i < fvelocity.size(); i++) {
+                    velocity[i] = fvelocity[i];
+                }
+                // convert units
+                for(unsigned int i = 0; i < velocity.size(); i++) {
+                    velocity[i] = velocity_converter.convert(velocity[i]);
+                }
+
+                // masses
+                if(HDF5tools::dataset_has_type(group, "Masses",
+                                               HDF5types::DOUBLE)) {
+                    masses = HDF5tools::read_dataset_scalar_chunk<double>(
+                            group, npart_other, nstarpart, "Masses",
+                            HDF5types::DOUBLE);
+                } else {
+                    vector<float> fmasses =
+                            HDF5tools::read_dataset_scalar_chunk<float>(
+                                    group, npart_other, nstarpart, "Masses",
+                                    HDF5types::FLOAT);
+                    for(unsigned int i = 0; i < fmasses.size(); i++) {
+                        masses[i] = fmasses[i];
+                    }
+                }
+                // convert units
+                for(unsigned int i = 0; i < masses.size(); i++) {
+                    masses[i] = mass_converter.convert(masses[i]);
+                }
+
+                // particle IDs
+                if(HDF5tools::dataset_has_type(group, "ParticleIDs",
+                                               HDF5types::ULONG)) {
+                    vector<unsigned long> lids =
+                            HDF5tools::read_dataset_scalar_chunk<unsigned long>(
+                                    group, npart_other, nstarpart,
+                                    "ParticleIDs", HDF5types::ULONG);
+                    for(unsigned int i = 0; i < lids.size(); i++) {
+                        // loss of precision!
+                        ids[i] = lids[i];
+                    }
+                } else {
+                    ids = HDF5tools::read_dataset_scalar_chunk<unsigned int>(
+                            group, npart_other, nstarpart, "ParticleIDs",
+                            HDF5types::UINT);
+                }
+
+                ages = HDF5tools::read_dataset_scalar_chunk<double>(
+                        group, npart_other, nstarpart, "Ages",
+                        HDF5types::DOUBLE);
+                for(unsigned int i = 0; i < ages.size(); i++) {
+                    ages[i] = time_converter.convert(ages[i]);
+                }
+
+                for(unsigned int i = 0; i < nstarpart; i++) {
+#if ndim_ == 3
+                    Vec position(coords[3 * i], coords[3 * i + 1],
+                                 coords[3 * i + 2]);
+#else
+                    Vec position(coords[3 * i], coords[3 * i + 1]);
+#endif
+                    keep_inside(position, simbox);
+                    particles.star(i) = new StarParticle(position);
+                    particles.star(i)->set_v(velocity[3 * i],
+                                             velocity[3 * i + 1],
+                                             velocity[3 * i + 2]);
+                    particles.star(i)->set_id(ids[i]);
+                    particles.star(i)->set_mass(masses[i]);
+                    particles.star(i)->set_age(ages[i]);
                 }
 
                 status = H5Gclose(group);

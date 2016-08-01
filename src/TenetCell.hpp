@@ -1,6 +1,6 @@
 /*******************************************************************************
  * This file is part of Shadowfax
- * Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+ * Copyright (C) 2016 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
  *
  * Shadowfax is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,28 +17,43 @@
  ******************************************************************************/
 
 /**
- * @file ParticleTypes.hpp
+ * @file TenetCell.hpp
  *
- * @brief Types of particles in the simulation
+ * @brief Cell used for Tenet implementation: header
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#ifndef PARTICLETYPES_HPP
-#define PARTICLETYPES_HPP
+#ifndef TENETCELL_HPP
+#define TENETCELL_HPP
+
+#include "StateVector.hpp"
+#include "Vec.hpp"
+#include <vector>
+
+class TenetBasisFunctions;
+class TenetCellWeights;
 
 /**
- * @brief Particle types
+ * @brief Cell of a Cartesian grid, contains the cell center and weights
  */
-enum ParticleType {
-    /*! Gas particle */
-    PARTTYPE_GAS = 0,
-    /*! Dark matter particle */
-    PARTTYPE_DM,
-    /*! Star particle */
-    PARTTYPE_STAR,
-    /*! Counter of the number of types (make sure this stays the last element in
-     *  the enum!) */
-    PARTTYPE_COUNTER
+class TenetCell {
+  private:
+    /*! @brief Center of the cell */
+    Vec _center;
+
+    /*! @brief Weights of the hydrodynamical variables inside the cell */
+    std::vector<StateVector> _weights;
+
+    /*! @brief Time derivatives of the weights */
+    std::vector<StateVector> _dt_weights;
+
+  public:
+    TenetCell(Vec center);
+
+    Vec get_center();
+
+    StateVector get_variables(Vec ksi, TenetCellWeights& weights,
+                              TenetBasisFunctions& basis);
 };
 
-#endif  // PARTICLETYPES_HPP
+#endif  // TENETCELL_HPP

@@ -1,6 +1,6 @@
 /*******************************************************************************
  * This file is part of Shadowfax
- * Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+ * Copyright (C) 2016 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
  *
  * Shadowfax is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,28 +17,40 @@
  ******************************************************************************/
 
 /**
- * @file ParticleTypes.hpp
+ * @file TenetSlopeLimiter.hpp
  *
- * @brief Types of particles in the simulation
+ * @brief General interface for Tenet slope limiters
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#ifndef PARTICLETYPES_HPP
-#define PARTICLETYPES_HPP
+#ifndef TENETSLOPELIMITER_HPP
+#define TENETSLOPELIMITER_HPP
+
+class TenetGrid;
+class TenetSystemState;
 
 /**
- * @brief Particle types
+ * @brief General interface for Tenet slope limiters
  */
-enum ParticleType {
-    /*! Gas particle */
-    PARTTYPE_GAS = 0,
-    /*! Dark matter particle */
-    PARTTYPE_DM,
-    /*! Star particle */
-    PARTTYPE_STAR,
-    /*! Counter of the number of types (make sure this stays the last element in
-     *  the enum!) */
-    PARTTYPE_COUNTER
+class TenetSlopeLimiter {
+  protected:
+    /*! @brief Reference to the TenetGrid on which the slope limiter acts */
+    TenetGrid& _grid;
+
+  public:
+    /**
+     * @brief Constructor
+     *
+     * @param grid Reference to the TenetGrid on which the slope limiter acts
+     */
+    TenetSlopeLimiter(TenetGrid& grid) : _grid(grid) {}
+
+    /**
+     * @brief Limit the weights of the given TenetSystemState
+     *
+     * @param state TenetSystemState on which to act
+     */
+    virtual void limit(TenetSystemState& state) = 0;
 };
 
-#endif  // PARTICLETYPES_HPP
+#endif  // TENETSLOPELIMITER_HPP

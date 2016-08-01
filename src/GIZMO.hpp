@@ -17,28 +17,31 @@
  ******************************************************************************/
 
 /**
- * @file ParticleTypes.hpp
+ * @file GIZMO.hpp
  *
- * @brief Types of particles in the simulation
+ * @brief Implementation of Phil Hopkins' GIZMO: header
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#ifndef PARTICLETYPES_HPP
-#define PARTICLETYPES_HPP
+#ifndef GIZMO_HPP
+#define GIZMO_HPP
+
+class ParticleVector;
 
 /**
- * @brief Particle types
+ * @brief Sideprogram with an implementation of Phil Hopkins' mesh free methods
  */
-enum ParticleType {
-    /*! Gas particle */
-    PARTTYPE_GAS = 0,
-    /*! Dark matter particle */
-    PARTTYPE_DM,
-    /*! Star particle */
-    PARTTYPE_STAR,
-    /*! Counter of the number of types (make sure this stays the last element in
-     *  the enum!) */
-    PARTTYPE_COUNTER
+class GIZMO {
+  private:
+    double kernel(double r, double h);
+    double kernel_d(double r, double h);
+
+    void invert_matrix(double* M, double* IM);
+
+    void test_tree(ParticleVector& particles);
+
+  public:
+    GIZMO(int argc, char** argv);
 };
 
-#endif  // PARTICLETYPES_HPP
+#endif  // GIZMO_HPP

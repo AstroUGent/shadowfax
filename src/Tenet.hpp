@@ -1,6 +1,6 @@
 /*******************************************************************************
  * This file is part of Shadowfax
- * Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+ * Copyright (C) 2016 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
  *
  * Shadowfax is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,28 +17,24 @@
  ******************************************************************************/
 
 /**
- * @file ParticleTypes.hpp
+ * @file Tenet.hpp
  *
- * @brief Types of particles in the simulation
+ * @brief Implementation of Kevin Schaal's Tenet: header
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#ifndef PARTICLETYPES_HPP
-#define PARTICLETYPES_HPP
+#ifndef TENET_HPP
+#define TENET_HPP
+
+class StateVector;
 
 /**
- * @brief Particle types
+ * @brief Sideprogram with an implementation of Kevin Schaal's discontinuous
+ * Galerkin method
  */
-enum ParticleType {
-    /*! Gas particle */
-    PARTTYPE_GAS = 0,
-    /*! Dark matter particle */
-    PARTTYPE_DM,
-    /*! Star particle */
-    PARTTYPE_STAR,
-    /*! Counter of the number of types (make sure this stays the last element in
-     *  the enum!) */
-    PARTTYPE_COUNTER
+class Tenet {
+  public:
+    Tenet(int argc, char** argv);
 };
 
-#endif  // PARTICLETYPES_HPP
+#endif  // TENET_HPP

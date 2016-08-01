@@ -30,6 +30,7 @@
 #include "Line.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
+#include "NgbSearch.hpp"
 #include "ProgramLog.hpp"
 #include "Simplex.hpp"
 #include "VorCell.hpp"

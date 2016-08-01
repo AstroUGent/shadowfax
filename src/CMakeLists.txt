@@ -267,3 +267,83 @@ if(DO_VTKMAKER)
     target_link_libraries(${VTKMAKERNAME} ${HDF5_LIBRARIES})
     target_link_libraries(${VTKMAKERNAME} ${ALL_Boost_LIBRARIES})
 endif(DO_VTKMAKER)
+
+if(${NDIM} EQUAL 3)
+if(DO_GIZMO)
+    set(GIZMONAME myGIZMO${NDIM}d)
+
+    add_executable(${GIZMONAME}
+    CubicBox.cpp
+    DelTess.cpp
+    DelTess_mpi.cpp
+    ExArith.cpp
+    GadgetSnapshotReader.cpp
+    GadgetSnapshotWriter.cpp
+    GIZMO.cpp
+    Image.cpp
+    Line.cpp
+    MPIGlobal.cpp
+    NgbSearch.cpp
+    Plane.cpp
+    ProgramLog.cpp
+    RectangularBox.cpp
+    ShadowfaxSnapshotReader.cpp
+    ShadowfaxSnapshotWriter.cpp
+    Simplex.cpp
+    SnapshotHandler.cpp
+    TimeLine.cpp
+    TimeStepWalker.cpp
+    VorCell.cpp
+    VorFace.cpp
+    VorGen.cpp
+    VorTess.cpp
+
+    GIZMO.hpp
+    )
+    set_target_properties(${GIZMONAME} PROPERTIES
+                          COMPILE_FLAGS "-Dndim_=${NDIM}")
+
+    target_link_libraries(${GIZMONAME} ${IONAME})
+    target_link_libraries(${GIZMONAME} ${UTILNAME})
+    target_link_libraries(${GIZMONAME} ${RIEMANNNAME})
+    target_link_libraries(${GIZMONAME} ${MPI_CXX_LIBRARIES})
+    target_link_libraries(${GIZMONAME} ${MPI_C_LIBRARIES})
+    target_link_libraries(${GIZMONAME} ${HDF5_LIBRARIES})
+    target_link_libraries(${GIZMONAME} ${ALL_Boost_LIBRARIES})
+
+endif(DO_GIZMO)
+endif(${NDIM} EQUAL 3)
+
+if(DO_TENET)
+    set(TENETNAME myTenet${NDIM}d)
+
+    add_executable(${TENETNAME}
+    Legendre.cpp
+    MPIGlobal.cpp
+    ProgramLog.cpp
+    Tenet.cpp
+    TenetCell.cpp
+    utilities/HelperFunctions.cpp
+    utilities/Timer.cpp
+
+    Legendre.hpp
+    RungeKutta.hpp
+    RungeKuttaFlux.hpp
+    Tenet.hpp
+    TenetBasisFunctions.hpp
+    TenetCell.hpp
+    TenetCellWeights.hpp
+    TenetGrid.hpp
+    TenetMinModSlopeLimiter.hpp
+    TenetRungeKuttaFlux.hpp
+    TenetSlopeLimiter.hpp
+    TenetSystemState.hpp
+    )
+    set_target_properties(${TENETNAME} PROPERTIES
+                          COMPILE_FLAGS "-Dndim_=${NDIM}")
+
+    target_link_libraries(${TENETNAME} ${RIEMANNNAME})
+    target_link_libraries(${TENETNAME} ${MPI_CXX_LIBRARIES})
+    target_link_libraries(${TENETNAME} ${MPI_C_LIBRARIES})
+
+endif(DO_TENET)

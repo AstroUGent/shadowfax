@@ -129,6 +129,12 @@ else(GIZMO)
     set(DO_GIZMO False)
 endif(GIZMO)
 
+if(TENET)
+    set(DO_TENET True)
+else(TENET)
+    set(DO_TENET False)
+endif(TENET)
+
 # put executable in the rundirs
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/rundir)
 

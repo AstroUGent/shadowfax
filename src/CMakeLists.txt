@@ -103,6 +103,7 @@ if(DO_SHADOWFAX)
     SnapshotHandler.hpp
     SnapshotReaderFactory.hpp
     SnapshotWriterFactory.hpp
+    SpecificICGenerator.hpp
     StarFormationParticleConverter.hpp
     StateVector.hpp
     StellarFeedback.hpp

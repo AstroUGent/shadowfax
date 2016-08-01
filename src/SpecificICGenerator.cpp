@@ -24,9 +24,9 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
+#include "SpecificICGenerator.hpp"
 #include "DelCont.hpp"
 #include "Error.hpp"
-#include "ICGenerator.hpp"
 #include "VorCell.hpp"
 #include "VorTessManager.hpp"
 #include "io/Unit.hpp"
@@ -641,9 +641,9 @@ double SpecificICGenerator::rand_double() {
  * @return Value of the Plummer g-function
  */
 double SpecificICGenerator::gplummer(double q) {
-    double gfac = sqrt(81. / 77.);
+    double gfac = sqrt(9. / 7.);
     gfac *= gfac * gfac * gfac * gfac * gfac * gfac;
-    gfac *= 0.25 * 81.;
+    gfac *= 4.5;
     double q2 = q * q;
     double g = sqrt(1. - q2);
     double g2 = g * g;

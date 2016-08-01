@@ -987,11 +987,22 @@ Vec VorCell::get_velocity() {
         }
     }
 
+    Vec vcell;
 #if ndim_ == 3
-    return Vec(W[1] + vel[0], W[2] + vel[1], W[3] + vel[2]);
+    vcell = Vec(W[1] + vel[0], W[2] + vel[1], W[3] + vel[2]);
 #else
-    return Vec(W[1] + vel[0], W[2] + vel[1]);
+    vcell = Vec(W[1] + vel[0], W[2] + vel[1]);
 #endif
+
+    // suppress velocity linearly near vacuum
+    // warning: this also supresses mesh movement in flows with very small
+    // densities!
+    if(W.rho() < 1.e-10) {
+        double fac = W.rho() * 1.e10;
+        return fac * vcell;
+    } else {
+        return vcell;
+    }
 }
 
 /**

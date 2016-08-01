@@ -32,6 +32,7 @@
 #include "utilities/TreeWalker.hpp"
 
 class DMParticle;
+class StarParticle;
 
 /**
  * @brief TreeWalker implemtentation used to calculate the hydrodynamical
@@ -241,6 +242,17 @@ class TimeStepWalker : public TreeWalker {
      * constructor
      */
     TimeStepWalker(DMParticle* p) {}
+
+    /**
+     * @brief Dummy constructor
+     *
+     * Only needed because Tree::walk_tree() needs a StarParticle constructor.
+     * This constructor will never be used in practice.
+     *
+     * @param p StarParticle that compiler-wise could be passed on to the
+     * constructor
+     */
+    TimeStepWalker(StarParticle* p) {}
 
     TimeStepWalker(Import& import);
 

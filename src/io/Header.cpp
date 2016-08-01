@@ -42,8 +42,9 @@ using namespace std;
  */
 Header::Header() {
     _npart = 0;
-    _npartspec[0] = 0;
-    _npartspec[1] = 0;
+    for(unsigned int i = PARTTYPE_COUNTER; i--;) {
+        _npartspec[i] = 0;
+    }
     _ndim = ndim_;
     for(unsigned int i = ndim_ + ndim_; i--;) {
         _box[i] = 0.;
@@ -72,7 +73,7 @@ Header::Header() {
   * @param npart The number of gas particles in the simulation
   */
 void Header::set_ngaspart(unsigned int npart) {
-    _npartspec[0] = npart;
+    _npartspec[PARTTYPE_GAS] = npart;
     _npart += npart;
 }
 
@@ -82,7 +83,17 @@ void Header::set_ngaspart(unsigned int npart) {
   * @param npart The number of DM particles in the simulation
   */
 void Header::set_ndmpart(unsigned int npart) {
-    _npartspec[1] = npart;
+    _npartspec[PARTTYPE_DM] = npart;
+    _npart += npart;
+}
+
+/**
+  * @brief Set the number of star particles in the simulation
+  *
+  * @param npart The number of star particles in the simulation
+  */
+void Header::set_nstarpart(unsigned int npart) {
+    _npartspec[PARTTYPE_STAR] = npart;
     _npart += npart;
 }
 
@@ -341,6 +352,15 @@ unsigned int Header::ndmpart() {
 }
 
 /**
+  * @brief Get the number of star particles
+  *
+  * @return The number of star particles in the simulation
+  */
+unsigned int Header::nstarpart() {
+    return _npartspec[PARTTYPE_STAR];
+}
+
+/**
   * @brief Get the simulation box
   *
   * @param box A 4- or 3-element array to fill
@@ -407,7 +427,8 @@ double Header::hsoft() {
  */
 void Header::pack_data(void* buffer, int bufsize, int* position) {
     MyMPI_Pack(&_npart, 1, MPI_UNSIGNED, buffer, bufsize, position);
-    MyMPI_Pack(&_npartspec[0], 2, MPI_UNSIGNED, buffer, bufsize, position);
+    MyMPI_Pack(&_npartspec[0], PARTTYPE_COUNTER, MPI_UNSIGNED, buffer, bufsize,
+               position);
     MyMPI_Pack(&_ndim, 1, MPI_UNSIGNED, buffer, bufsize, position);
     MyMPI_Pack(&_box[0], ndim_ + ndim_, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_time, 1, MPI_DOUBLE, buffer, bufsize, position);
@@ -429,7 +450,8 @@ void Header::pack_data(void* buffer, int bufsize, int* position) {
  */
 Header::Header(void* buffer, int bufsize, int* position) {
     MyMPI_Unpack(buffer, bufsize, position, &_npart, 1, MPI_UNSIGNED);
-    MyMPI_Unpack(buffer, bufsize, position, &_npartspec[0], 2, MPI_UNSIGNED);
+    MyMPI_Unpack(buffer, bufsize, position, &_npartspec[0], PARTTYPE_COUNTER,
+                 MPI_UNSIGNED);
     MyMPI_Unpack(buffer, bufsize, position, &_ndim, 1, MPI_UNSIGNED);
     MyMPI_Unpack(buffer, bufsize, position, &_box[0], ndim_ + ndim_,
                  MPI_DOUBLE);
@@ -450,7 +472,7 @@ Header::Header(void* buffer, int bufsize, int* position) {
  */
 void Header::dump(RestartFile& rfile) {
     rfile.write(_npart);
-    rfile.write(_npartspec, 2);
+    rfile.write(_npartspec, PARTTYPE_COUNTER);
     rfile.write(_ndim);
     rfile.write(_box, ndim_ + ndim_);
     rfile.write(_time);
@@ -470,7 +492,7 @@ void Header::dump(RestartFile& rfile) {
  */
 Header::Header(RestartFile& rfile) {
     rfile.read(_npart);
-    rfile.read(_npartspec, 2);
+    rfile.read(_npartspec, PARTTYPE_COUNTER);
     rfile.read(_ndim);
     rfile.read(_box, ndim_ + ndim_);
     rfile.read(_time);

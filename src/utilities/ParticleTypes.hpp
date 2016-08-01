@@ -34,6 +34,8 @@ enum ParticleType {
     PARTTYPE_GAS = 0,
     /*! Dark matter particle */
     PARTTYPE_DM,
+    /*! Star particle */
+    PARTTYPE_STAR,
     /*! Counter of the number of types (make sure this stays the last element in
      *  the enum!) */
     PARTTYPE_COUNTER

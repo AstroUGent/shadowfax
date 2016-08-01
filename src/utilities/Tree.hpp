@@ -768,10 +768,12 @@ class Tree {
      * the ParticleVector
      * @param dm True if the treewalk should be done fot the DMParticles in the
      * ParticleVector
+     * @param stars True if the treewalk should be done for the StarParticles in
+     * the ParticleVector
      * @param current_time unsigned long integer current simulation time
      */
     template <class T, typename P>
-    void walk_tree(P& particles, bool gas, bool dm,
+    void walk_tree(P& particles, bool gas, bool dm, bool stars,
                    unsigned long current_time) {
         // the walker has two associated classes called Import and Export, which
         // are used to communicate relevant information to and from other
@@ -796,6 +798,19 @@ class Tree {
             for(unsigned int i = 0; i < particles.dmsize(); i++) {
                 if(particles.dm(i)->get_endtime() == current_time) {
                     T walker(particles.dm(i));
+                    walk_tree(walker, exports);
+                    walker.after_walk();
+                }
+            }
+        }
+
+        if(stars) {
+            // first do the local treewalk. If the treewalk encounters a part
+            // of the three that is on another process, an Export is added to
+            // the list
+            for(unsigned int i = 0; i < particles.starsize(); i++) {
+                if(particles.star(i)->get_endtime() == current_time) {
+                    T walker(particles.star(i));
                     walk_tree(walker, exports);
                     walker.after_walk();
                 }

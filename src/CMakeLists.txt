@@ -1,6 +1,7 @@
 ################################################################################
 # This file is part of Shadowfax
 # Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+#               2016 Bert Vandenbroucke
 #
 # Shadowfax is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -61,6 +62,8 @@ if(DO_SHADOWFAX)
     Simplex.cpp
     Simulation.cpp
     SnapshotHandler.cpp
+    StarFormationParticleConverter.cpp
+    StellarFeedback.cpp
     TimeLine.cpp
     TimeStepWalker.cpp
     VorCell.cpp
@@ -87,6 +90,7 @@ if(DO_SHADOWFAX)
     MPIMethods.hpp
     NDIrregTable.hpp
     NDTable.hpp
+    NgbSearch.hpp
     ParameterFile.hpp
     Physics.cpp
     Plane.hpp
@@ -99,7 +103,9 @@ if(DO_SHADOWFAX)
     SnapshotHandler.hpp
     SnapshotReaderFactory.hpp
     SnapshotWriterFactory.hpp
+    StarFormationParticleConverter.hpp
     StateVector.hpp
+    StellarFeedback.hpp
     TimeLine.hpp
     TimeStepWalker.hpp
     Vec.hpp

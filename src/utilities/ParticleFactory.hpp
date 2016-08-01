@@ -30,7 +30,7 @@
 #include "DMParticle.hpp"
 #include "GasParticle.hpp"
 #include "MPIMethods.hpp"
-
+#include "StarParticle.hpp"
 #include <iostream>
 
 /**
@@ -56,6 +56,9 @@ class ParticleFactory {
         }
         if(type == PARTTYPE_DM) {
             return new DMParticle(buffer, bufsize, position);
+        }
+        if(type == PARTTYPE_STAR) {
+            return new StarParticle(buffer, bufsize, position);
         }
         std::cerr << "Unknown particle type: " << type << std::endl;
         my_exit();

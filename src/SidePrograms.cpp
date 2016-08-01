@@ -41,6 +41,7 @@
 #include "utilities/GasParticle.hpp"
 #include "utilities/Hilbert.hpp"
 #include "utilities/ParticleVector.hpp"
+#include "utilities/StarParticle.hpp"
 #include "utilities/Tree.hpp"
 #include <algorithm>
 #include <fstream>
@@ -604,7 +605,8 @@ PotentialCalculator::PotentialCalculator(int argc, char** argv) {
     cout << "Performing treewalk to obtain gravitational potentials..." << endl;
 
     // walk the tree to calculate the potentials
-    particles.get_tree().walk_tree<BHPotentialWalker>(particles, true, true, 0);
+    particles.get_tree().walk_tree<BHPotentialWalker>(particles, true, true,
+                                                      true, 0);
     cout << "Done." << endl;
 
     cout << "Writing file " << onlyname << ".epot..." << endl;

@@ -111,6 +111,19 @@ SpecificICGenerator::SpecificICGenerator(unsigned int ngaspart,
         my_exit();
 #endif
     }
+    if(type == IC_SPEC_NBODY) {
+#if ndim_ == 3
+        origin = Vec(0., 0., 0.);
+        sides = Vec(40., 40., 40.);
+#else
+        cerr << "The N-body test is a 3D test problem. Buy another dimension"
+                "and try again!"
+             << endl;
+        my_exit();
+#endif
+        _ndmpart = _ngaspart;
+        _ngaspart = 0;
+    }
     _container = new RectangularBox(origin, sides);
 }
 
@@ -134,13 +147,15 @@ SpecificICGenerator::~SpecificICGenerator() {
   */
 ParticleVector SpecificICGenerator::generate() {
     ParticleVector particles(false, *((RectangularBox*)_container));
-    if(_mode == IC_CART) {
-        make_cartesian_grid(particles);
-    } else {
-        make_random_grid(particles);
-        relax_grid(particles);
+    if(_ngaspart) {
+        if(_mode == IC_CART) {
+            make_cartesian_grid(particles);
+        } else {
+            make_random_grid(particles);
+            relax_grid(particles);
+        }
+        apply_profiles(particles);
     }
-    apply_profiles(particles);
     if(_ndmpart > 0) {
         add_DM(particles);
     }

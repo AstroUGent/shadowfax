@@ -38,7 +38,7 @@ class DelCont;
 /*! \brief Type of special initial condition to generate */
 enum ICSpecType {
     /*! Gresho vortex (2D only) */
-    IC_SPEC_GRESHO,
+    IC_SPEC_GRESHO = 0,
     /*! Sedov-Taylor blastwave */
     IC_SPEC_SEDOV_TAYLOR,
     /*! Dwarf galaxy halo (experimental) */
@@ -46,7 +46,9 @@ enum ICSpecType {
     /*! Kelvin-Helmholtz test (2D only) */
     IC_SPEC_KH,
     /*! Evrard collapse test (3D only) */
-    IC_SPEC_EVRARD
+    IC_SPEC_EVRARD,
+    /*! N-body test (3D only) */
+    IC_SPEC_NBODY
 };
 
 /**
@@ -97,6 +99,7 @@ class SpecificICGenerator : public ICGenerator {
     void add_DM(ParticleVector& grid);
 
     void add_DM_plummer(ParticleVector& grid);
+
     double rand_double();
 
   public:

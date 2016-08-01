@@ -27,6 +27,7 @@
 #include "ICGenerator.hpp"
 #include "MPIGlobal.hpp"
 #include "SnapshotWriterFactory.hpp"
+#include "SpecificICGenerator.hpp"
 #include "io/UnitSet.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/ParticleVector.hpp"

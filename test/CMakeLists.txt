@@ -137,7 +137,6 @@ add_unit_test(NAME testUnit
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES})
 
-
 #NDTable test
 set(TESTNDTABLE_SOURCES
     testNDTable.cpp
@@ -198,7 +197,6 @@ set(TESTGASCOOLING_FILES
     difcool.py
     )
 
-
 add_unit_test_bash(NAME testGasCooling
               SCRIPT testGasCooling.sh
               SOURCES ${TESTGASCOOLING_SOURCES}
@@ -234,6 +232,33 @@ add_unit_test(NAME testCosmology
               SOURCES ${TESTCOSMOLOGY_SOURCES}
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} utilities2d)
+
+#SpecificICGenerator test
+set(TESTSPECIFICICGENERATOR_SOURCES
+    testSpecificICGenerator.cpp
+
+    ../src/DelTess.cpp
+    ../src/DelTess_mpi.cpp
+    ../src/ExArith.cpp
+    ../src/Image.cpp
+    ../src/Line.cpp
+    ../src/MPIGlobal.cpp
+    ../src/NgbSearch.cpp
+    ../src/Plane.cpp
+    ../src/RectangularBox.cpp
+    ../src/Simplex.cpp
+    ../src/SpecificICGenerator.cpp
+    ../src/VorCell.cpp
+    ../src/VorFace.cpp
+    ../src/VorGen.cpp
+    ../src/VorTess.cpp
+    ../src/VorTessManager.cpp
+    )
+
+add_unit_test(NAME testSpecificICGenerator
+              SOURCES ${TESTSPECIFICICGENERATOR_SOURCES}
+              NDIM 3
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d io3d)
 
 # Legendre test
 set(TESTLEGENDRE_SOURCES

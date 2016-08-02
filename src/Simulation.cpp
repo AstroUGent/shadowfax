@@ -350,7 +350,11 @@ void Simulation::main_loop() {
     // snapshots are written by the timeline at appropriate times
     while(_timeline->step_forward()) {
         cout << "t = " << _timeline->get_time()
-             << ", dt = " << _timeline->get_realtime_interval(dt) << endl;
+             << ", dt = " << _timeline->get_realtime_interval(dt);
+        if(_cosmology) {
+            cout << " (z = " << (1. / _timeline->get_time() - 1.) << ")";
+        }
+        cout << endl;
 
         unsigned long currentTime = _timeline->get_integertime();
         if(_particles->gassize()) {

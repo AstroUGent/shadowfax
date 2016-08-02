@@ -25,7 +25,7 @@
 # contains all necessary commands to run the test and returns a useful value on
 # exit (0 begin success, all other values being a failed test)
 testnames=( overdensity nbody evrard gresho_vortex sedov_taylor restarttest \
-            flatdensity )
+            flatdensity cosmo )
 tests=()
 timings=()
 

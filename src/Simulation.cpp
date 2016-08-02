@@ -513,16 +513,25 @@ void Simulation::main_loop() {
                 } else {
                     timestep = _timeline->get_realtime_interval(dt);
                 }
-                _particles->dm(i)->move(_timeline->get_realtime(dt));
+                _particles->dm(i)->move(timestep);
                 _particles->get_container().keep_inside(_particles->dm(i));
             }
             for(unsigned int i = _particles->starsize(); i--;) {
                 double timestep;
                 if(_particles->star(i)->get_starttime() == currentTime) {
-                    timestep = 0.5 *
-                               _timeline->get_realtime_interval(
-                                       _particles->star(i)->get_endtime() -
-                                       _particles->star(i)->get_starttime());
+                    if(_cosmology) {
+                        timestep = _cosmology->get_acceleration_factor(
+                                _timeline->get_realtime(
+                                        _particles->star(i)->get_starttime()),
+                                _timeline->get_realtime(
+                                        _particles->star(i)->get_endtime()));
+                    } else {
+                        timestep =
+                                0.5 *
+                                _timeline->get_realtime_interval(
+                                        _particles->star(i)->get_endtime() -
+                                        _particles->star(i)->get_starttime());
+                    }
                     _particles->star(i)->accelerate(
                             _particles->star(i)
                                     ->get_gravitational_acceleration() *
@@ -622,6 +631,12 @@ void Simulation::main_loop() {
             LOGS("Start relative treewalk");
             _particles->get_tree().walk_tree<GravityWalker>(
                     *_particles, true, true, true, currentTime);
+            if(_periodic) {
+                _particles->get_tree()
+                        .walk_tree<EwaldGravityWalker,
+                                   Tree::EwaldWalk<EwaldGravityWalker> >(
+                                *_particles, true, true, true, currentTime);
+            }
             // set old acceleration before multiplying with G
             for(unsigned int i = _particles->gassize(); i--;) {
                 if(_particles->gas(i)->get_endtime() == currentTime) {
@@ -652,17 +667,23 @@ void Simulation::main_loop() {
             }
             // multiply with G
             for(unsigned int i = 0; i < _particles->gassize(); i++) {
-                _particles->gas(i)->set_gravitational_acceleration(
-                        _physics->get_gravitational_constant() *
-                        _particles->gas(i)->get_gravitational_acceleration());
-                _particles->gas(i)->set_eta(
-                        _physics->get_gravitational_constant() *
-                        _particles->gas(i)->get_eta());
+                if(_particles->gas(i)->get_endtime() == currentTime) {
+                    _particles->gas(i)->set_gravitational_acceleration(
+                            _physics->get_gravitational_constant() *
+                            _particles->gas(i)
+                                    ->get_gravitational_acceleration());
+                    _particles->gas(i)->set_eta(
+                            _physics->get_gravitational_constant() *
+                            _particles->gas(i)->get_eta());
+                }
             }
             for(unsigned int i = 0; i < _particles->dmsize(); i++) {
-                _particles->dm(i)->set_gravitational_acceleration(
-                        _physics->get_gravitational_constant() *
-                        _particles->dm(i)->get_gravitational_acceleration());
+                if(_particles->dm(i)->get_endtime() == currentTime) {
+                    _particles->dm(i)->set_gravitational_acceleration(
+                            _physics->get_gravitational_constant() *
+                            _particles->dm(i)
+                                    ->get_gravitational_acceleration());
+                }
             }
             for(unsigned int i = 0; i < _particles->starsize(); i++) {
                 if(_particles->star(i)->get_endtime() == currentTime) {
@@ -1232,6 +1253,13 @@ void Simulation::initialize(string filename) {
         LOGS("Starting Barnes-Hut gravity walk");
         _particles->get_tree().walk_tree<BHGravityWalker>(
                 *_particles, true, true, true, _timeline->get_integertime());
+        if(_periodic) {
+            _particles->get_tree()
+                    .walk_tree<BHEwaldGravityWalker,
+                               Tree::EwaldWalk<BHEwaldGravityWalker> >(
+                            *_particles, true, true, true,
+                            _timeline->get_integertime());
+        }
 
         // no multiplication by G needed, since it is already included in
         // Springel's relative criterion
@@ -1270,6 +1298,13 @@ void Simulation::initialize(string filename) {
         LOGS("Starting relative gravity walk");
         _particles->get_tree().walk_tree<GravityWalker>(
                 *_particles, true, true, true, _timeline->get_integertime());
+        if(_periodic) {
+            _particles->get_tree()
+                    .walk_tree<EwaldGravityWalker,
+                               Tree::EwaldWalk<EwaldGravityWalker> >(
+                            *_particles, true, true, true,
+                            _timeline->get_integertime());
+        }
 
         // set old acceleration before multiplying by G
         for(unsigned int i = _particles->gassize(); i--;) {

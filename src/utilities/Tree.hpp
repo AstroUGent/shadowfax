@@ -760,6 +760,83 @@ class Tree {
     };
 
     /**
+     * @brief Static class used to perform a normal tree walk without Ewald
+     * table
+     */
+    template <class T> class NoEwaldWalk {
+      public:
+        /*! @brief Typedef necessary to use T::Export as vector content type */
+        typedef typename T::Export TExport;
+
+        /**
+         * @brief Do a local tree walk
+         *
+         * @param tree Reference to the tree
+         * @param p Particle to walk the tree for
+         * @param exports List used for MPI communication
+         */
+        template <typename P>
+        static void walk_local(Tree& tree, P* p,
+                               std::vector<std::vector<TExport> > exports) {
+            T walker(p);
+            tree.walk_tree(walker, exports);
+            walker.after_walk();
+        }
+
+        /**
+         * @brief Do a non-local tree walk
+         *
+         * @param tree Reference to the tree
+         * @param import T::Import instance containing communicated particle
+         * data
+         */
+        template <typename TImport>
+        static void walk_mpi(Tree& tree, TImport& import) {
+            T walker(import);
+            tree.walk_tree(walker);
+            walker.after_walk(import);
+        }
+    };
+
+    /**
+     * @brief Static class used to perform a normal tree walk with Ewald table
+     */
+    template <class T> class EwaldWalk {
+      public:
+        /*! @brief Typedef necessary to use T::Export as vector content type */
+        typedef typename T::Export TExport;
+
+        /**
+         * @brief Do a local tree walk
+         *
+         * @param tree Reference to the tree
+         * @param p Particle to walk the tree for
+         * @param exports List used for MPI communication
+         */
+        template <typename P>
+        static void walk_local(Tree& tree, P* p,
+                               std::vector<std::vector<TExport> > exports) {
+            T walker(p, *tree._ewald_table);
+            tree.walk_tree(walker, exports);
+            walker.after_walk();
+        }
+
+        /**
+         * @brief Do a non-local tree walk
+         *
+         * @param tree Reference to the tree
+         * @param import T::Import instance containing communicated particle
+         * data
+         */
+        template <typename TImport>
+        static void walk_mpi(Tree& tree, TImport& import) {
+            T walker(import, *tree._ewald_table);
+            tree.walk_tree(walker);
+            walker.after_walk(import);
+        }
+    };
+
+    /**
      * @brief Generic function to walk the tree with a given TreeWalker on a
      * given set of particles
      *
@@ -772,7 +849,7 @@ class Tree {
      * the ParticleVector
      * @param current_time unsigned long integer current simulation time
      */
-    template <class T, typename P>
+    template <class T, class WalkMode = NoEwaldWalk<T>, typename P>
     void walk_tree(P& particles, bool gas, bool dm, bool stars,
                    unsigned long current_time) {
         // the walker has two associated classes called Import and Export, which
@@ -784,9 +861,7 @@ class Tree {
         if(gas) {
             for(unsigned int i = 0; i < particles.gassize(); i++) {
                 if(particles.gas(i)->get_endtime() == current_time) {
-                    T walker(particles.gas(i));
-                    walk_tree(walker, exports);
-                    walker.after_walk();
+                    WalkMode::walk_local(*this, particles.gas(i), exports);
                 }
             }
         }
@@ -797,9 +872,7 @@ class Tree {
             // the list
             for(unsigned int i = 0; i < particles.dmsize(); i++) {
                 if(particles.dm(i)->get_endtime() == current_time) {
-                    T walker(particles.dm(i));
-                    walk_tree(walker, exports);
-                    walker.after_walk();
+                    WalkMode::walk_local(*this, particles.dm(i), exports);
                 }
             }
         }
@@ -810,9 +883,7 @@ class Tree {
             // the list
             for(unsigned int i = 0; i < particles.starsize(); i++) {
                 if(particles.star(i)->get_endtime() == current_time) {
-                    T walker(particles.star(i));
-                    walk_tree(walker, exports);
-                    walker.after_walk();
+                    WalkMode::walk_local(*this, particles.star(i), exports);
                 }
             }
         }
@@ -991,9 +1062,7 @@ class Tree {
                             TImport import(
                                     &MPIGlobal::recvbuffer[buffers[freebuffer]],
                                     nelements, &recv_pos);
-                            T walker(import);
-                            particles.get_tree().walk_tree(walker);
-                            walker.after_walk(import);
+                            WalkMode::walk_mpi(*this, import);
                             import.pack_data(
                                     &MPIGlobal::sendbuffer[buffers[freebuffer +
                                                                    1]],

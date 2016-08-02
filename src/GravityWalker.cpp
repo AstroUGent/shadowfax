@@ -358,6 +358,239 @@ void GravityWalker::after_walk(Import& import) {
     import.set_comp_cost(_comp_cost);
 }
 
+// EwaldGravityWalker
+
+/**
+ * @brief Constructor
+ *
+ * @param p Particle for which the Ewald correction force is calculated
+ * @param ewald_table Reference to the EwaldTable used to calculate Ewald
+ * corrections
+ * @param local Flag signaling if the tree walk is done for a particle on the
+ * local process
+ */
+EwaldGravityWalker::EwaldGravityWalker(Particle* p, EwaldTable& ewald_table,
+                                       bool local)
+        : _ewald_table(ewald_table) {
+    _p = p;
+    _position = p->get_position();
+    _olda = p->get_old_acceleration();
+}
+
+/**
+ * @brief Import constructor.
+ *
+ * Initialize an EwaldGravityWalker for a Particle residing on another
+ * MPI-process
+ *
+ * @param import Import with imported data
+ * @param ewald_table Reference to the EwaldTable used to calculate Ewald
+ * corrections
+ */
+EwaldGravityWalker::EwaldGravityWalker(Import& import, EwaldTable& ewald_table)
+        : _ewald_table(ewald_table) {
+    _p = NULL;
+    _position = import.get_position();
+    _olda = import.get_olda();
+}
+
+/**
+ * @brief Destructor
+ */
+EwaldGravityWalker::~EwaldGravityWalker() {}
+
+/**
+ * @brief Get the resulting Ewald correction
+ *
+ * @return The result of the treewalk
+ */
+Vec EwaldGravityWalker::get_acceleration() {
+    return _acorr;
+}
+
+/**
+ * @brief Decide whether the given TreeNode should be opened or can be treated
+ * as a whole
+ *
+ * If it can be treated as a whole, we immediately treat it, as this makes more
+ * efficient use of the intermediate quantities.
+ *
+ * @param node TreeNode on which we operate
+ * @return True if the TreeNode should be opened, false otherwise
+ */
+bool EwaldGravityWalker::splitnode(TreeNode* node) {
+    Vec r = node->get_center_of_mass_node() - _position;
+    nearest(r);
+    double r2 = r.norm2();
+    bool openflag = false;
+    if(node->get_width() * node->get_width() * node->get_mass_node() >
+       r2 * r2 * _olda) {
+        openflag = true;
+    } else {
+        Vec center = node->get_center();
+        double nodewidth = 0.6 * node->get_width();
+        if(abs(center.x() - _position.x()) < nodewidth) {
+            if(abs(center.y() - _position.y()) < nodewidth) {
+#if ndim_ == 3
+                if(abs(center.z() - _position.z()) < nodewidth) {
+                    openflag = true;
+                }
+#else
+                openflag = true;
+#endif
+            }
+        }
+    }
+    if(openflag) {
+        Vec center = node->get_center();
+        for(unsigned int i = 0; i < ndim_; i++) {
+            double u = center[i] - _position[i];
+            nearest(u);
+            if(abs(u) >= 0.5 * (_boxsize - node->get_width())) {
+                return true;
+            }
+        }
+        if(node->get_width() > 0.2 * _boxsize) {
+            return true;
+        }
+    }
+    _acorr += node->get_mass_node() * _ewald_table.get_correction(r);
+    return false;
+}
+
+/**
+ * @brief Action to perform on a TreeNode as a whole
+ *
+ * @deprecated Action is already performed by EwaldGravityWalker::splitnode()
+ *
+ * @param node TreeNode on which we operate
+ */
+void EwaldGravityWalker::nodeaction(TreeNode* node) {
+    // obsolete, action is perfomed by splitnode()
+}
+
+/**
+ * @brief Action to perform on a single Leaf of the Tree
+ *
+ * @param leaf Leaf on which we operate
+ */
+void EwaldGravityWalker::leafaction(Leaf* leaf) {
+    Vec r = leaf->get_particle()->get_position() - _position;
+    nearest(r);
+    _acorr += leaf->get_particle()->get_mass() * _ewald_table.get_correction(r);
+}
+
+/**
+ * @brief Action performed when a PseudoNode is encountered
+ *
+ * @deprecated Method has been replaced by
+ * EwaldGravityWalker::export_to_pseudonode
+ *
+ * @param pseudonode PseudoNode on which we operate
+ */
+void EwaldGravityWalker::pseudonodeaction(PseudoNode* pseudonode) {
+    // do something
+    //    _exportlist[pseudonode->get_source()] = true;
+}
+
+/**
+ * @brief Decide if the Particle should be exported to the process which holds
+ * the actual node represented by the given PseudoNode
+ *
+ * @param pseudonode PseudoNode on which we operate
+ * @return True, since the gravitational force is only approximated for a local
+ * TreeNode
+ */
+bool EwaldGravityWalker::export_to_pseudonode(PseudoNode* pseudonode) {
+    return true;
+}
+
+/**
+ * @brief Set the position which is used for the treewalk
+ *
+ * @deprecated This method should not be used anymore
+ *
+ * @param position New position for the treewalk
+ */
+void EwaldGravityWalker::set_position(Vec position) {
+    _position = position;
+}
+
+/**
+ * @brief Get the position used for the treewalk
+ *
+ * @return Position used for the treewalk
+ */
+Vec EwaldGravityWalker::get_position() {
+    return _position;
+}
+
+/**
+ * @brief Periodic version of EwaldGravityWalker::splitnode()
+ *
+ * @deprecated Periodic boundaries are treated in a different way now
+ *
+ * @param node TreeNode on which we operate
+ * @param ewald_table EwaldTable used for periodic correction terms
+ * @return True if the TreeNode should be opened, false otherwise
+ */
+bool EwaldGravityWalker::periodicsplitnode(TreeNode* node,
+                                           EwaldTable& ewald_table) {
+    return false;
+}
+
+/**
+ * @brief Periodic version of EwaldGravityWalker::pseudonodeaction()
+ *
+ * @deprecated Method was never implemented and should not be used, since
+ * periodic boundaries are treated differently now
+ *
+ * @param pseudonode PseudoNode on which we operate
+ * @param ewald_table EwaldTable used for periodic correction terms
+ */
+void EwaldGravityWalker::periodicpseudonodeaction(PseudoNode* pseudonode,
+                                                  EwaldTable& ewald_table) {}
+
+/**
+ * @brief Periodic version of EwaldGravityWalker::leafaction()
+ *
+ * @deprecated Not used anymore
+ *
+ * @param leaf Leaf on which we operate
+ * @param ewald_table EwaldTable used for periodic correction terms
+ */
+void EwaldGravityWalker::periodicleafaction(Leaf* leaf,
+                                            EwaldTable& ewald_table) {}
+
+/**
+ * @brief Finalize the treewalk by setting the gravitational acceleration of the
+ * Particle
+ */
+void EwaldGravityWalker::after_walk() {
+    _p->set_gravitational_acceleration(_p->get_gravitational_acceleration() +
+                                       _acorr);
+}
+
+/**
+ * @brief Get an Export to export the Particle to another MPI-process
+ *
+ * @return An Export that can be used to communicate relevant Particle data to
+ * another MPI-process
+ */
+EwaldGravityWalker::Export EwaldGravityWalker::get_export() {
+    return Export(_p, _olda);
+}
+
+/**
+ * @brief Finalize the local treewalk for another MPI-process by setting the
+ * acceleration of the Import
+ *
+ * @param import Import that will be sent back to the original MPI-process
+ */
+void EwaldGravityWalker::after_walk(Import& import) {
+    import.set_acorr(_acorr);
+}
+
 // PotentialWalker
 
 /**
@@ -970,6 +1203,220 @@ BHGravityWalker::Export BHGravityWalker::get_export() {
 void BHGravityWalker::after_walk(Import& import) {
     import.set_a(_a);
     import.set_comp_cost(_comp_cost);
+}
+
+// BHEwaldGravityWalker
+
+/**
+ * @brief Constructor
+ *
+ * @param p Particle for which the Ewald correction force is calculated
+ * @param ewald_table Reference to the EwaldTable used to calculate Ewald
+ * corrections
+ * @param local Flag signaling if the tree walk is done for a particle on the
+ * local process
+ */
+BHEwaldGravityWalker::BHEwaldGravityWalker(Particle* p, EwaldTable& ewald_table,
+                                           bool local)
+        : _ewald_table(ewald_table) {
+    _p = p;
+    _position = p->get_position();
+}
+
+/**
+ * @brief Import constructor.
+ *
+ * Initialize an EwaldGravityWalker for a Particle residing on another
+ * MPI-process
+ *
+ * @param import Import with imported data
+ * @param ewald_table Reference to the EwaldTable used to calculate Ewald
+ * corrections
+ */
+BHEwaldGravityWalker::BHEwaldGravityWalker(Import& import,
+                                           EwaldTable& ewald_table)
+        : _ewald_table(ewald_table) {
+    _p = NULL;
+    _position = import.get_position();
+}
+
+/**
+ * @brief Destructor
+ */
+BHEwaldGravityWalker::~BHEwaldGravityWalker() {}
+
+/**
+ * @brief Get the resulting Ewald correction
+ *
+ * @return The result of the treewalk
+ */
+Vec BHEwaldGravityWalker::get_acceleration() {
+    return _acorr;
+}
+
+/**
+ * @brief Decide whether the given TreeNode should be opened or can be treated
+ * as a whole
+ *
+ * If it can be treated as a whole, we immediately treat it, as this makes more
+ * efficient use of the intermediate quantities.
+ *
+ * @param node TreeNode on which we operate
+ * @return True if the TreeNode should be opened, false otherwise
+ */
+bool BHEwaldGravityWalker::splitnode(TreeNode* node) {
+    Vec r = node->get_center_of_mass_node() - _position;
+    nearest(r);
+    double r2 = r.norm2();
+    // opening angle = 0.5 (0.5^2 = 0.25)
+    if(node->get_width() * node->get_width() > r2 * 0.25) {
+        Vec center = node->get_center();
+        for(unsigned int i = 0; i < ndim_; i++) {
+            double u = center[i] - _position[i];
+            nearest(u);
+            if(abs(u) >= 0.5 * (_boxsize - node->get_width())) {
+                return true;
+            }
+        }
+        if(node->get_width() > 0.2 * _boxsize) {
+            return true;
+        }
+    }
+    _acorr += node->get_mass_node() * _ewald_table.get_correction(r);
+    return false;
+}
+
+/**
+ * @brief Action to perform on a TreeNode as a whole
+ *
+ * @deprecated Action is already performed by EwaldGravityWalker::splitnode()
+ *
+ * @param node TreeNode on which we operate
+ */
+void BHEwaldGravityWalker::nodeaction(TreeNode* node) {
+    // obsolete, action is perfomed by splitnode()
+}
+
+/**
+ * @brief Action to perform on a single Leaf of the Tree
+ *
+ * @param leaf Leaf on which we operate
+ */
+void BHEwaldGravityWalker::leafaction(Leaf* leaf) {
+    Vec r = leaf->get_particle()->get_position() - _position;
+    nearest(r);
+    _acorr += leaf->get_particle()->get_mass() * _ewald_table.get_correction(r);
+}
+
+/**
+ * @brief Action performed when a PseudoNode is encountered
+ *
+ * @deprecated Method has been replaced by
+ * EwaldGravityWalker::export_to_pseudonode
+ *
+ * @param pseudonode PseudoNode on which we operate
+ */
+void BHEwaldGravityWalker::pseudonodeaction(PseudoNode* pseudonode) {
+    // do something
+    //    _exportlist[pseudonode->get_source()] = true;
+}
+
+/**
+ * @brief Decide if the Particle should be exported to the process which holds
+ * the actual node represented by the given PseudoNode
+ *
+ * @param pseudonode PseudoNode on which we operate
+ * @return True, since the gravitational force is only approximated for a local
+ * TreeNode
+ */
+bool BHEwaldGravityWalker::export_to_pseudonode(PseudoNode* pseudonode) {
+    return true;
+}
+
+/**
+ * @brief Set the position which is used for the treewalk
+ *
+ * @deprecated This method should not be used anymore
+ *
+ * @param position New position for the treewalk
+ */
+void BHEwaldGravityWalker::set_position(Vec position) {
+    _position = position;
+}
+
+/**
+ * @brief Get the position used for the treewalk
+ *
+ * @return Position used for the treewalk
+ */
+Vec BHEwaldGravityWalker::get_position() {
+    return _position;
+}
+
+/**
+ * @brief Periodic version of EwaldGravityWalker::splitnode()
+ *
+ * @deprecated Periodic boundaries are treated in a different way now
+ *
+ * @param node TreeNode on which we operate
+ * @param ewald_table EwaldTable used for periodic correction terms
+ * @return True if the TreeNode should be opened, false otherwise
+ */
+bool BHEwaldGravityWalker::periodicsplitnode(TreeNode* node,
+                                             EwaldTable& ewald_table) {
+    return false;
+}
+
+/**
+ * @brief Periodic version of EwaldGravityWalker::pseudonodeaction()
+ *
+ * @deprecated Method was never implemented and should not be used, since
+ * periodic boundaries are treated differently now
+ *
+ * @param pseudonode PseudoNode on which we operate
+ * @param ewald_table EwaldTable used for periodic correction terms
+ */
+void BHEwaldGravityWalker::periodicpseudonodeaction(PseudoNode* pseudonode,
+                                                    EwaldTable& ewald_table) {}
+
+/**
+ * @brief Periodic version of EwaldGravityWalker::leafaction()
+ *
+ * @deprecated Not used anymore
+ *
+ * @param leaf Leaf on which we operate
+ * @param ewald_table EwaldTable used for periodic correction terms
+ */
+void BHEwaldGravityWalker::periodicleafaction(Leaf* leaf,
+                                              EwaldTable& ewald_table) {}
+
+/**
+ * @brief Finalize the treewalk by setting the gravitational acceleration of the
+ * Particle
+ */
+void BHEwaldGravityWalker::after_walk() {
+    _p->set_gravitational_acceleration(_p->get_gravitational_acceleration() +
+                                       _acorr);
+}
+
+/**
+ * @brief Get an Export to export the Particle to another MPI-process
+ *
+ * @return An Export that can be used to communicate relevant Particle data to
+ * another MPI-process
+ */
+BHEwaldGravityWalker::Export BHEwaldGravityWalker::get_export() {
+    return Export(_p, 0.);
+}
+
+/**
+ * @brief Finalize the local treewalk for another MPI-process by setting the
+ * acceleration of the Import
+ *
+ * @param import Import that will be sent back to the original MPI-process
+ */
+void BHEwaldGravityWalker::after_walk(Import& import) {
+    import.set_acorr(_acorr);
 }
 
 // Barnes-Hut potential walk

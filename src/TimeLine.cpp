@@ -199,13 +199,7 @@ bool TimeLine::step_forward() {
   * @param time A new 64-bit integer current time for the TimeLine
   */
 void TimeLine::set_time(unsigned long time) {
-    if(_cosmology) {
-        _current_time = (unsigned long)((log(time) - _mintime) *
-                                        _integer_maxtime / _tottime);
-    } else {
-        _current_time = (unsigned long)((time - _mintime) * _integer_maxtime /
-                                        _tottime);
-    }
+    _current_time = time;
 }
 
 /**
@@ -217,8 +211,13 @@ void TimeLine::set_time(unsigned long time) {
  * @param time Floating point time
  */
 void TimeLine::set_time(double time) {
-    _current_time =
-            (unsigned long)((time - _mintime) * _integer_maxtime / _tottime);
+    if(_cosmology) {
+        _current_time = (unsigned long)((log(time) - _mintime) *
+                                        _integer_maxtime / _tottime);
+    } else {
+        _current_time = (unsigned long)((time - _mintime) * _integer_maxtime /
+                                        _tottime);
+    }
 }
 
 /**
@@ -546,6 +545,7 @@ void TimeLine::dump(RestartFile& rfile) {
  * @param particlevector Reference to the ParticleVector of the simulation
  * @param units Internal simulation UnitSet
  * @param output_units Output UnitSet
+ * @param cosmology Cosmology used for comoving integration
  */
 TimeLine::TimeLine(RestartFile& rfile, ParticleVector& particlevector,
                    UnitSet& units, UnitSet& output_units, Cosmology* cosmology)

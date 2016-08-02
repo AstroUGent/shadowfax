@@ -456,6 +456,240 @@ class GravityWalker : public PeriodicTreeWalker {
 };
 
 /**
+ * @brief TreeWalker used to calculate the Ewald correction to the gravitational
+ * force
+ */
+class EwaldGravityWalker : public PeriodicTreeWalker {
+  private:
+    /*! @brief Particle for which the Ewald correction force is calculated */
+    Particle* _p;
+
+    /*! @brief Position of the Particle for which the Ewald correction force is
+     *  calculated */
+    Vec _position;
+
+    /*! @brief Current value of the Ewald correction force */
+    Vec _acorr;
+
+    /*! @brief Reference to the EwaldTable used to calculate corrections */
+    EwaldTable& _ewald_table;
+
+    /*! @brief Old gravitational acceleration */
+    double _olda;
+
+  public:
+    /**
+     * @brief Auxiliary class used to communicate particle information to other
+     * MPI processes during the Ewald correction treewalk
+     */
+    class Export {
+      private:
+        /*! @brief Particle for which the Ewald correction is calculated */
+        Particle* _p;
+
+        /*! @brief Old acceleration of the Particle (is exported) */
+        double _olda;
+
+        /*! @brief Position of the Particle (is exported) */
+        Vec _pos;
+
+        /*! @brief Softening length of the Particle (is exported) */
+        double _hsoft;
+
+        /*! @brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (is
+         *  exported) */
+        ParticleType _type;
+
+      public:
+        /**
+         * @brief Constructor
+         *
+         * @param p Particle for which the Ewald correction is calculated
+         * @param olda Old acceleration of the Particle
+         */
+        Export(Particle* p, double olda) {
+            _p = p;
+            _olda = olda;
+            _pos = p->get_position();
+            _hsoft = p->get_hsoft();
+            _type = p->type();
+        }
+
+        /**
+         * @brief Add relevant data to the given communication buffer for export
+         * to another MPI-process
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        void pack_data(void* buffer, int bufsize, int* position) {
+            MyMPI_Pack(&_pos[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
+            MyMPI_Pack(&_olda, 1, MPI_DOUBLE, buffer, bufsize, position);
+            MyMPI_Pack(&_hsoft, 1, MPI_DOUBLE, buffer, bufsize, position);
+            MyMPI_Pack(&_type, 1, MPI_INT, buffer, bufsize, position);
+        }
+
+        /**
+         * @brief Read the response from the external treewalk from the given
+         * communication buffer and finalize the external treewalk
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        void unpack_data(void* buffer, int bufsize, int* position) {
+            Vec acorr;
+            unsigned int comp_cost;
+            MyMPI_Unpack(buffer, bufsize, position, &acorr[0], ndim_,
+                         MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1,
+                         MPI_UNSIGNED);
+            _p->set_gravitational_acceleration(
+                    _p->get_gravitational_acceleration() + acorr);
+            _p->add_comp_cost(comp_cost);
+        }
+    };
+
+    /**
+     * @brief Auxiliary class used to communicate particle information to other
+     * MPI processes during the Ewald correction treewalk
+     */
+    class Import {
+      private:
+        /*! @brief Position for which the Ewald correction is calculated */
+        Vec _pos;
+
+        /*! @brief Old acceleration, used for the relative opening criterion */
+        double _olda;
+
+        /*! @brief Result of the local treewalk (is exported) */
+        Vec _acorr;
+
+        /*! @brief Computational cost of the local treewalk (is exported) */
+        unsigned int _comp_cost;
+
+        /*! @brief Softening length of the external Particle */
+        double _hsoft;
+
+        /*! @brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
+        ParticleType _type;
+
+      public:
+        /**
+         * @brief Constructor. Initialize the import from the given
+         * communication buffer
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        Import(void* buffer, int bufsize, int* position) {
+            MyMPI_Unpack(buffer, bufsize, position, &_pos[0], ndim_,
+                         MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &_olda, 1, MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &_hsoft, 1, MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &_type, 1, MPI_INT);
+        }
+
+        /**
+         * @brief Get the position of the external Particle
+         *
+         * @return Position of the external Particle
+         */
+        Vec get_position() {
+            return _pos;
+        }
+
+        /**
+         * @brief Get the old acceleration of the external Particle
+         *
+         * @return Old acceleration of the Particle
+         */
+        double get_olda() {
+            return _olda;
+        }
+
+        /**
+         * @brief Get the softening length of the external Particle
+         *
+         * @return Softening length of the external Particle
+         */
+        double get_hsoft() {
+            return _hsoft;
+        }
+
+        /**
+         * @brief Get the type of the external Particle
+         *
+         * @return Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM)
+         */
+        ParticleType get_type() {
+            return _type;
+        }
+
+        /**
+         * @brief Set the Ewald correction force
+         *
+         * @param acorr Value of the Ewald correction
+         */
+        void set_acorr(Vec acorr) {
+            _acorr = acorr;
+        }
+
+        /**
+         * @brief Set the computational cost
+         *
+         * @param comp_cost Value of the computational cost
+         */
+        void set_comp_cost(unsigned int comp_cost) {
+            _comp_cost = comp_cost;
+        }
+
+        /**
+         * @brief Add relevant data to the given communication stream to send
+         * them back to the original process
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        void pack_data(void* buffer, int bufsize, int* position) {
+            MyMPI_Pack(&_acorr[0], ndim_, MPI_DOUBLE, buffer, bufsize,
+                       position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer, bufsize, position);
+        }
+    };
+
+    EwaldGravityWalker(Particle* p, EwaldTable& ewald_table, bool local = true);
+    EwaldGravityWalker(Import& import, EwaldTable& ewald_table);
+
+    ~EwaldGravityWalker();
+
+    Vec get_acceleration();
+
+    bool splitnode(TreeNode* node);
+    void nodeaction(TreeNode* node);
+    void leafaction(Leaf* leaf);
+    void pseudonodeaction(PseudoNode* pseudonode);
+    bool export_to_pseudonode(PseudoNode* pseudonode);
+
+    void set_position(Vec position);
+    Vec get_position();
+
+    bool periodicsplitnode(TreeNode* node, EwaldTable& ewald_table);
+    void periodicpseudonodeaction(PseudoNode* pseudonode,
+                                  EwaldTable& ewald_table);
+    void periodicleafaction(Leaf* leaf, EwaldTable& ewald_table);
+
+    void after_walk();
+
+    void after_walk(Import& import);
+
+    Export get_export();
+};
+
+/**
  * @brief TreeWalker used to calculate the gravitational potential for a given
  * Particle
  */
@@ -908,6 +1142,238 @@ class BHGravityWalker : public PeriodicTreeWalker {
     BHGravityWalker(Import& import);
 
     ~BHGravityWalker();
+
+    Vec get_acceleration();
+
+    bool splitnode(TreeNode* node);
+    void nodeaction(TreeNode* node);
+    void leafaction(Leaf* leaf);
+    void pseudonodeaction(PseudoNode* pseudonode);
+    bool export_to_pseudonode(PseudoNode* pseudonode);
+
+    void set_position(Vec position);
+    Vec get_position();
+
+    bool periodicsplitnode(TreeNode* node, EwaldTable& ewald_table);
+    void periodicpseudonodeaction(PseudoNode* pseudonode,
+                                  EwaldTable& ewald_table);
+    void periodicleafaction(Leaf* leaf, EwaldTable& ewald_table);
+
+    void after_walk();
+
+    void after_walk(Import& import);
+
+    Export get_export();
+};
+
+/**
+ * @brief TreeWalker used to calculate the Ewald correction to the gravitational
+ * force using a Barnes-Hut opening criterion
+ */
+class BHEwaldGravityWalker : public PeriodicTreeWalker {
+  private:
+    /*! @brief Particle for which the Ewald correction force is calculated */
+    Particle* _p;
+
+    /*! @brief Position of the Particle for which the Ewald correction force is
+     *  calculated */
+    Vec _position;
+
+    /*! @brief Current value of the Ewald correction force */
+    Vec _acorr;
+
+    /*! @brief Reference to the EwaldTable used to calculate corrections */
+    EwaldTable& _ewald_table;
+
+  public:
+    /**
+     * @brief Auxiliary class used to communicate particle information to other
+     * MPI processes during the Ewald correction treewalk
+     */
+    class Export {
+      private:
+        /*! @brief Particle for which the Ewald correction is calculated */
+        Particle* _p;
+
+        /*! @brief Old acceleration of the Particle (is exported) */
+        double _olda;
+
+        /*! @brief Position of the Particle (is exported) */
+        Vec _pos;
+
+        /*! @brief Softening length of the Particle (is exported) */
+        double _hsoft;
+
+        /*! @brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (is
+         *  exported) */
+        ParticleType _type;
+
+      public:
+        /**
+         * @brief Constructor
+         *
+         * @param p Particle for which the Ewald correction is calculated
+         * @param olda Old acceleration of the Particle
+         */
+        Export(Particle* p, double olda) {
+            _p = p;
+            _olda = olda;
+            _pos = p->get_position();
+            _hsoft = p->get_hsoft();
+            _type = p->type();
+        }
+
+        /**
+         * @brief Add relevant data to the given communication buffer for export
+         * to another MPI-process
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        void pack_data(void* buffer, int bufsize, int* position) {
+            MyMPI_Pack(&_pos[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
+            MyMPI_Pack(&_olda, 1, MPI_DOUBLE, buffer, bufsize, position);
+            MyMPI_Pack(&_hsoft, 1, MPI_DOUBLE, buffer, bufsize, position);
+            MyMPI_Pack(&_type, 1, MPI_INT, buffer, bufsize, position);
+        }
+
+        /**
+         * @brief Read the response from the external treewalk from the given
+         * communication buffer and finalize the external treewalk
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        void unpack_data(void* buffer, int bufsize, int* position) {
+            Vec acorr;
+            unsigned int comp_cost;
+            MyMPI_Unpack(buffer, bufsize, position, &acorr[0], ndim_,
+                         MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1,
+                         MPI_UNSIGNED);
+            _p->set_gravitational_acceleration(
+                    _p->get_gravitational_acceleration() + acorr);
+            _p->add_comp_cost(comp_cost);
+        }
+    };
+
+    /**
+     * @brief Auxiliary class used to communicate particle information to other
+     * MPI processes during the Ewald correction treewalk
+     */
+    class Import {
+      private:
+        /*! @brief Position for which the Ewald correction is calculated */
+        Vec _pos;
+
+        /*! @brief Old acceleration, used for the relative opening criterion */
+        double _olda;
+
+        /*! @brief Result of the local treewalk (is exported) */
+        Vec _acorr;
+
+        /*! @brief Computational cost of the local treewalk (is exported) */
+        unsigned int _comp_cost;
+
+        /*! @brief Softening length of the external Particle */
+        double _hsoft;
+
+        /*! @brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
+        ParticleType _type;
+
+      public:
+        /**
+         * @brief Constructor. Initialize the import from the given
+         * communication buffer
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        Import(void* buffer, int bufsize, int* position) {
+            MyMPI_Unpack(buffer, bufsize, position, &_pos[0], ndim_,
+                         MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &_olda, 1, MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &_hsoft, 1, MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &_type, 1, MPI_INT);
+        }
+
+        /**
+         * @brief Get the position of the external Particle
+         *
+         * @return Position of the external Particle
+         */
+        Vec get_position() {
+            return _pos;
+        }
+
+        /**
+         * @brief Get the old acceleration of the external Particle
+         *
+         * @return Old acceleration of the Particle
+         */
+        double get_olda() {
+            return _olda;
+        }
+
+        /**
+         * @brief Get the softening length of the external Particle
+         *
+         * @return Softening length of the external Particle
+         */
+        double get_hsoft() {
+            return _hsoft;
+        }
+
+        /**
+         * @brief Get the type of the external Particle
+         *
+         * @return Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM)
+         */
+        ParticleType get_type() {
+            return _type;
+        }
+
+        /**
+         * @brief Set the Ewald correction force
+         *
+         * @param acorr Value of the Ewald correction
+         */
+        void set_acorr(Vec acorr) {
+            _acorr = acorr;
+        }
+
+        /**
+         * @brief Set the computational cost
+         *
+         * @param comp_cost Value of the computational cost
+         */
+        void set_comp_cost(unsigned int comp_cost) {
+            _comp_cost = comp_cost;
+        }
+
+        /**
+         * @brief Add relevant data to the given communication stream to send
+         * them back to the original process
+         *
+         * @param buffer Communication buffer
+         * @param bufsize Size of the buffer
+         * @param position Current position of the buffer (is updated)
+         */
+        void pack_data(void* buffer, int bufsize, int* position) {
+            MyMPI_Pack(&_acorr[0], ndim_, MPI_DOUBLE, buffer, bufsize,
+                       position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer, bufsize, position);
+        }
+    };
+
+    BHEwaldGravityWalker(Particle* p, EwaldTable& ewald_table,
+                         bool local = true);
+    BHEwaldGravityWalker(Import& import, EwaldTable& ewald_table);
+
+    ~BHEwaldGravityWalker();
 
     Vec get_acceleration();
 

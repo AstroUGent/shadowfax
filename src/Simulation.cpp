@@ -25,6 +25,7 @@
  */
 #include "Simulation.hpp"
 #include "CoolingLocation.hpp"
+#include "Cosmology.hpp"
 #include "DelCont.hpp"
 #include "ExArith.hpp"
 #include "GasCooling.hpp"
@@ -201,6 +202,7 @@ Simulation::~Simulation() {
     delete _physics;
     delete _starformation_converter;
     delete _stellar_feedback;
+    delete _cosmology;
     delete _parameterfile;
     delete _logfiles;
     delete _solver;
@@ -482,14 +484,34 @@ void Simulation::main_loop() {
         if(_gravity) {
             // half a kick and drift for the N-body particles
             for(unsigned int i = _particles->dmsize(); i--;) {
+                double timestep;
                 if(_particles->dm(i)->get_starttime() == currentTime) {
+                    if(_cosmology) {
+                        timestep = 0.5 *
+                                   _cosmology->get_acceleration_factor(
+                                           _timeline->get_realtime(
+                                                   _particles->dm(i)
+                                                           ->get_starttime()),
+                                           _timeline->get_realtime(
+                                                   _particles->dm(i)
+                                                           ->get_endtime()));
+                    } else {
+                        timestep = 0.5 *
+                                   _timeline->get_realtime_interval(
+                                           _particles->dm(i)->get_endtime() -
+                                           _particles->dm(i)->get_starttime());
+                    }
                     _particles->dm(i)->accelerate(
                             _particles->dm(i)
                                     ->get_gravitational_acceleration() *
-                            0.5 *
-                            _timeline->get_realtime_interval(
-                                    _particles->dm(i)->get_endtime() -
-                                    _particles->dm(i)->get_starttime()));
+                            timestep);
+                }
+                if(_cosmology) {
+                    timestep = _cosmology->get_velocity_factor(
+                            _timeline->get_realtime(currentTime),
+                            _timeline->get_realtime(currentTime + dt));
+                } else {
+                    timestep = _timeline->get_realtime_interval(dt);
                 }
                 _particles->dm(i)->move(_timeline->get_realtime(dt));
                 _particles->get_container().keep_inside(_particles->dm(i));
@@ -683,22 +705,44 @@ void Simulation::main_loop() {
             // kick active collisionless particles
             for(unsigned int i = _particles->dmsize(); i--;) {
                 if(_particles->dm(i)->get_endtime() == currentTime) {
+                    double timestep;
+                    if(_cosmology) {
+                        timestep = 0.5 *
+                                   _cosmology->get_acceleration_factor(
+                                           _timeline->get_realtime(
+                                                   _particles->dm(i)
+                                                           ->get_starttime()),
+                                           _timeline->get_realtime(
+                                                   _particles->dm(i)
+                                                           ->get_endtime()));
+                    } else {
+                        timestep = 0.5 *
+                                   _timeline->get_realtime_interval(
+                                           _particles->dm(i)->get_endtime() -
+                                           _particles->dm(i)->get_starttime());
+                    }
                     _particles->dm(i)->accelerate(
                             _particles->dm(i)
                                     ->get_gravitational_acceleration() *
-                            0.5 *
-                            _timeline->get_realtime_interval(
-                                    _particles->dm(i)->get_endtime() -
-                                    _particles->dm(i)->get_starttime()));
+                            timestep);
                 }
             }
             for(unsigned int i = _particles->starsize(); i--;) {
                 if(_particles->star(i)->get_endtime() == currentTime) {
                     double timestep;
-                    timestep = 0.5 *
-                               _timeline->get_realtime_interval(
-                                       _particles->star(i)->get_endtime() -
-                                       _particles->star(i)->get_starttime());
+                    if(_cosmology) {
+                        timestep = _cosmology->get_acceleration_factor(
+                                _timeline->get_realtime(
+                                        _particles->star(i)->get_starttime()),
+                                _timeline->get_realtime(
+                                        _particles->star(i)->get_endtime()));
+                    } else {
+                        timestep =
+                                0.5 *
+                                _timeline->get_realtime_interval(
+                                        _particles->star(i)->get_endtime() -
+                                        _particles->star(i)->get_starttime());
+                    }
                     _particles->star(i)->accelerate(
                             _particles->star(i)
                                     ->get_gravitational_acceleration() *
@@ -862,6 +906,10 @@ void Simulation::dump(RestartFile& restartfile) {
         _stellar_feedback->dump(restartfile);
     }
 
+    if(_cosmology) {
+        _cosmology->dump(restartfile);
+    }
+
     if(_gascooling) {
         _gascooling->dump(restartfile);
     }
@@ -929,6 +977,12 @@ void Simulation::restart(string filename) {
         _stellar_feedback = NULL;
     }
 
+    if(_parameterfile->check_parameter("Cosmology.CosmologicalSimulation")) {
+        _cosmology = new Cosmology(restartfile);
+    } else {
+        _cosmology = NULL;
+    }
+
     if(_parameterfile->check_parameter("Physics.Cooling")) {
         _gascooling = new GasCooling(restartfile);
     } else {
@@ -940,7 +994,7 @@ void Simulation::restart(string filename) {
                                     _periodic, _periodic && _gravity);
     LOGS("ParticleVector restarted");
     _timeline = new TimeLine(restartfile, *_particles, *_simulation_units,
-                             *_output_units);
+                             *_output_units, _cosmology);
 
     unsigned int max_memory = HelperFunctions::machine_readable_bytes(
             _parameterfile->get_parameter<string>(
@@ -1026,6 +1080,14 @@ void Simulation::initialize(string filename) {
         _stellar_feedback = NULL;
     }
 
+    if(_parameterfile->check_parameter("Cosmology.CosmologicalSimulation")) {
+        double hubble_factor = _physics->get_Hubble_constant();
+        _cosmology = new Cosmology(_parameterfile, hubble_factor);
+        LOGS("Set up cosmology");
+    } else {
+        _cosmology = NULL;
+    }
+
     if(_parameterfile->check_parameter("Physics.Cooling")) {
         _gascooling = new GasCooling(COOLING_LOCATION, _simulation_units,
                                      _parameterfile, _physics);
@@ -1041,7 +1103,8 @@ void Simulation::initialize(string filename) {
     _particles = new ParticleVector(_parameterfile, *_box, _periodic, true);
     LOGS("ParticleVector created");
     _timeline = new TimeLine(_parameterfile, _outputdir, *_particles,
-                             *_simulation_units, *_output_units, _periodic);
+                             *_simulation_units, *_output_units, _periodic,
+                             _cosmology);
     string icfile_type = _parameterfile->get_parameter<string>(
             "IC.Type", SIMULATION_DEFAULT_ICTYPE);
     string icfile_name = _outputdir + string("/") +
@@ -1049,6 +1112,26 @@ void Simulation::initialize(string filename) {
                                  "IC.FileName", SIMULATION_DEFAULT_ICNAME);
     double time =
             load(*_particles, icfile_type, icfile_name, *_simulation_units);
+
+    if(_cosmology) {
+        time = exp(log(1. / (1. + 99.)));
+        for(unsigned int i = 0; i < _particles->gassize(); i++) {
+            Vec v = _cosmology->comoving_velocity(
+                    _particles->gas(i)->get_velocity(), time);
+            _particles->gas(i)->set_velocity(v);
+        }
+        for(unsigned int i = 0; i < _particles->dmsize(); i++) {
+            Vec v = _cosmology->comoving_velocity(
+                    _particles->dm(i)->get_velocity(), time);
+            _particles->dm(i)->set_velocity(v);
+        }
+        for(unsigned int i = 0; i < _particles->starsize(); i++) {
+            Vec v = _cosmology->comoving_velocity(
+                    _particles->star(i)->get_velocity(), time);
+            _particles->star(i)->set_velocity(v);
+        }
+    }
+
     _gravity = _parameterfile->check_parameter("Gravity.Gravity");
     // make sure the particles know if gravity is on or off
     _particles->get_header().set_gravity(_gravity);
@@ -1147,8 +1230,8 @@ void Simulation::initialize(string filename) {
 
         // Barnes-Hut
         LOGS("Starting Barnes-Hut gravity walk");
-        _particles->get_tree().walk_tree<BHGravityWalker>(*_particles, true,
-                                                          true, true, 0);
+        _particles->get_tree().walk_tree<BHGravityWalker>(
+                *_particles, true, true, true, _timeline->get_integertime());
 
         // no multiplication by G needed, since it is already included in
         // Springel's relative criterion
@@ -1185,8 +1268,8 @@ void Simulation::initialize(string filename) {
 
         // relative criterion
         LOGS("Starting relative gravity walk");
-        _particles->get_tree().walk_tree<GravityWalker>(*_particles, true, true,
-                                                        true, 0);
+        _particles->get_tree().walk_tree<GravityWalker>(
+                *_particles, true, true, true, _timeline->get_integertime());
 
         // set old acceleration before multiplying by G
         for(unsigned int i = _particles->gassize(); i--;) {

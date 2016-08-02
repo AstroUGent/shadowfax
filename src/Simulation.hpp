@@ -45,6 +45,7 @@ class RestartFile;
 class LogFiles;
 class Physics;
 class GasCooling;
+class Cosmology;
 
 /**
   * \brief The main class for actual simulations
@@ -105,6 +106,9 @@ class Simulation {
 
     /*! @brief StarFormationParticleConverter used for star formation */
     StellarFeedback* _stellar_feedback;
+
+    /*! @brief Cosmology used for comoving integration */
+    Cosmology* _cosmology;
 
     /*! \brief VorTessManager used to calculate the Voronoi grid used for the
      *  hydrodynamical integration */

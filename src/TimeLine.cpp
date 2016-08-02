@@ -24,6 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "TimeLine.hpp"
+#include "Cosmology.hpp"
 #include "MPIGlobal.hpp"
 #include "MPIMethods.hpp"
 #include "ParameterFile.hpp"
@@ -60,6 +61,7 @@ using namespace std;
  * be used
  * @param periodic Bool specifying whether the box containing the
  * ParticleVector is periodic (true) or reflective (false)
+ * @param cosmology Cosmology used for comoving integration
  * @param treetime Bool specifying whether the timesteps should be calculated
  * using the expensive treewalk
  * @param max_timestep Maximum particle timestep allowed
@@ -71,14 +73,20 @@ using namespace std;
 TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
                    ParticleVector& particlevector, std::string snaptype,
                    std::string snapname, UnitSet& units, UnitSet& output_units,
-                   bool gravity, bool periodic, bool treetime,
-                   double max_timestep, double min_timestep,
+                   bool gravity, bool periodic, Cosmology* cosmology,
+                   bool treetime, double max_timestep, double min_timestep,
                    unsigned int lastsnap, bool per_node_output)
         : _particles(particlevector) {
     _snapshotwriter = SnapshotWriterFactory::generate(
             snaptype, snapname, units, output_units, lastsnap, per_node_output);
     _maxtime = maxtime;
-    _mintime = 0.;
+    _cosmology = cosmology;
+    if(_cosmology) {
+        _mintime = log(_cosmology->get_a0());
+        _maxtime = log(_maxtime);
+    } else {
+        _mintime = 0.;
+    }
     _tottime = _maxtime - _mintime;
     _integer_maxtime = 1;
     _integer_maxtime <<= 60;
@@ -123,10 +131,11 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
  * @param units Internal units
  * @param output_units Output units
  * @param periodic Flag indicating if the simulation box is periodic
+ * @param cosmology Cosmology used for comoving integration
  */
 TimeLine::TimeLine(ParameterFile* parameters, std::string outputdir,
                    ParticleVector& particlevector, UnitSet& units,
-                   UnitSet& output_units, bool periodic)
+                   UnitSet& output_units, bool periodic, Cosmology* cosmology)
         : TimeLine(parameters->get_parameter<double>("Time.MaxTime", -1000.),
                    parameters->get_parameter<double>(
                            "Snapshots.SnapTime",
@@ -146,7 +155,7 @@ TimeLine::TimeLine(ParameterFile* parameters, std::string outputdir,
                                    TIMELINE_DEFAULT_BASENAME),
                    units, output_units,
                    parameters->check_parameter("Gravity.Gravity"), periodic,
-                   parameters->check_parameter("Time.TreeTime"),
+                   cosmology, parameters->check_parameter("Time.TreeTime"),
                    parameters->get_parameter<double>(
                            "Time.MaxTimeStep", TIMELINE_DEFAULT_MAXTIMESTEP),
                    parameters->get_parameter<double>(
@@ -190,7 +199,13 @@ bool TimeLine::step_forward() {
   * @param time A new 64-bit integer current time for the TimeLine
   */
 void TimeLine::set_time(unsigned long time) {
-    _current_time = time;
+    if(_cosmology) {
+        _current_time = (unsigned long)((log(time) - _mintime) *
+                                        _integer_maxtime / _tottime);
+    } else {
+        _current_time = (unsigned long)((time - _mintime) * _integer_maxtime /
+                                        _tottime);
+    }
 }
 
 /**
@@ -308,7 +323,19 @@ unsigned long TimeLine::calculate_timestep() {
         unsigned long tidt = Smax;
         if(a) {
             double eps = _particles.dm(i)->get_hsoft();
+            if(_cosmology) {
+                double curtime = get_realtime(_current_time);
+                a /= (curtime * curtime * curtime);
+            }
             double dt = sqrt(2. * eps * eta / a);
+            if(_cosmology) {
+                //                dt = _cosmology->get_da(dt,
+                //                get_realtime(_current_time));
+                dt *= _cosmology->H(get_realtime(_current_time));
+            }
+            // the line below is necessary to avoid an overflow when converting
+            // to unsigned long
+            dt = std::min(_tottime, dt);
             tidt = std::min(
                     tidt, (unsigned long)((dt / _tottime) * _integer_maxtime));
         }
@@ -352,6 +379,9 @@ unsigned long TimeLine::calculate_timestep() {
         if(a) {
             double eps = _particles.star(i)->get_hsoft();
             double dt = sqrt(2. * eps * eta / a);
+            if(_cosmology) {
+                dt = _cosmology->get_da(dt, get_realtime(_current_time));
+            }
             // the line below is necessary to avoid an overflow when converting
             // to unsigned long
             dt = std::min(_tottime, dt);
@@ -518,7 +548,7 @@ void TimeLine::dump(RestartFile& rfile) {
  * @param output_units Output UnitSet
  */
 TimeLine::TimeLine(RestartFile& rfile, ParticleVector& particlevector,
-                   UnitSet& units, UnitSet& output_units)
+                   UnitSet& units, UnitSet& output_units, Cosmology* cosmology)
         : _particles(particlevector) {
     _snapshotwriter = SnapshotWriterFactory::load(rfile, units, output_units);
     rfile.read(_maxtime);
@@ -535,6 +565,8 @@ TimeLine::TimeLine(RestartFile& rfile, ParticleVector& particlevector,
     rfile.read(_max_timestep);
     rfile.read(_min_timestep);
     rfile.read(_treetime);
+
+    _cosmology = cosmology;
 
     _iotimer = new Timer(rfile);
 

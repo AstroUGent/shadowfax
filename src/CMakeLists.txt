@@ -31,6 +31,7 @@ if(DO_SHADOWFAX)
     set(SHADOWFAXSOURCES
     CircularBox.cpp
     CoolingTable.cpp
+    Cosmology.cpp
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
@@ -41,6 +42,7 @@ if(DO_SHADOWFAX)
     GadgetSnapshotWriter.cpp
     GasCooling.cpp
     GravityWalker.cpp
+    GSL.cpp
     Image.cpp
     Line.cpp
     LogFiles.cpp
@@ -74,6 +76,7 @@ if(DO_SHADOWFAX)
 
     CoolingLocation.hpp
     CoolingTable.hpp
+    Cosmology.hpp
     DelCont.hpp
     DelTess.hpp
     Error.hpp
@@ -83,6 +86,7 @@ if(DO_SHADOWFAX)
     GadgetSnapshotWriter.hpp
     GasCooling.hpp
     GravityWalker.hpp
+    GSL.hpp
     Image.hpp
     Line.hpp
     LogFiles.hpp
@@ -160,12 +164,14 @@ if(DO_ICMAKER)
     set(ICMAKERSOURCES
     BlockICGenerator.cpp
     CircularBox.cpp
+    Cosmology.cpp
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
     DelTessCheck.cpp
     ExArith.cpp
     GadgetSnapshotWriter.cpp
+    GSL.cpp
     ICMaker.cpp
     ICRegion.cpp
     Line.cpp
@@ -227,12 +233,14 @@ endif(DO_ICMAKER)
 if(DO_VTKMAKER)
     set(VTKMAKERNAME vtkmaker${NDIM}d)
     add_executable(${VTKMAKERNAME}
+    Cosmology.cpp
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
     ExArith.cpp
     GadgetSnapshotReader.cpp
     GadgetSnapshotWriter.cpp
+    GSL.cpp
     Image.cpp
     Line.cpp
     MPIGlobal.cpp
@@ -273,6 +281,7 @@ if(DO_GIZMO)
     set(GIZMONAME myGIZMO${NDIM}d)
 
     add_executable(${GIZMONAME}
+    Cosmology.cpp
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
@@ -280,6 +289,7 @@ if(DO_GIZMO)
     GadgetSnapshotReader.cpp
     GadgetSnapshotWriter.cpp
     GIZMO.cpp
+    GSL.cpp
     Image.cpp
     Line.cpp
     MPIGlobal.cpp

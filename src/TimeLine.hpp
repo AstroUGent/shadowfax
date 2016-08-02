@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of Shadowfax
  * Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+ *               2016 Bert Vandenbroucke
  *
  * Shadowfax is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +33,7 @@
 #include <iostream>
 #include <string>
 
+class Cosmology;
 class ParticleVector;
 class ParameterFile;
 class UnitSet;
@@ -88,6 +90,9 @@ class TimeLine {
      *  reflective (false) */
     bool _periodic;
 
+    /*! @brief Cosmology used for comoving integration (if applicable) */
+    Cosmology* _cosmology;
+
     /*! \brief Gravitational timestep constant */
     double _grav_eta;
 
@@ -107,7 +112,7 @@ class TimeLine {
     TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
              ParticleVector& particlevector, std::string snaptype,
              std::string snapname, UnitSet& units, UnitSet& output_units,
-             bool gravity, bool periodic,
+             bool gravity, bool periodic, Cosmology* cosmology = NULL,
              bool treetime = TIMELINE_DEFAULT_TREETIMEFLAG,
              double max_timestep = TIMELINE_DEFAULT_MAXTIMESTEP,
              double min_timestep = TIMELINE_DEFAULT_MINTIMESTEP,
@@ -115,7 +120,7 @@ class TimeLine {
              bool per_node_output = TIMELINE_DEFAULT_PERNODEOUTPUTFLAG);
     TimeLine(ParameterFile* parameters, std::string outputdir,
              ParticleVector& particlevector, UnitSet& units,
-             UnitSet& output_units, bool periodic);
+             UnitSet& output_units, bool periodic, Cosmology* cosmology = NULL);
 
     /**
      * @brief Destructor
@@ -152,6 +157,9 @@ class TimeLine {
      */
     double get_realtime(unsigned long integer_time) {
         double t = (double)integer_time / (double)_integer_maxtime;
+        if(_cosmology) {
+            return exp(_tottime * t + _mintime);
+        }
         return _tottime * t + _mintime;
     }
 
@@ -184,7 +192,7 @@ class TimeLine {
 
     void dump(RestartFile& rfile);
     TimeLine(RestartFile& rfile, ParticleVector& particlevector, UnitSet& units,
-             UnitSet& output_units);
+             UnitSet& output_units, Cosmology* cosmology = NULL);
 };
 
 #endif  // TIMELINE_HPP

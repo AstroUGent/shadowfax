@@ -3,6 +3,7 @@
 ################################################################################
 # This file is part of Shadowfax
 # Copyright (C) 2015 Bert Vandenbroucke (bert.vandenbroucke@gmail.com)
+#               2016 Bert Vandenbroucke
 #
 # Shadowfax is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +26,7 @@
 # contains all necessary commands to run the test and returns a useful value on
 # exit (0 begin success, all other values being a failed test)
 testnames=( overdensity nbody evrard gresho_vortex sedov_taylor restarttest \
-            flatdensity cosmo )
+            flatdensity cosmo vacuum )
 tests=()
 timings=()
 

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<box>
+  <height>1.0</height>
+  <width>1.0</width>
+  <depth>1.0</depth>
+  <origin>
+    <x>0.5</x><y>0.5</y><z>0.5</z>
+  </origin>
+  <boundary>periodic</boundary>
+  <regions>
+    <region>
+      <height>0.5</height>
+      <width>1.0</width>
+      <depth>1.0</depth>
+      <exponent>10.0</exponent>
+      <origin>
+        <x>0.25</x><y>0.5</y><z>0.5</z>
+      </origin>
+      <hydro>
+        <rho>1.</rho><vx>-4.</vx><vy>0.</vy><vz>0.</vz><p>1.</p>
+      </hydro>
+    </region>
+    <region>
+      <height>0.5</height>
+      <width>1.</width>
+      <depth>1.</depth>
+      <exponent>10.0</exponent>
+      <origin>
+        <x>0.75</x><y>0.5</y><z>0.5</z>
+      </origin>
+      <hydro>
+        <rho>1.</rho><vx>4.</vx><vy>0.</vy><vz>0.</vz><p>1.</p>
+      </hydro>
+    </region>
+  </regions>
+</box>

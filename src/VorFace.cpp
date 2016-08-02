@@ -847,7 +847,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
     }
     double areafac = get_area() / _left->get_particle()->get_total_area();
     areafac *= timefac;
-    if(fabs(dQL[0]) > areafac * _left->get_particle()->get_Qvec().m()) {
+    if(dQL[0] > areafac * _left->get_particle()->get_Qvec().m()) {
         double corfac =
                 fabs(areafac * _left->get_particle()->get_Qvec().m() / dQL[0]);
         dQL *= corfac;
@@ -856,7 +856,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
     if(_right->get_particle()) {
         double areafac = get_area() / _right->get_particle()->get_total_area();
         areafac *= timefac;
-        if(fabs(dQR[0]) > areafac * _right->get_particle()->get_Qvec().m()) {
+        if(dQR[0] > areafac * _right->get_particle()->get_Qvec().m()) {
             double corfac = fabs(
                     areafac * _right->get_particle()->get_Qvec().m() / dQR[0]);
             dQR *= corfac;

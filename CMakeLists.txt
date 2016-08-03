@@ -43,6 +43,7 @@ set(CMAKE_CXX_FLAGS_PROFILE "-pg -g")
 set(CMAKE_C_FLAGS_PROFILE "-pg -g")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wignored-qualifiers -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
 
 if(NO_SANITIZER)
     set(SANITIZER False)

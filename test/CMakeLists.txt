@@ -297,15 +297,17 @@ add_unit_test(NAME testRungeKutta
               NDIM 2)
 
 # shapy tests
-configure_file(testShapy2d.py.in
-               ${PROJECT_BINARY_DIR}/rundir/test/testShapy2d.py @ONLY)
+if(PYTHON_MODULES)
+    configure_file(testShapy2d.py.in
+                   ${PROJECT_BINARY_DIR}/rundir/test/testShapy2d.py @ONLY)
 
-configure_file(testShapy3d.py.in
-               ${PROJECT_BINARY_DIR}/rundir/test/testShapy3d.py @ONLY)
+    configure_file(testShapy3d.py.in
+                   ${PROJECT_BINARY_DIR}/rundir/test/testShapy3d.py @ONLY)
 
-add_unit_test_python(NAME testShapy2d SCRIPT testShapy2d.py)
+    add_unit_test_python(NAME testShapy2d SCRIPT testShapy2d.py)
 
-add_unit_test_python(NAME testShapy3d SCRIPT testShapy3d.py)
+    add_unit_test_python(NAME testShapy3d SCRIPT testShapy3d.py)
+endif(PYTHON_MODULES)
 
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}

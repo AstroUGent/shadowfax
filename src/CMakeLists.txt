@@ -25,6 +25,10 @@ add_subdirectory(io)
 add_subdirectory(riemann)
 add_subdirectory(utilities)
 
+if(PYTHON_MODULES)
+add_subdirectory(python)
+endif(PYTHON_MODULES)
+
 if(DO_SHADOWFAX)
     set(SHADOWFAXNAME shadowfax${NDIM}d)
 
@@ -36,7 +40,6 @@ if(DO_SHADOWFAX)
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
-    DelTessCheck.cpp
     ExArith.cpp
     FixedGrid.cpp
     GadgetSnapshotReader.cpp
@@ -173,7 +176,6 @@ if(DO_ICMAKER)
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
-    DelTessCheck.cpp
     ExArith.cpp
     GadgetSnapshotWriter.cpp
     GSL.cpp
@@ -364,3 +366,42 @@ if(DO_TENET)
     target_link_libraries(${TENETNAME} ${MPI_C_LIBRARIES})
 
 endif(DO_TENET)
+
+if(DO_LLOYD)
+    set(LLOYDNAME lloydmaker${NDIM}d)
+
+    set(LLOYD_SOURCES
+    ColorMap.cpp
+    CubicBox.cpp
+    DelTess.cpp
+    DelTess_mpi.cpp
+    ExArith.cpp
+    GadgetSnapshotReader.cpp
+    Line.cpp
+    Lloyd.cpp
+    MPIGlobal.cpp
+    NgbSearch.cpp
+    Plane.cpp
+    ProgramLog.cpp
+    RectangularBox.cpp
+    ShadowfaxSnapshotReader.cpp
+    Simplex.cpp
+    SnapshotHandler.cpp
+    VorCell.cpp
+    VorFace.cpp
+    VorGen.cpp
+    VorTess.cpp
+
+    Lloyd.hpp
+    )
+    add_executable(${LLOYDNAME} ${LLOYD_SOURCES})
+    set_target_properties(${LLOYDNAME} PROPERTIES
+                          COMPILE_FLAGS "-Dndim_=${NDIM}")
+
+    target_link_libraries(${LLOYDNAME} ${IONAME})
+    target_link_libraries(${LLOYDNAME} ${UTILNAME})
+    target_link_libraries(${LLOYDNAME} ${MPI_CXX_LIBRARIES})
+    target_link_libraries(${LLOYDNAME} ${MPI_C_LIBRARIES})
+    target_link_libraries(${LLOYDNAME} ${HDF5_LIBRARIES})
+    target_link_libraries(${LLOYDNAME} ${ALL_Boost_LIBRARIES})
+endif(DO_LLOYD)

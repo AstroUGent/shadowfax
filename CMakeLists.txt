@@ -112,6 +112,16 @@ message(STATUS "Found HDF5_DIFF: " ${HDF5_DIFF_EXECUTABLE})
 include_directories(${HDF5_INCLUDE_DIR})
 link_directories(${HDF5_LIBRARY_DIRS})
 
+if(PYTHON_MODULES)
+    find_package(Boost 1.53.0 COMPONENTS "python" REQUIRED)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+    set(Boost_Python_LIBRARIES ${Boost_LIBRARIES})
+
+    find_package(PythonLibs 2.7 REQUIRED)
+    include_directories(${PYTHON_INCLUDE_PATH})
+endif(PYTHON_MODULES)
+
 # select the programs to compile
 if(ONLY_SIMULATION_PROGRAM)
     set(DO_SHADOWFAX True)
@@ -134,6 +144,12 @@ if(TENET)
 else(TENET)
     set(DO_TENET False)
 endif(TENET)
+
+if(LLOYD)
+    set(DO_LLOYD True)
+else(LLOYD)
+    set(DO_LLOYD False)
+endif(LLOYD)
 
 # put executable in the rundirs
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/rundir)

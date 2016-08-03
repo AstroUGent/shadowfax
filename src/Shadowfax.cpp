@@ -99,7 +99,6 @@ unsigned int bootstrap(int argc, char** argv) {
             {"mass", no_argument, NULL, SIDEPROGRAM_MASS},
             {"epot", no_argument, NULL, SIDEPROGRAM_EPOT},
             {"sort", no_argument, NULL, SIDEPROGRAM_SORT},
-            {"delaunaycheck", no_argument, NULL, SIDEPROGRAM_DELTEST},
             {"exact_arithmetics", no_argument, NULL, SIDEPROGRAM_EXARITH},
             {0, 0, 0, 0}};
 
@@ -141,12 +140,6 @@ unsigned int bootstrap(int argc, char** argv) {
             }
             case SIDEPROGRAM_SORT: {
                 HilbertSorter hs(argc, argv);
-                return 1;
-            }
-            case SIDEPROGRAM_DELTEST: {
-                // check the delaunay algorithms
-                DelTess delaunay(NULL, 0);
-                delaunay.check_methods();
                 return 1;
             }
             case SIDEPROGRAM_EXARITH: {

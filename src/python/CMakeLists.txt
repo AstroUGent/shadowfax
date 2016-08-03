@@ -24,6 +24,7 @@ set(SHAPYNAME shapy${NDIM}d)
 
 set(PYTHON_RIEMANNSOURCES
     RiemannModule.cpp
+    ../riemann/ApproximateSolver.cpp
     ../riemann/ExactRiemannSolver.cpp
     ../MPIGlobal.cpp
     ../ProgramLog.cpp

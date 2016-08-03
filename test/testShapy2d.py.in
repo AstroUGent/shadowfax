@@ -21,4 +21,18 @@
 import sys
 sys.path.append("@PROJECT_BINARY_DIR@")
 
-import shapy2d
+import shapy2d as sh
+
+# test Lloyd module
+coords = [0.3, 0.4]
+centroid = sh.calculate_centroids(coords, [0., 0.], [1., 1.], False)
+if centroid[0]-0.5 > 1.e-10 or centroid[1]-0.5 > 1.e-10:
+    print centroid, " =/= [0.5, 0.5]"
+    raise Exception("Centroid is incorrect!")
+
+# test Riemann solver
+solver = sh.ExactRiemannSolver(5./3.)
+Wstar = solver.solve([1., 0., 0., 1.], [0.125, 0., 0., 0.1])
+if Wstar[0]-0.47969>1.e-4 or Wstar[1]-0.841194>1.e-4 or Wstar[3]-0.293945>1.e-4:
+    print Wstar, " =/= [0.47969, 0.841194, 0.293945]"
+    raise Exception("Wrong solution to Riemann problem!")

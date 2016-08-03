@@ -24,7 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  * @author Sven De Rijcke (sven.derijcke@ugent.be)
  */
-#include "DelCont.hpp"
+#include "CubicBox.hpp"
 #include "VorGen.hpp"
 #include "utilities/Hilbert.hpp"
 #include "utilities/Particle.hpp"

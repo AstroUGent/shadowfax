@@ -23,7 +23,7 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "DelCont.hpp"           // for CubicBox, DelCont
+#include "CubicBox.hpp"          // for CubicBox, DelCont
 #include "DelTess.hpp"           // for DelTess
 #include "Error.hpp"             // for my_exit
 #include "Simplex.hpp"           // for Simplex

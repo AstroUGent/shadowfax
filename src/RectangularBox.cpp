@@ -23,7 +23,7 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "DelCont.hpp"
+#include "RectangularBox.hpp"
 #include "ProgramLog.hpp"
 #include "RestartFile.hpp"
 #include "VorGen.hpp"

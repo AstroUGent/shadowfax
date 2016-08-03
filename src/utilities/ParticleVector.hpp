@@ -27,13 +27,12 @@
 #define PARTICLEVECTOR_HPP
 
 #include "../src/io/Header.hpp"
-#include "DelCont.hpp"
 #include "ParticleTypes.hpp"
+#include "RectangularBox.hpp"
 #include "Tree.hpp"
 #include "utilities/Timer.hpp"
 #include <vector>
 
-class RectangularBox;
 class GasParticle;
 class DMParticle;
 class ParameterFile;

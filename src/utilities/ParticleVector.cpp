@@ -32,6 +32,7 @@
 #include "ParameterFile.hpp"
 #include "Particle.hpp"
 #include "ParticleConverter.hpp"
+#include "RectangularBox.hpp"
 #include "RestartFile.hpp"
 #include "StarParticle.hpp"
 #include <fstream>

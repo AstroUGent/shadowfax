@@ -26,7 +26,7 @@
 #include "../utilities/Cuboid.hpp"
 #include "../utilities/GasParticle.hpp"
 #include "../utilities/Tree.hpp"
-#include "DelCont.hpp"
+#include "CubicBox.hpp"
 #include "Vec.hpp"
 #include "VorCell.hpp"
 #include "VorFace.hpp"

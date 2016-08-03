@@ -23,7 +23,7 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "DelCont.hpp"
+#include "CircularBox.hpp"
 #include "VorGen.hpp"
 #include <cmath>
 #include <cstdlib>

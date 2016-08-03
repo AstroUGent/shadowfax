@@ -67,6 +67,16 @@ macro(add_unit_test_bash)
     set(TESTNAMES ${TESTNAMES} ${TEST_NAME})
 endmacro(add_unit_test_bash)
 
+macro(add_unit_test_python)
+    set(oneValueArgs NAME SCRIPT)
+    cmake_parse_arguments(TEST "${options}" "${oneValueArgs}"
+                               "${multiValueArgs}" ${ARGN})
+    find_program(PYTHON_COMMAND python)
+    add_test(NAME ${TEST_NAME}
+             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/rundir/test
+             COMMAND ${PYTHON_COMMAND} ${TEST_SCRIPT})
+endmacro(add_unit_test_python)
+
 # RiemannSolver test
 set(TESTRIEMANNSOLVER_SOURCES
     myAssert.hpp
@@ -285,6 +295,17 @@ set(TESTRK_SOURCES
 add_unit_test(NAME testRungeKutta
               SOURCES ${TESTRK_SOURCES}
               NDIM 2)
+
+# shapy tests
+configure_file(testShapy2d.py.in
+               ${PROJECT_BINARY_DIR}/rundir/test/testShapy2d.py @ONLY)
+
+configure_file(testShapy3d.py.in
+               ${PROJECT_BINARY_DIR}/rundir/test/testShapy3d.py @ONLY)
+
+add_unit_test_python(NAME testShapy2d SCRIPT testShapy2d.py)
+
+add_unit_test_python(NAME testShapy3d SCRIPT testShapy3d.py)
 
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}

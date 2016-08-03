@@ -18,10 +18,12 @@
 ################################################################################
 
 set(IONAME io${NDIM}d)
+set(FORTNAME fortune${NDIM}d)
 set(RIEMANNNAME riemann${NDIM}d)
 set(UTILNAME utilities${NDIM}d)
 
 add_subdirectory(io)
+add_subdirectory(fortune)
 add_subdirectory(riemann)
 add_subdirectory(utilities)
 

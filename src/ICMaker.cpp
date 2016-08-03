@@ -24,7 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ICMaker.hpp"
-#include "ICGenerator.hpp"
+#include "BlockICGenerator.hpp"
 #include "MPIGlobal.hpp"
 #include "SnapshotWriterFactory.hpp"
 #include "SpecificICGenerator.hpp"

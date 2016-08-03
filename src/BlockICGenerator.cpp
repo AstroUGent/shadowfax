@@ -24,9 +24,9 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
+#include "BlockICGenerator.hpp"
 #include "DelCont.hpp"
 #include "Error.hpp"
-#include "ICGenerator.hpp"
 #include "ICRegion.hpp"
 #include "VorCell.hpp"
 #include "VorTessManager.hpp"

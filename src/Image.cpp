@@ -24,99 +24,105 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Image.hpp"
-#include "DelCont.hpp"
-#include "Error.hpp"
-#include "MPIGlobal.hpp"
-#include "StateVector.hpp"
-#include "VorCell.hpp"
-#include "VorFace.hpp"
-#include "VorGen.hpp"
-#include "VorTess.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/Tree.hpp"
-#include "utilities/TreeWalker.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
+#include "ColorMap.hpp"
+#include "DelCont.hpp"                // for DelCont
+#include "Error.hpp"                  // for my_exit
+#include "MPIGlobal.hpp"              // for rank
+#include "StateVector.hpp"            // for StateVector
+#include "Vec.hpp"                    // for Vec
+#include "utilities/GasParticle.hpp"  // for GasParticle
+#include "utilities/Particle.hpp"     // for Particle
+#include "utilities/Tree.hpp"         // for Tree
+#include <algorithm>                  // for min, max
+#include <cmath>                      // for log10, sqrt, M_PI
+#include <ext/alloc_traits.h>
+#include <iostream>  // for operator<<, ofstream, etc
 #include <sstream>
+#if ndim_ == 2
+#include "VorCell.hpp"  // for VorCell
+#include "VorFace.hpp"  // for VorFace
+#include "VorGen.hpp"   // for VorGen
+#include "VorTess.hpp"  // for VorTess
+#endif
 using namespace std;
 
 // three possible colormaps: CM_JET, CM_AFMHOT, CM_OCEAN, CM_RDBU
-/*! \brief Matplotlib jet colormap: red: x-values */
+// all are shamelessly stolen from matplotlib
+// (as is the way in which they are calculated)
+/*! @brief Matplotlib jet colormap: red: x-values */
 double rxjet[5] = {0., 0.35, 0.66, 0.89, 1.};
-/*! \brief Matplotlib jet colormap: red: y-values */
+/*! @brief Matplotlib jet colormap: red: y-values */
 double ryjet[5] = {0., 0., 1., 1., 0.5};
-/*! \brief Matplotlib jet colormap: green: x-values */
+/*! @brief Matplotlib jet colormap: green: x-values */
 double gxjet[6] = {0., 0.125, 0.375, 0.64, 0.91, 1.};
-/*! \brief Matplotlib jet colormap: green: y-values */
+/*! @brief Matplotlib jet colormap: green: y-values */
 double gyjet[6] = {0., 0., 1., 1., 0., 0.};
-/*! \brief Matplotlib jet colormap: blue: x-values */
+/*! @brief Matplotlib jet colormap: blue: x-values */
 double bxjet[5] = {0., 0.11, 0.34, 0.65, 1.};
-/*! \brief Matplotlib jet colormap: blue: y-values */
+/*! @brief Matplotlib jet colormap: blue: y-values */
 double byjet[5] = {0.5, 1., 1., 0., 0.};
-/*! \brief Matplotlib jet colormap definition */
+/*! @brief Matplotlib jet colormap definition */
 static ColorMap _jet(rxjet, ryjet, 5, gxjet, gyjet, 6, bxjet, byjet, 5);
 
-/*! \brief Matplotlib afmhot colormap: red: x-values */
+/*! @brief Matplotlib afmhot colormap: red: x-values */
 double rxafmhot[3] = {0., 0.5, 1.};
-/*! \brief Matplotlib afmhot colormap: red: y-values */
+/*! @brief Matplotlib afmhot colormap: red: y-values */
 double ryafmhot[3] = {0., 1., 1.};
-/*! \brief Matplotlib afmhot colormap: green: x-values */
+/*! @brief Matplotlib afmhot colormap: green: x-values */
 double gxafmhot[4] = {0., 0.25, 0.75, 1.};
-/*! \brief Matplotlib afmhot colormap: green: y-values */
+/*! @brief Matplotlib afmhot colormap: green: y-values */
 double gyafmhot[4] = {0., 0., 1., 1.};
-/*! \brief Matplotlib afmhot colormap: blue: x-values */
+/*! @brief Matplotlib afmhot colormap: blue: x-values */
 double bxafmhot[3] = {0., 0.5, 1.};
-/*! \brief Matplotlib afmhot colormap: blue: y-values */
+/*! @brief Matplotlib afmhot colormap: blue: y-values */
 double byafmhot[3] = {0., 0., 1.};
-/*! \brief Matplotlib afmhot colormap definition */
+/*! @brief Matplotlib afmhot colormap definition */
 static ColorMap _afmhot(rxafmhot, ryafmhot, 3, gxafmhot, gyafmhot, 4, bxafmhot,
                         byafmhot, 3);
 
-/*! \brief Matplotlib ocean colormap: red: x-values */
+/*! @brief Matplotlib ocean colormap: red: x-values */
 double rxocean[3] = {0., 0.66, 1.};
-/*! \brief Matplotlib ocean colormap: red: y-values */
+/*! @brief Matplotlib ocean colormap: red: y-values */
 double ryocean[3] = {0., 0., 1.};
-/*! \brief Matplotlib ocean colormap: green: x-values */
+/*! @brief Matplotlib ocean colormap: green: x-values */
 double gxocean[3] = {0., 0.33, 1.};
-/*! \brief Matplotlib ocean colormap: green: y-values */
+/*! @brief Matplotlib ocean colormap: green: y-values */
 double gyocean[3] = {0.5, 0., 1.};
-/*! \brief Matplotlib ocean colormap: blue: x-values */
+/*! @brief Matplotlib ocean colormap: blue: x-values */
 double bxocean[2] = {0., 1.};
-/*! \brief Matplotlib ocean colormap: blue: y-values */
+/*! @brief Matplotlib ocean colormap: blue: y-values */
 double byocean[2] = {0., 1.};
-/*! \brief Matplotlib ocean colormap definition */
+/*! @brief Matplotlib ocean colormap definition */
 static ColorMap _ocean(rxocean, ryocean, 3, gxocean, gyocean, 3, bxocean,
                        byocean, 2);
 
 // Red to blue colormap:
-/*! \brief Matplotlib rdbu colormap: red: x-values */
+/*! @brief Matplotlib rdbu colormap: red: x-values */
 double rxrdbu[11] = {0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.};
-/*! \brief Matplotlib rdbu colormap: red: y-values */
+/*! @brief Matplotlib rdbu colormap: red: y-values */
 double ryrdbu[11] = {0.4039, 0.6980, 0.8392, 0.9569, 0.9922, 0.9686,
                      0.8196, 0.5725, 0.2627, 0.1294, 0.0196};
-/*! \brief Matplotlib rdbu colormap: green: x-values */
+/*! @brief Matplotlib rdbu colormap: green: x-values */
 double gxrdbu[11] = {0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.};
-/*! \brief Matplotlib rdbu colormap: green: y-values */
+/*! @brief Matplotlib rdbu colormap: green: y-values */
 double gyrdbu[11] = {0.,     0.09412, 0.3765, 0.6471, 0.8588, 0.9686,
                      0.8980, 0.7725,  0.5765, 0.4,    0.1882};
-/*! \brief Matplotlib rdbu colormap: blue: x-values */
+/*! @brief Matplotlib rdbu colormap: blue: x-values */
 double bxrdbu[11] = {0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.};
-/*! \brief Matplotlib rdbu colormap: blue: y-values */
+/*! @brief Matplotlib rdbu colormap: blue: y-values */
 double byrdbu[11] = {0.1216, 0.1686, 0.3020, 0.5098, 0.7804, 0.9686,
                      0.9412, 0.8706, 0.7647, 0.6745, 0.3804};
-/*! \brief Matplotlib rdbu colormap definition */
+/*! @brief Matplotlib rdbu colormap definition */
 static ColorMap _rdbu(rxrdbu, ryrdbu, 11, gxrdbu, gyrdbu, 11, bxrdbu, byrdbu,
                       11);
 
 // we want to be able to use the enum to determine the colormap, so we need an
 // array that links integers to colormaps
-/*! \brief List of default color maps */
+/*! @brief List of default color maps */
 static ColorMap* _default_colormaps[4] = {&_jet, &_afmhot, &_ocean, &_rdbu};
 
 /**
-  * \brief Constuct an image for a given Particle vector, plotting the given
+  * @brief Constuct an image for a given Particle vector, plotting the given
   * variable
   *
   * The specifics of the grid of pixels used for the actual image can be
@@ -139,12 +145,14 @@ Image::Image(vector<Particle*>& plist, DelCont& delcont, bool periodic,
              PlotVariable variable, bool grid, double offset_x, double offset_y,
              double height, double width, double pixsize)
         : _delcont(delcont) {
-    if(!MPIGlobal::rank) {
+    if(MPIGlobal::rank) {
         return;
     }
     unsigned long tottime = 1;
     tottime <<= 60;
     if(variable > 3) {
+        //        _maxval = plist[0]->get_paq(variable-4);
+        //        _minval = plist[0]->get_paq(variable-4);
         _maxval = 1. * plist[0]->get_timestep() / tottime;
         _minval = 1. * plist[0]->get_timestep() / tottime;
     } else {
@@ -158,7 +166,7 @@ Image::Image(vector<Particle*>& plist, DelCont& delcont, bool periodic,
 }
 
 /**
-  * \brief Calculate pixel values for all pixels in the actual image using a
+  * @brief Calculate pixel values for all pixels in the actual image using a
   * Tree to find the closest cell
   *
   * The hydrodynamical quantities of the closest cell are then used to set the
@@ -178,12 +186,22 @@ void Image::calculate(vector<Particle*>& plist, PlotVariable variable,
                       double height, double width, double pixsize) {
     unsigned long tottime = 1;
     tottime <<= 60;
+    //#if ndim_==3
+    //    Vec origin(0.5,0.5,0.5);
+    //    Vec sides(1.,1.);
+    //#else
+    //    Vec origin(0.5,0.5);
+    //    Vec sides(1.,1.);
+    //#endif
+    //    Cuboid box(origin, sides);
     Tree tree(_delcont.get_cuboid(), _periodic);
     for(unsigned int i = plist.size(); i--;) {
         plist[i]->set_key(_delcont.get_key(plist[i]->get_position()));
         tree.add_particle(plist[i]);
     }
     tree.finalize();
+    //    ofstream treefile("tree");
+    //    tree.print(treefile);
     double pixheight = height / pixsize;
     double pixwidth = width / pixsize;
     double cellheight = pixsize;
@@ -206,12 +224,22 @@ void Image::calculate(vector<Particle*>& plist, PlotVariable variable,
             Vec center(offset_x + (j + 0.5) * cellwidth,
                        offset_y + (i + 0.5) * cellheight);
 #endif
+            //            ClosestNgbSearch treewalk(center, sr);
             Particle* closest;
             if(_periodic) {
                 closest = tree.get_periodic_closest(center, sr);
+                //                while(!treewalk.get_closest()){
+                //                    tree.walk_tree_periodic(treewalk);
+                //                    treewalk.increase_radius();
+                //                }
             } else {
                 closest = tree.get_closest(center, sr);
+                //                while(!treewalk.get_closest()){
+                //                    tree.walk_tree(treewalk);
+                //                    treewalk.increase_radius();
+                //                }
             }
+            //            Particle* closest = treewalk.get_closest();
             if(variable > 3) {
                 rowdens.push_back(1. * closest->get_timestep() / tottime);
             } else {
@@ -241,6 +269,7 @@ void Image::calculate(vector<Particle*>& plist, PlotVariable variable,
         }
         voronoi.complete(tree);
         voronoi.construct();
+        //        int type = BIN_PPM | CM_JET;
         for(unsigned int i = plist.size(); i--;) {
             VorCell* cell = ((GasParticle*)plist[i])->get_cell();
             vector<VorFace*> faces = cell->get_faces();
@@ -264,7 +293,7 @@ void Image::calculate(vector<Particle*>& plist, PlotVariable variable,
 }
 
 /**
-  * \brief Draw a line between the given two points in the pixel grid
+  * @brief Draw a line between the given two points in the pixel grid
   *
   * The pixel values for pixels on the line are set to negative values. The line
   * starts at the coordinates of the first point and stops at the coordinates of
@@ -285,7 +314,7 @@ void Image::draw_line(int x0, int y0, int x1, int y1) {
 }
 
 /**
-  * \brief Save the plot to a file with given name
+  * @brief Save the plot to a file with given name
   *
   * Images can be saved in binary or in ascii format, color or grayscale.
   * Minimal and maximal cutoff values can be specified and logarithmic scaling
@@ -300,7 +329,7 @@ void Image::draw_line(int x0, int y0, int x1, int y1) {
   */
 void Image::save(std::string name, int type, double maxval, double minval,
                  bool logarithmic) {
-    if(!MPIGlobal::rank) {
+    if(MPIGlobal::rank) {
         return;
     }
     if(maxval == -1.) {
@@ -312,6 +341,10 @@ void Image::save(std::string name, int type, double maxval, double minval,
     if(maxval == minval) {
         minval -= 0.01;
         maxval += 0.01;
+    }
+    if(!_image.size()) {
+        cerr << "Image does not have a size!" << endl;
+        my_exit();
     }
     ofstream file;
     stringstream filename;
@@ -409,110 +442,4 @@ void Image::save(std::string name, int type, double maxval, double minval,
         }
         file.close();
     }
-}
-
-/**
-  * \brief Construct a ColorMap with the given color functions
-  *
-  * The color functions are specified by linear chunks in the 3 RGB colors.
-  *
-  * @param rx,ry Red color chunks
-  * @param nr Number of red color chunks
-  * @param gx,gy,ng Green color chunks
-  * @param bx,by,nb Blue color chunks
-  */
-ColorMap::ColorMap(double* rx, double* ry, unsigned int nr, double* gx,
-                   double* gy, unsigned int ng, double* bx, double* by,
-                   unsigned int nb) {
-    for(unsigned int i = 0; i < nr; i++) {
-        _rx.push_back(rx[i]);
-        _ry.push_back(ry[i]);
-    }
-    for(unsigned int i = 0; i < ng; i++) {
-        _gx.push_back(gx[i]);
-        _gy.push_back(gy[i]);
-    }
-    for(unsigned int i = 0; i < nb; i++) {
-        _bx.push_back(bx[i]);
-        _by.push_back(by[i]);
-    }
-}
-
-/**
-  * \brief Convert a double value in the range [0,1] to RGB colors in the range
-  * [0,255]
-  *
-  * @param value Numerical value to convert from
-  * @param colors 3-element array to store the resulting colors in
-  */
-void ColorMap::get_color(double value, int* colors) {
-    colors[0] = int(interpolate(value, _rx, _ry) * 255 + 0.5);
-    colors[1] = int(interpolate(value, _gx, _gy) * 255 + 0.5);
-    colors[2] = int(interpolate(value, _bx, _by) * 255 + 0.5);
-}
-
-/**
-  * \brief Linearly interpolate the given value on the given color function
-  *
-  * @param value A seed value
-  * @param cx,cy Color function
-  * @return A value in the range [0,1]
-  */
-double ColorMap::interpolate(double value, vector<double>& cx,
-                             vector<double>& cy) {
-    unsigned int i = 1;
-    while(value > cx[i]) {
-        i++;
-    }
-    if(value == cx[i]) {
-        return cy[i];
-    } else {
-        return cy[i - 1] +
-               (cy[i] - cy[i - 1]) / (cx[i] - cx[i - 1]) * (value - cx[i - 1]);
-    }
-}
-
-/**
-  * \brief Save a sample of the ColorMap to a file with given name and type
-  *
-  * @param filename Name of the file
-  * @param type ImageType specifying color map and file type of the image
-  */
-void ColorMap::save_map(string name, int type) {
-    ofstream file;
-    stringstream filename;
-    filename << name;
-    filename << ".ppm";
-    if(type & 1) {
-        // ASCII image
-        file.open(filename.str().c_str());
-        file << "P3\n";
-    } else {
-        // binary image
-        file.open(filename.str().c_str(), ios::out | ios::binary);
-        file << "P6\n";
-    }
-    file << 1000 << "\t" << 400 << "\n255\n";
-    // the loop determines the direction of the image, so don't simply change it
-    // to boost performance!
-    for(unsigned int i = 0; i < 400; i++) {
-        for(unsigned int j = 1000; j--;) {
-            int colors[3] = {0};
-            get_color(j * 0.001, colors);
-            if(type & 1) {
-                if(!j) {
-                    file << colors[0] << " " << colors[1] << " " << colors[2]
-                         << "\n";
-                } else {
-                    file << colors[0] << " " << colors[1] << " " << colors[2]
-                         << "\t";
-                }
-            } else {
-                file.write((char*)&colors[0], 1);
-                file.write((char*)&colors[1], 1);
-                file.write((char*)&colors[2], 1);
-            }
-        }
-    }
-    file.close();
 }

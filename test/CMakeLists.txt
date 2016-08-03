@@ -237,10 +237,10 @@ add_unit_test(NAME testCosmology
 set(TESTSPECIFICICGENERATOR_SOURCES
     testSpecificICGenerator.cpp
 
+    ../src/ColorMap.cpp
     ../src/DelTess.cpp
     ../src/DelTess_mpi.cpp
     ../src/ExArith.cpp
-    ../src/Image.cpp
     ../src/Line.cpp
     ../src/MPIGlobal.cpp
     ../src/NgbSearch.cpp

@@ -37,6 +37,7 @@
 #include <ostream>
 #include <vector>
 
+class ColorMap;
 class Simplex;
 class VorFace;
 class VorGen;

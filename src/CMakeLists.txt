@@ -30,6 +30,7 @@ if(DO_SHADOWFAX)
 
     set(SHADOWFAXSOURCES
     CircularBox.cpp
+    ColorMap.cpp
     CoolingTable.cpp
     Cosmology.cpp
     CubicBox.cpp
@@ -44,6 +45,7 @@ if(DO_SHADOWFAX)
     GravityWalker.cpp
     GSL.cpp
     Image.cpp
+    ImageDescription.cpp
     Line.cpp
     LogFiles.cpp
     MPIGlobal.cpp
@@ -74,6 +76,7 @@ if(DO_SHADOWFAX)
     VorTess.cpp
     VorTessManager.cpp
 
+    ColorMap.hpp
     CoolingLocation.hpp
     CoolingTable.hpp
     Cosmology.hpp
@@ -88,6 +91,8 @@ if(DO_SHADOWFAX)
     GravityWalker.hpp
     GSL.hpp
     Image.hpp
+    ImageDescription.hpp
+    ImageOptions.hpp
     Line.hpp
     LogFiles.hpp
     MPIGlobal.hpp
@@ -233,6 +238,7 @@ endif(DO_ICMAKER)
 if(DO_VTKMAKER)
     set(VTKMAKERNAME vtkmaker${NDIM}d)
     add_executable(${VTKMAKERNAME}
+    ColorMap.cpp
     Cosmology.cpp
     CubicBox.cpp
     DelTess.cpp
@@ -281,6 +287,7 @@ if(DO_GIZMO)
     set(GIZMONAME myGIZMO${NDIM}d)
 
     add_executable(${GIZMONAME}
+    ColorMap.cpp
     Cosmology.cpp
     CubicBox.cpp
     DelTess.cpp

@@ -31,6 +31,7 @@
 #include <ostream>
 #include <vector>
 
+class ColorMap;
 class DelTess;
 class DelCont;
 class TimeLine;

@@ -24,6 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorCell.hpp"
+#include "ColorMap.hpp"
 #include "Error.hpp"
 #include "ExArith.hpp"
 #include "Simplex.hpp"

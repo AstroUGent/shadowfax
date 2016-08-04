@@ -29,7 +29,7 @@
 #if ndim_ == 2
 
 #include "DoublyConnectedEdgeList.hpp"  // for DoublyConnectedEdgeList
-#include <iosfwd>                       // for ostream
+#include <ostream>                       // for ostream
 #include <vector>                       // for vector
 
 class BinaryLeaf;

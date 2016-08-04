@@ -32,7 +32,6 @@
 #include "Vec.hpp"                       // for Vec
 #include <cmath>                         // for fabs
 #include <cstddef>                       // for NULL
-#include <ostream>                       // for operator<<, ostream, etc
 using namespace std;
 
 /**

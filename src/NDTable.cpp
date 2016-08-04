@@ -25,15 +25,20 @@
  * @author Yorick Van Den Bossche (yorick.vandenbossche@ugent.be)
  */
 #include "NDTable.hpp"
+#include "RestartFile.hpp"
+#include "io/Unit.hpp"           // for operator/, Unit, operator*
+#include "io/UnitConverter.hpp"  // for UnitConverter
+#include "io/UnitSet.hpp"        // for UnitSet
+#include <algorithm>             // for sort, unique, upper_bound
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
-#include <float.h>
-#include <fstream>
-#include <math.h>
-#include <set>
+#include <float.h>   // for DBL_MAX
+#include <iostream>  // for ifstream
+#include <iterator>  // for distance
+#include <math.h>    // for pow
 #include <sstream>
-#include <string>
-#include <vector>
+#include <string>  // for basic_string, string
+#include <vector>  // for vector, vector<>::iterator
 using namespace std;
 
 inline int find_in_set1(vector<double>& values, double value) {

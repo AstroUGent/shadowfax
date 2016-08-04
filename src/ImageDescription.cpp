@@ -24,10 +24,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ImageDescription.hpp"
-#include "Error.hpp"
+#include "Error.hpp"                           // for my_exit
 #include <boost/property_tree/ini_parser.hpp>  // for read_ini
-#include <fstream>   // for operator<<, basic_ostream, etc
-#include <iostream>  // for cout, cerr
+#include <iostream>                            // for cout, cerr
 
 /**
  * @brief Print the contents of the parameter file to the stdout

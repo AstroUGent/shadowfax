@@ -26,18 +26,14 @@
  */
 #ifndef NDIRREGTABLE_HPP
 #define NDIRREGTABLE_HPP
-#include "io/Unit.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
-#include <dirent.h>
-#include <iostream>
-#include <set>
-#include <sstream>
-#include <string>
-#include <vector>
-using namespace std;
+
+#include <array>
+#include <string>   // for string
+#include <utility>  // for pair
+#include <vector>   // for vector
 
 class RestartFile;
+class UnitSet;
 
 /**
   * @brief 3D table that is non-rectangular along its third axis
@@ -50,23 +46,24 @@ class RestartFile;
 class ThreeDIrregTable {
   private:
     /*! @brief Values of Fe for which the table has values */
-    vector<double> _Fe_values;
+    std::vector<double> _Fe_values;
     /*! @brief Values of Mg for which the table has values */
-    vector<double> _Mg_values;
+    std::vector<double> _Mg_values;
     /*! @brief Ints that determine if the table is flattened along an axis */
-    vector<int> _collapsed;
+    std::vector<int> _collapsed;
     /*! @brief 3D vector of pair that contain the n & nH values */
-    vector<vector<vector<pair<double, double>>>> _table;
+    std::vector<std::vector<std::vector<std::pair<double, double>>>> _table;
     /*! @brief array used to store values in interpolation */
-    array<double, 12> _axisranges;
+    std::array<double, 12> _axisranges;
 
-    double linear_interp(vector<double> value);
+    double linear_interp(std::vector<double> value);
     int find_n_in_table(double value, int a, int b);
 
   public:
-    ThreeDIrregTable(vector<string> filenames, UnitSet* simulation_units);
+    ThreeDIrregTable(std::vector<std::string> filenames,
+                     UnitSet* simulation_units);
 
-    double get_value(vector<double> value);
+    double get_value(std::vector<double> value);
 
     void dump(RestartFile& rfile);
     ThreeDIrregTable(RestartFile& rfile);

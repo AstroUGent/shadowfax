@@ -24,15 +24,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Line.hpp"
-#include "ExArith.hpp"
+#include "Vec.hpp"     // for Vec
+#include "VorGen.hpp"  // for VorGen
+#include <cmath>       // for sqrt
+#include <ostream>     // for operator<<, basic_ostream, etc
+#include <vector>      // for vector
+#if ndim_ == 3
 #include "Plane.hpp"
-#include "VorGen.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <valarray>
-#include <vector>
+#endif
 using namespace std;
 
 /**

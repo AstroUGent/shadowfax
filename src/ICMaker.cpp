@@ -24,17 +24,21 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ICMaker.hpp"
-#include "BlockICGenerator.hpp"
-#include "MPIGlobal.hpp"
-#include "SnapshotWriterFactory.hpp"
-#include "SpecificICGenerator.hpp"
-#include "io/UnitSet.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "utilities/ParticleVector.hpp"
-#include <getopt.h>
-#include <mpi.h>
-#include <string>
-#include <vector>
+#include "BlockICGenerator.hpp"       // for BlockICGenerator
+#include "ICGenerator.hpp"            // for ICGenerator, etc
+#include "MPIGlobal.hpp"              // for sendsize, recvbuffer, etc
+#include "SnapshotHandler.hpp"        // for SnapshotWriter
+#include "SnapshotWriterFactory.hpp"  // for SnapshotWriterFactory
+#include "SpecificICGenerator.hpp"    // for SpecificICGenerator
+#include "io/Header.hpp"
+#include "io/UnitSet.hpp"                 // for UnitSet
+#include "utilities/HelperFunctions.hpp"  // for human_readable_bytes
+#include "utilities/ParticleVector.hpp"   // for ParticleVector
+#include <algorithm>                      // for min
+#include <getopt.h>                       // for optarg, required_argument, etc
+#include <iostream>                       // for operator<<, basic_ostream, etc
+#include <stdlib.h>                       // for NULL, atoi
+#include <string>                         // for string, char_traits, etc
 using namespace std;
 
 /**

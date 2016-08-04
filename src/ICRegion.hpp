@@ -26,11 +26,11 @@
 #ifndef ICREGION_H
 #define ICREGION_H
 
-#include <string>
-#include <vector>
-
-#include "StateVector.hpp"
-#include "Vec.hpp"
+#include "StateVector.hpp"  // for StateVector
+#include "Vec.hpp"          // for Vec
+#include <stddef.h>         // for NULL
+#include <string>           // for string
+#include <vector>           // for vector
 
 class SymbolicFunction;
 

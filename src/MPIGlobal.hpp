@@ -29,7 +29,6 @@
 #ifndef MPIGLOBAL_HPP
 #define MPIGLOBAL_HPP
 
-#include "Error.hpp"
 #include "utilities/Timer.hpp"
 #include <mpi.h>
 

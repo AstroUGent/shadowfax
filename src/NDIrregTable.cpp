@@ -25,14 +25,19 @@
  * @author Yorick Van Den Bossche (yorick.vandenbossche@ugent.be)
  */
 #include "NDIrregTable.hpp"
+#include "RestartFile.hpp"
+#include "io/Unit.hpp"           // for Unit, operator/
+#include "io/UnitConverter.hpp"  // for UnitConverter
+#include "io/UnitSet.hpp"        // for UnitSet
+#include <algorithm>             // for sort, unique, upper_bound
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
-#include <fstream>
-#include <math.h>
-#include <set>
+#include <iostream>  // for istringstream, etc
+#include <iterator>  // for distance
+#include <math.h>    // for log10, floor
 #include <sstream>
-#include <string>
-#include <vector>
+#include <string>  // for basic_string, string
+#include <vector>  // for vector, vector<>::iterator
 using namespace std;
 
 /**

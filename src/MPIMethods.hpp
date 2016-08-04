@@ -26,7 +26,11 @@
 #ifndef MPIMETHODS_HPP
 #define MPIMETHODS_HPP
 
-#include "Error.hpp"
+#include "Error.hpp"            // for my_exit
+#include "MPIGlobal.hpp"        // for commtimer, idletimer, size, etc
+#include "utilities/Timer.hpp"  // for Timer
+#include <iostream>             // for operator<<, basic_ostream, etc
+#include <string>               // for string, operator!=, etc
 
 /**
  * @brief Wrapper around MPI_Comm_rank

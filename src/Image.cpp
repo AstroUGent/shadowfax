@@ -24,7 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Image.hpp"
-#include "ColorMap.hpp"
+#include "ColorMap.hpp"               // for ColorMap
 #include "DelCont.hpp"                // for DelCont
 #include "Error.hpp"                  // for my_exit
 #include "MPIGlobal.hpp"              // for rank
@@ -35,8 +35,7 @@
 #include "utilities/Tree.hpp"         // for Tree
 #include <algorithm>                  // for min, max
 #include <cmath>                      // for log10, sqrt, M_PI
-#include <ext/alloc_traits.h>
-#include <iostream>  // for operator<<, ofstream, etc
+#include <iostream>                   // for operator<<, ofstream, etc
 #include <sstream>
 #if ndim_ == 2
 #include "VorCell.hpp"  // for VorCell

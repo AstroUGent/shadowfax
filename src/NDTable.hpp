@@ -26,19 +26,13 @@
  */
 #ifndef NDTABLE_HPP
 #define NDTABLE_HPP
-#include "io/Unit.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
+
 #include <array>
-#include <dirent.h>
-#include <iostream>
-#include <set>
-#include <sstream>
-#include <string>
-#include <vector>
-using namespace std;
+#include <string>  // for string
+#include <vector>  // for vector
 
 class RestartFile;
+class UnitSet;
 
 /**
   * @brief 5D table that is rectangular
@@ -49,27 +43,28 @@ class RestartFile;
 class FiveDTable {
   private:
     /*! @brief Values of Fe for which the table has values */
-    vector<double> _Fe_values;
+    std::vector<double> _Fe_values;
     /*! @brief Values of Mg for which the table has values */
-    vector<double> _Mg_values;
+    std::vector<double> _Mg_values;
     /*! @brief Values of redshift z for which the table has values */
-    vector<double> _redshift_values;
+    std::vector<double> _redshift_values;
     /*! @brief Values of nH for which the table has values */
-    vector<double> _nH_values;
+    std::vector<double> _nH_values;
     /*! @brief Values of T for which the table has values */
-    vector<double> _T_values;
+    std::vector<double> _T_values;
     /*! @brief Ints that determine if the table is flattened along an axis */
-    vector<int> _collapsed;
+    std::vector<int> _collapsed;
     /*! @brief 5D vector of doules that contain the cooling rate values */
-    vector<vector<vector<vector<vector<double>>>>> _table;
+    std::vector<std::vector<std::vector<std::vector<std::vector<double>>>>>
+            _table;
     /*! @brief array used to store values in interpolation */
-    array<double, 10> _axisranges;
+    std::array<double, 10> _axisranges;
 
-    double linear_interp(vector<double> value);
+    double linear_interp(std::vector<double> value);
 
   public:
-    FiveDTable(vector<string> filenames, UnitSet* simulation_units);
-    double get_value(vector<double> value);
+    FiveDTable(std::vector<std::string> filenames, UnitSet* simulation_units);
+    double get_value(std::vector<double> value);
 
     double get_T_max();
     double get_z_max();

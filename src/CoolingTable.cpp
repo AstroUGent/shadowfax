@@ -29,12 +29,13 @@
 #include "Error.hpp"         // for my_exit
 #include "NDIrregTable.hpp"  // for ThreeDIrregTable
 #include "NDTable.hpp"       // for FiveDTable
-#include <algorithm>         // for min
-#include <dirent.h>          // for closedir, opendir, readdir, etc
-#include <iostream>          // for operator<<, basic_ostream, etc
-#include <stddef.h>          // for NULL
-#include <string>            // for string, allocator, etc
-#include <vector>            // for vector
+#include "RestartFile.hpp"
+#include <algorithm>  // for min
+#include <dirent.h>   // for closedir, opendir, readdir, etc
+#include <iostream>   // for operator<<, basic_ostream, etc
+#include <stddef.h>   // for NULL
+#include <string>     // for string, allocator, etc
+#include <vector>     // for vector
 using namespace std;
 
 /**

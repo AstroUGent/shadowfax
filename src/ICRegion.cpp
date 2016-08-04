@@ -24,9 +24,10 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ICRegion.hpp"
-#include "SymbolicFunction.hpp"
-#include <cmath>
-#include <iostream>
+#include "SymbolicFunction.hpp"  // for SymbolicFunction
+#include <algorithm>             // for max
+#include <cmath>                 // for pow, fabs, sqrt
+#include <stdlib.h>              // for rand, RAND_MAX
 using namespace std;
 
 /**

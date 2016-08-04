@@ -32,11 +32,13 @@
 #ifndef HEAD_LINE
 #define HEAD_LINE
 
-#include <ostream>
-#include <vector>
+#include <ostream>  // for ostream
+#include <vector>   // for vector
 
 class VorGen;
+#if ndim_ == 3
 class Plane;
+#endif
 
 /**
  * @brief Representation of a geometrical line in 2D or 3D

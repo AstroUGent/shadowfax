@@ -385,7 +385,7 @@ void Image::save(std::string name, int type, double maxval, double minval,
         }
         file.close();
     } else {
-        if(!type & 2) {
+        if((!type) & 2) {
             cout << "Error: can't use a colormap for a grayscale image!"
                  << endl;
             my_exit();

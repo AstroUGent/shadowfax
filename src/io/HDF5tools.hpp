@@ -38,19 +38,19 @@
   */
 namespace HDF5types {
 /*! \brief Boolean representation: a native 32-bit unsigned integer */
-static const hid_t BOOL = H5T_NATIVE_UINT32;
+static const hid_t BOOL __attribute__((used)) = H5T_NATIVE_UINT32;
 /*! \brief Double precision floating point representation: a native 64-bit
  *  double */
-static const hid_t DOUBLE = H5T_NATIVE_DOUBLE;
+static const hid_t DOUBLE __attribute__((used)) = H5T_NATIVE_DOUBLE;
 /*! \brief Unsigned integer representation: a native 32-bit unsigned integer */
-static const hid_t UINT = H5T_NATIVE_UINT32;
+static const hid_t UINT __attribute__((used)) = H5T_NATIVE_UINT32;
 /*! \brief Single precision floating point representation: a native 32-bit
  *  float */
-static const hid_t FLOAT = H5T_NATIVE_FLOAT;
+static const hid_t FLOAT __attribute__((used)) = H5T_NATIVE_FLOAT;
 /*! \brief Unsigned long representation: a native 64-bit unsigned integer */
-static const hid_t ULONG = H5T_NATIVE_UINT64;
+static const hid_t ULONG __attribute__((used)) = H5T_NATIVE_UINT64;
 /*! \brief Integer representation: a native 32-bit integer */
-static const hid_t INT = H5T_NATIVE_INT32;
+static const hid_t INT __attribute__((used)) = H5T_NATIVE_INT32;
 }
 
 /**
@@ -58,25 +58,25 @@ static const hid_t INT = H5T_NATIVE_INT32;
   */
 namespace HDF5constants {
 /*! \brief The default property list used if properties are required */
-static const hid_t DEFAULT_PROPERTY_LIST = H5P_DEFAULT;
+static const hid_t DEFAULT_PROPERTY_LIST __attribute__((used)) = H5P_DEFAULT;
 /*! \brief Overwrite existing files when creating a new HDF5 file */
-static const hid_t OVERWRITE_EXISTING_FILES = H5F_ACC_TRUNC;
+static const hid_t OVERWRITE_EXISTING_FILES __attribute__((used)) = H5F_ACC_TRUNC;
 /*! \brief Open a HDF5 file in read/write modus */
-static const hid_t READWRITE = H5F_ACC_RDWR;
+static const hid_t READWRITE __attribute__((used)) = H5F_ACC_RDWR;
 /*! \brief Open a HDF5 file in read only modus */
-static const hid_t READONLY = H5F_ACC_RDONLY;
+static const hid_t READONLY __attribute__((used)) = H5F_ACC_RDONLY;
 /*! \brief Use the entire dataspace of the dataset or attribute as file space or
  *  memory space during read/write operations */
-static const hid_t COMPLETE_DATASPACE = H5S_ALL;
+static const hid_t COMPLETE_DATASPACE __attribute__((used)) = H5S_ALL;
 
 /*! \brief Intialize a new selection when selecting hyperslabs of dataspaces */
-static const H5S_seloper_t SET_NEW_SELECTION = H5S_SELECT_SET;
+static const H5S_seloper_t SET_NEW_SELECTION __attribute__((used)) = H5S_SELECT_SET;
 /*! \brief Select a continuous block in the dataspace during hyperslab
  *  selection */
-static const hsize_t* CONTINUOUS_SELECTION = NULL;
+static const hsize_t* CONTINUOUS_SELECTION __attribute__((used)) = NULL;
 /*! \brief Return single element blocks when selecting hyperslabs of
  *  dataspaces */
-static const hsize_t* SINGLE_ELEMENT_BLOCKS = NULL;
+static const hsize_t* SINGLE_ELEMENT_BLOCKS __attribute__((used)) = NULL;
 }
 
 /**

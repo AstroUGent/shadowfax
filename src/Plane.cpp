@@ -24,10 +24,9 @@
  * @brief 3D plane: implementation
  */
 #include "Plane.hpp"
-#include "Line.hpp"
-#include "VorGen.hpp"
-#include <cmath>
-#include <iostream>
+#include "Line.hpp"    // for Line
+#include "VorGen.hpp"  // for VorGen
+#include <cmath>       // for fabs, sqrt
 using namespace std;
 
 #if ndim_ == 3

@@ -26,7 +26,13 @@
 #ifndef SHADOWFAXSNAPSHOTWRITER_HPP
 #define SHADOWFAXSNAPSHOTWRITER_HPP
 
-#include "SnapshotHandler.hpp"
+#include "SnapshotHandler.hpp"  // for SnapshotWriter
+#include "utilities/Timer.hpp"  // for Timer
+#include <string>               // for string
+
+class ParticleVector;
+class RestartFile;
+class UnitSet;
 
 /**
  * @brief SnapshotWriter implementation to write default Shadowfax snapshots

@@ -26,11 +26,18 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "StarFormationParticleConverter.hpp"
-#include "Physics.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/Particle.hpp"
-#include "utilities/ParticleTypes.hpp"
-#include "utilities/StarParticle.hpp"
+#include "ParameterFile.hpp"            // for ParameterFile
+#include "Physics.hpp"                  // for Physics
+#include "StateVector.hpp"              // for StateVector
+#include "Vec.hpp"                      // for Vec
+#include "io/Unit.hpp"                  // for Unit, operator/, operator*
+#include "io/UnitConverter.hpp"         // for UnitConverter
+#include "io/UnitSet.hpp"               // for UnitSet, etc
+#include "utilities/GasParticle.hpp"    // for GasParticle
+#include "utilities/Particle.hpp"       // for Particle
+#include "utilities/ParticleTypes.hpp"  // for ParticleType, etc
+#include "utilities/StarParticle.hpp"   // for StarParticle
+#include <sstream>                      // for basic_stringbuf<>::int_type, etc
 
 /**
  * @brief Check if the given ParticleType can be converted

@@ -27,8 +27,7 @@
 #ifndef SIDEPROGRAMS_HPP
 #define SIDEPROGRAMS_HPP
 
-#include <string>
-#include <vector>
+#include <string>  // for string
 
 class ParticleVector;
 

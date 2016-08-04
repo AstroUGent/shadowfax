@@ -42,6 +42,7 @@
 #include "utilities/DMParticle.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/Particle.hpp"
+#include "utilities/StarParticle.hpp"
 
 class VorGen;
 

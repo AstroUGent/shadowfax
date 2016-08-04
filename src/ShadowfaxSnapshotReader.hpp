@@ -26,7 +26,12 @@
 #ifndef SHADOWFAXSNAPSHOTREADER_HPP
 #define SHADOWFAXSNAPSHOTREADER_HPP
 
-#include "SnapshotHandler.hpp"
+#include "SnapshotHandler.hpp"  // for Header, SnapshotReader
+#include <string>               // for string
+
+class Header;
+class ParticleVector;
+class UnitSet;
 
 /**
  * @brief Specialization of the SnapshotReader interface for Shadowfax snapshots

@@ -26,17 +26,15 @@
 #ifndef SNAPSHOTHANDLER_HPP
 #define SNAPSHOTHANDLER_HPP
 
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "RestartFile.hpp"
-#include "utilities/Timer.hpp"
-#include <ostream>
-#include <string>
-#include <vector>
+#include "MPIGlobal.hpp"    // for rank, local_rank, etc
+#include "RestartFile.hpp"  // for RestartFile
+#include <ostream>          // for ifstream, ofstream
+#include <stdio.h>          // for remove
+#include <string>           // for allocator, string, etc
 
-class UnitSet;
-class ParticleVector;
 class Header;
+class ParticleVector;
+class UnitSet;
 
 /**
  * @brief General interface for classes that read or write snapshots

@@ -24,16 +24,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ShadowfaxSnapshotReader.hpp"
-#include "Error.hpp"
+#include "Error.hpp"  // for my_exit
 #include "io/Block.hpp"
-#include "io/Input.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
-#include "io/UnitSetGenerator.hpp"
-#include "utilities/DMParticle.hpp"
-#include "utilities/GasParticle.hpp"
+#include "io/Input.hpp"             // for FileInput
+#include "io/UnitConverter.hpp"     // for UnitConverter
+#include "io/UnitSet.hpp"           // for UnitSet
+#include "io/UnitSetGenerator.hpp"  // for UnitSetGenerator
 #include "utilities/ParticleVector.hpp"
-#include <fstream>
+#include <iostream>  // for operator<<, basic_ostream, etc
 using namespace std;
 
 /**

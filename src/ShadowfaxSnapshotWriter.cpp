@@ -24,18 +24,24 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ShadowfaxSnapshotWriter.hpp"
-#include "MPIGlobal.hpp"
-#include "io/Block.hpp"
-#include "io/Header.hpp"
-#include "io/Output.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
-#include "io/UnitSetGenerator.hpp"
-#include "utilities/DMParticle.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "utilities/ParticleVector.hpp"
-#include <iostream>
+#include "Error.hpp"      // for my_exit
+#include "MPIGlobal.hpp"  // for rank
+#include "RestartFile.hpp"
+#include "StateVector.hpp"                // for StateVector
+#include "Vec.hpp"                        // for Vec
+#include "io/Block.hpp"                   // for Block
+#include "io/Header.hpp"                  // for Header
+#include "io/Output.hpp"                  // for FileOutput
+#include "io/Unit.hpp"                    // for Unit, operator/
+#include "io/UnitConverter.hpp"           // for UnitConverter
+#include "io/UnitSet.hpp"                 // for UnitSet
+#include "io/UnitSetGenerator.hpp"        // for UnitSetGenerator
+#include "utilities/DMParticle.hpp"       // for DMParticle
+#include "utilities/GasParticle.hpp"      // for GasParticle
+#include "utilities/HelperFunctions.hpp"  // for make_hdf5_file
+#include "utilities/ParticleVector.hpp"   // for ParticleVector
+#include <iostream>                       // for operator<<, basic_ostream, etc
+#include <vector>                         // for vector
 using namespace std;
 
 /**

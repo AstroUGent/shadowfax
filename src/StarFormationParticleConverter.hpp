@@ -28,16 +28,14 @@
 #ifndef STARFORMATIONPARTICLECONVERTER_HPP
 #define STARFORMATIONPARTICLECONVERTER_HPP
 
-#include "ParameterFile.hpp"
-#include "StateVector.hpp"
-#include "io/Unit.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
-#include "io/UnitSetGenerator.hpp"
-#include "utilities/ParticleConverter.hpp"
+#include "utilities/ParticleConverter.hpp"  // for ParticleConverter
+#include "utilities/ParticleTypes.hpp"      // for ParticleType
 
+class ParameterFile;
+class Particle;
 class Physics;
 class RestartFile;
+class UnitSet;
 
 #define STARFORMATIONPARTICLECONVERTER_DEFAULT_MINSFDENSITY 2.e-22
 #define STARFORMATIONPARTICLECONVERTER_DEFAULT_MAXSFTEMP 15000.

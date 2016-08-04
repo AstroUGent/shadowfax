@@ -27,12 +27,14 @@
 #ifndef HEAD_TETRAHEDRON
 #define HEAD_TETRAHEDRON
 
-#include "Error.hpp"
-#include "ExArith.hpp"
-#include "VorGen.hpp"
-#include <iostream>
-#include <map>
-#include <vector>
+#include "Error.hpp"    // for my_exit
+#include "ExArith.hpp"  // for incircle
+#include "VorGen.hpp"   // for VorGen
+#include <iostream>     // for operator<<, ostream, etc
+#include <vector>       // for vector
+#if ndim_ == 3
+#include <stddef.h>  // for NULL
+#endif
 
 /**
  * @brief 2D triangle or 3D tetrahedron

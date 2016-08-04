@@ -26,12 +26,16 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "StellarFeedback.hpp"
-#include "NgbSearch.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/Particle.hpp"
-#include "utilities/ParticleTypes.hpp"
-#include "utilities/StarParticle.hpp"
+#include "NgbSearch.hpp"                 // for ClosestNgbSearch
+#include "ParameterFile.hpp"             // for ParameterFile
+#include "StateVector.hpp"               // for StateVector
+#include "utilities/GasParticle.hpp"     // for GasParticle
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include "utilities/StarParticle.hpp"    // for StarParticle
+#include "utilities/Tree.hpp"            // for Tree
+#include <algorithm>                     // for max, min
+#include <sstream>                       // for basic_stringbuf<>::int_type, etc
+#include <stddef.h>                      // for NULL
 using namespace std;
 
 /**

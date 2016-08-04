@@ -24,16 +24,18 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "RestartFile.hpp"
-#include "../inc/ShadowfaxVersion.hpp"
-#include "Error.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include <cstring>
-#include <dirent.h>
+#include "Error.hpp"      // for my_exit
+#include "MPIGlobal.hpp"  // for noderank, nodesize, etc
+#include "ShadowfaxVersion.hpp"
+#include <cstring>   // for strlen, NULL
+#include <dirent.h>  // for closedir, opendir, readdir, etc
+#include <iostream>  // for cout, cerr
 #include <sstream>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/utsname.h>
+#include <stdio.h>        // for sscanf, rename, remove
+#include <sys/stat.h>     // for stat, mkdir, S_IRWXU
+#include <sys/time.h>     // for gettimeofday, timeval
+#include <sys/utsname.h>  // for utsname, uname
+#include <time.h>         // for localtime, strftime
 using namespace std;
 
 /**

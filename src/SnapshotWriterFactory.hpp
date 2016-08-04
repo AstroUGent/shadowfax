@@ -27,12 +27,16 @@
 #ifndef SNAPSHOTWRITERFACTORY_HPP
 #define SNAPSHOTWRITERFACTORY_HPP
 
-#include "Error.hpp"
-#include "GadgetSnapshotWriter.hpp"
-#include "RestartFile.hpp"
-#include "ShadowfaxSnapshotWriter.hpp"
-#include "SnapshotHandler.hpp"
-#include <istream>
+#include "Error.hpp"                    // for my_exit
+#include "GadgetSnapshotWriter.hpp"     // for GadgetSnapshotWriter
+#include "RestartFile.hpp"              // for RestartFile
+#include "ShadowfaxSnapshotWriter.hpp"  // for ShadowfaxSnapshotWriter
+#include "SnapshotHandler.hpp"          // for SnapshotWriter
+#include <iostream>                     // for operator<<, basic_ostream, etc
+#include <stddef.h>                     // for NULL
+#include <string>                       // for operator==, basic_string, etc
+
+class UnitSet;
 
 /**
  * @brief Factory to generate a SnapshotWriter from a given std::string and to

@@ -27,8 +27,9 @@
 #ifndef PARAMETERFILE_HPP
 #define PARAMETERFILE_HPP
 
-#include <boost/property_tree/ptree.hpp>
-#include <string>
+#include <boost/property_tree/ptree.hpp>  // for basic_ptree
+#include <sstream>  // for basic_stringbuf<>::int_type, etc
+#include <string>   // for string, operator<
 
 class RestartFile;
 

@@ -28,16 +28,10 @@
 #ifndef STELLARFEEDBACK_HPP
 #define STELLARFEEDBACK_HPP
 
-#include "ParameterFile.hpp"
-#include "StateVector.hpp"
-#include "io/Unit.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
-#include "io/UnitSetGenerator.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/StarParticle.hpp"
-
+class ParameterFile;
+class ParticleVector;
 class RestartFile;
+class StarParticle;
 
 #define STELLARFEEDBACK_DEFAULT_SWSTART 0.
 #define STELLARFEEDBACK_DEFAULT_SWEND 4.7335389e17

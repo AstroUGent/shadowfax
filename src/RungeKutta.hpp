@@ -26,8 +26,9 @@
 #ifndef RUNGEKUTTA_HPP
 #define RUNGEKUTTA_HPP
 
-#include "RungeKuttaFlux.hpp"
-#include <iostream>
+#include <iostream>  // for operator<<, cerr, endl, etc
+
+template <typename SystemState> class RungeKuttaFlux;
 
 /**
  * @brief Runge-Kutta integrator

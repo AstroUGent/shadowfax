@@ -25,29 +25,27 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "SidePrograms.hpp"
-#include "DelCont.hpp"
-#include "Error.hpp"
 #include "GravityWalker.hpp"
-#include "SnapshotReaderFactory.hpp"
-#include "SnapshotWriterFactory.hpp"
-#include "Vec.hpp"
-#include "VorCell.hpp"
-#include "VorTess.hpp"
-#include "io/Block.hpp"
-#include "io/Header.hpp"
-#include "io/Input.hpp"
-#include "io/Output.hpp"
-#include "io/UnitSet.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/Hilbert.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/StarParticle.hpp"
-#include "utilities/Tree.hpp"
-#include <algorithm>
-#include <fstream>
-#include <getopt.h>
-#include <iostream>
-#include <vector>
+#include "ShadowfaxSnapshotReader.hpp"  // for ShadowfaxSnapshotReader
+#include "ShadowfaxSnapshotWriter.hpp"
+#include "SnapshotHandler.hpp"           // for SnapshotReader
+#include "SnapshotReaderFactory.hpp"     // for SnapshotReaderFactory
+#include "Vec.hpp"                       // for Vec
+#include "VorCell.hpp"                   // for VorCell
+#include "VorTess.hpp"                   // for VorTess
+#include "io/Block.hpp"                  // for Block
+#include "io/Header.hpp"                 // for Header
+#include "io/Input.hpp"                  // for AsciiInput
+#include "io/Unit.hpp"                   // for Unit
+#include "io/UnitSet.hpp"                // for UnitSet
+#include "utilities/GasParticle.hpp"     // for GasParticle
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include "utilities/Tree.hpp"            // for Tree
+#include <algorithm>                     // for max, min
+#include <getopt.h>                      // for optarg, required_argument, etc
+#include <iostream>                      // for operator<<, basic_ostream, etc
+#include <stdlib.h>                      // for NULL, atof
+#include <vector>                        // for vector
 using namespace std;
 
 /**

@@ -27,11 +27,15 @@
 #ifndef SNAPSHOTREADERFACTORY_HPP
 #define SNAPSHOTREADERFACTORY_HPP
 
-#include "Error.hpp"
-#include "GadgetSnapshotReader.hpp"
-#include "ShadowfaxSnapshotReader.hpp"
-#include "SnapshotHandler.hpp"
-#include <istream>
+#include "Error.hpp"                    // for my_exit
+#include "GadgetSnapshotReader.hpp"     // for GadgetSnapshotReader
+#include "ShadowfaxSnapshotReader.hpp"  // for ShadowfaxSnapshotReader
+#include <iostream>                     // for operator<<, basic_ostream, etc
+#include <stddef.h>                     // for NULL
+#include <string>                       // for operator==, basic_string, etc
+
+class SnapshotReader;
+class UnitSet;
 
 /**
  * @brief Factory class for SnapshotReader

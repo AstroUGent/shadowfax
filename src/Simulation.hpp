@@ -28,24 +28,23 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
-#include <string>
-#include <utilities/Timer.hpp>
-#include <vector>
+#include "utilities/Timer.hpp"  // for Timer
+#include <string>               // for string
 
+class Cosmology;
+class GasCooling;
+class LogFiles;
 class ParameterFile;
-class RiemannSolver;
-class UnitSet;
-class RectangularBox;
 class ParticleVector;
+class Physics;
+class RectangularBox;
+class RestartFile;
+class RiemannSolver;
 class StarFormationParticleConverter;
 class StellarFeedback;
 class TimeLine;
+class UnitSet;
 class VorTessManager;
-class RestartFile;
-class LogFiles;
-class Physics;
-class GasCooling;
-class Cosmology;
 
 /**
   * \brief The main class for actual simulations

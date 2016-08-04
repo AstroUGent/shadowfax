@@ -24,11 +24,13 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "RectangularBox.hpp"
-#include "ProgramLog.hpp"
-#include "RestartFile.hpp"
-#include "VorGen.hpp"
-#include "utilities/Hilbert.hpp"
-#include "utilities/Particle.hpp"
+#include "ProgramLog.hpp"          // for LOGS
+#include "RestartFile.hpp"         // for RestartFile
+#include "VorGen.hpp"              // for VorGen
+#include "utilities/Hilbert.hpp"   // for get_key
+#include "utilities/Particle.hpp"  // for Particle
+#include <algorithm>               // for max
+#include <math.h>                  // for fabs, sqrt
 using namespace std;
 
 /**

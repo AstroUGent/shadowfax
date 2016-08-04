@@ -25,17 +25,12 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Simplex.hpp"
-#include "ExArith.hpp"
-#include "Line.hpp"
-#include "Plane.hpp"
-#include "VorGen.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <map>
-#include <ostream>
-#include <utility>
-#include <vector>
+#include "ExArith.hpp"  // for orient2d
+#include "Vec.hpp"      // for Vec, operator-
+#include "VorGen.hpp"   // for VorGen
+#include <cstdlib>      // for NULL
+#include <iostream>     // for operator<<, ostream, etc
+#include <vector>       // for vector
 using namespace std;
 
 #if ndim_ == 2

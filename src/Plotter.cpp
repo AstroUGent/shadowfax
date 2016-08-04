@@ -24,23 +24,21 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Plotter.hpp"
-#include "DelCont.hpp"               // for RectangularBox
-#include "Error.hpp"                 // for my_exit
-#include "GadgetSnapshotReader.hpp"  // for GadgetSnapshotReader
-#include "Image.hpp"                 // for Image, ImageType::BIN_PGM, etc
-#include "ImageDescription.hpp"
-#include "MPIMethods.hpp"                // for MyMPI_Barrier
+#include "GadgetSnapshotReader.hpp"      // for GadgetSnapshotReader
+#include "Image.hpp"                     // for Image, PlotVariable, etc
+#include "ImageDescription.hpp"          // for ImageDescription
+#include "ImageOptions.hpp"              // for ImageType::BIN_PGM, etc
 #include "Vec.hpp"                       // for Vec
 #include "io/Header.hpp"                 // for Header
 #include "io/UnitSet.hpp"                // for UnitSet
 #include "utilities/GasParticle.hpp"     // for GasParticle
 #include "utilities/ParticleVector.hpp"  // for ParticleVector
-#include <cstdlib>                       // for atof
+#include <algorithm>                     // for max
+#include <cstdlib>                       // for NULL
 #include <cstring>                       // for strlen
-#include <getopt.h>
-#include <iostream>  // for operator<<, ostream, cout, etc
-#include <vector>    // for vector
-class Particle;
+#include <getopt.h>                      // for getopt_long, optarg, etc
+#include <iostream>                      // for operator<<, basic_ostream, etc
+#include <vector>                        // for vector
 using namespace std;
 
 /**

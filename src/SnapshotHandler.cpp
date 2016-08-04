@@ -24,7 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "SnapshotHandler.hpp"
-#include "RestartFile.hpp"
+#include "RestartFile.hpp"  // for RestartFile
 #include <sstream>
 using namespace std;
 

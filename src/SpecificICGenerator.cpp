@@ -25,17 +25,23 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "SpecificICGenerator.hpp"
-#include "DelCont.hpp"
-#include "Error.hpp"
-#include "VorCell.hpp"
-#include "VorTessManager.hpp"
-#include "io/Unit.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
-#include "utilities/DMParticle.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/ParticleVector.hpp"
-#include <fstream>
+#include "DelCont.hpp"                   // for DelCont
+#include "Error.hpp"                     // for my_exit
+#include "MPIGlobal.hpp"                 // for rank, size
+#include "StateVector.hpp"               // for StateVector
+#include "Vec.hpp"                       // for Vec
+#include "VorTessManager.hpp"            // for VorTessManager
+#include "io/Unit.hpp"                   // for Unit
+#include "io/UnitConverter.hpp"          // for UnitConverter
+#include "io/UnitSet.hpp"                // for UnitSet
+#include "utilities/DMParticle.hpp"      // for DMParticle
+#include "utilities/GasParticle.hpp"     // for GasParticle
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include <algorithm>                     // for max
+#include <cmath>                         // for sqrt, sin, M_PI, cos, log, etc
+#include <iostream>                      // for operator<<, basic_ostream, etc
+#include <stdlib.h>                      // for rand, srand, RAND_MAX, NULL
+#include <string>                        // for string
 using namespace std;
 
 /**

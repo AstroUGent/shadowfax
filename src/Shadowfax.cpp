@@ -23,14 +23,14 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "DelTess.hpp"
-#include "ExArith.hpp"
-#include "MPIMethods.hpp"
-#include "Plotter.hpp"
-#include "SidePrograms.hpp"
-#include "Simulation.hpp"
-#include <getopt.h>
-#include <iostream>
+#include "ExArith.hpp"       // for test_predicates
+#include "MPIMethods.hpp"    // for MyMPI_Finalize, MyMPI_Init
+#include "Plotter.hpp"       // for Plotter
+#include "SidePrograms.hpp"  // for AreaCalculator, etc
+#include "Simulation.hpp"    // for Simulation
+#include <getopt.h>          // for no_argument, getopt_long, etc
+#include <iostream>          // for operator<<, basic_ostream, etc
+#include <stddef.h>          // for NULL
 using namespace std;
 
 /**

@@ -25,47 +25,44 @@
  */
 #include "Simulation.hpp"
 #include "CoolingLocation.hpp"
-#include "Cosmology.hpp"
-#include "DelCont.hpp"
-#include "ExArith.hpp"
-#include "GasCooling.hpp"
+#include "Cosmology.hpp"   // for Cosmology
+#include "DelCont.hpp"     // for DelCont
+#include "Error.hpp"       // for my_exit
+#include "GasCooling.hpp"  // for GasCooling
 #include "GravityWalker.hpp"
-#include "LogFiles.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "ParameterFile.hpp"
-#include "Physics.hpp"
-#include "ProgramLog.hpp"
-#include "RestartFile.hpp"
-#include "SnapshotReaderFactory.hpp"
+#include "LogFiles.hpp"               // for LogFiles
+#include "MPIGlobal.hpp"              // for sendsize, size, recvbuffer, etc
+#include "ParameterFile.hpp"          // for ParameterFile
+#include "Physics.hpp"                // for Physics
+#include "ProgramLog.hpp"             // for LOGS, LOGINIT
+#include "RestartFile.hpp"            // for RestartFile
+#include "SnapshotHandler.hpp"        // for SnapshotReader
+#include "SnapshotReaderFactory.hpp"  // for SnapshotReaderFactory
 #include "StarFormationParticleConverter.hpp"
-#include "StellarFeedback.hpp"
-#include "TimeLine.hpp"
-#include "Vec.hpp"
-#include "VorCell.hpp"
-#include "VorTessManager.hpp"
-#include "io/Block.hpp"
-#include "io/HDF5tools.hpp"
-#include "io/Header.hpp"
-#include "io/Input.hpp"
-#include "io/Output.hpp"
-#include "io/UnitSet.hpp"
-#include "io/UnitSetGenerator.hpp"
-#include "riemann/ApproximateSolver.hpp"
-#include "riemann/RiemannSolver.hpp"
-#include "riemann/RiemannSolverFactory.hpp"
-#include "utilities/DMParticle.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/StarParticle.hpp"
-#include "utilities/Timer.hpp"
-#include "utilities/Tree.hpp"
-#include "utilities/TreeWalker.hpp"
-#include <fstream>
-#include <getopt.h>
-#include <iostream>
-#include <vector>
+#include "StateVector.hpp"                   // for StateVector
+#include "StellarFeedback.hpp"               // for StellarFeedback
+#include "TimeLine.hpp"                      // for TimeLine
+#include "Vec.hpp"                           // for Vec, operator*
+#include "VorTessManager.hpp"                // for VorTessManager
+#include "io/HDF5tools.hpp"                  // for turn_off_error_handling
+#include "io/Header.hpp"                     // for Header
+#include "io/UnitSet.hpp"                    // for UnitSet
+#include "io/UnitSetGenerator.hpp"           // for UnitSetGenerator
+#include "riemann/RiemannSolver.hpp"         // for RiemannSolver
+#include "riemann/RiemannSolverFactory.hpp"  // for RiemannSolverFactory
+#include "utilities/DMParticle.hpp"          // for DMParticle
+#include "utilities/GasParticle.hpp"         // for GasParticle
+#include "utilities/HelperFunctions.hpp"     // for machine_readable_bytes, etc
+#include "utilities/ParticleVector.hpp"      // for ParticleVector
+#include "utilities/StarParticle.hpp"        // for StarParticle
+#include "utilities/Timer.hpp"               // for Timer
+#include "utilities/Tree.hpp"                // for Tree
+#include <algorithm>                         // for max_element, min
+#include <getopt.h>                          // for getopt_long, optarg, etc
+#include <iostream>  // for operator<<, basic_ostream, etc
+#include <math.h>    // for exp, log
+#include <sstream>   // for basic_stringbuf<>::int_type, etc
+#include <stddef.h>  // for NULL
 
 //#define VARIABLE_SOFTENING
 //#define ENTROPY
@@ -80,8 +77,6 @@
 #define SIMULATION_DEFAULT_VORONOITOLERANCE 1.e-9
 #define SIMULATION_DEFAULT_GRAVALPHA 0.005
 
-// for debug purposes
-#include <VorGen.hpp>
 using namespace std;
 
 /**

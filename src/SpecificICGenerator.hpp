@@ -26,14 +26,10 @@
 #ifndef SPECIFICICGENERATOR_HPP
 #define SPECIFICICGENERATOR_HPP
 
-#include "ICGenerator.hpp"
-#include "StateVector.hpp"
-#include "Vec.hpp"
-#include <string>
-#include <vector>
+#include "ICGenerator.hpp"  // for ICMode::IC_RAND, etc
 
-class ParticleVector;
 class DelCont;
+class ParticleVector;
 
 /*! \brief Type of special initial condition to generate */
 enum ICSpecType {

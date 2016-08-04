@@ -26,14 +26,16 @@
 #ifndef GASPARTICLE_HPP
 #define GASPARTICLE_HPP
 
-#include <vector>
-
-#include "Particle.hpp"
+#include "Particle.hpp"       // for Particle
+#include "ParticleTypes.hpp"  // for ParticleType, etc
 #include "StateVector.hpp"
+#include <exception>  // for exception
+#include <ostream>    // for ostream
+#include <vector>     // for vector
 
-class VorGen;
+class RestartFile;
 class VorCell;
-class Block;
+class VorGen;
 
 /**
   * \brief Representation of a gas particle (in SPH style thinking)

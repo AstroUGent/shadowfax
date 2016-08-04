@@ -24,15 +24,17 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "GadgetSnapshotReader.hpp"
-#include "Error.hpp"                     // for my_exit
-#include "MPIGlobal.hpp"                 // for size, rank
-#include "StateVector.hpp"               // for StateVector
-#include "io/HDF5tools.hpp"              // for read_dataset_scalar_chunk, etc
-#include "io/Header.hpp"                 // for Header
-#include "io/Unit.hpp"                   // for Unit
-#include "io/UnitConverter.hpp"          // for UnitConverter
-#include "io/UnitSet.hpp"                // for UnitSet
-#include "io/UnitSetGenerator.hpp"       // for UnitSetGenerator
+#include "Error.hpp"                // for my_exit
+#include "MPIGlobal.hpp"            // for size, rank
+#include "StateVector.hpp"          // for StateVector
+#include "io/HDF5tools.hpp"         // for read_dataset_scalar_chunk, etc
+#include "io/Header.hpp"            // for Header
+#include "io/Unit.hpp"              // for Unit
+#include "io/UnitConverter.hpp"     // for UnitConverter
+#include "io/UnitSet.hpp"           // for UnitSet
+#include "io/UnitSetGenerator.hpp"  // for UnitSetGenerator
+#include "utilities/DMParticle.hpp"
+#include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"  // for ParticleVector
 #include "utilities/StarParticle.hpp"    // for StarParticle
 #include "utilities/Tree.hpp"            // for Tree

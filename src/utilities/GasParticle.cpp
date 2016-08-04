@@ -24,11 +24,10 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "GasParticle.hpp"
-#include "MPIMethods.hpp"
 #include "RestartFile.hpp"
 #include "VorGen.hpp"
-#include "io/Block.hpp"
-#include <mpi.h>
+#include <iostream>  // for operator<<, ostream, etc
+#include <stddef.h>  // for NULL
 using namespace std;
 
 /**

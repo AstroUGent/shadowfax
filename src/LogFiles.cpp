@@ -24,13 +24,15 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "LogFiles.hpp"
-#include "MPIGlobal.hpp"                  // for rank
-#include "ProgramLog.hpp"                 // for LOGS
-#include "RestartFile.hpp"                // for RestartFile
-#include "StateVector.hpp"                // for StateVector
-#include "TimeLine.hpp"                   // for TimeLine
-#include "Vec.hpp"                        // for Vec
-#include "riemann/RiemannSolver.hpp"      // for RiemannSolver
+#include "MPIGlobal.hpp"              // for rank
+#include "ProgramLog.hpp"             // for LOGS
+#include "RestartFile.hpp"            // for RestartFile
+#include "StateVector.hpp"            // for StateVector
+#include "TimeLine.hpp"               // for TimeLine
+#include "Vec.hpp"                    // for Vec
+#include "riemann/RiemannSolver.hpp"  // for RiemannSolver
+#include "utilities/DMParticle.hpp"
+#include "utilities/GasParticle.hpp"
 #include "utilities/HelperFunctions.hpp"  // for human_readable_counter, etc
 #include "utilities/ParticleVector.hpp"   // for ParticleVector
 #include <algorithm>                      // for min

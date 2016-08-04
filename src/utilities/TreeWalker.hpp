@@ -26,16 +26,10 @@
 #ifndef TREEWALKER_HPP
 #define TREEWALKER_HPP
 
-#include "EwaldTable.hpp"
-#include "Particle.hpp"
-#include "Vec.hpp"
-#include <vector>
-
-class TreeNode;
+class EwaldTable;
 class Leaf;
-class GasParticle;
-class Particle;
 class PseudoNode;
+class TreeNode;
 
 /**
  * @brief General interface for treewalkers

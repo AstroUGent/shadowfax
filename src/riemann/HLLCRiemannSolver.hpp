@@ -27,11 +27,9 @@
 #define HLLCRIEMANNSOLVER_HPP
 
 #include "RiemannSolver.hpp"  // for RiemannSolver
-#include "StateVector.hpp"    // for StateVector
 #include <string>             // for string
 
 class RestartFile;
-class Vec;
 
 /**
  * @brief HLLC RiemannSolver

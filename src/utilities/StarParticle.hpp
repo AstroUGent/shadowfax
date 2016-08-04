@@ -28,9 +28,8 @@
 
 #include "Particle.hpp"       // for Particle
 #include "ParticleTypes.hpp"  // for ParticleType, etc
-#include <iosfwd>             // for ostream
+#include <ostream>            // for ostream
 
-class ParticleVector;
 class RestartFile;
 class Vec;
 

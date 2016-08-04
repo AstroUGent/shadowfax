@@ -32,7 +32,9 @@
 #include "HLLCRiemannSolver.hpp"
 #include "ParameterFile.hpp"
 #include "RestartFile.hpp"
-#include <istream>
+#include "RiemannSolver.hpp"  // for RiemannSolver
+#include <stddef.h>           // for NULL
+#include <string>             // for operator==, basic_string, etc
 
 #define RIEMANNSOLVERFACTORY_DEFAULT_TYPE "Exact"
 #define RIEMANNSOLVERFACTORY_DEFAULT_GAMMA (5. / 3.)

@@ -26,11 +26,13 @@
 #include "GadgetSnapshotWriter.hpp"
 #include "MPIGlobal.hpp"  // for nodesize, local_rank, etc
 #include "RestartFile.hpp"
-#include "StateVector.hpp"                // for StateVector
-#include "io/HDF5tools.hpp"               // for DOUBLE, etc
-#include "io/Unit.hpp"                    // for Unit
-#include "io/UnitConverter.hpp"           // for UnitConverter
-#include "io/UnitSet.hpp"                 // for UnitSet
+#include "StateVector.hpp"       // for StateVector
+#include "io/HDF5tools.hpp"      // for DOUBLE, etc
+#include "io/Unit.hpp"           // for Unit
+#include "io/UnitConverter.hpp"  // for UnitConverter
+#include "io/UnitSet.hpp"        // for UnitSet
+#include "utilities/DMParticle.hpp"
+#include "utilities/GasParticle.hpp"
 #include "utilities/HelperFunctions.hpp"  // for make_hdf5_file
 #include "utilities/ParticleVector.hpp"   // for ParticleVector
 #include "utilities/StarParticle.hpp"     // for StarParticle

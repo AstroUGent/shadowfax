@@ -34,8 +34,7 @@
 #ifndef HEAD_HILBERT
 #define HEAD_HILBERT
 
-#include "TreeRoute.hpp"
-#include <iostream>
+#include "TreeRoute.hpp"  // for TreeRoute
 
 class RestartFile;
 

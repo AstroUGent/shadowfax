@@ -25,19 +25,15 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Tree.hpp"
-#include "../io/PhysicalConstant.hpp"
-#include "../io/Unit.hpp"
-#include "../io/UnitSet.hpp"
-#include "GasParticle.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "Particle.hpp"
-#include "StateVector.hpp"
-#include "TreeWalker.hpp"
+#include "EwaldTable.hpp"     // for EwaldTable
+#include "GasParticle.hpp"    // for GasParticle
+#include "Particle.hpp"       // for Particle
+#include "ParticleTypes.hpp"  // for ParticleType::PARTTYPE_GAS
+#include "TreeWalker.hpp"     // for TreeWalker
 #include "VorGen.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
+#include <algorithm>  // for max, min
+#include <cstdlib>    // for NULL
+#include <vector>     // for vector
 using namespace std;
 
 // Tree

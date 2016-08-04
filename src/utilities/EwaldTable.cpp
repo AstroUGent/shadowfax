@@ -28,7 +28,8 @@
 #include "EwaldTable.hpp"
 #include "EwaldTableLocation.hpp"
 #include <fstream>
-#include <iostream>
+#include <iostream>  // for operator<<, basic_ostream, etc
+#include <string>    // for string
 using namespace std;
 
 /**

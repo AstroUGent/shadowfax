@@ -31,14 +31,12 @@
 #ifndef HEAD_PARTICLE
 #define HEAD_PARTICLE
 
-#include "Hilbert.hpp"
+#include "Hilbert.hpp"        // for Hilbert_Object
+#include "ParticleTypes.hpp"  // for ParticleType
 #include "Vec.hpp"
+#include <iostream>  // for ostream
 
-#include "ParticleTypes.hpp"
-
-#include <iostream>
-#include <ostream>
-#include <string>
+class RestartFile;
 
 /**
  * \brief Representation of a particle

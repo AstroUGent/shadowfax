@@ -29,9 +29,11 @@
 
 #include "DMParticle.hpp"
 #include "GasParticle.hpp"
-#include "MPIMethods.hpp"
+#include "Particle.hpp"       // for Particle
+#include "ParticleTypes.hpp"  // for ParticleType::PARTTYPE_DM, etc
 #include "StarParticle.hpp"
-#include <iostream>
+#include <iostream>  // for basic_ostream::operator<<, etc
+#include <stddef.h>  // for NULL
 
 /**
  * @brief Factory to facilitate the sending and receiving of particles of

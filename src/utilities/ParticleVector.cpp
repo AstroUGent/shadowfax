@@ -24,18 +24,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ParticleVector.hpp"
-#include "DMParticle.hpp"
-#include "GasParticle.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "ParallelSorter.hpp"
+#include "ParallelSorter.hpp"  // for ParallelSorter
 #include "ParameterFile.hpp"
-#include "Particle.hpp"
-#include "ParticleConverter.hpp"
-#include "RectangularBox.hpp"
+#include "Particle.hpp"           // for Particle
+#include "ParticleConverter.hpp"  // for ParticleConverter
 #include "RestartFile.hpp"
-#include "StarParticle.hpp"
-#include <fstream>
+#include <sstream>   // for operator<<, basic_ostream, etc
+#include <stddef.h>  // for NULL
+#include <vector>    // for vector
 using namespace std;
 
 /**

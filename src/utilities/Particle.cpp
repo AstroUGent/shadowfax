@@ -24,10 +24,8 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Particle.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
 #include "RestartFile.hpp"
-#include <iostream>
+#include <iostream>  // for ostream
 using namespace std;
 
 /**

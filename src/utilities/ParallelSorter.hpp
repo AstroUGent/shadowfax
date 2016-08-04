@@ -27,14 +27,11 @@
 #ifndef PARALLELSORTER_HPP
 #define PARALLELSORTER_HPP
 
-#include "Hilbert.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
+#include "Hilbert.hpp"  // for sortfunc, Hilbert_Object
 #include "ParticleFactory.hpp"
-#include <algorithm>
-#include <iostream>
-#include <mpi.h>
-#include <vector>
+#include <algorithm>  // for max, min, sort
+#include <stddef.h>   // for NULL
+#include <vector>     // for vector
 
 /**
  * @brief Index-key pair used for the parallel sorting algorithm

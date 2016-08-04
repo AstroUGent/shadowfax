@@ -28,24 +28,26 @@
 #include "GravityWalker.hpp"
 #include "ShadowfaxSnapshotReader.hpp"  // for ShadowfaxSnapshotReader
 #include "ShadowfaxSnapshotWriter.hpp"
-#include "SnapshotHandler.hpp"           // for SnapshotReader
-#include "SnapshotReaderFactory.hpp"     // for SnapshotReaderFactory
-#include "Vec.hpp"                       // for Vec
-#include "VorCell.hpp"                   // for VorCell
-#include "VorTess.hpp"                   // for VorTess
-#include "io/AsciiInput.hpp"             // for AsciiInput
-#include "io/Block.hpp"                  // for Block
-#include "io/Header.hpp"                 // for Header
-#include "io/Unit.hpp"                   // for Unit
-#include "io/UnitSet.hpp"                // for UnitSet
+#include "SnapshotHandler.hpp"        // for SnapshotReader
+#include "SnapshotReaderFactory.hpp"  // for SnapshotReaderFactory
+#include "Vec.hpp"                    // for Vec
+#include "VorCell.hpp"                // for VorCell
+#include "VorTess.hpp"                // for VorTess
+#include "io/AsciiInput.hpp"          // for AsciiInput
+#include "io/Block.hpp"               // for Block
+#include "io/Header.hpp"              // for Header
+#include "io/Unit.hpp"                // for Unit
+#include "io/UnitSet.hpp"             // for UnitSet
+#include "utilities/DMParticle.hpp"
 #include "utilities/GasParticle.hpp"     // for GasParticle
 #include "utilities/ParticleVector.hpp"  // for ParticleVector
-#include "utilities/Tree.hpp"            // for Tree
-#include <algorithm>                     // for max, min
-#include <getopt.h>                      // for optarg, required_argument, etc
-#include <iostream>                      // for operator<<, basic_ostream, etc
-#include <stdlib.h>                      // for NULL, atof
-#include <vector>                        // for vector
+#include "utilities/StarParticle.hpp"
+#include "utilities/Tree.hpp"  // for Tree
+#include <algorithm>           // for max, min
+#include <getopt.h>            // for optarg, required_argument, etc
+#include <iostream>            // for operator<<, basic_ostream, etc
+#include <stdlib.h>            // for NULL, atof
+#include <vector>              // for vector
 using namespace std;
 
 /**

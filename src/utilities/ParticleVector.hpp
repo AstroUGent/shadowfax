@@ -26,17 +26,17 @@
 #ifndef PARTICLEVECTOR_HPP
 #define PARTICLEVECTOR_HPP
 
-#include "../src/io/Header.hpp"
 #include "ParticleTypes.hpp"
 #include "RectangularBox.hpp"
-#include "Tree.hpp"
-#include "utilities/Timer.hpp"
-#include <vector>
+#include "Tree.hpp"  // for Tree
+#include "io/Header.hpp"
+#include <string>  // for string
 
-class GasParticle;
 class DMParticle;
+class GasParticle;
 class ParameterFile;
 class ParticleConverter;
+class RestartFile;
 class StarParticle;
 
 #define PARTICLEVECTOR_DEFAULT_PERIODICFLAG false

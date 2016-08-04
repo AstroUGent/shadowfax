@@ -26,24 +26,15 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
-#include "EwaldTable.hpp"
-#include "Hilbert.hpp"
-#include "TreeRoute.hpp"
-#include "Vec.hpp"
-#include <fstream>
-#include <ostream>
-#include <sstream>
+#include "Box.hpp"      // for Box
+#include "Cuboid.hpp"   // for Cuboid
+#include "Hilbert.hpp"  // for Hilbert_Object
+#include "Particle.hpp"
+#include <fstream>  // for ostream
 
-#include "Box.hpp"
-#include "Cuboid.hpp"
-
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "utilities/DMParticle.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/Particle.hpp"
-#include "utilities/StarParticle.hpp"
-
+class EwaldTable;
+class GasParticle;
+class TreeWalker;
 class VorGen;
 
 #if ndim_ == 3
@@ -51,9 +42,6 @@ class VorGen;
 #else
 #define numnode_ 4
 #endif
-
-class TreeWalker;
-class PeriodicTreeWalker;
 
 /**
  * @brief Auxiliary class used to communicate TreeNode information to a

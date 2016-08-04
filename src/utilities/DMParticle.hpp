@@ -26,7 +26,11 @@
 #ifndef DMPARTICLE_HPP
 #define DMPARTICLE_HPP
 
-#include "Particle.hpp"
+#include "Particle.hpp"       // for Particle
+#include "ParticleTypes.hpp"  // for ParticleType, etc
+#include <ostream>            // for ostream
+
+class RestartFile;
 
 /**
   * \brief Representation of a cold dark matter particle

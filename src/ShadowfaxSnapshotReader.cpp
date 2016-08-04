@@ -30,6 +30,8 @@
 #include "io/UnitConverter.hpp"     // for UnitConverter
 #include "io/UnitSet.hpp"           // for UnitSet
 #include "io/UnitSetGenerator.hpp"  // for UnitSetGenerator
+#include "utilities/DMParticle.hpp"
+#include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"
 #include <iostream>  // for operator<<, basic_ostream, etc
 using namespace std;

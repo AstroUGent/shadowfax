@@ -24,8 +24,6 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "DMParticle.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
 #include "RestartFile.hpp"
 using namespace std;
 

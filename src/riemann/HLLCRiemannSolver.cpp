@@ -24,12 +24,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "HLLCRiemannSolver.hpp"
-#include "Error.hpp"        // for my_exit
-#include "RestartFile.hpp"  // for RestartFile
-#include "Vec.hpp"          // for Vec
-#include <algorithm>        // for max
-#include <cmath>            // for pow, sqrt, fabs
-#include <iostream>         // for operator<<, basic_ostream, etc
+#include "RestartFile.hpp"
+#include <algorithm>  // for max
+#include <cmath>      // for fabs
 
 /**
  * @brief Solve the vacuum Riemann problem for the flux

@@ -24,12 +24,8 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "StarParticle.hpp"
-#include "GasParticle.hpp"
-#include "MPIMethods.hpp"  // for MyMPI_Pack, MyMPI_Unpack
-#include "ParticleVector.hpp"
-#include "RestartFile.hpp"  // for RestartFile
-#include "Vec.hpp"          // for Vec
-#include <ostream>          // for operator<<, ostream, etc
+#include "MPIMethods.hpp"
+#include "RestartFile.hpp"
 using namespace std;
 
 /**

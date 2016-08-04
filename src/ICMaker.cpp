@@ -31,7 +31,8 @@
 #include "SnapshotWriterFactory.hpp"  // for SnapshotWriterFactory
 #include "SpecificICGenerator.hpp"    // for SpecificICGenerator
 #include "io/Header.hpp"
-#include "io/UnitSet.hpp"                 // for UnitSet
+#include "io/UnitSet.hpp"  // for UnitSet
+#include "utilities/GasParticle.hpp"
 #include "utilities/HelperFunctions.hpp"  // for human_readable_bytes
 #include "utilities/ParticleVector.hpp"   // for ParticleVector
 #include <algorithm>                      // for min

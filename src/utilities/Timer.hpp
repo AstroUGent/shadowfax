@@ -26,9 +26,7 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
 
-#include <istream>
-#include <ostream>
-#include <sys/time.h>
+#include <sys/time.h>  // for timeval
 
 class RestartFile;
 

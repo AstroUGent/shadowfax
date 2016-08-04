@@ -24,21 +24,26 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Tenet.hpp"
-#include "Legendre.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "RungeKutta.hpp"
-#include "TenetBasisFunctions.hpp"
-#include "TenetCell.hpp"
-#include "TenetGrid.hpp"
-#include "TenetMinModSlopeLimiter.hpp"
-#include "TenetRungeKuttaFlux.hpp"
-#include "TenetSystemState.hpp"
-#include "riemann/RiemannSolverFactory.hpp"
-#include "utilities/Cuboid.hpp"
-#include <fstream>
-#include <iostream>
-#include <vector>
+#include "Legendre.hpp"                 // for Legendre
+#include "MPIMethods.hpp"               // for MyMPI_Finalize, MyMPI_Init
+#include "RungeKutta.hpp"               // for RungeKutta
+#include "StateVector.hpp"              // for StateVector, operator*
+#include "TenetBasisFunctions.hpp"      // for TenetBasisFunctions, etc
+#include "TenetCell.hpp"                // for TenetCell
+#include "TenetCellWeights.hpp"         // for TenetCellWeights
+#include "TenetGrid.hpp"                // for TenetGrid::iterator, etc
+#include "TenetMinModSlopeLimiter.hpp"  // for TenetMinModSlopeLimiter
+#include "TenetRungeKuttaFlux.hpp"      // for TenetRungeKuttaFlux
+#include "TenetSystemState.hpp"         // for TenetSystemState, operator*, etc
+#include "Vec.hpp"                      // for Vec, operator-, operator*, etc
+#include "riemann/RiemannSolver.hpp"    // for RiemannSolver
+#include "riemann/RiemannSolverFactory.hpp"  // for RiemannSolverFactory
+#include "utilities/Cuboid.hpp"              // for Cuboid
+#include <algorithm>                         // for min
+#include <iostream>  // for operator<<, basic_ostream, etc
+#include <math.h>    // for fabs, sqrt
+#include <stdlib.h>  // for atoi
+#include <vector>    // for vector
 using namespace std;
 
 /**

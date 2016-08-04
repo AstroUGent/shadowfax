@@ -26,22 +26,20 @@
 #ifndef HEAD_VORTESS
 #define HEAD_VORTESS
 
-#include "Image.hpp"
-#include "StateVector.hpp"
-#include <ostream>
-#include <vector>
+#include "StateVector.hpp"  // for StateVector
+#include <ostream>          // for ostream
+#include <vector>           // for vector
 
 class ColorMap;
-class DelTess;
 class DelCont;
-class TimeLine;
+class DelTess;
+class GasParticle;
+class ParticleVector;
 class RiemannSolver;
+class TimeLine;
 class Tree;
 class VorCell;
-class GasParticle;
-class VorGen;
 class VorFace;
-class ParticleVector;
 
 /**
  * @brief 2D or 3D Voronoi tesselation

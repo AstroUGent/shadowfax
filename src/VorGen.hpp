@@ -30,15 +30,13 @@
 #ifndef HEADER_VORGEN
 #define HEADER_VORGEN
 
-#include "Vec.hpp"
-#include <iterator>
-#include <list>
-#include <ostream>
-#include <string>
+#include "Vec.hpp"  // for Vec, operator-
+#include <list>     // for list
+#include <ostream>  // for ostream
 
+class GasParticle;
 class Simplex;
 class VorCell;
-class GasParticle;
 
 /**
  * @brief Voronoi generator

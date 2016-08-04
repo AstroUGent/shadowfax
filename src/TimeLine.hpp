@@ -27,17 +27,18 @@
 #ifndef TIMELINE_HPP
 #define TIMELINE_HPP
 
-#include "GadgetSnapshotWriter.hpp"
-#include "ShadowfaxSnapshotWriter.hpp"
-#include "utilities/Timer.hpp"
-#include <iostream>
-#include <string>
+#include "SnapshotHandler.hpp"  // for SnapshotWriter
+#include "utilities/Timer.hpp"  // for Timer
+#include <iostream>             // for operator<<, basic_ostream, etc
+#include <math.h>               // for exp
+#include <stddef.h>             // for NULL
+#include <string>               // for string
 
 class Cosmology;
-class ParticleVector;
 class ParameterFile;
-class UnitSet;
+class ParticleVector;
 class RestartFile;
+class UnitSet;
 
 #define TIMELINE_DEFAULT_CFL 0.4
 #define TIMELINE_DEFAULT_GRAVETA 0.017857143

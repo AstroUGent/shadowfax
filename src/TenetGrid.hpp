@@ -26,9 +26,11 @@
 #ifndef TENETGRID_HPP
 #define TENETGRID_HPP
 
-#include "TenetCell.hpp"
-#include "utilities/Cuboid.hpp"
-#include <vector>
+#include "TenetCell.hpp"         // for TenetCell
+#include "Vec.hpp"               // for Vec, operator*, operator+
+#include "utilities/Cuboid.hpp"  // for Cuboid
+#include <stddef.h>              // for NULL
+#include <vector>                // for vector
 
 /**
  * @brief Abstraction of the grid used by Tenet

@@ -26,13 +26,16 @@
 #ifndef TIMESTEPWALKER_HPP
 #define TIMESTEPWALKER_HPP
 
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/TreeWalker.hpp"
+#include "MPIMethods.hpp"             // for MyMPI_Pack, MyMPI_Unpack
+#include "utilities/GasParticle.hpp"  // for GasParticle
+#include "utilities/TreeWalker.hpp"   // for TreeWalker
+#include <algorithm>                  // for min
 
 class DMParticle;
+class Leaf;
+class PseudoNode;
 class StarParticle;
+class TreeNode;
 
 /**
  * @brief TreeWalker implemtentation used to calculate the hydrodynamical

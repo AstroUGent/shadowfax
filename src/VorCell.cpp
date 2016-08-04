@@ -24,18 +24,19 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorCell.hpp"
-#include "ColorMap.hpp"
-#include "Error.hpp"
-#include "ExArith.hpp"
-#include "Simplex.hpp"
-#include "VorFace.hpp"
-#include "utilities/GasParticle.hpp"
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <set>
-#include <vector>
+#include "ColorMap.hpp"               // for ColorMap
+#include "Error.hpp"                  // for my_exit
+#include "VorFace.hpp"                // for VorFace
+#include "VorGen.hpp"                 // for VorGen
+#include "utilities/GasParticle.hpp"  // for GasParticle
+#include <cmath>                      // for fabs, sqrt, M_PI, atan2
+#include <cstdlib>                    // for NULL
+#include <iostream>                   // for cout
+#include <vector>                     // for vector
+#if ndim_ == 2
+#include <map>      // for map, _Rb_tree_iterator, etc
+#include <utility>  // for pair
+#endif
 using namespace std;
 
 /**

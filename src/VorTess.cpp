@@ -24,23 +24,22 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorTess.hpp"
-#include "DelCont.hpp"
-#include "DelTess.hpp"
-#include "Line.hpp"
-#include "ProgramLog.hpp"
-#include "Simplex.hpp"
-#include "VorCell.hpp"
-#include "VorFace.hpp"
-#include "VorGen.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/Timer.hpp"
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <ostream>
+#include "DelTess.hpp"                // for DelTess
+#include "ProgramLog.hpp"             // for LOGS
+#include "Simplex.hpp"                // for Simplex
+#include "VorCell.hpp"                // for VorCell
+#include "VorFace.hpp"                // for VorFace
+#include "VorGen.hpp"                 // for VorGen
+#include "utilities/GasParticle.hpp"  // for GasParticle
+#include <algorithm>                  // for sort
+#include <cstdlib>                    // for NULL
+#include <list>                       // for list, _List_iterator
+#include <ostream>                    // for operator<<, stringstream, etc
 #include <sstream>
-#include <vector>
+#include <vector>  // for vector
+#if ndim_ == 2
+#include <string>  // for operator<<
+#endif
 using namespace std;
 
 /**

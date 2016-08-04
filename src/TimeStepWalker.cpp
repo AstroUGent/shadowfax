@@ -24,9 +24,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "TimeStepWalker.hpp"
-#include "StateVector.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/Tree.hpp"
+#include "StateVector.hpp"              // for StateVector
+#include "Vec.hpp"                      // for Vec
+#include "utilities/GasParticle.hpp"    // for GasParticle
+#include "utilities/Particle.hpp"       // for Particle
+#include "utilities/ParticleTypes.hpp"  // for ParticleType::PARTTYPE_GAS
+#include "utilities/Tree.hpp"           // for PseudoNode, Leaf, TreeNode
+#include <math.h>                       // for sqrt
+#include <stddef.h>                     // for NULL
 using namespace std;
 
 /**

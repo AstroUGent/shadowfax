@@ -24,17 +24,18 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorFace.hpp"
-#include "Error.hpp"
-#include "MPIGlobal.hpp"
-#include "TimeLine.hpp"
-#include "VorCell.hpp"
-#include "VorGen.hpp"
-#include "riemann/RiemannSolver.hpp"
-#include "utilities/GasParticle.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
+#include "MPIGlobal.hpp"              // for rank
+#include "TimeLine.hpp"               // for TimeLine
+#include "VorCell.hpp"                // for VorCell
+#include "VorGen.hpp"                 // for VorGen
+#include "riemann/RiemannSolver.hpp"  // for RiemannSolver
+#include "utilities/GasParticle.hpp"  // for GasParticle
+#include <algorithm>                  // for max, min
+#include <cstdlib>                    // for NULL
+#include <iostream>                   // for cerr
+#if ndim_ == 3
+#include <cmath>  // for sqrt, fabs
+#endif
 using namespace std;
 
 /**

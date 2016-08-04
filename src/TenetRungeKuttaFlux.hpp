@@ -26,15 +26,16 @@
 #ifndef TENETRUNGEKUTTAFLUX_HPP
 #define TENETRUNGEKUTTAFLUX_HPP
 
-#include "Legendre.hpp"
-#include "RungeKuttaFlux.hpp"
-#include "StateVector.hpp"
-#include "TenetBasisFunctions.hpp"
-#include "TenetCellWeights.hpp"
-#include "TenetGrid.hpp"
-#include "Vec.hpp"
-#include "riemann/RiemannSolver.hpp"
-#include <vector>
+#include "Error.hpp"                  // for my_exit
+#include "Legendre.hpp"               // for Legendre
+#include "RungeKuttaFlux.hpp"         // for RungeKuttaFlux
+#include "StateVector.hpp"            // for StateVector, operator*, etc
+#include "TenetBasisFunctions.hpp"    // for TenetBasisFunctions
+#include "TenetGrid.hpp"              // for TenetGrid
+#include "Vec.hpp"                    // for Vec
+#include "riemann/RiemannSolver.hpp"  // for RiemannSolver
+#include <iostream>                   // for operator<<, basic_ostream, etc
+#include <vector>                     // for vector
 
 /**
  * @brief Runge-Kutta flux for Tenet

@@ -26,8 +26,6 @@
 #ifndef TENET_HPP
 #define TENET_HPP
 
-class StateVector;
-
 /**
  * @brief Sideprogram with an implementation of Kevin Schaal's discontinuous
  * Galerkin method

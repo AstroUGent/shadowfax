@@ -24,14 +24,12 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorGen.hpp"
-#include "Error.hpp"
-#include "Simplex.hpp"
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
+#include "Error.hpp"      // for my_exit
+#include "MPIGlobal.hpp"  // for rank
+#include <cstdlib>        // for NULL
+#include <iostream>       // for cout
 #include <iterator>
-#include <ostream>
+#include <ostream>  // for operator<<, ostream, etc
 using namespace std;
 
 #if ndim_ == 3

@@ -26,19 +26,17 @@
 #ifndef HEAD_VORTESSMANAGER
 #define HEAD_VORTESSMANAGER
 
-class VorTess;
-class DelCont;
-class GasParticle;
-class ParticleVector;
-class AdaptiveVorTess;
-class AdaptiveVorTess3d;
-class FixedGrid;
-class RestartFile;
+#include "Vec.hpp"              // for Vec
+#include "utilities/Timer.hpp"  // for Timer
+#include <ostream>              // for ostream
 
-#include "TimeLine.hpp"
-#include "riemann/RiemannSolver.hpp"
-#include "utilities/Timer.hpp"
-#include "utilities/Tree.hpp"
+class DelCont;
+class ParticleVector;
+class RestartFile;
+class RiemannSolver;
+class StateVector;
+class TimeLine;
+class VorTess;
 
 /**
  * @brief General Voronoi tesselation that is accessed by Simulation

@@ -27,8 +27,9 @@
 #ifndef TENETCELLWEIGHTS_HPP
 #define TENETCELLWEIGHTS_HPP
 
-#include "StateVector.hpp"
-#include <vector>
+#include "StateVector.hpp"  // for StateVector
+#include <algorithm>        // for fill
+#include <vector>           // for vector
 
 /**
  * @brief Weights for a single TenetCell

@@ -24,14 +24,20 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VTKMaker.hpp"
-#include "Error.hpp"
-#include "MPIGlobal.hpp"
-#include "SnapshotReaderFactory.hpp"
-#include "VorTess.hpp"
-#include "io/UnitSet.hpp"
-#include "utilities/ParticleVector.hpp"
-#include <fstream>
-#include <getopt.h>
+#include "MPIMethods.hpp"                // for MyMPI_Finalize, MyMPI_Init
+#include "SnapshotHandler.hpp"           // for SnapshotReader
+#include "SnapshotReaderFactory.hpp"     // for SnapshotReaderFactory
+#include "StateVector.hpp"               // for StateVector
+#include "Vec.hpp"                       // for Vec
+#include "VorTess.hpp"                   // for VorTess
+#include "io/Header.hpp"                 // for Header
+#include "io/UnitSet.hpp"                // for UnitSet
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include <getopt.h>                      // for optarg, getopt_long, etc
+#include <iostream>                      // for cerr
+#include <stddef.h>                      // for NULL
+#include <string>                        // for string
+#include <vector>                        // for vector
 using namespace std;
 
 /**

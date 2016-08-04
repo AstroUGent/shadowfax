@@ -24,18 +24,16 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "VorTessManager.hpp"
-#include "Error.hpp"
-#include "FixedGrid.hpp"
-#include "MPIMethods.hpp"
-#include "ProgramLog.hpp"
-#include "VorCell.hpp"
-#include "VorFace.hpp"
-#include "VorTess.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/Timer.hpp"
-#include <fstream>
-#include <sstream>
+#include "ProgramLog.hpp"                // for LOGS
+#include "RestartFile.hpp"               // for RestartFile
+#include "VorCell.hpp"                   // for VorCell
+#include "VorFace.hpp"                   // for VorFace
+#include "VorTess.hpp"                   // for VorTess
+#include "utilities/GasParticle.hpp"     // for GasParticle
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include "utilities/Timer.hpp"           // for Timer
+#include <iostream>                      // for operator<<, ostream, etc
+#include <vector>                        // for vector
 using namespace std;
 
 //#define FIXED_GRID

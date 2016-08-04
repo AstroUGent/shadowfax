@@ -30,18 +30,15 @@
 #ifndef HEAD_VORCELL
 #define HEAD_VORCELL
 
-#include "Image.hpp"
-#include "StateVector.hpp"
-#include "Vec.hpp"
-#include <map>
-#include <ostream>
-#include <vector>
+#include "StateVector.hpp"  // for StateVector
+#include "Vec.hpp"          // for Vec
+#include <ostream>          // for ostream
+#include <vector>           // for vector
 
 class ColorMap;
-class Simplex;
+class GasParticle;
 class VorFace;
 class VorGen;
-class GasParticle;
 
 /**
  * @brief 2D or 3D Voronoi cell

@@ -24,19 +24,23 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "TimeLine.hpp"
-#include "Cosmology.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
+#include "Cosmology.hpp"  // for Cosmology
+#include "Error.hpp"      // for my_exit
+#include "MPIGlobal.hpp"  // for size
 #include "ParameterFile.hpp"
-#include "ProgramLog.hpp"
-#include "RestartFile.hpp"
-#include "SnapshotHandler.hpp"
-#include "SnapshotWriterFactory.hpp"
+#include "ProgramLog.hpp"             // for LOGS
+#include "RestartFile.hpp"            // for RestartFile
+#include "SnapshotHandler.hpp"        // for SnapshotWriter
+#include "SnapshotWriterFactory.hpp"  // for SnapshotWriterFactory
+#include "StateVector.hpp"            // for StateVector
 #include "TimeStepWalker.hpp"
-#include "utilities/DMParticle.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/StarParticle.hpp"
+#include "Vec.hpp"                       // for Vec
+#include "utilities/DMParticle.hpp"      // for DMParticle
+#include "utilities/GasParticle.hpp"     // for GasParticle
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include "utilities/StarParticle.hpp"    // for StarParticle
+#include "utilities/Tree.hpp"            // for Tree
+#include <algorithm>                     // for min, max
 using namespace std;
 
 /**

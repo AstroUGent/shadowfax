@@ -26,18 +26,17 @@
 #ifndef HEAD_VORFACE
 #define HEAD_VORFACE
 
-#include "StateVector.hpp"
-#include "Vec.hpp"
-#include <exception>
-#include <ostream>
-#include <vector>
+#include "StateVector.hpp"  // for StateVector
+#include "Vec.hpp"          // for Vec
+#include <exception>        // for exception
+#include <math.h>           // for fabs, fmax, fmin, sqrt
+#include <ostream>          // for ostream
+#include <vector>           // for vector
 
-class VorGen;
-class VorCell;
-class StateVector;
-class TimeLine;
-class RiemannSolver;
 class ParticleVector;
+class RiemannSolver;
+class TimeLine;
+class VorGen;
 
 /**
  * @brief Voronoi face in 2D or 3D

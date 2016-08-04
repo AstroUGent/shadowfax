@@ -27,9 +27,13 @@
 #ifndef TENETMINMODSLOPELIMITER_HPP
 #define TENETMINMODSLOPELIMITER_HPP
 
-#include "StateVector.hpp"
-#include "TenetSlopeLimiter.hpp"
-#include "TenetSystemState.hpp"
+#include "StateVector.hpp"        // for StateVector, operator*, etc
+#include "TenetCellWeights.hpp"   // for TenetCellWeights
+#include "TenetSlopeLimiter.hpp"  // for TenetSlopeLimiter
+#include "TenetSystemState.hpp"   // for TenetSystemState
+#include <algorithm>              // for max, min
+#include <math.h>                 // for sqrt
+class TenetGrid;
 
 /**
  * @brief TenetSlopeLimiter implementation containing a simple conserved

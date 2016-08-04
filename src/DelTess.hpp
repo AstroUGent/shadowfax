@@ -34,22 +34,17 @@
 #ifndef HEAD_DELTESS
 #define HEAD_DELTESS
 
-#include <cmath>
-#include <map>
-#include <ostream>
-#include <set>
-#include <string>
-#include <vector>
+#include "utilities/Cuboid.hpp"  // for Cuboid
+#include <ostream>               // for ostream
+#include <vector>                // for vector
 
-#include "utilities/Cuboid.hpp"
-
-class VorTess;
 class DelCont;
 class GasParticle;
-class VorGen;
-class Tree;
 class Simplex;
+class Tree;
 class VorCell;
+class VorGen;
+class VorTess;
 
 /**
  * \brief The Delaunay triangulation

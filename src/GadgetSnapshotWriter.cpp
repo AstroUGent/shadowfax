@@ -24,14 +24,24 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "GadgetSnapshotWriter.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "io/HDF5tools.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSetGenerator.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/StarParticle.hpp"
+#include "MPIGlobal.hpp"  // for nodesize, local_rank, etc
+#include "RestartFile.hpp"
+#include "StateVector.hpp"                // for StateVector
+#include "io/HDF5tools.hpp"               // for DOUBLE, etc
+#include "io/Unit.hpp"                    // for Unit
+#include "io/UnitConverter.hpp"           // for UnitConverter
+#include "io/UnitSet.hpp"                 // for UnitSet
+#include "utilities/HelperFunctions.hpp"  // for make_hdf5_file
+#include "utilities/ParticleVector.hpp"   // for ParticleVector
+#include "utilities/StarParticle.hpp"     // for StarParticle
+#include <H5Dpublic.h>                    // for H5Dclose
+#include <H5Fpublic.h>                    // for H5Fclose, H5Fcreate, etc
+#include <H5Gpublic.h>                    // for H5Gclose
+#include <H5Ipublic.h>                    // for hid_t
+#include <H5public.h>                     // for herr_t
+#include <H5version.h>                    // for H5Dopen, H5Gcreate, H5Gopen
+#include <iostream>                       // for operator<<, basic_ostream, etc
+#include <vector>                         // for vector
 using namespace std;
 
 /**

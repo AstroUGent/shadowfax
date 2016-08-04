@@ -24,13 +24,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "FixedGrid.hpp"
-#include "Error.hpp"
-#include "TimeLine.hpp"
-#include "VorCell.hpp"
-#include "VorFace.hpp"
-#include "VorGen.hpp"
-#include "riemann/RiemannSolverFactory.hpp"
-#include "utilities/ParticleVector.hpp"
+#include "Error.hpp"                     // for my_exit
+#include "Vec.hpp"                       // for Vec
+#include "VorCell.hpp"                   // for VorCell
+#include "VorFace.hpp"                   // for VorFace
+#include "VorGen.hpp"                    // for VorGen
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include <cmath>                         // for sqrt, M_PI
+#include <iostream>                      // for operator<<, basic_ostream, etc
 using namespace std;
 
 /**

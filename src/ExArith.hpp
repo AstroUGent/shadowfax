@@ -26,10 +26,9 @@
 #ifndef HEAD_EXARITH
 #define HEAD_EXARITH
 
-#include "Error.hpp"
-#include "Vec.hpp"
-#include <cfloat>
-#include <limits>
+#include <cfloat>  // for DBL_MANT_DIG
+
+class Vec;
 
 #define MANTISSAMASK ((long)1 << DBL_MANT_DIG)
 

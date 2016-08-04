@@ -26,10 +26,17 @@
 #ifndef HEAD_GRAVITYWALKER
 #define HEAD_GRAVITYWALKER
 
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/TreeWalker.hpp"
+#include "MPIMethods.hpp"               // for MyMPI_Pack, MyMPI_Unpack
+#include "utilities/GasParticle.hpp"    // for GasParticle
+#include "utilities/Particle.hpp"       // for Particle
+#include "utilities/ParticleTypes.hpp"  // for ParticleType, etc
+#include "utilities/TreeWalker.hpp"     // for PeriodicTreeWalker
+#include <stddef.h>                     // for NULL
+
+class EwaldTable;
+class Leaf;
+class PseudoNode;
+class TreeNode;
 
 /**
  * @brief Interface for gravity kernels

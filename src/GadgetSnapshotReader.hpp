@@ -26,8 +26,13 @@
 #ifndef GADGETSNAPSHOTREADER_HPP
 #define GADGETSNAPSHOTREADER_HPP
 
-#include "SnapshotHandler.hpp"
-#include "Vec.hpp"
+#include "SnapshotHandler.hpp"  // for SnapshotReader
+#include "Vec.hpp"              // for Vec
+#include "io/Header.hpp"        // for Header
+#include <string>               // for string
+
+class ParticleVector;
+class UnitSet;
 
 /**
  * @brief SnapshotReader specialization to read Gadget snapshots

@@ -23,29 +23,20 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "DelTess.hpp"
-#include "DelCont.hpp"
-#include "Error.hpp"
-#include "ExArith.hpp"
-#include "Line.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "NgbSearch.hpp"
-#include "ProgramLog.hpp"
-#include "Simplex.hpp"
-#include "VorCell.hpp"
-#include "VorGen.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "utilities/Tree.hpp"
-#include "utilities/TreeWalker.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <ostream>
-#include <sstream>
-#include <vector>
+#include "DelTess.hpp"                // for DelTess
+#include "MPIGlobal.hpp"              // for size, rank, sendbuffer, etc
+#include "MPIMethods.hpp"             // for MyMPI_Pack, MyMPI_Unpack
+#include "NgbSearch.hpp"              // for NgbSearch
+#include "ProgramLog.hpp"             // for LOGS
+#include "Simplex.hpp"                // for Simplex
+#include "StateVector.hpp"            // for StateVector
+#include "Vec.hpp"                    // for Vec, operator-
+#include "VorGen.hpp"                 // for VorGen
+#include "utilities/GasParticle.hpp"  // for GasParticle
+#include "utilities/Tree.hpp"         // for Tree
+#include <algorithm>                  // for min, max
+#include <cstdlib>                    // for NULL
+#include <vector>                     // for vector, vector<>::reference
 using namespace std;
 
 /**

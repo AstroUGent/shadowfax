@@ -24,10 +24,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "GIZMO.hpp"
-#include "DelCont.hpp"     // for RectangularBox
-#include "Error.hpp"       // for my_exit
-#include "MPIMethods.hpp"  // for MyMPI_Finalize, MyMPI_Init
-#include "NgbSearch.hpp"
+#include "Error.hpp"                  // for my_exit
+#include "MPIMethods.hpp"             // for MyMPI_Finalize, MyMPI_Init
+#include "NgbSearch.hpp"              // for NgbSearch
 #include "SnapshotHandler.hpp"        // for SnapshotReader
 #include "SnapshotReaderFactory.hpp"  // for SnapshotReaderFactory
 #include "StateVector.hpp"            // for StateVector
@@ -43,12 +42,10 @@
 #include <algorithm>                         // for max, min
 #include <cmath>                             // for M_PI
 #include <cstddef>                           // for NULL
-#include <ext/alloc_traits.h>
-#include <getopt.h>  // for optarg, getopt_long, etc
+#include <getopt.h>                          // for optarg, getopt_long, etc
 #include <iostream>  // for operator<<, basic_ostream, etc
-#include <sstream>
-#include <string>  // for string, operator<<, etc
-#include <vector>  // for vector, vector<>::reference
+#include <string>    // for string, operator<<, etc
+#include <vector>    // for vector, vector<>::reference
 using namespace std;
 
 /**

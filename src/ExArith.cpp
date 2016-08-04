@@ -24,12 +24,19 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ExArith.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "utilities/Timer.hpp"
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/number.hpp>
-#include <cmath>
-#include <iostream>
+#include "Vec.hpp"                           // for Vec, operator-
+#include "utilities/HelperFunctions.hpp"     // for rand_double, sign
+#include "utilities/Timer.hpp"               // for Timer
+#include <algorithm>                         // for copy
+#include <boost/multiprecision/cpp_int.hpp>  // for cpp_int_backend, etc
+#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
+#include <boost/multiprecision/detail/no_et_ops.hpp>  // for operator*, etc
+#include <boost/multiprecision/detail/number_base.hpp>
+#include <boost/multiprecision/detail/number_compare.hpp>
+#include <boost/multiprecision/number.hpp>  // for number
+#include <cmath>                            // for fabs
+#include <iostream>  // for operator<<, cout, ostream, etc
+#include <stdlib.h>  // for srand
 // if you want to use this, you have to link to the GMP library, which is not
 // done in the basic CMake setup
 //#include <boost/multiprecision/gmp.hpp>

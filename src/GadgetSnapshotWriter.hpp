@@ -26,7 +26,12 @@
 #ifndef GADGETSNAPSHOTWRITER_HPP
 #define GADGETSNAPSHOTWRITER_HPP
 
-#include "SnapshotHandler.hpp"
+#include "SnapshotHandler.hpp"  // for SnapshotWriter
+#include <string>               // for string
+
+class ParticleVector;
+class RestartFile;
+class UnitSet;
 
 /**
  * @brief SnapshotWriter implementation that writes Gadget snapshots

@@ -26,17 +26,16 @@
  */
 #ifndef GASCOOLING_HPP
 #define GASCOOLING_HPP
-#include "CoolingTable.hpp"
-#include "LogFiles.hpp"
-#include "ParameterFile.hpp"
-#include "io/Unit.hpp"
-#include "io/UnitSet.hpp"
-#include "utilities/GasParticle.hpp"
-#include <vector>
-using namespace std;
 
+#include <string>  // for string
+#include <vector>  // for vector
+
+class CoolingTable;
+class GasParticle;
+class ParameterFile;
 class Physics;
 class RestartFile;
+class UnitSet;
 
 #define GASCOOLING_DEFAULT_REQPREC 0.001
 #define GASCOOLING_DEFAULT_MAXIT 128
@@ -66,19 +65,19 @@ class GasCooling {
     /*! @brief Hydrogen fraction */
     double _Hfrac;
     /*! @brief Results? */
-    vector<double> _results;
+    std::vector<double> _results;
     /*! @brief Calc A ? */
-    vector<double> _calca;
+    std::vector<double> _calca;
     /*! @brief Calc B ? */
-    vector<double> _calcb;
+    std::vector<double> _calcb;
 
     double cooling(double Fe, double Mg, double density, double temp);
     double calc_cooling_mmm(GasParticle* particle);
     double calc_cooling_bs(GasParticle* particle);
-    vector<double>& calcvec(int i);
+    std::vector<double>& calcvec(int i);
 
   public:
-    GasCooling(string directory, UnitSet* simulation_units,
+    GasCooling(std::string directory, UnitSet* simulation_units,
                ParameterFile* parameters, Physics* physics);
     ~GasCooling();
 

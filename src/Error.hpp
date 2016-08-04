@@ -28,7 +28,7 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include <MPIGlobal.hpp>
+#include "MPIGlobal.hpp"
 #include <iostream>
 
 #define my_exit()                                                          \

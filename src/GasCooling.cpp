@@ -25,15 +25,19 @@
  * @author Yorick Van Den Bossche (yorick.vandenbossche@ugent.be)
  */
 #include "GasCooling.hpp"
-#include "Physics.hpp"
-#include "StateVector.hpp"
-#include "io/UnitConverter.hpp"
-#include <boost/math/special_functions/factorials.hpp>
-#include <cmath>
-#include <iostream>
-#include <sstream>
-#include <string>
-
+#include "CoolingTable.hpp"           // for CoolingTable
+#include "ParameterFile.hpp"          // for ParameterFile
+#include "Physics.hpp"                // for Physics
+#include "StateVector.hpp"            // for StateVector
+#include "io/Unit.hpp"                // for Unit, operator/, operator*
+#include "io/UnitConverter.hpp"       // for UnitConverter
+#include "io/UnitSet.hpp"             // for UnitSet, etc
+#include "utilities/GasParticle.hpp"  // for GasParticle
+#include <algorithm>                  // for min, max
+#include <cmath>                      // for abs, log10
+#include <iostream>                   // for operator<<, basic_ostream, etc
+#include <sstream>                    // for basic_stringbuf<>::int_type, etc
+#include <string>                     // for string
 using namespace std;
 
 /**

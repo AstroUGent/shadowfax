@@ -24,9 +24,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "GravityWalker.hpp"
-#include "utilities/Particle.hpp"
-#include "utilities/Tree.hpp"
-#include "utilities/TreeWalker.hpp"
+#include "utilities/EwaldTable.hpp"
+#include "utilities/Particle.hpp"  // for Particle
+#include "utilities/Tree.hpp"      // for TreeNode, etc
 using namespace std;
 
 // GravityWalker

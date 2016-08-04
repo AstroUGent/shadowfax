@@ -24,27 +24,22 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "DelTess.hpp"
-#include "DelCont.hpp"
-#include "Error.hpp"
-#include "ExArith.hpp"
+#include "DelCont.hpp"  // for DelCont
+#include "Error.hpp"    // for my_exit
+#include "ExArith.hpp"  // for orient2d
 #include "Line.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "ProgramLog.hpp"
-#include "Simplex.hpp"
-#include "VorCell.hpp"
-#include "VorGen.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include "utilities/Tree.hpp"
-#include "utilities/TreeWalker.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <ostream>
-#include <sstream>
-#include <vector>
+#include "ProgramLog.hpp"                 // for LOGS
+#include "Simplex.hpp"                    // for Simplex
+#include "Vec.hpp"                        // for Vec, operator-, operator*
+#include "VorGen.hpp"                     // for VorGen
+#include "utilities/GasParticle.hpp"      // for GasParticle
+#include "utilities/HelperFunctions.hpp"  // for human_readable_counter
+#include <algorithm>                      // for max, min
+#include <cstdlib>                        // for NULL
+#include <iostream>                       // for cout, cerr
+#include <ostream>                        // for operator<<, basic_ostream, etc
+#include <string>                         // for operator<<, char_traits
+#include <vector>                         // for vector, vector<>::iterator
 using namespace std;
 
 // size of the buffer to store simplices in during the find_simplex routine

@@ -24,17 +24,25 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "GadgetSnapshotReader.hpp"
-#include "Error.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "io/HDF5tools.hpp"
-#include "io/Header.hpp"
-#include "io/UnitConverter.hpp"
-#include "io/UnitSet.hpp"
-#include "io/UnitSetGenerator.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/StarParticle.hpp"
-#include <fstream>
+#include "Error.hpp"                     // for my_exit
+#include "MPIGlobal.hpp"                 // for size, rank
+#include "StateVector.hpp"               // for StateVector
+#include "io/HDF5tools.hpp"              // for read_dataset_scalar_chunk, etc
+#include "io/Header.hpp"                 // for Header
+#include "io/Unit.hpp"                   // for Unit
+#include "io/UnitConverter.hpp"          // for UnitConverter
+#include "io/UnitSet.hpp"                // for UnitSet
+#include "io/UnitSetGenerator.hpp"       // for UnitSetGenerator
+#include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include "utilities/StarParticle.hpp"    // for StarParticle
+#include "utilities/Tree.hpp"            // for Tree
+#include <H5Fpublic.h>                   // for H5Fclose, H5Fopen
+#include <H5Gpublic.h>                   // for H5Gclose
+#include <H5Ipublic.h>                   // for hid_t
+#include <H5public.h>                    // for herr_t
+#include <H5version.h>                   // for H5Gopen
+#include <iostream>                      // for operator<<, basic_ostream, etc
+#include <vector>                        // for vector
 using namespace std;
 
 /**

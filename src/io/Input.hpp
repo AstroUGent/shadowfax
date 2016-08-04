@@ -28,16 +28,11 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
-#include <fstream>
-#include <hdf5.h>
-#include <string>
-#include <vector>
-
 class Block;
 class Header;
 
 /**
-  * \brief Interface for data input
+  * @brief Interface for data input
   *
   * Data is organized in blocks which basically are tables with column names and
   * rows of data. Extra information is written to the file through a Header.
@@ -45,7 +40,7 @@ class Header;
 class Input {
   public:
     /**
-      * \brief Fill the given Block with data
+      * @brief Fill the given Block with data
       *
       * The column names have to be pre-specified in the header of the Block and
       * only those data are accessible. Since many input methods gain
@@ -58,7 +53,7 @@ class Input {
     virtual void read(Block& block, unsigned int npart) = 0;
 
     /**
-      * \brief Fill the given Header with data
+      * @brief Fill the given Header with data
       *
       * Contrary to the function that reads a Block, the implementation itself
       * determines what data are actually read in.
@@ -66,48 +61,6 @@ class Input {
       * @param header Header to fill
       */
     virtual void read_header(Header& header) = 0;
-};
-
-/**
-  * \brief Read in data from the default HDF5 snapshot format
-  */
-class FileInput : public Input {
-  private:
-    /*! \brief Name of the HDF5 file that is being read */
-    std::string _filename;
-
-  public:
-    FileInput(std::string filename);
-    ~FileInput() {}
-
-    void read(Block& block, unsigned int npart);
-    void read_header(Header& header);
-};
-
-/**
-  * \brief Read in data from an ASCII file
-  *
-  * The data is expected to be in columns. The first line of the file can
-  * optionally contain column names that are linked to the data. No Header
-  * information can be present in the file. All data is read in during
-  * construction and is stored in internal vectors.
-  */
-class AsciiInput : public Input {
-  private:
-    /*! \brief Internal data vector */
-    std::vector<std::vector<double> > _data;
-
-    /*! \brief Internal vector of column names */
-    std::vector<std::string> _column_names;
-
-    void read_column_names(std::string line);
-
-  public:
-    AsciiInput(std::string filename);
-    ~AsciiInput() {}
-
-    void read(Block& block, unsigned int npart);
-    void read_header(Header& header);
 };
 
 #endif  // INPUT_HPP

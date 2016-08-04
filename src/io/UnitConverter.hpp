@@ -26,10 +26,9 @@
 #ifndef UNITCONVERTER_HPP
 #define UNITCONVERTER_HPP
 
-#include "Error.hpp"
-#include "Unit.hpp"
-#include <cstdlib>
-#include <iostream>
+#include "Unit.hpp"  // for Unit
+#include <iostream>  // for basic_ostream, operator<<, etc
+#include <string>    // for operator<<, string
 
 /**
   * \brief Convert from one Unit to another.

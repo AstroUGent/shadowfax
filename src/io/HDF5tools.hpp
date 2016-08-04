@@ -26,12 +26,12 @@
 #ifndef HDF5TOOLS_HPP
 #define HDF5TOOLS_HPP
 
-#include <hdf5.h>
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include "Error.hpp"
+#include <hdf5.h>
+#include <iostream>  // for operator<<, basic_ostream, etc
+#include <stddef.h>  // for NULL
+#include <string>    // for operator<<, char_traits, etc
+#include <vector>    // for vector
 
 /**
   * \brief Convenient aliases for the HDF5 datatypes

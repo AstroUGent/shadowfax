@@ -26,7 +26,7 @@
 #include "ShadowfaxSnapshotReader.hpp"
 #include "Error.hpp"  // for my_exit
 #include "io/Block.hpp"
-#include "io/Input.hpp"             // for FileInput
+#include "io/FileInput.hpp"         // for FileInput
 #include "io/UnitConverter.hpp"     // for UnitConverter
 #include "io/UnitSet.hpp"           // for UnitSet
 #include "io/UnitSetGenerator.hpp"  // for UnitSetGenerator

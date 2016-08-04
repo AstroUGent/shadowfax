@@ -27,7 +27,6 @@
 #define HEADER_HPP
 
 #include "utilities/ParticleTypes.hpp"
-#include <ostream>
 
 class RestartFile;
 

@@ -23,13 +23,14 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Block.hpp"
-#include "Header.hpp"
-#include "Output.hpp"
+#include "AsciiOutput.hpp"
+#include "Block.hpp"  // for Block
+#include <string>     // for string, char_traits, etc
+#include <vector>     // for vector
 using namespace std;
 
 /**
-  * \brief Construct an AsciiOutput to write a file with the given name
+  * @brief Construct an AsciiOutput to write a file with the given name
   *
   * @param filename Name of the file to write. The file is overwritten if it
   * already exists
@@ -39,7 +40,7 @@ AsciiOutput::AsciiOutput(string filename) {
 }
 
 /**
-  * \brief Destructor. Does the actual writing of the file
+  * @brief Destructor. Does the actual writing of the file
   *
   * We first write the column names to a comment line and then we write the
   * data.
@@ -60,7 +61,7 @@ AsciiOutput::~AsciiOutput() {
 }
 
 /**
-  * \brief Write the column names to the file
+  * @brief Write the column names to the file
   *
   * The line starts with a # and column names are separated by a tab.
   *
@@ -79,7 +80,7 @@ void AsciiOutput::write_column_names(ofstream& file) {
 }
 
 /**
-  * \brief Write the given Header to the file
+  * @brief Write the given Header to the file
   *
   * This function is only provided to implement the Output interface and does
   * not do anything (yet?)
@@ -91,7 +92,7 @@ void AsciiOutput::write_header(Header& header) {
 }
 
 /**
-  * \brief Write the given Block to the file
+  * @brief Write the given Block to the file
   *
   * The data is actually written to internal vectors and only written out in the
   * end (in the destructor). Column names in the header of the Block are

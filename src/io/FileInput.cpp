@@ -25,22 +25,23 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Block.hpp"
-#include "HDF5tools.hpp"
-#include "Header.hpp"
-#include "Input.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "UnitConverter.hpp"
-#include <cstdlib>
-#include <hdf5.h>
-#include <iostream>
+#include "FileInput.hpp"
+#include "Block.hpp"          // for Block
+#include "HDF5tools.hpp"      // for read_attribute, BOOL, etc
+#include "Header.hpp"         // for Header
+#include "MPIGlobal.hpp"      // for rank, size
+#include "MPIMethods.hpp"     // for MyMPI_Bcast, MyMPI_Barrier
+#include "Unit.hpp"           // for Unit
+#include "UnitConverter.hpp"  // for UnitConverter
+#include <cstdlib>            // for NULL
+#include <iostream>           // for operator<<, basic_ostream, etc
 #include <sstream>
-#include <vector>
+#include <string>  // for string, operator<<
+#include <vector>  // for vector
 using namespace std;
 
 /**
-  * \brief Construct a FileInput for the file with the given name
+  * @brief Construct a FileInput for the file with the given name
   *
   * No attempt is made to actually open the file and no check on the existence
   * of the file is present (yet?).
@@ -69,8 +70,13 @@ FileInput::FileInput(string filename) {
   * @param npart Number of lines that should be read
   */
 void FileInput::read(Block& block, unsigned int npart) {
+#ifdef PYTHON_MODULE
+    int rank = 0;
+    int size = 1;
+#else
     int rank = MPIGlobal::rank;
     int size = MPIGlobal::size;
+#endif
     // if npart is a multiple of world.size(), we want nice blocks. If it is
     // not, we should make sure that all particles are read
     unsigned int npart_local = npart / size + ((npart % size) > 0);
@@ -129,12 +135,14 @@ void FileInput::read(Block& block, unsigned int npart) {
                 std::cerr << "ERROR!" << std::endl;
             }
         }
+#ifndef PYTHON_MODULE
         MyMPI_Barrier();
+#endif
     }
 }
 
 /**
-  * \brief Fill the given Header with the header information of the file
+  * @brief Fill the given Header with the header information of the file
   *
   * All information is read in and then a consistency check is performed to
   * check if the compiled version of the code is compatible with the information
@@ -143,7 +151,11 @@ void FileInput::read(Block& block, unsigned int npart) {
   * @param header Header to fill
   */
 void FileInput::read_header(Header& header) {
+#ifdef PYTHON_MODULE
+    int rank = 0;
+#else
     int rank = MPIGlobal::rank;
+#endif
     if(!rank) {
         hid_t flag = H5Pcreate(H5P_FILE_ACCESS);
         H5Pset_fclose_degree(flag, H5F_CLOSE_SEMI);
@@ -185,6 +197,7 @@ void FileInput::read_header(Header& header) {
 
         header.check_makeflags();
     }
+#ifndef PYTHON_MODULE
     // we do not have the MPIGlobal buffer yet at this point,
     // so we have to provide our own buffer
     int bufsize = sizeof(Header);
@@ -198,4 +211,5 @@ void FileInput::read_header(Header& header) {
     int recv_pos = 0;
     header = Header(buffer, send_pos, &recv_pos);
     delete[] buffer;
+#endif
 }

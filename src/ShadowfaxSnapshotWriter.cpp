@@ -30,8 +30,8 @@
 #include "StateVector.hpp"                // for StateVector
 #include "Vec.hpp"                        // for Vec
 #include "io/Block.hpp"                   // for Block
+#include "io/FileOutput.hpp"              // for FileOutput
 #include "io/Header.hpp"                  // for Header
-#include "io/Output.hpp"                  // for FileOutput
 #include "io/Unit.hpp"                    // for Unit, operator/
 #include "io/UnitConverter.hpp"           // for UnitConverter
 #include "io/UnitSet.hpp"                 // for UnitSet

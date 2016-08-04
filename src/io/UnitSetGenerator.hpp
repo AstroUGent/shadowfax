@@ -26,11 +26,12 @@
 #ifndef UNITSETGENERATOR_HPP
 #define UNITSETGENERATOR_HPP
 
-#include <iostream>
-#include <string>
-
 #include "Error.hpp"
-#include "UnitSet.hpp"
+#include "Unit.hpp"     // for Unit, operator/
+#include "UnitSet.hpp"  // for UnitSet
+#include <iostream>     // for operator<<, basic_ostream, etc
+#include <stddef.h>     // for NULL
+#include <string>       // for string, operator==, etc
 
 /**
   * \brief Class that generates a UnitSet based on an input string

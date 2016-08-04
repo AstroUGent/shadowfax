@@ -23,17 +23,18 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Block.hpp"
-#include "Error.hpp"
-#include "Header.hpp"
-#include "Input.hpp"
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include "AsciiInput.hpp"
+#include "Block.hpp"   // for Block
+#include "Error.hpp"   // for my_exit
+#include "Header.hpp"  // for Header
+#include "sstream"
+#include <iostream>  // for operator<<, basic_istream, etc
+#include <string>    // for string, operator<<, getline, etc
+#include <vector>    // for vector
 using namespace std;
 
 /**
-  * \brief Construct an AsciiInput that reads the file with the given name
+  * @brief Construct an AsciiInput that reads the file with the given name
   *
   * The file is opened and the data is written to an internal vector. If
   * present, the names of the columns are read in from a commented out line.
@@ -64,7 +65,7 @@ AsciiInput::AsciiInput(std::string filename) {
 }
 
 /**
-  * \brief Read a block from the file
+  * @brief Read a block from the file
   *
   * Every name in the header of the Block is looked up in the internal list of
   * column names and the requested columns are then written line by line to the
@@ -117,7 +118,7 @@ void AsciiInput::read(Block& block, unsigned int npart) {
 }
 
 /**
-  * \brief Read the header of the file
+  * @brief Read the header of the file
   *
   * For now, we only set the number of gas particles, since no other data can be
   * present in the file.
@@ -129,7 +130,7 @@ void AsciiInput::read_header(Header& header) {
 }
 
 /**
-  * \brief Read column names from a string
+  * @brief Read column names from a string
   *
   * The names are expected to be single strings (without internal whitespace)
   * and separated by whitespace (spaces or tabs)

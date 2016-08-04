@@ -24,9 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Block.hpp"
-#include "Error.hpp"
-#include <cstdlib>
-#include <iostream>
+#include <iostream>  // for operator<<, basic_ostream, etc
 using namespace std;
 
 /**

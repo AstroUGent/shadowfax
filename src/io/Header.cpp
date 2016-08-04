@@ -24,12 +24,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Header.hpp"
-#include "Error.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
 #include "RestartFile.hpp"
-#include "StateVector.hpp"
-#include <iostream>
+#include <iostream>  // for cerr
+#include <ostream>   // for operator<<, basic_ostream, etc
 using namespace std;
 
 /**

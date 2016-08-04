@@ -23,10 +23,12 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
+#include "../io/AsciiInput.hpp"
+#include "../io/AsciiOutput.hpp"
 #include "../io/Block.hpp"
+#include "../io/FileInput.hpp"
+#include "../io/FileOutput.hpp"
 #include "../io/Header.hpp"
-#include "../io/Input.hpp"
-#include "../io/Output.hpp"
 #include "../io/Unit.hpp"
 #include "../io/UnitConverter.hpp"
 #include "../io/UnitSet.hpp"

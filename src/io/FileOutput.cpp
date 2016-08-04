@@ -25,20 +25,22 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "Block.hpp"
-#include "HDF5tools.hpp"
-#include "Header.hpp"
-#include "MPIGlobal.hpp"
-#include "MPIMethods.hpp"
-#include "Output.hpp"
-#include <hdf5.h>
-#include <iostream>
+#include "FileOutput.hpp"
+#include "Block.hpp"       // for Block
+#include "HDF5tools.hpp"   // for write_attribute_scalar, etc
+#include "Header.hpp"      // for Header
+#include "MPIGlobal.hpp"   // for local_rank, rank, size
+#include "MPIMethods.hpp"  // for MyMPI_Allgather, etc
+#include "Unit.hpp"        // for Unit
+#include <cstddef>         // for NULL
+#include <iostream>        // for operator<<, basic_ostream, etc
 #include <sstream>
-#include <vector>
+#include <string>  // for operator<<, string
+#include <vector>  // for vector
 using namespace std;
 
 /**
-  * \brief Construct a FileOutput with the given name
+  * @brief Construct a FileOutput with the given name
   *
   * We check if the file can be created and in the process override a possibly
   * existing file with the same name.
@@ -46,7 +48,11 @@ using namespace std;
   * @param filename Name of the file (should end with .hdf5)
   */
 FileOutput::FileOutput(string filename) {
+#ifdef PYTHON_MODULE
+    int rank = 0;
+#else
     int rank = MPIGlobal::local_rank;
+#endif
     // check if we can open the file (and immediately overwrite it if it already
     // exists)
     if(!rank) {
@@ -63,7 +69,7 @@ FileOutput::FileOutput(string filename) {
 }
 
 /**
-  * \brief Write a Block to the HDF5 file.
+  * @brief Write a Block to the HDF5 file.
   *
   * The corresponding dataset in the file is first created by the process with
   * rank 0. Since we do not use parallel HDF5, we have to close and reopen the
@@ -74,12 +80,20 @@ FileOutput::FileOutput(string filename) {
   */
 void FileOutput::write(Block& block) {
     unsigned int blocksize = block.get_size();
+#ifdef PYTHON_MODULE
+    vector<unsigned int> blocksizes(1);
+    blocksizes[0] = blocksize;
+    int rank = 0;
+    int size = 1;
+    int lrank = 0;
+#else
     int rank = MPIGlobal::rank;
     int size = MPIGlobal::size;
     int lrank = MPIGlobal::local_rank;
     vector<unsigned int> blocksizes(size);
     MyMPI_Allgather(&blocksize, 1, MPI_UNSIGNED, &blocksizes[0], 1,
                     MPI_UNSIGNED);
+#endif
     for(int i = 0; i < size; i++) {
         if(i == lrank) {
             if(!lrank) {
@@ -175,21 +189,27 @@ void FileOutput::write(Block& block) {
                 }
             }
         }
+#ifndef PYTHON_MODULE
         // we have to wait for the previous process to close the file (because
         // opening a file that is already opened does result in errors)
         MyMPI_Barrier();
+#endif
     }
 }
 
 /**
-  * \brief Write a Header to the file
+  * @brief Write a Header to the file
   *
   * Only the process with rank 0 writes the header.
   *
   * @param header The Header to write to the file
   */
 void FileOutput::write_header(Header& header) {
+#ifdef PYTHON_MODULE
+    int rank = 0;
+#else
     int rank = MPIGlobal::local_rank;
+#endif
     // only process 0 writes the header
     if(!rank) {
         hid_t file = H5Fopen(_filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);

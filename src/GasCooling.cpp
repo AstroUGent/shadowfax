@@ -27,6 +27,7 @@
 #include "GasCooling.hpp"
 #include "Physics.hpp"
 #include "StateVector.hpp"
+#include "io/UnitConverter.hpp"
 #include <boost/math/special_functions/factorials.hpp>
 #include <cmath>
 #include <iostream>

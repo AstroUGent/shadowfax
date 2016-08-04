@@ -29,9 +29,9 @@
 // size of the look-up tables used to calculate the correction factors
 #define COSMOLOGY_TABLE_SIZE 1000
 
-#include "ParameterFile.hpp"
-#include "Vec.hpp"
+#include "Vec.hpp"  // for Vec
 
+class ParameterFile;
 class RestartFile;
 
 #define COSMOLOGY_DEFAULT_HUBBLE0 0.7

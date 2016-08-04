@@ -24,26 +24,8 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ColorMap.hpp"
-#include "DelCont.hpp"  // for DelCont
-#include "Error.hpp"    // for my_exit
-#include "Image.hpp"
-#include "MPIGlobal.hpp"              // for rank
-#include "StateVector.hpp"            // for StateVector
-#include "Vec.hpp"                    // for Vec
-#include "utilities/GasParticle.hpp"  // for GasParticle
-#include "utilities/Particle.hpp"     // for Particle
-#include "utilities/Tree.hpp"         // for Tree
-#include <algorithm>                  // for min, max
-#include <cmath>                      // for log10, sqrt, M_PI
-#include <ext/alloc_traits.h>
-#include <iostream>  // for operator<<, ofstream, etc
-#include <sstream>
-#if ndim_ == 2
-#include "VorCell.hpp"  // for VorCell
-#include "VorFace.hpp"  // for VorFace
-#include "VorGen.hpp"   // for VorGen
-#include "VorTess.hpp"  // for VorTess
-#endif
+#include <fstream>
+#include <sstream>  // for operator<<, etc
 using namespace std;
 
 /**

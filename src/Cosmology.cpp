@@ -24,9 +24,10 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Cosmology.hpp"
-#include "GSL.hpp"
-#include "RestartFile.hpp"
-#include <cmath>
+#include "GSL.hpp"  // for qag
+#include "ParameterFile.hpp"
+#include "RestartFile.hpp"  // for RestartFile
+#include <cmath>            // for log, sqrt, exp
 
 /**
  * @brief Integrand for the correction factor used in the force equation

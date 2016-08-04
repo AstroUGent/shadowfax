@@ -25,19 +25,25 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "BlockICGenerator.hpp"
-#include "DelCont.hpp"
-#include "Error.hpp"
-#include "ICRegion.hpp"
-#include "VorCell.hpp"
-#include "VorTessManager.hpp"
-#include "utilities/DMParticle.hpp"
-#include "utilities/GasParticle.hpp"
-#include "utilities/ParticleVector.hpp"
-#include "utilities/Tree.hpp"
-#include <boost/algorithm/string.hpp>
-#include <boost/optional/optional.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+#include "DelCont.hpp"                         // for DelCont
+#include "Error.hpp"                           // for my_exit
+#include "ICGenerator.hpp"                     // for ICMode::IC_CART
+#include "ICRegion.hpp"                        // for ICRegion
+#include "MPIGlobal.hpp"                       // for size, rank
+#include "Vec.hpp"                             // for Vec
+#include "VorTessManager.hpp"                  // for VorTessManager
+#include "utilities/DMParticle.hpp"            // for DMParticle
+#include "utilities/GasParticle.hpp"           // for GasParticle
+#include "utilities/ParticleVector.hpp"        // for ParticleVector
+#include <algorithm>                           // for max
+#include <boost/algorithm/string/trim.hpp>     // for trim
+#include <boost/property_tree/xml_parser.hpp>  // for read_xml
+#include <fstream>   // for operator<<, basic_ostream, etc
+#include <iostream>  // for cout, cerr
+#include <math.h>    // for round
+#include <sstream>   // for basic_stringbuf<>::int_type, etc
+#include <stdlib.h>  // for RAND_MAX, rand, srand, NULL
+#include <utility>   // for pair
 using namespace std;
 
 /**

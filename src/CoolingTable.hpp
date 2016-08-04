@@ -26,20 +26,14 @@
  */
 #ifndef COOLINGTABLE_HPP
 #define COOLINGTABLE_HPP
-#include "io/Unit.hpp"
-#include "io/UnitSet.hpp"
-#include <NDIrregTable.hpp>
-#include <NDTable.hpp>
-#include <dirent.h>
-#include <dirent.h>
-#include <iostream>
-#include <set>
-#include <sstream>
-#include <string>
-#include <vector>
-using namespace std;
 
+#include <string>  // for string
+#include <vector>  // for vector
+
+class FiveDTable;
 class RestartFile;
+class ThreeDIrregTable;
+class UnitSet;
 
 /**
   * @brief Class that calculates cooling rate for a given Fe, Mg, z, T and n
@@ -66,10 +60,10 @@ class CoolingTable {
     /*! @brief Maximum redshift value that is tabulated */
     double _z_max;
 
-    vector<string> get_file_list(string directory);
+    std::vector<std::string> get_file_list(std::string directory);
 
   public:
-    CoolingTable(string directory, UnitSet* simulation_units);
+    CoolingTable(std::string directory, UnitSet* simulation_units);
     ~CoolingTable();
 
     double get_value(double Fe, double Mg, double rs, double n, double T);

@@ -26,15 +26,17 @@
  */
 #include "CoolingTable.hpp"
 #include "CoolingLocation.hpp"
-#include "Error.hpp"
-#include <boost/algorithm/string.hpp>
-#include <fstream>
-#include <math.h>
-#include <set>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "Error.hpp"         // for my_exit
+#include "NDIrregTable.hpp"  // for ThreeDIrregTable
+#include "NDTable.hpp"       // for FiveDTable
+#include <algorithm>         // for min
+#include <dirent.h>          // for closedir, opendir, readdir, etc
+#include <iostream>          // for operator<<, basic_ostream, etc
+#include <stddef.h>          // for NULL
+#include <string>            // for string, allocator, etc
+#include <vector>            // for vector
 using namespace std;
+
 /**
  * @brief Cooling Table file scanner
  *

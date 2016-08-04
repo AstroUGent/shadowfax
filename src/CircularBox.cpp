@@ -24,10 +24,8 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "CircularBox.hpp"
-#include "VorGen.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
+#include "VorGen.hpp"  // for VorGen
+#include <cmath>       // for sqrt
 using namespace std;
 
 /**

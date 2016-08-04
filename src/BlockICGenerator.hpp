@@ -27,12 +27,13 @@
 #ifndef BLOCKICGENERATOR_HPP
 #define BLOCKICGENERATOR_HPP
 
-#include "ICGenerator.hpp"
-#include <string>
-#include <vector>
+#include "ICGenerator.hpp"  // for ICGenerator, etc
+#include <string>           // for string
+#include <vector>           // for vector
 
 class DelCont;
 class ICRegion;
+class ParticleVector;
 class Vec;
 
 /**

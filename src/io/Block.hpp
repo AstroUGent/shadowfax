@@ -31,7 +31,7 @@
 #include <vector>
 
 /**
-  * \brief A block of data to be written to or read from a snapshot file
+  * @brief A block of data to be written to or read from a snapshot file
   *
   * A Block represents a chunk of data that can be written to a snapshot file
   * or read from it. The data is stored in columns, every column has a header
@@ -42,25 +42,25 @@
   */
 class Block {
   private:
-    /*! \brief The name of the Block */
+    /*! @brief The name of the Block */
     std::string _name;
 
-    /*! \brief The header list of the Block */
+    /*! @brief The header list of the Block */
     std::vector<std::string> _headers;
 
-    /*! \brief The dimensions list of the Block (the dimensions of a given
+    /*! @brief The dimensions list of the Block (the dimensions of a given
      *  column are the number of values inside one cell of that column) */
     std::vector<unsigned int> _dimensions;
 
-    /*! \brief The internal data buffer of the Block */
+    /*! @brief The internal data buffer of the Block */
     std::vector<std::vector<double> > _data;
 
-    /*! \brief The index of the first uninitialized row in the internal data
+    /*! @brief The index of the first uninitialized row in the internal data
      *  buffer. If no uninitialized rows exist, this is equal to the column
      *  length */
     unsigned int _emptyline;
 
-    /*! \brief A vector with a Unit for every column in the Block */
+    /*! @brief A vector with a Unit for every column in the Block */
     std::vector<Unit> _units;
 
   public:

@@ -31,7 +31,7 @@
 class RestartFile;
 
 /**
-  * \brief Header information about a ParticleVector
+  * @brief Header information about a ParticleVector
   *
   * A Header contains important information about a ParticleVector that can be
   * directly written to a snapshot, like the total number of particle, the
@@ -42,47 +42,47 @@ class RestartFile;
   */
 class Header {
   private:
-    /*! \brief The total number of particles in the simulation */
+    /*! @brief The total number of particles in the simulation */
     unsigned int _npart;
 
-    /*! \brief The total number of gas, dm, and star particles in the
+    /*! @brief The total number of gas, dm, and star particles in the
      *  simulation */
     unsigned int _npartspec[PARTTYPE_COUNTER];
 
-    /*! \brief The number of dimensions of the simulation (2 or 3) */
+    /*! @brief The number of dimensions of the simulation (2 or 3) */
     unsigned int _ndim;
 
-    /*! \brief Origin and side of the simulation box */
+    /*! @brief Origin and side of the simulation box */
     double _box[ndim_ + ndim_];
 
-    /*! \brief The current time of the simulation */
+    /*! @brief The current time of the simulation */
     double _time;
 
-    /*! \brief Boolean specifying if the code is run with periodic or reflective
+    /*! @brief Boolean specifying if the code is run with periodic or reflective
      *  boundaries (0 = reflective, 1 = periodic) */
     unsigned int _periodic;
 
-    /*! \brief Boolean specifying if the code is run with a second or first
+    /*! @brief Boolean specifying if the code is run with a second or first
      *  order integration scheme (0 = first order, 1 = second order) */
     unsigned int _second_order;
 
-    /*! \brief Boolean specifying if the code is run with a static or a moving
+    /*! @brief Boolean specifying if the code is run with a static or a moving
      *  mesh (0 = static, 1 = moving) */
     unsigned int _static;
 
-    /*! \brief Boolean specifying if a global timestep is used (0 = individual
+    /*! @brief Boolean specifying if a global timestep is used (0 = individual
      *  timesteps, 1 = global timestep) */
     unsigned int _global_timestep;
 
-    /*! \brief Value used for the adiabatic index of the gas (not sure if this
+    /*! @brief Value used for the adiabatic index of the gas (not sure if this
      *  works correctly) */
     double _gamma;
 
-    /*! \brief Boolean specifying if the code is run with gravity or not (0 = no
+    /*! @brief Boolean specifying if the code is run with gravity or not (0 = no
      *  gravity, 1 = gravity) */
     unsigned int _gravity;
 
-    /*! \brief Value of the softening length for collisionless particles */
+    /*! @brief Value of the softening length for collisionless particles */
     double _hsoft;
 
   public:

@@ -29,12 +29,12 @@
 #include "Error.hpp"
 #include "Unit.hpp"     // for Unit, operator/
 #include "UnitSet.hpp"  // for UnitSet
+#include <cstddef>      // for NULL
 #include <iostream>     // for operator<<, basic_ostream, etc
-#include <stddef.h>     // for NULL
 #include <string>       // for string, operator==, etc
 
 /**
-  * \brief Class that generates a UnitSet based on an input string
+  * @brief Class that generates a UnitSet based on an input string
   */
 class UnitSetGenerator {
   public:

@@ -325,7 +325,9 @@ void Header::check_makeflags() {
   */
 unsigned int Header::npart() {
     if(!_npart) {
-        _npart = _npartspec[0] + _npartspec[1];
+        for(unsigned int i = PARTTYPE_COUNTER; i--;) {
+            _npart += _npartspec[i];
+        }
     }
     return _npart;
 }
@@ -336,7 +338,7 @@ unsigned int Header::npart() {
   * @return The number of gas particles in the simulation
   */
 unsigned int Header::ngaspart() {
-    return _npartspec[0];
+    return _npartspec[PARTTYPE_GAS];
 }
 
 /**
@@ -345,7 +347,7 @@ unsigned int Header::ngaspart() {
   * @return The number of DM particles in the simulation
   */
 unsigned int Header::ndmpart() {
-    return _npartspec[1];
+    return _npartspec[PARTTYPE_DM];
 }
 
 /**

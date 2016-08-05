@@ -31,22 +31,22 @@
 #include "UnitSet.hpp"
 
 /**
-  * \brief Representation of a physical constant.
+  * @brief Representation of a physical constant.
   *
   * The constant has a value and a Unit, such that we can easily
   * convert from one set of units to another.
   */
 class PhysicalConstant {
   private:
-    /*! \brief Value of the physical constant */
+    /*! @brief Value of the physical constant */
     double _value;
 
-    /*! \brief Unit of the physical constant */
+    /*! @brief Unit of the physical constant */
     Unit _unit;
 
   public:
     /**
-      * \brief Construct a physical constant with a Unit and a value
+      * @brief Construct a physical constant with a Unit and a value
       *
       * @param value Value of the physical constant
       * @param unit Unit of the physical constant
@@ -55,7 +55,7 @@ class PhysicalConstant {
             : _value(value), _unit(unit) {}
 
     /**
-      * \brief Get the raw value of the physical constant
+      * @brief Get the raw value of the physical constant
       *
       * This function totally disregards the Unit of the physical constant, so
       * it is unsafe to use.
@@ -67,7 +67,7 @@ class PhysicalConstant {
     }
 
     /**
-      * \brief Get the raw value of the Unit associated to this physical
+      * @brief Get the raw value of the Unit associated to this physical
       * constant
       *
       * This function can be used together with the get_value() function to make
@@ -80,7 +80,7 @@ class PhysicalConstant {
     }
 
     /**
-      * \brief Get the value of the physical constant in the specified system of
+      * @brief Get the value of the physical constant in the specified system of
       * units
       *
       * The function determines what the Unit for the physical constant is in

@@ -34,53 +34,55 @@
 #include <vector>    // for vector
 
 /**
-  * \brief Convenient aliases for the HDF5 datatypes
+  * @brief Convenient aliases for the HDF5 datatypes
   */
 namespace HDF5types {
-/*! \brief Boolean representation: a native 32-bit unsigned integer */
+/*! @brief Boolean representation: a native 32-bit unsigned integer */
 static const hid_t BOOL __attribute__((used)) = H5T_NATIVE_UINT32;
-/*! \brief Double precision floating point representation: a native 64-bit
+/*! @brief Double precision floating point representation: a native 64-bit
  *  double */
 static const hid_t DOUBLE __attribute__((used)) = H5T_NATIVE_DOUBLE;
-/*! \brief Unsigned integer representation: a native 32-bit unsigned integer */
+/*! @brief Unsigned integer representation: a native 32-bit unsigned integer */
 static const hid_t UINT __attribute__((used)) = H5T_NATIVE_UINT32;
-/*! \brief Single precision floating point representation: a native 32-bit
+/*! @brief Single precision floating point representation: a native 32-bit
  *  float */
 static const hid_t FLOAT __attribute__((used)) = H5T_NATIVE_FLOAT;
-/*! \brief Unsigned long representation: a native 64-bit unsigned integer */
+/*! @brief Unsigned long representation: a native 64-bit unsigned integer */
 static const hid_t ULONG __attribute__((used)) = H5T_NATIVE_UINT64;
-/*! \brief Integer representation: a native 32-bit integer */
+/*! @brief Integer representation: a native 32-bit integer */
 static const hid_t INT __attribute__((used)) = H5T_NATIVE_INT32;
 }
 
 /**
-  * \brief Convenient aliases for HDF5 constants
+  * @brief Convenient aliases for HDF5 constants
   */
 namespace HDF5constants {
-/*! \brief The default property list used if properties are required */
+/*! @brief The default property list used if properties are required */
 static const hid_t DEFAULT_PROPERTY_LIST __attribute__((used)) = H5P_DEFAULT;
-/*! \brief Overwrite existing files when creating a new HDF5 file */
-static const hid_t OVERWRITE_EXISTING_FILES __attribute__((used)) = H5F_ACC_TRUNC;
-/*! \brief Open a HDF5 file in read/write modus */
+/*! @brief Overwrite existing files when creating a new HDF5 file */
+static const hid_t OVERWRITE_EXISTING_FILES __attribute__((used)) =
+        H5F_ACC_TRUNC;
+/*! @brief Open a HDF5 file in read/write modus */
 static const hid_t READWRITE __attribute__((used)) = H5F_ACC_RDWR;
-/*! \brief Open a HDF5 file in read only modus */
+/*! @brief Open a HDF5 file in read only modus */
 static const hid_t READONLY __attribute__((used)) = H5F_ACC_RDONLY;
-/*! \brief Use the entire dataspace of the dataset or attribute as file space or
+/*! @brief Use the entire dataspace of the dataset or attribute as file space or
  *  memory space during read/write operations */
 static const hid_t COMPLETE_DATASPACE __attribute__((used)) = H5S_ALL;
 
-/*! \brief Intialize a new selection when selecting hyperslabs of dataspaces */
-static const H5S_seloper_t SET_NEW_SELECTION __attribute__((used)) = H5S_SELECT_SET;
-/*! \brief Select a continuous block in the dataspace during hyperslab
+/*! @brief Intialize a new selection when selecting hyperslabs of dataspaces */
+static const H5S_seloper_t SET_NEW_SELECTION __attribute__((used)) =
+        H5S_SELECT_SET;
+/*! @brief Select a continuous block in the dataspace during hyperslab
  *  selection */
 static const hsize_t* CONTINUOUS_SELECTION __attribute__((used)) = NULL;
-/*! \brief Return single element blocks when selecting hyperslabs of
+/*! @brief Return single element blocks when selecting hyperslabs of
  *  dataspaces */
 static const hsize_t* SINGLE_ELEMENT_BLOCKS __attribute__((used)) = NULL;
 }
 
 /**
-  * \brief Simplified wrappers around low level HDF5 API functions
+  * @brief Simplified wrappers around low level HDF5 API functions
   */
 namespace HDF5tools {
 // if you remove any of the "inline" qualifiers, the code below will
@@ -89,7 +91,7 @@ namespace HDF5tools {
 // write functions
 
 /**
-  * \brief Write a scalar attribute to the specified group or dataset
+  * @brief Write a scalar attribute to the specified group or dataset
   *
   * The method creates the appropriate memory space and then creates the
   * attribute. Both the memory space and the attribute are also closed again.
@@ -145,7 +147,7 @@ inline void write_attribute_scalar(hid_t group, std::string name, hid_t type,
 }
 
 /**
-  * \brief Write an array attribute to the specified group or dataset
+  * @brief Write an array attribute to the specified group or dataset
   *
   * The method creates the appropriate memory space and then creates the
   * attribute. Both the memory space and the attribute are also closed again.
@@ -204,7 +206,7 @@ inline void write_attribute_array(hid_t group, unsigned int length,
 }
 
 /**
-  * \brief Write a string attribute to the specified group or dataset
+  * @brief Write a string attribute to the specified group or dataset
   *
   * Writing variable size strings requires the creation of the appropriate
   * HDF5 data type. The function then creates the appropriate memory space
@@ -285,7 +287,7 @@ inline void write_attribute_string(hid_t group, std::string name,
 }
 
 /**
-  * \brief Write an array attribute to the specified group or dataset
+  * @brief Write an array attribute to the specified group or dataset
   *
   * The method creates the appropriate memory space and then creates the
   * attribute. Both the memory space and the attribute are also closed again.
@@ -344,7 +346,7 @@ inline void write_attribute_array(hid_t group, std::string name, hid_t type,
 }
 
 /**
-  * \brief Write an array attribute to the specified group or dataset
+  * @brief Write an array attribute to the specified group or dataset
   *
   * The method creates the appropriate memory space and then creates the
   * attribute. Both the memory space and the attribute are also closed again.
@@ -406,7 +408,7 @@ inline void write_attribute_array(hid_t group, std::string name, hid_t type,
 }
 
 /**
-  * \brief Write a scalar dataset to the specified group
+  * @brief Write a scalar dataset to the specified group
   *
   * The method creates the dataset, writes the data to it and then closes it
   * again.
@@ -467,7 +469,7 @@ inline void write_dataset_scalar(hid_t group, std::string name, hid_t type,
 }
 
 /**
-  * \brief Write a vector dataset to the specified group
+  * @brief Write a vector dataset to the specified group
   *
   * The method creates the dataset, writes the data to it and then closes it
   * again. The data is assumed to have a length that is a multiple of 3, wherein
@@ -756,7 +758,7 @@ inline void write_dataset_vector_chunk(hid_t dataset, hid_t type,
 /// read functions
 
 /**
-  * \brief Read an array or scalar attribute from the specified group or dataset
+  * @brief Read an array or scalar attribute from the specified group or dataset
   *
   * The attribute is opened, read and closed again.
   *
@@ -795,7 +797,7 @@ inline void read_attribute(hid_t group, std::string name, hid_t type,
 }
 
 /**
-  * \brief Read a string attribute from the specified group or dataset
+  * @brief Read a string attribute from the specified group or dataset
   *
   * Handling variable size strings with HDF5 requires the creation
   * of a specific string data type. The attribute is opened and the
@@ -869,7 +871,7 @@ inline std::string read_attribute_string(hid_t group, std::string name) {
 }
 
 /**
-  * \brief Read a scalar attribute from the specified group or dataset
+  * @brief Read a scalar attribute from the specified group or dataset
   *
   * The attribute is opened, read and closed again and its value is returned.
   *
@@ -912,7 +914,7 @@ inline T read_attribute_scalar(hid_t group, std::string name, hid_t type) {
 }
 
 /**
-  * \brief Read a vector attribute from the specified group or dataset
+  * @brief Read a vector attribute from the specified group or dataset
   *
   * The attribute is opened, read and closed again and its value is returned.
   * If a single attribute is found, it is returned as a std::vector with a
@@ -987,7 +989,7 @@ inline std::vector<T> read_attribute_vector(hid_t group, std::string name,
 }
 
 /**
-  * \brief Read a scalar dataset from the specified group
+  * @brief Read a scalar dataset from the specified group
   *
   * The dataset is opened, its dimensions are read and used to create a
   * std::vector in which the dataset contents are stored.
@@ -1058,7 +1060,7 @@ inline std::vector<T> read_dataset_scalar(hid_t group, std::string name,
 }
 
 /**
-  * \brief Read a scalar dataset chunk from the specified group
+  * @brief Read a scalar dataset chunk from the specified group
   *
   * The dataset is opened, its dimensions are read and used to create a
   * std::vector in which the dataset contents are stored.
@@ -1153,7 +1155,7 @@ inline std::vector<T> read_dataset_scalar_chunk(hid_t group,
 }
 
 /**
-  * \brief Read a vector dataset from the specified group
+  * @brief Read a vector dataset from the specified group
   *
   * The dataset is opened, its dimensions are read and used to create a
   * std::vector in which the dataset contents are stored. No assumptions
@@ -1228,7 +1230,7 @@ inline std::vector<T> read_dataset_vector(hid_t group, std::string name,
 }
 
 /**
-  * \brief Read a vector dataset chunk from the specified group
+  * @brief Read a vector dataset chunk from the specified group
   *
   * The dataset is opened, its dimensions are read and used to create a
   * std::vector in which the dataset contents are stored. No assumptions
@@ -1440,7 +1442,7 @@ inline bool dataset_has_type(hid_t group, std::string name, hid_t type) {
 }
 
 /**
-  * \brief Determine the size of the attribute of the given group with the given
+  * @brief Determine the size of the attribute of the given group with the given
   * name
   *
   * @param group HDF5 id of a group or dataset
@@ -1500,7 +1502,7 @@ inline unsigned int get_attribute_size(hid_t group, std::string name) {
 }
 
 /**
-  * \brief Check if the given group has a child with the given name
+  * @brief Check if the given group has a child with the given name
   *
   * @param group HDF5 id of a group
   * @param name Name of a dataset or attribute

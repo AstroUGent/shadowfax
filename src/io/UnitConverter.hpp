@@ -31,14 +31,14 @@
 #include <string>    // for operator<<, string
 
 /**
-  * \brief Convert from one Unit to another.
+  * @brief Convert from one Unit to another.
   *
   * This is of course only possible if both units are compatible, i.e. if the
   * quantities of both units are the same.
   */
 class UnitConverter {
   private:
-    /*! \brief Conversion factor that converts the SI-value of one Unit to that
+    /*! @brief Conversion factor that converts the SI-value of one Unit to that
      *  of another */
     double _conversion_factor;
 

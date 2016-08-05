@@ -63,33 +63,33 @@ class StarParticle;
  */
 class ParticleVector {
   private:
-    /*! \brief List of particles */
+    /*! @brief List of particles */
     std::vector<Particle*> _particles;
 
-    /*! \brief Offsets of the different particle types in the internal particle
+    /*! @brief Offsets of the different particle types in the internal particle
      *  vector */
     unsigned int _offsets[PARTTYPE_COUNTER];
 
-    /*! \brief Sizes of the different particle types on the local process */
+    /*! @brief Sizes of the different particle types on the local process */
     unsigned int _sizes[PARTTYPE_COUNTER + 1];
 
-    /*! \brief The number of active particles at the current system time */
+    /*! @brief The number of active particles at the current system time */
     unsigned int _numactive;
 
-    /*! \brief Octtree used for neighbour searches and tree walks */
+    /*! @brief Octtree used for neighbour searches and tree walks */
     Tree _tree;
 
-    /*! \brief RectangularBox specifying the dimensions of the enclosing box
+    /*! @brief RectangularBox specifying the dimensions of the enclosing box
      *  that contains all particles */
     RectangularBox _container;
 
-    /*! \brief Header containing global information on all particles over all
+    /*! @brief Header containing global information on all particles over all
      *  MPI processes, used to write Header information to snapshot files */
     Header _header;
 
-    /*! \brief Timer used to quantify the time spent in sorting */
+    /*! @brief Timer used to quantify the time spent in sorting */
     Timer _sorttimer;
-    /*! \brief Timer used to quantify the time spent in tree building */
+    /*! @brief Timer used to quantify the time spent in tree building */
     Timer _treetimer;
 
     /**

@@ -39,7 +39,7 @@
 class RestartFile;
 
 /**
- * \brief Representation of a particle
+ * @brief Representation of a particle
  *
  * A Particle has properties like a position, a velocity and an acceleration and
  * offers an interface to some mass variable.
@@ -48,38 +48,38 @@ class RestartFile;
 class Particle : public Hilbert_Object {
 
   protected:
-    /*! \brief Position of the particle */
+    /*! @brief Position of the particle */
     Vec _x;
 
-    /*! \brief Velocity of the particle */
+    /*! @brief Velocity of the particle */
     Vec _v;
 
-    /*! \brief Gravitational acceleration of the particle */
+    /*! @brief Gravitational acceleration of the particle */
     Vec _a_grav_new;
 
-    /*! \brief Norm of the gravitational acceleration during the previous
+    /*! @brief Norm of the gravitational acceleration during the previous
      *  integration timestep */
     double _old_a;
 
-    /*! \brief Unique identifier for this Particle */
+    /*! @brief Unique identifier for this Particle */
     unsigned long _id;
 
-    /*! \brief Time on the integer timeline of the beginning of the current
+    /*! @brief Time on the integer timeline of the beginning of the current
      *   timestep */
     unsigned long _starttime;
 
-    /*! \brief Time on the integer timeline of the end of the current
+    /*! @brief Time on the integer timeline of the end of the current
      *  timestep */
     unsigned long _endtime;
 
-    /*! \brief Computational cost of the gravitational treewalk during the
+    /*! @brief Computational cost of the gravitational treewalk during the
      *  previous timestep, used for load-balancing */
     unsigned int _comp_cost;
 
-    /*! \brief Gravitational potential energy of the particle */
+    /*! @brief Gravitational potential energy of the particle */
     double _epot;
 
-    /*! \brief Gravitational softening length of the particle */
+    /*! @brief Gravitational softening length of the particle */
     double _hsoft;
 
   public:
@@ -89,7 +89,7 @@ class Particle : public Hilbert_Object {
     virtual ~Particle() {}
 
     /**
-      * \brief Convenience function to distinguish between different
+      * @brief Convenience function to distinguish between different
       * implementations of Particle
       */
     virtual ParticleType type() = 0;
@@ -103,7 +103,7 @@ class Particle : public Hilbert_Object {
     double pos(int index);
 
     /**
-      * \brief Get the position of the particle
+      * @brief Get the position of the particle
       *
       * @return Vec containing the position of the particle
       */
@@ -138,7 +138,7 @@ class Particle : public Hilbert_Object {
     void set_starttime(unsigned long integertime);
 
     /**
-      * \brief Set the gravitational acceleration of the particle
+      * @brief Set the gravitational acceleration of the particle
       *
       * @param a_grav New gravitational acceleration for the particle
       */
@@ -151,7 +151,7 @@ class Particle : public Hilbert_Object {
     void set_old_acceleration(double a_grav);
 
     /**
-      * \brief Get the norm of the gravitational acceleration during the
+      * @brief Get the norm of the gravitational acceleration during the
       * previous integration timestep
       *
       * @return The norm of the gravitational acceleration during the previous

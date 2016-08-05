@@ -280,12 +280,12 @@ void GasParticle::set_total_area(double total_area) {
  */
 void GasParticle::apply_gravity(double dt) {
 #define SCHEME3
-
-#ifdef SCHEME1
     // don't add gravity to vacuum cells
     if(!_Q[0]) {
         return;
     }
+
+#ifdef SCHEME1
 #if ndim_ == 3
     _Q[4] -= 0.5 * (_Q[1] * _Q[1] + _Q[2] * _Q[2] + _Q[3] * _Q[3]) / _Q[0];
 #else
@@ -747,6 +747,7 @@ GasParticle::GasParticle(void* buffer, int bufsize, int* position)
     MyMPI_Unpack(buffer, bufsize, position, &_max_radius, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_centroid[0], ndim_, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_total_area, 1, MPI_DOUBLE);
+    MyMPI_Unpack(buffer, bufsize, position, &_real_dt, 1, MPI_DOUBLE);
     _vorgen = NULL;
     _vorgenid = 0;
     _copies.push_back(0);
@@ -756,7 +757,6 @@ GasParticle::GasParticle(void* buffer, int bufsize, int* position)
         _exports[i] = false;
     }
     _max_mach = 0.;
-    _real_dt = 0.;
 }
 
 /**
@@ -782,6 +782,7 @@ void GasParticle::pack_data(void* buffer, int bufsize, int* position) {
     MyMPI_Pack(&_max_radius, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_centroid[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_total_area, 1, MPI_DOUBLE, buffer, bufsize, position);
+    MyMPI_Pack(&_real_dt, 1, MPI_DOUBLE, buffer, bufsize, position);
 }
 
 /**
@@ -818,9 +819,7 @@ void GasParticle::dump(RestartFile& rfile) {
     rfile.write(_eta);
     rfile.write(_total_area);
 
-    // we do not need to dump _real_dt, since it is only used during the
-    // timestep calculation (which does not conflict with restarting)
-    //    rfile.write(_real_dt);
+    rfile.write(_real_dt);
 }
 
 /**
@@ -857,8 +856,7 @@ GasParticle::GasParticle(RestartFile& rfile) : Particle(rfile) {
     rfile.read(_eta);
     rfile.read(_total_area);
 
-    // we do not dump _real_dt, see above
-    //    rfile.read(_real_dt);
+    rfile.read(_real_dt);
 }
 
 /**

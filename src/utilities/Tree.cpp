@@ -82,7 +82,7 @@ Tree::Tree(Cuboid box, bool periodic, bool do_ewald, double alpha,
  */
 Tree::~Tree() {
     delete _root;
-    // _root contains all implementations of =Node
+    // _root contains all implementations of Node
     // ExportNode is no implementation of Node and has to be deleted
     // seperately
     for(unsigned int i = _exportnodes.size(); i--;) {
@@ -485,7 +485,7 @@ void Tree::get_neighbours(Vec& coords, double radius,
 
 /**
  * @brief Get the neighbours inside the sphere with given origin and radius that
- * lie inside on of the periodic or reflective copies of the box in which the
+ * lie inside one of the periodic or reflective copies of the box in which the
  * tree is embedded, but not in the box itself
  *
  * @param coords Origin of the search sphere

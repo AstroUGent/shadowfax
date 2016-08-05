@@ -39,10 +39,10 @@
  */
 class Cuboid {
   private:
-    /*! \brief Bottom left (front) corner of the box */
+    /*! @brief Bottom left (front) corner of the box */
     Vec _anchor;
 
-    /*! \brief Sides of the box */
+    /*! @brief Sides of the box */
     Vec _sides;
 
   public:

@@ -33,14 +33,14 @@
 class RestartFile;
 
 /**
-  * \brief Representation of a cold dark matter particle
+  * @brief Representation of a cold dark matter particle
   *
   * A dark matter particle extends Particle with a mass and only interacts
   * through gravity
   */
 class DMParticle : public Particle {
   private:
-    /*! \brief Mass of the dark matter particle */
+    /*! @brief Mass of the dark matter particle */
     double _mass;
 
   public:
@@ -50,7 +50,7 @@ class DMParticle : public Particle {
     virtual ~DMParticle() {}
 
     /**
-      * \brief Mark this Particle as a dark matter particle
+      * @brief Mark this Particle as a dark matter particle
       *
       * @return PARTTYPE_DM
       */
@@ -61,7 +61,7 @@ class DMParticle : public Particle {
     void set_mass(double mass);
 
     /**
-      * \brief Get the mass of the dark matter particle
+      * @brief Get the mass of the dark matter particle
       *
       * @return The mass of the dark matter particle
       */

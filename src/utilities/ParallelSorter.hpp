@@ -38,10 +38,10 @@
  */
 class Splitter {
   private:
-    /*! \brief Hilbert key at which the split is performed */
+    /*! @brief Hilbert key at which the split is performed */
     unsigned long _key;
 
-    /*! \brief Index of the key if multiple objects with the same key exist */
+    /*! @brief Index of the key if multiple objects with the same key exist */
     unsigned int _index;
 
   public:

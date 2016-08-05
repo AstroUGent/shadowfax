@@ -38,15 +38,15 @@
 class TreeRoute {
   private:
 #if ndim_ == 3
-    /*! \brief Indices of the child nodes per level of the tree */
+    /*! @brief Indices of the child nodes per level of the tree */
     unsigned int _path[20];
 #else
-    /*! \brief Indices of the child nodes per level of the tree */
+    /*! @brief Indices of the child nodes per level of the tree */
     unsigned int _path[30];
 #endif
-    /*! \brief Current level in the tree */
+    /*! @brief Current level in the tree */
     unsigned int _curpos;
-    /*! \brief Total length of the route in levels of the tree */
+    /*! @brief Total length of the route in levels of the tree */
     unsigned int _length;
 
   public:

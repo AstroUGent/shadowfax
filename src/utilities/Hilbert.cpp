@@ -318,7 +318,7 @@ static const unsigned long placeholder = ((unsigned long)1) << 60;
 //#endif
 
 /**
-  * \brief Convert integer coordinates to a key of given length
+  * @brief Convert integer coordinates to a key of given length
   *
   * This function takes an array of 2 or 3 integer type coordinates
   * and converts them to a hilbert key with the desired length.
@@ -358,7 +358,7 @@ unsigned long HB::get_key(unsigned long* bits, unsigned int nbits) {
 }
 
 /**
-  * \brief Convert a key of given length to integer coordinates
+  * @brief Convert a key of given length to integer coordinates
   *
   * This function takes a key of given length and calculates integer
   * coordinates from this key, so that evaluation of this function on
@@ -390,7 +390,7 @@ void HB::get_coords(unsigned long key, unsigned int nbits,
 }
 
 /**
-  * \brief Calculate the neighbouring keys for the given integer coordinates on
+  * @brief Calculate the neighbouring keys for the given integer coordinates on
   * a given level and with a given length
   *
   * This function is equivalent to HB::get_key, but then not only for the given
@@ -445,7 +445,7 @@ void HB::get_ngb_keys(unsigned long* bits, unsigned int nbits,
 }
 
 /**
-  * \brief Convert a hilbert key to a TreeRoute
+  * @brief Convert a hilbert key to a TreeRoute
   *
   * This function takes a hilbert key and converts it to a roadmap for Tree
   * traversal that leads to the block pointed to by the key. This roadmap is
@@ -472,7 +472,7 @@ TreeRoute HB::get_route_to_node(unsigned long key) {
 }
 
 /**
-  * \brief Sort hilbert objects along a space filling curve
+  * @brief Sort hilbert objects along a space filling curve
   *
   * Sort function that can be used in combination with std::sort to sort
   * Hilbert_Object objects. If you want to be able to sort objects in this way,
@@ -488,7 +488,7 @@ bool HB::sortfunc(Hilbert_Object* a, Hilbert_Object* b) {
 }
 
 /**
-  * \brief Empty Hilbert_Object constructor
+  * @brief Empty Hilbert_Object constructor
   *
   * Initialize a Hilbert_Object with key 0.
   */
@@ -497,7 +497,7 @@ Hilbert_Object::Hilbert_Object() {
 }
 
 /**
-  * \brief Set the hilbert key of a Hilbert_Object
+  * @brief Set the hilbert key of a Hilbert_Object
   *
   * @param key A hilbert key
   */
@@ -506,7 +506,7 @@ void Hilbert_Object::set_key(unsigned long key) {
 }
 
 /**
-  * \brief Access the hilbert key of the Hilbert_Object
+  * @brief Access the hilbert key of the Hilbert_Object
   *
   * @return The hilbert key of the Hilbert_Object
   */

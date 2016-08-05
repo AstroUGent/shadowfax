@@ -36,10 +36,10 @@
  */
 class Box {
   private:
-    /*! \brief Bottom left (front) corner of the box */
+    /*! @brief Bottom left (front) corner of the box */
     Vec _anchor;
 
-    /*! \brief Side length of the box */
+    /*! @brief Side length of the box */
     double _side;
 
   public:

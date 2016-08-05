@@ -38,7 +38,7 @@ class VorCell;
 class VorGen;
 
 /**
-  * \brief Representation of a gas particle (in SPH style thinking)
+  * @brief Representation of a gas particle (in SPH style thinking)
   *
   * The particle is in fact a voronoi grid cell, its position is the position of
   * the mesh generator. For most purposes however, it is easier to think of the
@@ -46,88 +46,88 @@ class VorGen;
   */
 class GasParticle : public Particle {
   private:
-    /*! \brief Gravitational acceleration from the previous timestep */
+    /*! @brief Gravitational acceleration from the previous timestep */
     Vec _a_grav_old;
 
-    /*! \brief Soundspeed of the gas */
+    /*! @brief Soundspeed of the gas */
     double _csnd;
 
-    /*! \brief Pointer to the VorGen that generates the current VorCell
+    /*! @brief Pointer to the VorGen that generates the current VorCell
      *  associated to the gas particle */
     VorGen* _vorgen;
 
-    /*! \brief Index of the VorGen associated with this particle in the
+    /*! @brief Index of the VorGen associated with this particle in the
      *  DelTess VorGen list */
     unsigned int _vorgenid;
 
-    /*! \brief Conserved quantities of the previous timestep */
+    /*! @brief Conserved quantities of the previous timestep */
     StateVector _old_Q;
 
-    /*! \brief Size of the voronoi cell (assuming a sphere with the same volume
+    /*! @brief Size of the voronoi cell (assuming a sphere with the same volume
      *  as the cell) */
     double _h;
 
-    /*! \brief Vector holding an integer for every MPI process specifying which
+    /*! @brief Vector holding an integer for every MPI process specifying which
      *  periodic/reflective copies of the particle already exist */
     std::vector<unsigned int> _copies;
 
-    /*! \brief Booleans specifying to which MPI processes this particle was
+    /*! @brief Booleans specifying to which MPI processes this particle was
      *  already exported */
     bool* _exports;
 
-    /*! \brief Primitive variables (density, velocity and pressure) for the
+    /*! @brief Primitive variables (density, velocity and pressure) for the
      *  gas */
     StateVector _W;
 
-    /*! \brief Conserved quantities (mass, momentum and energy) for the gas */
+    /*! @brief Conserved quantities (mass, momentum and energy) for the gas */
     StateVector _Q;
 
-    /*! \brief Integrated fluxes for the conserved quantities during the current
+    /*! @brief Integrated fluxes for the conserved quantities during the current
      *  timestep */
     StateVector _dQ;
 
-    /*! \brief Gravitational energy flux through the faces during the current
+    /*! @brief Gravitational energy flux through the faces during the current
      *  timestep */
     Vec _delta_E_grav;
 
-    /*! \brief Gradients for the primitive variables in the cell */
+    /*! @brief Gradients for the primitive variables in the cell */
     StateVector _gradientvecs[ndim_];
 
-    /*! \brief Radius used to search for neighbours to complete the VorCell
+    /*! @brief Radius used to search for neighbours to complete the VorCell
      *  associated to this particle */
     double _max_radius;
 
-    /*! \brief Flag marking this particle as a pseudo particle */
+    /*! @brief Flag marking this particle as a pseudo particle */
     bool _is_pseudo;
 
-    /*! \brief Velocity for a Springel like regularization algorithm */
+    /*! @brief Velocity for a Springel like regularization algorithm */
     Vec _mesh_v;
 
-    /*! \brief Mass for a Springel like regularization algorithm */
+    /*! @brief Mass for a Springel like regularization algorithm */
     double _mesh_m;
 
-    /*! \brief Maximum Mach number occuring for all shockwaves in flux
+    /*! @brief Maximum Mach number occuring for all shockwaves in flux
      *  calculations for faces during the current timestep */
     double _max_mach;
 
-    /*! \brief Coordinates of the geometrical centroid of the latest Voronoi
+    /*! @brief Coordinates of the geometrical centroid of the latest Voronoi
      *  cell that was associated with this particle */
     Vec _centroid;
 
-    /*! \brief Index of the particle in the local ParticleVector */
+    /*! @brief Index of the particle in the local ParticleVector */
     unsigned int _local_id;
 
-    /*! \brief Factor for gravitational softening correction term */
+    /*! @brief Factor for gravitational softening correction term */
     double _eta;
 
-    /*! \brief Velocity of the particle during the previous timestep */
+    /*! @brief Velocity of the particle during the previous timestep */
     Vec _old_v;
 
-    /*! \brief Real timestep of the particle (as opposed to the integer value
+    /*! @brief Real timestep of the particle (as opposed to the integer value
      *  stored indirectly in Particle */
     double _real_dt;
 
-    /*! \brief Total surface area of the Voronoi cell associated with this
+    /*! @brief Total surface area of the Voronoi cell associated with this
      *  particle */
     double _total_area;
 
@@ -139,7 +139,7 @@ class GasParticle : public Particle {
     virtual ~GasParticle();
 
     /**
-      * \brief Mark this Particle as a GasParticle
+      * @brief Mark this Particle as a GasParticle
       *
       * @return PARTTYPE_GAS
       */
@@ -176,7 +176,7 @@ class GasParticle : public Particle {
     void set_mass(double mass);
 
     /**
-      * \brief Set the mass of the particle during the previous timestep
+      * @brief Set the mass of the particle during the previous timestep
       *
       * @param old_mass Value to store in the conserved quantities StateVector
       */
@@ -185,7 +185,7 @@ class GasParticle : public Particle {
     }
 
     /**
-      * \brief Get the mass of the particle
+      * @brief Get the mass of the particle
       *
       * The mass is the first component of the conserved quantities StateVector
       *
@@ -196,7 +196,7 @@ class GasParticle : public Particle {
     }
 
     /**
-      * \brief Get the mass of the particle during the previous timestep
+      * @brief Get the mass of the particle during the previous timestep
       *
       * @return The mass of the gas inside the Voronoi grid cell during the
       * previous timestep
@@ -252,7 +252,7 @@ class GasParticle : public Particle {
     //    void save_props_gadget(Block& block);
 
     /**
-      * \brief Set the gravitational acceleration of this particle
+      * @brief Set the gravitational acceleration of this particle
       *
       * The current gravitational acceleration is saved to another variable
       * before it is overwritten.
@@ -293,7 +293,7 @@ class GasParticle : public Particle {
  */
 class UpdateQException : public std::exception {
   private:
-    /*! \brief GasParticle throwing the exception */
+    /*! @brief GasParticle throwing the exception */
     GasParticle& _p;
 
   public:

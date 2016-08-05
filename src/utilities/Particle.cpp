@@ -29,7 +29,7 @@
 using namespace std;
 
 /**
- * \brief Construct a default empty Particle with id, position, velocity... set
+ * @brief Construct a default empty Particle with id, position, velocity... set
  * to zero
  */
 Particle::Particle() : Hilbert_Object() {
@@ -43,7 +43,7 @@ Particle::Particle() : Hilbert_Object() {
 }
 
 /**
- * \brief Construct a Particle with the given position and all other properties
+ * @brief Construct a Particle with the given position and all other properties
  * set to zero
  *
  * @param pos Vec containing the position of the particle
@@ -60,7 +60,7 @@ Particle::Particle(Vec pos) : Hilbert_Object() {
 }
 
 /**
- * \brief Get the x-coordinate of the position of the particle
+ * @brief Get the x-coordinate of the position of the particle
  *
  * @return The x-coordinate of the position of the particle
  */
@@ -69,7 +69,7 @@ double Particle::x() {
 }
 
 /**
- * \brief Get the y-coordinate of the position of the particle
+ * @brief Get the y-coordinate of the position of the particle
  *
  * @return The y-coordinate of the position of the particle
  */
@@ -78,7 +78,7 @@ double Particle::y() {
 }
 
 /**
- * \brief Get the z-coordinate of the position of the particle
+ * @brief Get the z-coordinate of the position of the particle
  *
  * This function only works properly when the code is compiled for 3D usage,
  * otherwise, it just returns 0.
@@ -94,7 +94,7 @@ double Particle::z() {
 }
 
 /**
- * \brief Get the specified coordinate of the position of the particle
+ * @brief Get the specified coordinate of the position of the particle
  *
  * Possible parameter values are dependent on the number of dimensions. Usage of
  * any other values will compile, but will also lead to strange bugs in your
@@ -110,7 +110,7 @@ double Particle::pos(int index) {
 }
 
 /**
-  * \brief Get the velocity of the particle
+  * @brief Get the velocity of the particle
   *
   * @return Vec containing the velocity of the particle
   */
@@ -119,7 +119,7 @@ Vec Particle::get_velocity() {
 }
 
 /**
- * \brief Get the x-component of the velocity of the particle
+ * @brief Get the x-component of the velocity of the particle
  *
  * @return The x-component of the velocity of the particle
  */
@@ -128,7 +128,7 @@ double Particle::vx() {
 }
 
 /**
- * \brief Get the y-component of the velocity of the particle
+ * @brief Get the y-component of the velocity of the particle
  *
  * @return The y-component of the velocity of the particle
  */
@@ -137,7 +137,7 @@ double Particle::vy() {
 }
 
 /**
- * \brief Get the z-component of the velocity of the particle
+ * @brief Get the z-component of the velocity of the particle
  *
  * This function only works properly when the code is compiled for 3D usage,
  * otherwise, it just returns 0.
@@ -153,7 +153,7 @@ double Particle::vz() {
 }
 
 /**
- * \brief Get the specified coordinate of the velocity of the particle
+ * @brief Get the specified coordinate of the velocity of the particle
  *
  * Possible parameter values are dependent on the number of dimensions. Usage of
  * any other values will compile, but will also lead to strange bugs in your
@@ -169,7 +169,7 @@ double Particle::vel(int index) {
 }
 
 /**
- * \brief Set the x-coordinate of the position of the particle
+ * @brief Set the x-coordinate of the position of the particle
  *
  * @param x The new x-coordinate for the position of the particle
  */
@@ -178,7 +178,7 @@ void Particle::set_x(double x) {
 }
 
 /**
- * \brief Set the y-coordinate of the position of the particle
+ * @brief Set the y-coordinate of the position of the particle
  *
  * @param y The new y-coordinate for the position of the particle
  */
@@ -187,7 +187,7 @@ void Particle::set_y(double y) {
 }
 
 /**
- * \brief Set the z-coordinate of the position of the particle
+ * @brief Set the z-coordinate of the position of the particle
  *
  * This function only works properly when the code is compiled for 3D usage.
  * Other uses will not result in compilation errors, but will lead to strange
@@ -200,7 +200,7 @@ void Particle::set_z(double z) {
 }
 
 /**
- * \brief Print the Particle to the given ostream
+ * @brief Print the Particle to the given ostream
  *
  * This method currently does nothing
  *
@@ -211,7 +211,7 @@ void Particle::print(ostream& stream) {
 }
 
 /**
-  * \brief Print the position and id of the particle to a line in the given
+  * @brief Print the position and id of the particle to a line in the given
   * stream
   *
   * The coordinates of the position are separated by tabs, there are always 3
@@ -225,7 +225,7 @@ void Particle::print_gen(ostream& stream) {
 }
 
 /**
-  * \brief Set the velocity of the particle
+  * @brief Set the velocity of the particle
   *
   * We always require 3 coordinates (even in the 2D case), but the third
   * coordinate is only used in the 3D case.
@@ -256,7 +256,7 @@ void Particle::set_velocity(Vec& v) {
 }
 
 /**
- * \brief Get the unique identifier for the Particle
+ * @brief Get the unique identifier for the Particle
  *
  * @return The id of the Particle
  */

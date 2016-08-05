@@ -28,14 +28,14 @@
 using namespace std;
 
 /**
-  * \brief Construct a default DMParticle with zero mass
+  * @brief Construct a default DMParticle with zero mass
   */
 DMParticle::DMParticle() : Particle() {
     _mass = 0.;
 }
 
 /**
-  * \brief Construct a DMParticle with given position and zero mass
+  * @brief Construct a DMParticle with given position and zero mass
   *
   * @param pos Position of the particle
   */
@@ -44,7 +44,7 @@ DMParticle::DMParticle(Vec pos) : Particle(pos) {
 }
 
 /**
-  * \brief Set the mass of the dark matter particle
+  * @brief Set the mass of the dark matter particle
   *
   * @param mass The mass of the dark matter particle
   */
@@ -53,7 +53,7 @@ void DMParticle::set_mass(double mass) {
 }
 
 /**
-  * \brief Construct a DMParticle from an MPI buffer (for parallellization
+  * @brief Construct a DMParticle from an MPI buffer (for parallellization
   * without boost)
   *
   * @param buffer Char buffer containing MPI packed data
@@ -67,7 +67,7 @@ DMParticle::DMParticle(void* buffer, int bufsize, int* position)
 }
 
 /**
-  * \brief Pack particle data into an MPI buffer (for parallellization without
+  * @brief Pack particle data into an MPI buffer (for parallellization without
   * boost)
   *
   * @param buffer Char buffer to write MPI packed data to

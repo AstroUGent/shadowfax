@@ -49,22 +49,22 @@ class VorGen;
  */
 class NodeInfo {
   private:
-    /*! \brief Hilbert key of the node */
+    /*! @brief Hilbert key of the node */
     unsigned long _key;
 
-    /*! \brief Maximum soundspeed in the node */
+    /*! @brief Maximum soundspeed in the node */
     double _cmax;
 
-    /*! \brief Maximum velocity in the node */
+    /*! @brief Maximum velocity in the node */
     double _vmax;
 
-    /*! \brief Total mass in the node */
+    /*! @brief Total mass in the node */
     double _mass;
 
-    /*! \brief Maximum softening length in the node */
+    /*! @brief Maximum softening length in the node */
     double _hmax;
 
-    /*! \brief Center of mass of the node */
+    /*! @brief Center of mass of the node */
     Vec _center_of_mass;
 
   public:
@@ -186,17 +186,17 @@ class NodeInfo {
  */
 class Node {
   protected:
-    /*! \brief Flag used to check if this Node contains a Leaf */
+    /*! @brief Flag used to check if this Node contains a Leaf */
     unsigned int _flag_leaf : 1;
 
-    /*! \brief Flag used to check if this Node is the last child of its
+    /*! @brief Flag used to check if this Node is the last child of its
      *  parent */
     unsigned int _flag_last : 1;
 
-    /*! \brief Flag used to check if this Node is a PseudoNode */
+    /*! @brief Flag used to check if this Node is a PseudoNode */
     unsigned int _flag_pseudo : 1;
 
-    /*! \brief Flag used to check if this Node has only children on the local
+    /*! @brief Flag used to check if this Node has only children on the local
      *  MPI process */
     unsigned int _flag_local : 1;
 
@@ -327,7 +327,7 @@ class Node {
  */
 class ExportNode : public Hilbert_Object {
   private:
-    /*! \brief Node associated with this export node */
+    /*! @brief Node associated with this export node */
     Node* _node;
 
   public:
@@ -361,30 +361,30 @@ class ExportNode : public Hilbert_Object {
  */
 class PseudoNode : public Node, public Hilbert_Object {
   private:
-    /*! \brief Node on the same level that is next in the efficient Tree
+    /*! @brief Node on the same level that is next in the efficient Tree
      *  traversal order */
     Node* _sibling;
 
-    /*! \brief Box specifying the geometrical dimensions of the node */
+    /*! @brief Box specifying the geometrical dimensions of the node */
     Box _box;
 
-    /*! \brief Rank of the MPI process holding the TreeNode corresponding to
+    /*! @brief Rank of the MPI process holding the TreeNode corresponding to
      *  the PseudoNode */
     unsigned int _src;
 
-    /*! \brief Total mass inside the node */
+    /*! @brief Total mass inside the node */
     double _total_mass;
 
-    /*! \brief Center of mass of the node */
+    /*! @brief Center of mass of the node */
     Vec _center_of_mass;
 
-    /*! \brief Maximum soundspeed in the node */
+    /*! @brief Maximum soundspeed in the node */
     double _cmax;
 
-    /*! \brief Maximum velocity in the node */
+    /*! @brief Maximum velocity in the node */
     double _vmax;
 
-    /*! \brief Maximum softening length in the node */
+    /*! @brief Maximum softening length in the node */
     double _hmax;
 
   public:
@@ -426,22 +426,22 @@ class PseudoNode : public Node, public Hilbert_Object {
  */
 class TreeNode : public Node {
   private:
-    /*! \brief Box specifying the geometrical dimensions of the node */
+    /*! @brief Box specifying the geometrical dimensions of the node */
     Box _box;
     union {
-        /*! \brief Child nodes of the treenode during tree construction */
+        /*! @brief Child nodes of the treenode during tree construction */
         Node* _nodes[numnode_];
 
         struct {
-            /*! \brief Node on the same level that is next in the efficient Tree
+            /*! @brief Node on the same level that is next in the efficient Tree
             *  traversal order */
             Node* _sibling;
 
-            /*! \brief First child node of this treenode in the efficient Tree
+            /*! @brief First child node of this treenode in the efficient Tree
              *  traversal order */
             Node* _child;
 
-            /*! \brief Total mass inside this node */
+            /*! @brief Total mass inside this node */
             double _total_mass;
 
             /**
@@ -452,16 +452,16 @@ class TreeNode : public Node {
              */
             double _center_of_mass[ndim_];
 
-            /*! \brief Maximum soundspeed inside the node */
+            /*! @brief Maximum soundspeed inside the node */
             double _cmax;
 
-            /*! \brief Maximum velocity inside the node */
+            /*! @brief Maximum velocity inside the node */
             double _vmax;
 
-            /*! \brief Mass of the node in the mesh regularization algorithm */
+            /*! @brief Mass of the node in the mesh regularization algorithm */
             double _mesh_m;
 
-            /*! \brief Maximum softening length of the node */
+            /*! @brief Maximum softening length of the node */
             double _hmax;
         };
     };
@@ -515,10 +515,10 @@ class TreeNode : public Node {
  */
 class Leaf : public Node {
   private:
-    /*! \brief Particle stored in this leaf */
+    /*! @brief Particle stored in this leaf */
     Particle* _particle;
 
-    /*! \brief Node on the same level that is next in the efficient Tree
+    /*! @brief Node on the same level that is next in the efficient Tree
      *  traversal order */
     Node* _sibling;
 
@@ -554,29 +554,29 @@ class Leaf : public Node {
  */
 class Tree {
   private:
-    /*! \brief Ewald table used to calculate periodic force corrections */
+    /*! @brief Ewald table used to calculate periodic force corrections */
     EwaldTable* _ewald_table;
 
-    /*! \brief Root node of the tree */
+    /*! @brief Root node of the tree */
     Node* _root;
 
-    /*! \brief Box specifying the geometric dimensions of the tree */
+    /*! @brief Box specifying the geometric dimensions of the tree */
     Cuboid _box;
 
-    /*! \brief Side length of the tree */
+    /*! @brief Side length of the tree */
     double _side;
 
-    /*! \brief Hilbert key range of nodes that are stored on the local MPI
+    /*! @brief Hilbert key range of nodes that are stored on the local MPI
      *  process */
     unsigned long _keyrange[2];
 
-    /*! \brief List of pseudonodes that are stored on other MPI processes */
+    /*! @brief List of pseudonodes that are stored on other MPI processes */
     std::vector<PseudoNode*> _pseudonodes;
 
-    /*! \brief List of nodes that have pseudonodes on other MPI processes */
+    /*! @brief List of nodes that have pseudonodes on other MPI processes */
     std::vector<ExportNode*> _exportnodes;
 
-    /*! \brief Flag indicating if the simulation box is periodic (true) or
+    /*! @brief Flag indicating if the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
 
@@ -740,7 +740,7 @@ class Tree {
         }
     }
 
-    /*! \brief Tags used to distinguish between MPI messages */
+    /*! @brief Tags used to distinguish between MPI messages */
     enum MPI_TAGS {
         /*! Tag for the sending of Export information to external processes */
         TAG_EXPORT,

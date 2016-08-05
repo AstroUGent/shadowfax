@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 /**
- * \file Hilbert.hpp
+ * @file Hilbert.hpp
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  *
@@ -39,7 +39,7 @@
 class RestartFile;
 
 /**
-  * \brief Abstract class for objects that can be ordered along a hilbert curve
+  * @brief Abstract class for objects that can be ordered along a hilbert curve
   *
   * This object attaches a key to its children that can be used to sort the
   * children along a space-filling hilbert curve.
@@ -48,7 +48,7 @@ class RestartFile;
   */
 class Hilbert_Object {
   private:
-    /*! \brief The hilbert key */
+    /*! @brief The hilbert key */
     unsigned long _key;
 
   public:
@@ -73,7 +73,7 @@ class Hilbert_Object {
 };
 
 /**
- * \brief Methods to calculate Hilbert-keys
+ * @brief Methods to calculate Hilbert-keys
  *
  * This namespace holds a method to calculate a Hilbert-key for a given set of
  * integer coordinates, using a given key length.

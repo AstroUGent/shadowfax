@@ -46,10 +46,10 @@ class TreeNode;
  */
 class TreeWalker {
   protected:
-    /*! \brief Size of the simulation box */
+    /*! @brief Size of the simulation box */
     double _boxsize;
 
-    /*! \brief Half the size of the simulation box */
+    /*! @brief Half the size of the simulation box */
     double _boxhalf;
 
     /**

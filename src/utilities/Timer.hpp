@@ -31,7 +31,7 @@
 class RestartFile;
 
 /**
-  * \brief A simplified interface to the Unix system timer
+  * @brief A simplified interface to the Unix system timer
   *
   * The Timer automatically registers the current system time when constructed
   * and returns the elapsed time in seconds when it is stopped.
@@ -43,11 +43,11 @@ class RestartFile;
   */
 class Timer {
   private:
-    /*! \brief Starting time of the timer */
+    /*! @brief Starting time of the timer */
     timeval _start;
-    /*! \brief Stop time of the timer */
+    /*! @brief Stop time of the timer */
     timeval _stop;
-    /*! \brief Total time interval registered so far */
+    /*! @brief Total time interval registered so far */
     timeval _diff;
 
   public:

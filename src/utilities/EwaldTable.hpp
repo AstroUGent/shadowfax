@@ -31,7 +31,7 @@
 #include "Vec.hpp"
 
 /**
- * \brief Ewald force corrections for N-body gravity with periodic boundary
+ * @brief Ewald force corrections for N-body gravity with periodic boundary
  * conditions
  *
  * Following Springel (2005) and Hernquist, Bouchet and Suto (1991), we tabulate
@@ -54,22 +54,22 @@ class EwaldTable {
     bool read_table();
 
 #if ndim_ == 3
-    /*! \brief A multidimensional array of Vec force corrections */
+    /*! @brief A multidimensional array of Vec force corrections */
     Vec*** _f;
 #else
-    /*! \brief A multidimensional array of Vec force corrections */
+    /*! @brief A multidimensional array of Vec force corrections */
     Vec** _f;
 #endif
 
-    /*! \brief Factor that maps a double coordinate to a floating point "index"
+    /*! @brief Factor that maps a double coordinate to a floating point "index"
      *  in the internal table */
     double _ewald_intp_fac;
 
-    /*! \brief Ewald alpha factor that determines the cutoff between long and
+    /*! @brief Ewald alpha factor that determines the cutoff between long and
      *  short range forces */
     double _alpha;
 
-    /*! \brief Size of the internal table (in one dimension). The actual size of
+    /*! @brief Size of the internal table (in one dimension). The actual size of
      *  the table is a power of this */
     unsigned int _size;
 

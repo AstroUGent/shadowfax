@@ -42,12 +42,12 @@
 #include <iostream>  // for cout, cerr
 #include <math.h>    // for round
 #include <sstream>   // for basic_stringbuf<>::int_type, etc
-#include <stdlib.h>  // for RAND_MAX, rand, srand, NULL
+#include <cstdlib>  // for RAND_MAX, rand, srand, NULL
 #include <utility>   // for pair
 using namespace std;
 
 /**
-  * \brief Construct a BlockICGenerator with a given number of cells, ICMode and
+  * @brief Construct a BlockICGenerator with a given number of cells, ICMode and
   * adiabatic index
   *
   * If ICMode::IC_CART is selected, the sampled number of cells can be lower
@@ -90,7 +90,7 @@ BlockICGenerator::~BlockICGenerator() {
 }
 
 /**
-  * \brief Read in geometrical blocks and other relevant information from a
+  * @brief Read in geometrical blocks and other relevant information from a
   * specified xml file
   *
   * A basic xml file could look like
@@ -235,7 +235,7 @@ void BlockICGenerator::read_xml(string filename) {
 }
 
 /**
-  * \brief Set the hydrodynamical state vectors for the cells in the given grid
+  * @brief Set the hydrodynamical state vectors for the cells in the given grid
   * based on the geometrical blocks
   *
   * For every block (starting from the first one added - order is important
@@ -264,7 +264,7 @@ void BlockICGenerator::apply_regions(ParticleVector& grid) {
 }
 
 /**
-  * \brief Generate initial conditions
+  * @brief Generate initial conditions
   *
   * We first set up a ParticleVector using the DelCont previously set up. We
   * then generate the grid cells and optionally regularize them. We then set up
@@ -293,7 +293,7 @@ ParticleVector BlockICGenerator::generate() {
 }
 
 /**
-  * \brief Set up a cartesian grid of cells
+  * @brief Set up a cartesian grid of cells
   *
   * @param plist Reference to an empty ParticleVector that will be filled
   */
@@ -381,7 +381,7 @@ void BlockICGenerator::make_cartesian_grid(ParticleVector& plist) {
 }
 
 /**
-  * \brief Set up a uniform random grid using adaptive random sampling
+  * @brief Set up a uniform random grid using adaptive random sampling
   *
   * @param plist Reference to an empty ParticleVector that will be filled
   */
@@ -429,7 +429,7 @@ void BlockICGenerator::make_random_grid(ParticleVector& plist) {
 }
 
 /**
-  * \brief Determine whether a given Vec is an acceptable coordinate vector for
+  * @brief Determine whether a given Vec is an acceptable coordinate vector for
   * a randomly sampled particle
   *
   * We take into account the geometrical blocks and their density with respect
@@ -480,7 +480,7 @@ bool BlockICGenerator::regions_accepted_dm(Vec& p) {
 }
 
 /**
-  * \brief Regularize a randomly sampled grid using Lloyd's algorithm
+  * @brief Regularize a randomly sampled grid using Lloyd's algorithm
   *
   * The VorTess for the grid is calculated and the positions of the cell
   * generators are reset to the centroids of their respective VorCell. This

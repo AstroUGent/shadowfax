@@ -30,7 +30,6 @@
 #include "ProgramLog.hpp"
 #include "RestartFile.hpp"
 #include "utilities/HelperFunctions.hpp"
-#include <algorithm>
 #include <cmath>
 #include <iostream>
 using namespace std;
@@ -66,7 +65,7 @@ ExactRiemannSolver::ExactRiemannSolver(double gamma, double tolerance,
     _counterTotal = 0;
     _vacuum = 0;
 
-    LOGS("Initialized exact RiemannSolver");
+    LOGS("Initialized ExactRiemannSolver");
 }
 
 /**
@@ -342,7 +341,7 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
         if(!WL.rho()) {
             solution = WR;
             // vacuum left state
-            if(-vR < aR) {
+            if(-aR < vR) {
                 double SR = vR - 2. * aR / (_gamma - 1.);
                 if(SR >= 0.) {
                     // vacuum
@@ -372,11 +371,8 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
             double SR = vR - 2. * aR / (_gamma - 1.);
             double SL = vL + 2. * aL / (_gamma - 1.);
             if(SR > 0. && SL < 0.) {
-                if(fabs(SR) > fabs(SL)) {
-                    vhalf = SR - vR;
-                } else {
-                    vhalf = SL - vL;
-                }
+                solution.reset();
+                vhalf = 0.;
             } else {
                 if(SL >= 0.) {
                     solution = WL;
@@ -402,7 +398,7 @@ StateVector ExactRiemannSolver::solve_vacuum(StateVector& WL, StateVector& WR,
                     }
                 } else {
                     solution = WR;
-                    if(-vR < aR) {
+                    if(-aR < vR) {
                         solution.set_rho(WR.rho() *
                                          pow(2. / (_gamma + 1.) -
                                                      (_gamma - 1.) /
@@ -518,8 +514,8 @@ double ExactRiemannSolver::BrentsMethodSolve(double lowerLimit,
         if(!(((s > tmp2) && (s < b)) || ((s < tmp2) && (s > b))) ||
            (mflag && (fabs(s - b) >= (fabs(b - c) / 2.))) ||
            (!mflag && (fabs(s - b) >= (fabs(c - d) / 2.))) ||
-           (mflag && (fabs(b - c) < errorTol)) ||
-           (!mflag && (fabs(c - d) < errorTol))) {
+           (mflag && (fabs(b - c) < errorTol * (b + c) * 0.5)) ||
+           (!mflag && (fabs(c - d) < errorTol * (c + d) * 0.5))) {
             s = (a + b) / 2.;
             mflag = true;
         } else {
@@ -655,7 +651,7 @@ double ExactRiemannSolver::guess_p(StateVector& WL, StateVector& WR, double vL,
     double qmax = pmax / pmin;
     double ppv = 0.5 * (WL.p() + WR.p()) -
                  0.125 * (vR - vL) * (WL.rho() + WR.rho()) * (aL + aR);
-    ppv = max(_tolerance, ppv);
+    ppv = max(_tolerance * 0.5 * (WL.p() + WR.p()), ppv);
     if(qmax <= 2. && pmin <= ppv && ppv <= pmax) {
         pguess = ppv;
     } else {
@@ -674,48 +670,8 @@ double ExactRiemannSolver::guess_p(StateVector& WL, StateVector& WR, double vL,
     // Toro: "Not that approximate solutions may predict, incorrectly, a
     // negative value for pressure (...). Thus in order to avoid negative guess
     // values we introduce the small positive constant _tolerance"
-    pguess = max(_tolerance, pguess);
+    pguess = max(_tolerance * 0.5 * (WL.p() + WR.p()), pguess);
     return pguess;
-}
-
-/**
- * @brief Test the Riemann solver on 6 problems with known solutions
- */
-void ExactRiemannSolver::test() {
-    cout << "Testing the Riemann solver" << endl;
-    double rhoL[6] = {1., 1., 1., 1., 5.99924, 1.};
-    double rhoR[6] = {0.125, 1., 1., 1., 5.99242, 1.};
-    double uL[6] = {0., -2., 0., 0., 19.5975, -1.};
-    double uR[6] = {0., 2., 0., 0., -6.19633, 1.};
-    double pL[6] = {1., 0.4, 1000., 0.01, 460.894, 1.e-6};
-    double pR[6] = {0.1, 0.4, 0.01, 100., 46.0950, 1.0005e-6};
-    double rhosol[6] = {0.47969, 0.00617903, 0.615719, 0.61577, 12.743, 0.};
-    double usol[6] = {0.841194, 0., 18.2812, -5.78011, 8.56045, 0.};
-    double psol[6] = {0.293945, 8.32249e-05, 445.626, 44.5687, 1841.82, 0.};
-    for(unsigned int i = 0; i < 6; i++) {
-        cout << "Test problem " << i + 1 << endl;
-        StateVector WL, WR;
-        WL.set_rho(rhoL[i]);
-        WL.set_vx(uL[i]);
-        WL.set_vy(2.);
-        WL.set_p(pL[i]);
-        WR.set_rho(rhoR[i]);
-        WR.set_vx(uR[i]);
-        WR.set_vy(1.);
-        WR.set_p(pR[i]);
-        cout << "WL: " << WL.rho() << " " << WL.vx() << " " << WL.p() << "\t("
-             << WL.vy() << ")" << endl;
-        cout << "WR: " << WR.rho() << " " << WR.vx() << " " << WR.p() << "\t("
-             << WR.vy() << ")" << endl;
-        double mach;
-        Vec n;
-        n[0] = 1.;
-        StateVector solution = solve(WL, WR, n, mach);
-        cout << "solution : " << solution.rho() << " " << solution.vx() << " "
-             << solution.p() << "\t(" << solution.vy() << ")" << endl;
-        cout << "should be: " << rhosol[i] << " " << usol[i] << " " << psol[i]
-             << endl;
-    }
 }
 
 /**
@@ -780,6 +736,9 @@ StateVector ExactRiemannSolver::get_W(double volume, StateVector& Q,
             (Q.e() - 0.5 * (Q.px() * Q.px() + Q.py() * Q.py()) / Q.m()) /
             volume);
 #endif
+    for(unsigned int i = 0; i < NUM_PAQ; i++) {
+        W.paq(i) = Q.paq(i) / Q.m();
+    }
     if(use_energy) {
         // reset entropy
         Q.set_paq(Q.m() * W.p() / pow(W.rho(), _gamma));
@@ -802,14 +761,7 @@ StateVector ExactRiemannSolver::get_W(double volume, StateVector& Q,
     }
 
     if(W.rho() < 1.e-30) {
-        W.set_rho(0.);
-        W.set_vx(0.);
-        W.set_vy(0.);
-#if ndim_ == 3
-        W.set_vz(0.);
-#endif
-        W.set_p(0.);
-        W.set_paq(0.);
+        W.reset();
     }
 
     return W;
@@ -841,6 +793,9 @@ StateVector ExactRiemannSolver::get_Q(double volume, const StateVector& W) {
 #endif
     // Ai = Pi/rhoi^gamma
     Q.set_paq(Q.m() * W.p() / pow(W.rho(), _gamma));
+    for(unsigned int i = 0; i < NUM_PAQ; i++) {
+        Q.paq(i) = Q.m() * W.paq(i);
+    }
 
     // sanity check results
     if(Q.m() < 0. || Q.e() < 0.) {
@@ -862,6 +817,9 @@ StateVector ExactRiemannSolver::get_Q(double volume, const StateVector& W) {
 StateVector ExactRiemannSolver::get_flux(const Vec& v, unsigned int index,
                                          const StateVector& W) {
     StateVector F;
+    if(!W.rho()) {
+        return F;
+    }
     F[0] = W.rho() * (W[1 + index] - v[index]);
     F[1] = W.rho() * (W[1 + index] - v[index]) * W.vx();
     F[2] = W.rho() * (W[1 + index] - v[index]) * W.vy();
@@ -872,6 +830,10 @@ StateVector ExactRiemannSolver::get_flux(const Vec& v, unsigned int index,
     F[ndim_ + 1] =
             (W[1 + index] - v[index]) * get_energy(W) + W.p() * W[1 + index];
     F.set_paq(W.rho() * (W[1 + index] - v[index]) * W.paq());
+    F.set_dye(W.rho() * (W[1 + index] - v[index]) * W.dye());
+    for(unsigned int i = 0; i < NUM_PAQ; i++) {
+        F.paq(i) = W.rho() * (W[1 + index] - v[index]) * W.paq(i);
+    }
     return F;
 }
 
@@ -962,6 +924,13 @@ StateVector ExactRiemannSolver::get_time_derivative(
     dWdt[3] = -_gamma * W.p() * (gradients[0].vx() + gradients[1].vy()) -
               W.vx() * gradients[0].p() - W.vy() * gradients[1].p();
 #endif
+    for(unsigned int i = 0; i < NUM_PAQ; i++) {
+        dWdt.paq(i) =
+                -W.vx() * gradients[0].paq(i) - W.vy() * gradients[1].paq(i);
+#if ndim_ == 3
+        dWdt.paq(i) -= W.vz() * gradients[2].paq(i);
+#endif
+    }
 
     return dWdt;
 }
@@ -1017,121 +986,4 @@ ExactRiemannSolver::ExactRiemannSolver(RestartFile& rfile) : _timer(rfile) {
     rfile.read(_vacuum);
 
     LOGS("RiemannSolver restarted");
-}
-
-/**
- * @brief Constructor
- *
- * @param W Derived primitive variables
- * @param Q Conserved variables
- * @param V Volume
- */
-PrimitiveVariablesException::PrimitiveVariablesException(StateVector W,
-                                                         StateVector Q,
-                                                         double V) {
-    _W = W;
-    _Q = Q;
-    _V = V;
-}
-
-/**
- * @brief Human readable error message for this Exception
- * @return Human readable C-string
- */
-const char* PrimitiveVariablesException::what() const throw() {
-    cerr << "Error! Negative density/pressure after calculation of primitive "
-            "quantities!"
-         << endl;
-    cerr << "Q: " << _Q.m() << "\t" << _Q.px() << "\t" << _Q.py() << "\t";
-#if ndim_ == 3
-    cerr << _Q.pz() << "\t";
-#endif
-    cerr << _Q.e() << endl;
-    cerr << "W: " << _W.rho() << "\t" << _W.vx() << "\t" << _W.vy() << "\t";
-#if ndim_ == 3
-    cerr << _W.vz() << "\t";
-#endif
-    cerr << _W.p() << endl;
-    cerr << "V: " << _V << endl;
-    return "PrimitiveVariablesException";
-}
-
-/**
- * @brief Constructor
- *
- * @param W Primitive variables
- * @param Q Derived conserved variables
- * @param V Volume
- */
-ConservedVariablesException::ConservedVariablesException(StateVector W,
-                                                         StateVector Q,
-                                                         double V) {
-    _W = W;
-    _Q = Q;
-    _V = V;
-
-    LOGE("ConservedVariablesException raised!");
-}
-
-/**
- * @brief Human readable error message
- * @return Human readable C-string
- */
-const char* ConservedVariablesException::what() const throw() {
-    cerr << "Error! Negative mass/energy after calculation of conserved "
-            "quantities!"
-         << endl;
-    cerr << "W: " << _W.rho() << "\t" << _W.vx() << "\t" << _W.vy() << "\t";
-#if ndim_ == 3
-    cerr << _W.vz() << "\t";
-#endif
-    cerr << _W.p() << endl;
-    cerr << "Q: " << _Q.m() << "\t" << _Q.px() << "\t" << _Q.py() << "\t";
-#if ndim_ == 3
-    cerr << _Q.pz() << "\t";
-#endif
-    cerr << _Q.e() << endl;
-    cerr << "V: " << _V << endl;
-    return "ConservedVariablesException";
-}
-
-/**
- * @brief Constructor
- *
- * @param WL Left StateVector
- * @param WR Right StateVector
- * @param Wstar Solution of the Riemann problem
- */
-RiemannSolverException::RiemannSolverException(StateVector WL, StateVector WR,
-                                               StateVector Wstar) {
-    _WL = WL;
-    _WR = WR;
-    _Wstar = Wstar;
-
-    LOGE("RiemannSolverException raised!");
-}
-
-/**
- * @brief Human readable error message
- * @return Human readable C-string
- */
-const char* RiemannSolverException::what() const throw() {
-    cerr << "Error! Unacceptable solution to Riemann problem!" << endl;
-    cerr << "WL: " << _WL.rho() << "\t" << _WL.vx() << "\t" << _WL.vy() << "\t";
-#if ndim_ == 3
-    cerr << _WL.vz() << "\t";
-#endif
-    cerr << _WL.p() << endl;
-    cerr << "WR: " << _WR.rho() << "\t" << _WR.vx() << "\t" << _WR.vy() << "\t";
-#if ndim_ == 3
-    cerr << _WR.vz() << "\t";
-#endif
-    cerr << _WR.p() << endl;
-    cerr << "Wstar: " << _Wstar.rho() << "\t" << _Wstar.vx() << "\t"
-         << _Wstar.vy() << "\t";
-#if ndim_ == 3
-    cerr << _Wstar.vz() << "\t";
-#endif
-    cerr << _Wstar.p() << endl;
-    return "RiemannSolverException";
 }

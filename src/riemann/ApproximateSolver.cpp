@@ -24,10 +24,12 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ApproximateSolver.hpp"
-#include "ProgramLog.hpp"
-#include "RestartFile.hpp"
-#include "utilities/HelperFunctions.hpp"
-#include <iostream>
+#include "ProgramLog.hpp"                 // for LOGS
+#include "RestartFile.hpp"                // for RestartFile
+#include "Vec.hpp"                        // for Vec
+#include "utilities/HelperFunctions.hpp"  // for human_readable_counter
+#include <cmath>                          // for pow, fabs, sqrt
+#include <iostream>                       // for operator<<, basic_ostream, etc
 using namespace std;
 
 /**
@@ -84,6 +86,148 @@ TRRSSolver::~TRRSSolver() {
 }
 
 /**
+ * @brief Vacuum solver
+ *
+ * @param WL Left StateVector
+ * @param WR Right StateVector
+ * @param n Interface normal
+ * @param uL Left velocity along interface normal
+ * @param uR Right velocity along interface normal
+ * @param aL Left sound speed
+ * @param aR Right sound speed
+ * @return Solution of the vacuum Riemann problem
+ */
+StateVector TRRSSolver::solve_vacuum(StateVector& WL, StateVector& WR, Vec& n,
+                                     double uL, double uR, double aL,
+                                     double aR) {
+    StateVector solution;
+
+    // Left and right state vacuum has already been treated
+
+    double vhalf;
+    if(!WR.rho()) {
+        solution = WL;
+        // vacuum right state
+        if(aL > uL) {
+            double SL = uL + 2. * aL / (_gamma - 1.);
+            if(SL > 0.) {
+                solution.set_rho(
+                        WL.rho() *
+                        pow(2. / (_gamma + 1.) +
+                                    (_gamma - 1.) / (_gamma + 1.) / aL * uL,
+                            2. / (_gamma - 1.)));
+                vhalf = 2. / (_gamma + 1.) * (aL + 0.5 * (_gamma - 1.) * uL) -
+                        uL;
+                solution.set_p(
+                        WL.p() *
+                        pow(2. / (_gamma + 1.) +
+                                    (_gamma - 1.) / (_gamma + 1.) / aL * uL,
+                            2. * _gamma / (_gamma - 1.)));
+            } else {
+                // vacuum
+                solution.reset();
+                vhalf = 0.;
+            }
+        } else {
+            // solution = WL
+            vhalf = 0.;
+        }
+    } else {
+        if(!WL.rho()) {
+            solution = WR;
+            // vacuum left state
+            if(-uR < aR) {
+                double SR = uR - 2. * aR / (_gamma - 1.);
+                if(SR >= 0.) {
+                    // vacuum
+                    solution.reset();
+                    vhalf = 0.;
+                } else {
+                    solution.set_rho(
+                            WR.rho() *
+                            pow(2. / (_gamma + 1.) -
+                                        (_gamma - 1.) / (_gamma + 1.) / aR * uR,
+                                2. / (_gamma - 1.)));
+                    vhalf = 2. / (_gamma + 1.) *
+                                    (-aR + 0.5 * (_gamma - 1.) * uR) -
+                            uR;
+                    solution.set_p(
+                            WR.p() *
+                            pow(2. / (_gamma + 1.) -
+                                        (_gamma - 1.) / (_gamma + 1.) / aR * uR,
+                                2. * _gamma / (_gamma - 1.)));
+                }
+            } else {
+                // solution = WR
+                vhalf = 0.;
+            }
+        } else {
+            // vacuum generation
+            double SR = uR - 2. * aR / (_gamma - 1.);
+            double SL = uL + 2. * aL / (_gamma - 1.);
+            if(SR > 0. && SL < 0.) {
+                solution.reset();
+                vhalf = 0.;
+            } else {
+                if(SL >= 0.) {
+                    solution = WL;
+                    if(uL < aL) {
+                        solution.set_rho(WL.rho() *
+                                         pow(2. / (_gamma + 1.) +
+                                                     (_gamma - 1.) /
+                                                             (_gamma + 1.) /
+                                                             aL * uL,
+                                             2. / (_gamma - 1.)));
+                        vhalf = 2. / (_gamma + 1.) *
+                                        (aL + 0.5 * (_gamma - 1.) * uL) -
+                                uL;
+                        solution.set_p(WL.p() *
+                                       pow(2. / (_gamma + 1.) +
+                                                   (_gamma - 1.) /
+                                                           (_gamma + 1.) / aL *
+                                                           uL,
+                                           2. * _gamma / (_gamma - 1.)));
+                    } else {
+                        // solution = WL
+                        vhalf = 0.;
+                    }
+                } else {
+                    solution = WR;
+                    if(-uR < aR) {
+                        solution.set_rho(WR.rho() *
+                                         pow(2. / (_gamma + 1.) -
+                                                     (_gamma - 1.) /
+                                                             (_gamma + 1.) /
+                                                             aR * uR,
+                                             2. / (_gamma - 1.)));
+                        vhalf = 2. / (_gamma + 1.) *
+                                        (-aR + 0.5 * (_gamma - 1.) * uR) -
+                                uR;
+                        solution.set_p(WR.p() *
+                                       pow(2. / (_gamma + 1.) -
+                                                   (_gamma - 1.) /
+                                                           (_gamma + 1.) / aR *
+                                                           uR,
+                                           2. * _gamma / (_gamma - 1.)));
+                    } else {
+                        // solution = WR
+                        vhalf = 0.;
+                    }
+                }
+            }
+        }
+    }
+
+    solution[1] += vhalf * n[0];
+    solution[2] += vhalf * n[1];
+#if ndim_ == 3
+    solution[3] += vhalf * n[2];
+#endif
+
+    return solution;
+}
+
+/**
  * @brief Solve the Riemann problem in between the given left and right state
  *
  * @param WL Left primitive variables StateVector
@@ -102,6 +246,9 @@ StateVector TRRSSolver::solve(StateVector& WL, StateVector& WR, Vec& n,
     _timer.start();
 
     StateVector Whalf;
+    if(!WL.rho() && (reflective || !WR.rho())) {
+        return Whalf;
+    }
 
 #if ndim_ == 3
     double vL = WL[1] * n[0] + WL[2] * n[1] + WL[3] * n[2];
@@ -118,6 +265,14 @@ StateVector TRRSSolver::solve(StateVector& WL, StateVector& WR, Vec& n,
 
     double aL = get_soundspeed(WL);
     double aR = get_soundspeed(WR);
+
+    // Handle vacuum: vacuum does not require iteration and is always exact
+    if(!WL.rho() || !WR.rho()) {
+        return solve_vacuum(WL, WR, n, vL, vR, aL, aR);
+    }
+    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) < fabs(vL - vR)) {
+        return solve_vacuum(WL, WR, n, vL, vR, aL, aR);
+    }
 
     double PLR = pow(WL.p() / WR.p(), _gm1d2g);
     double ustar = (PLR * vL / aL + vR / aR + _tdgm1 * (PLR - 1.)) /
@@ -278,6 +433,9 @@ double TRRSSolver::get_soundspeed(const StateVector& W) {
  * Since this is an approximate solver, it will fail on most of these problems.
  */
 void TRRSSolver::test() {
+    // Important remark: we still need test problems for the vacuum solver!!
+    // Toro does not provide them and a quick search didn't yield them either
+    // The vacuum solver has hence never been thoroughly tested
     cout << "Testing the Riemann solver" << endl;
     double rhoL[6] = {1., 1., 1., 1., 5.99924, 1.};
     double rhoR[6] = {0.125, 1., 1., 1., 5.99242, 1.};
@@ -354,6 +512,10 @@ StateVector TRRSSolver::get_Q(double volume, const StateVector& W) {
  */
 StateVector TRRSSolver::get_W(double volume, StateVector& Q, bool use_energy) {
     StateVector W;
+    // handle vacuum
+    if(!Q.m()) {
+        return W;
+    }
     W.set_rho(Q.m() / volume);
     W.set_vx(Q.px() / Q.m());
     W.set_vy(Q.py() / Q.m());
@@ -378,6 +540,29 @@ StateVector TRRSSolver::get_W(double volume, StateVector& Q, bool use_energy) {
         W.set_p(W.paq() * pow(W.rho(), _gamma));
         Q.set_e(get_energy(W) * volume);
     }
+
+    if(W.p() < 1.e-30) {
+        W.set_p(1.e-30);
+#if ndim_ == 3
+        Q.set_e(0.5 * (Q.px() * Q.px() + Q.py() * Q.py() + Q.pz() * Q.pz()) /
+                        Q.m() +
+                W.p() * volume / (_gamma - 1.));
+#else
+        Q.set_e(0.5 * (Q.px() * Q.px() + Q.py() * Q.py()) / Q.m() +
+                W.p() * volume / (_gamma - 1.));
+#endif
+    }
+
+    if(W.rho() < 1.e-30) {
+        W.set_rho(0.);
+        W.set_vx(0.);
+        W.set_vy(0.);
+#if ndim_ == 3
+        W.set_vz(0.);
+#endif
+        W.set_p(0.);
+        W.set_paq(0.);
+    }
     return W;
 }
 
@@ -393,6 +578,9 @@ StateVector TRRSSolver::get_W(double volume, StateVector& Q, bool use_energy) {
 StateVector TRRSSolver::get_flux(const Vec& v, unsigned int index,
                                  const StateVector& W) {
     StateVector F;
+    if(!W.rho()) {
+        return F;
+    }
     F[0] = W.rho() * (W[1 + index] - v[index]);
     F[1] = W.rho() * (W[1 + index] - v[index]) * W.vx();
     F[2] = W.rho() * (W[1 + index] - v[index]) * W.vy();

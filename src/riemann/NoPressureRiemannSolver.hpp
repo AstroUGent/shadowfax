@@ -17,14 +17,14 @@
  ******************************************************************************/
 
 /**
- * @file ApproximateSolver.hpp
+ * @file NoPressureRiemannSolver.hpp
  *
- * @brief Two Rarefaction Riemann Solver (TRRS): header
+ * @brief Riemann solver for a fluid without pressure: header
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#ifndef APPROXIMATESOLVER_HPP
-#define APPROXIMATESOLVER_HPP
+#ifndef NOPRESSURERIEMANNSOLVER_HPP
+#define NOPRESSURERIEMANNSOLVER_HPP
 
 #include "RiemannSolver.hpp"    // for RiemannSolver
 #include "StateVector.hpp"      // for StateVector
@@ -34,56 +34,31 @@
 class RestartFile;
 
 /**
- * @brief Two Rarefaction Riemann Solver
+ * @brief Riemann solver for a pressureless fluid
  *
- * Approximate Riemann solver that assumes that both the left and the right
- * intermediate state in the solution of the Riemann problem are rarefaction
- * waves. This allows us to skip the iterative procedure for finding p and
- * speeds up the solution of the Riemann problem.
+ * Since all basic hydro is (should be) isolated in the Riemann solver, we can
+ * easily make a pressureless fluid by implementing a special type of Riemann
+ * solver.
  */
-class TRRSSolver : public RiemannSolver {
+class NoPressureRiemannSolver : public RiemannSolver {
   private:
-    /*! @brief Adiabatic index \f$\gamma{}\f$ of the gas */
-    double _gamma;
-    /*! @brief \f$\frac{\gamma{}+1}{2\gamma{}}\f$ */
-    double _gp1d2g;
-    /*! @brief \f$\frac{\gamma{}-1}{2\gamma{}}\f$ */
-    double _gm1d2g;
-    /*! @brief \f$\frac{\gamma{}-1}{\gamma{}+1}\f$ */
-    double _gm1dgp1;
-    /*! @brief \f$\frac{2}{\gamma{}+1}\f$ */
-    double _tdgp1;
-    /*! @brief \f$\frac{2}{\gamma{}-1}\f$ */
-    double _tdgm1;
-    /*! @brief \f$\frac{\gamma{}-1}{2}\f$ */
-    double _gm1d2;
-    /*! @brief \f$\frac{2\gamma{}}{\gamma{}-1}\f$ */
-    double _tgdgm1;
-    /*! @brief \f$\frac{1}{\gamma}\f$ */
-    double _ginv;
-
     /*! @brief Counts the number of times the solver was called */
     unsigned long _counter;
 
     /*! @brief Timer quantifying the time spent in the solver */
     Timer _timer;
 
-    double get_energy(const StateVector& W);
-
-    StateVector solve_vacuum(StateVector& WL, StateVector& WR, Vec& n,
-                             double uL, double uR, double aL, double aR);
-
   public:
-    TRRSSolver(double gamma);
-    ~TRRSSolver();
+    NoPressureRiemannSolver();
+    ~NoPressureRiemannSolver();
 
     /**
      * @brief Get the identifying tag for this Solver
      *
-     * @return "TRRS", because this is a TRRSSolver
+     * @return "NOPR", because this is a NoPressureRiemannSolver
      */
     virtual std::string tag() {
-        return "TRRS";
+        return "NOPR";
     }
 
     virtual StateVector solve(StateVector& WL, StateVector& WR, Vec& n,
@@ -103,7 +78,7 @@ class TRRSSolver : public RiemannSolver {
     unsigned long get_neval();
 
     virtual void dump(RestartFile& rfile);
-    TRRSSolver(RestartFile& rfile);
+    NoPressureRiemannSolver(RestartFile& rfile);
 };
 
 #endif

@@ -41,51 +41,51 @@ class RestartFile;
  */
 class ExactRiemannSolver : public RiemannSolver {
   private:
-    /*! \brief Adiabatic index \f$\gamma\f$ of the fluid */
+    /*! @brief Adiabatic index \f$\gamma\f$ of the fluid */
     double _gamma;
 
-    /*! \brief \f$\frac{\gamma+1}{2\gamma}\f$ */
+    /*! @brief \f$\frac{\gamma+1}{2\gamma}\f$ */
     double _gp1d2g;
 
-    /*! \brief \f$\frac{\gamma-1}{2\gamma}\f$ */
+    /*! @brief \f$\frac{\gamma-1}{2\gamma}\f$ */
     double _gm1d2g;
 
-    /*! \brief \f$\frac{\gamma-1}{\gamma+1}\f$ */
+    /*! @brief \f$\frac{\gamma-1}{\gamma+1}\f$ */
     double _gm1dgp1;
 
-    /*! \brief \f$\frac{2}{\gamma+1}\f$ */
+    /*! @brief \f$\frac{2}{\gamma+1}\f$ */
     double _tdgp1;
 
-    /*! \brief \f$\frac{2}{\gamma-1}\f$ */
+    /*! @brief \f$\frac{2}{\gamma-1}\f$ */
     double _tdgm1;
 
-    /*! \brief \f$\frac{\gamma-1}{2}\f$ */
+    /*! @brief \f$\frac{\gamma-1}{2}\f$ */
     double _gm1d2;
 
-    /*! \brief \f$\frac{2\gamma}{\gamma-1}\f$ */
+    /*! @brief \f$\frac{2\gamma}{\gamma-1}\f$ */
     double _tgdgm1;
 
-    /*! \brief \f$\frac{1}{\gamma}\f$ */
+    /*! @brief \f$\frac{1}{\gamma}\f$ */
     double _ginv;
 
-    /*! \brief Tolerance used to decide when the pressure iteration is
+    /*! @brief Tolerance used to decide when the pressure iteration is
      *  converged */
     double _tolerance;
 
-    /*! \brief Cutoff used to distinguish between a Newton-Raphson iteration
+    /*! @brief Cutoff used to distinguish between a Newton-Raphson iteration
      *  and Brent's method */
     double _cutoff;
 
-    /*! \brief Total number of Brent Riemann evaluations */
+    /*! @brief Total number of Brent Riemann evaluations */
     unsigned long _counterBrent;
 
-    /*! \brief Total number of Riemann solver evaluations */
+    /*! @brief Total number of Riemann solver evaluations */
     unsigned long _counterTotal;
 
-    /*! \brief Total number of vacuum Riemann solver evaluations */
+    /*! @brief Total number of vacuum Riemann solver evaluations */
     unsigned long _vacuum;
 
-    /*! \brief Timer for time spent in Riemann solver evaluations */
+    /*! @brief Timer for time spent in Riemann solver evaluations */
     Timer _timer;
 
     StateVector solve_vacuum(StateVector& WL, StateVector& WR, double vL,
@@ -138,8 +138,6 @@ class ExactRiemannSolver : public RiemannSolver {
     double get_soundspeed(const StateVector& W);
 
     double get_energy(const StateVector& W);
-
-    void test();
 
     StateVector get_Q(double volume, const StateVector& W);
     StateVector get_W(double volume, StateVector& Q, bool use_energy = true);

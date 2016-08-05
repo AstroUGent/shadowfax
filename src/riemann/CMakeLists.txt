@@ -17,12 +17,22 @@
 ################################################################################
 
 add_library(${RIEMANNNAME}
+    AdvectionRiemannSolver.cpp
     ApproximateSolver.cpp
+    CollelaGlazRiemannSolver.cpp
     ExactRiemannSolver.cpp
+    GottliebGrothRiemannSolver.cpp
     HLLCRiemannSolver.cpp
+    NoPressureRiemannSolver.cpp
+    RiemannSolver.cpp
+
+    AdvectionRiemannSolver.hpp
     ApproximateSolver.hpp
+    CollelaGlazRiemannSolver.hpp
     ExactRiemannSolver.hpp
+    GottliebGrothRiemannSolver.hpp
     HLLCRiemannSolver.hpp
+    NoPressureRiemannSolver.hpp
     RiemannSolver.hpp
     RiemannSolverFactory.hpp
 )

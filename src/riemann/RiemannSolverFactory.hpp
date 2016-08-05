@@ -27,13 +27,16 @@
 #ifndef RIEMANNSOLVERFACTORY_HPP
 #define RIEMANNSOLVERFACTORY_HPP
 
-#include "ApproximateSolver.hpp"
-#include "ExactRiemannSolver.hpp"
-#include "HLLCRiemannSolver.hpp"
+#include "AdvectionRiemannSolver.hpp"   // for AdvectionRiemannSolver
+#include "ApproximateSolver.hpp"        // for TRRSSolver
+#include "Error.hpp"                    // for my_exit
+#include "ExactRiemannSolver.hpp"       // for ExactRiemannSolver
+#include "HLLCRiemannSolver.hpp"        // for HLLCRiemannSolver
+#include "NoPressureRiemannSolver.hpp"  // for NoPressureRiemannSolver
 #include "ParameterFile.hpp"
 #include "RestartFile.hpp"
 #include "RiemannSolver.hpp"  // for RiemannSolver
-#include <stddef.h>           // for NULL
+#include <cstddef>            // for NULL
 #include <string>             // for operator==, basic_string, etc
 
 #define RIEMANNSOLVERFACTORY_DEFAULT_TYPE "Exact"
@@ -51,13 +54,13 @@
 class RiemannSolverFactory {
   public:
     /**
-     * @brief Load a Solver from the given RestartFile
+     * @brief Load a RiemannSolver from the given RestartFile
      *
      * We first read the tag from the RestartFile and then call the restart
-     * constructor for the corresponding Solver implementation.
+     * constructor for the corresponding RiemannSolver implementation.
      *
      * @param rfile RestartFile to read from
-     * @return Solver instance
+     * @return RiemannSolver instance
      */
     static RiemannSolver* load(RestartFile& rfile) {
         std::string tag;
@@ -71,14 +74,20 @@ class RiemannSolverFactory {
         if(tag == "TRRS") {
             return new TRRSSolver(rfile);
         }
+        if(tag == "ADVE") {
+            return new AdvectionRiemannSolver(rfile);
+        }
+        if(tag == "NOPR") {
+            return new NoPressureRiemannSolver(rfile);
+        }
         return NULL;
     }
 
     /**
-     * @brief Dump the given Solver to the given RestartFile
+     * @brief Dump the given RiemannSolver to the given RestartFile
      *
      * We first write an identifying tag to the RestartFile and then call the
-     * dump method of the solver itself.
+     * dump method of the RiemannSolver itself.
      *
      * @param rfile RestartFile to write to
      * @param solver RiemannSolver to dump
@@ -92,16 +101,16 @@ class RiemannSolverFactory {
     }
 
     /**
-     * @brief Generate a Riemann solver of the given type
+     * @brief Generate a RiemannSolver of the given type
      *
-     * @param name Type of Riemann solver to generate
+     * @param name Type of RiemannSolver to generate
      * @param gamma Adiabatic index of the gas
      * @param tolerance Tolerance value used to decide when the iterative
      * method to find the pressure is converged (exact solver only)
      * @param cutoff Cutoff value to distinguish between Newton-Raphson and
      * Brent's method in the iterative pressure finding procedure (exact solver
      * only)
-     * @return A pointer to a Solver instance
+     * @return A pointer to a RiemannSolver instance
      */
     static RiemannSolver* generate(std::string name, double gamma,
                                    double tolerance, double cutoff) {
@@ -114,6 +123,12 @@ class RiemannSolverFactory {
         if(name == "TRRS") {
             return new TRRSSolver(gamma);
         }
+        if(name == "NoPressure") {
+            return new NoPressureRiemannSolver();
+        }
+        if(name == "Advection") {
+            return new AdvectionRiemannSolver(gamma);
+        }
         std::cerr << "Error! Unknown Riemann solver type: " << name << "!"
                   << std::endl;
         my_exit();
@@ -121,7 +136,7 @@ class RiemannSolverFactory {
     }
 
     /**
-     * @brief Generate a Riemann solver based on the given parameters
+     * @brief Generate a RiemannSolver based on the given parameters
      *
      * @param parameters ParameterFile containing the desired parameter values
      * @return A pointer to a RiemannSolver instance

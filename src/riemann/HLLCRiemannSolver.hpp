@@ -69,8 +69,6 @@ class HLLCRiemannSolver : public RiemannSolver {
 
     virtual double get_soundspeed(const StateVector& W);
 
-    void test();
-
     virtual StateVector get_Q(double volume, const StateVector& W);
 
     virtual StateVector get_W(double volume, StateVector& Q,

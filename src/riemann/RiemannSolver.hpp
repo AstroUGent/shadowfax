@@ -44,7 +44,7 @@ class RiemannSolver {
      * @brief Get a std::string describing the specific implementation of
      * RiemannSolver
      *
-     * @return An implementation specific identifying tag for the Solver
+     * @return An implementation specific identifying tag for the RiemannSolver
      */
     virtual std::string tag() = 0;
 
@@ -98,11 +98,6 @@ class RiemannSolver {
     virtual double get_soundspeed(const StateVector& W) = 0;
 
     /**
-     * @brief Test the Riemann solver on a set of problems with known solutions
-     */
-    virtual void test() = 0;
-
-    /**
      * @brief Calculate conserved quantities from the given primitive variables
      * and given volume
      *
@@ -138,14 +133,14 @@ class RiemannSolver {
                                  const StateVector& W) = 0;
 
     /**
-     * @brief Get the adiabatic index used in this Solver
+     * @brief Get the adiabatic index used in this RiemannSolver
      *
      * @return The adiabatic index
      */
     virtual double get_gamma() = 0;
 
     /**
-     * @brief Dump the Solver to the given RestartFile
+     * @brief Dump the RiemannSolver to the given RestartFile
      *
      * @param rfile RestartFile to write to
      */
@@ -165,13 +160,13 @@ class RiemannSolver {
  */
 class PrimitiveVariablesException : public std::exception {
   private:
-    /*! \brief Derived primitive variables */
+    /*! @brief Derived primitive variables */
     StateVector _W;
 
-    /*! \brief Conserved variables */
+    /*! @brief Conserved variables */
     StateVector _Q;
 
-    /*! \brief Volume */
+    /*! @brief Volume */
     double _V;
 
   public:
@@ -186,13 +181,13 @@ class PrimitiveVariablesException : public std::exception {
  */
 class ConservedVariablesException : public std::exception {
   private:
-    /*! \brief Primitive variables */
+    /*! @brief Primitive variables */
     StateVector _W;
 
-    /*! \brief Derived conserved variables */
+    /*! @brief Derived conserved variables */
     StateVector _Q;
 
-    /*! \brief Volume */
+    /*! @brief Volume */
     double _V;
 
   public:
@@ -206,13 +201,13 @@ class ConservedVariablesException : public std::exception {
  */
 class RiemannSolverException : public std::exception {
   private:
-    /*! \brief Left StateVector */
+    /*! @brief Left StateVector */
     StateVector _WL;
 
-    /*! \brief Right StateVector */
+    /*! @brief Right StateVector */
     StateVector _WR;
 
-    /*! \brief Riemann solver solution */
+    /*! @brief Riemann solver solution */
     StateVector _Wstar;
 
   public:

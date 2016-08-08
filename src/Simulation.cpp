@@ -140,15 +140,17 @@ Simulation::Simulation(int argc, char** argv) {
     static struct option long_options[] = {
             {"restart", required_argument, NULL, 'r'},
             {"params", required_argument, NULL, 'p'},
+            {"read_mass", no_argument, NULL, 'm'},
             {0, 0, 0, 0}};
 
     std::string filename;
     bool restartflag = false;
+    bool read_mass = false;
     int c;
     // force rescan of the arguments
     optind = 1;
     opterr = 0;
-    while((c = getopt_long(argc, argv, ":r:p:", long_options, NULL)) != -1) {
+    while((c = getopt_long(argc, argv, ":r:p:m", long_options, NULL)) != -1) {
         switch(c) {
             case 'r':
                 restartflag = true;
@@ -156,6 +158,9 @@ Simulation::Simulation(int argc, char** argv) {
                 break;
             case 'p':
                 filename = optarg;
+                break;
+            case 'm':
+                read_mass = true;
                 break;
             case ':':
                 cerr << "Error! No ";
@@ -174,12 +179,12 @@ Simulation::Simulation(int argc, char** argv) {
         cout << "No parameterfile provided, using default parameterfile "
                 "default.ini"
              << endl;
-        initialize("default.ini");
+        initialize("default.ini", read_mass);
     } else {
         if(restartflag) {
             restart(filename);
         } else {
-            initialize(filename);
+            initialize(filename, read_mass);
         }
     }
     _starttimer->stop();
@@ -232,16 +237,20 @@ Simulation::~Simulation() {
   * @param filename The name of the snapshot file containing the particles that
   * should be put in the ParticleVector
   * @param simulation_units Internal Units used
+  * @param read_mass Read masses from snapshot file?
   * @return The time stamp of the snapshot file
   */
 double Simulation::load(ParticleVector& cells, string ictype, string filename,
-                        UnitSet& simulation_units) {
+                        UnitSet& simulation_units, bool read_mass) {
     LOGS("Start loading particles...");
 
     cout << "Read initial condition file " << filename << endl;
+    if(read_mass) {
+        cout << "Reading masses from snapshot instead of densities" << endl;
+    }
     SnapshotReader* reader =
             SnapshotReaderFactory::generate(ictype, filename, simulation_units);
-    Header header = reader->read_snapshot(cells);
+    Header header = reader->read_snapshot(cells, read_mass);
     cout << "Found " << header.npart()
          << " particles (gas: " << header.ngaspart()
          << ", DM: " << header.ndmpart() << ")" << endl;
@@ -1064,8 +1073,11 @@ void Simulation::check_for_restart(bool force_restart) {
  * @brief Initialize the simulation from the parameterfile with the given name
  *
  * @param filename Name of the parameter file
+ * @param read_mass Read masses from snapshot? (If true, densities are ignored
+ * and masses are used to calculate initial densities after the initial Voronoi
+ * grid construction)
  */
-void Simulation::initialize(string filename) {
+void Simulation::initialize(string filename, bool read_mass) {
     _parameterfile = new ParameterFile(filename);
 
     string outputdir = _parameterfile->get_parameter<string>(
@@ -1130,8 +1142,8 @@ void Simulation::initialize(string filename) {
     string icfile_name = _outputdir + string("/") +
                          _parameterfile->get_parameter<string>(
                                  "IC.FileName", SIMULATION_DEFAULT_ICNAME);
-    double time =
-            load(*_particles, icfile_type, icfile_name, *_simulation_units);
+    double time = load(*_particles, icfile_type, icfile_name,
+                       *_simulation_units, read_mass);
 
     if(_cosmology) {
         time = exp(log(1. / (1. + 99.)));
@@ -1215,7 +1227,17 @@ void Simulation::initialize(string filename) {
     for(unsigned int i = _particles->gassize(); i--;) {
         double V = _voronoi->get_volume(i);
         double A = _voronoi->get_total_area(i);
-        StateVector Q = _solver->get_Q(V, _particles->gas(i)->get_Wvec());
+        StateVector Q;
+        if(read_mass) {
+            Q = _particles->gas(i)->get_Qvec();
+            StateVector W = _particles->gas(i)->get_Wvec();
+            // first set correct density
+            W.set_rho(Q.m() / V);
+            // convert internal energy to pressure
+            W.set_p(2. * W.rho() * W.p() / 3.);
+            _particles->gas(i)->set_W(W);
+        }
+        Q = _solver->get_Q(V, _particles->gas(i)->get_Wvec());
         _particles->gas(i)->set_Q(Q);
         _particles->gas(i)->set_soundspeed(
                 _solver->get_soundspeed(_particles->gas(i)->get_Wvec()));

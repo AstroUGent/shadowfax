@@ -140,10 +140,10 @@ class Simulation {
     void main_loop();
 
     void print_welcome_message();
-    void initialize(std::string filename);
+    void initialize(std::string filename, bool read_mass);
 
     double load(ParticleVector& cells, std::string ictype, std::string filename,
-                UnitSet& simulation_units);
+                UnitSet& simulation_units, bool read_mass);
 
     void initialize_MPI_buffer(unsigned int partsize, unsigned int maxsize);
     void dump(RestartFile& restartfile);

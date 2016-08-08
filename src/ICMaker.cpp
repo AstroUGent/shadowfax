@@ -96,7 +96,7 @@ ICMaker::ICMaker(int argc, char** argv) {
     // force rescan of the arguments
     optind = 1;
     opterr = 0;
-    while((c = getopt_long(argc, argv, ":n:m:s:p:r:t:o:", long_options,
+    while((c = getopt_long(argc, argv, ":n:m:s:p:r:t:o:c", long_options,
                            NULL)) != -1) {
         switch(c) {
             case 'n':

@@ -60,7 +60,8 @@ class GadgetSnapshotReader : public SnapshotReader {
   public:
     GadgetSnapshotReader(std::string name, UnitSet& units);
 
-    virtual Header read_snapshot(ParticleVector& particles);
+    virtual Header read_snapshot(ParticleVector& particles,
+                                 bool read_mass = false);
 };
 
 #endif  // GADGETSNAPSHOTREADER_HPP

@@ -74,9 +74,11 @@ ShadowfaxSnapshotReader::ShadowfaxSnapshotReader(std::string basename,
  * @brief Read the snapshot and store its contents in the given particle vector
  *
  * @param particles ParticleVector to fill
+ * @param read_mass Should the mass be read from the snapshot file?
  * @return Header containing general information about the snapshot
  */
-Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles) {
+Header ShadowfaxSnapshotReader::read_snapshot(ParticleVector& particles,
+                                              bool read_mass) {
     Header header;
     FileInput file(_name);
     file.read_header(header);

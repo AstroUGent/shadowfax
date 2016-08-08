@@ -45,7 +45,7 @@ class ShadowfaxSnapshotReader : public SnapshotReader {
                             unsigned int nr);
     ~ShadowfaxSnapshotReader() {}
 
-    Header read_snapshot(ParticleVector& particles);
+    Header read_snapshot(ParticleVector& particles, bool read_mass = false);
 };
 
 #endif  // SHADOWFAXSNAPSHOTREADER_HPP

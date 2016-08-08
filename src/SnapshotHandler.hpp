@@ -218,9 +218,11 @@ class SnapshotReader : public SnapshotHandler {
      * ParticleVector
      *
      * @param particles ParticleVector to fill
+     * @param read_mass Should the mass be read from the snapshot?
      * @return Header containing general information about the snapshot
      */
-    virtual Header read_snapshot(ParticleVector& particles) = 0;
+    virtual Header read_snapshot(ParticleVector& particles,
+                                 bool read_mass = false) = 0;
 };
 
 #endif  // SNAPSHOTHANDLER_HPP

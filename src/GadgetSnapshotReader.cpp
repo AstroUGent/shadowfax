@@ -73,9 +73,14 @@ GadgetSnapshotReader::GadgetSnapshotReader(string name, UnitSet& units)
  * simulation units.
  *
  * @param particles Reference to a ParticleVector to fill
+ * @param read_mass Should the mass be read from the snapshot?
  * @return A copy of the Header that was read in
  */
-Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
+Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles,
+                                           bool read_mass) {
+
+    const static char* paq_names[NUM_PAQ] = PAQ_NAMES;
+
     Header header;
 
     for(int irank = 0; irank < MPIGlobal::size; irank++) {
@@ -122,6 +127,14 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
                                              _units.get_pressure_unit());
             UnitConverter time_converter(input_units->get_time_unit(),
                                          _units.get_time_unit());
+
+            if(read_mass) {
+                // pressure is actually internal energy:
+                // mass*length^2/time^2/mass
+                pressure_converter = UnitConverter(
+                        input_units->get_unit("length*length/time/time"),
+                        _units.get_unit("length*length/time/time"));
+            }
 
             // Header
             group = H5Gopen(file, "/Header");
@@ -244,6 +257,11 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
                 vector<double> velocity(ngaspart * 3, 0.);
                 vector<double> pressure(ngaspart, 0.);
                 vector<unsigned int> ids(ngaspart, 0);
+                vector<vector<double> > paqs(NUM_PAQ);
+                vector<double> masses;
+                if(read_mass) {
+                    masses.resize(ngaspart, 0.);
+                }
 
                 group = H5Gopen(file, "/PartType0");
 
@@ -280,38 +298,68 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
                     velocity[i] = velocity_converter.convert(velocity[i]);
                 }
 
-                // densities and pressures
-                if(HDF5tools::dataset_has_type(group, "Density",
+                if(read_mass) {
+                    // masses
+                    if(HDF5tools::dataset_has_type(group, "Masses",
+                                                   HDF5types::DOUBLE)) {
+                        masses = HDF5tools::read_dataset_scalar_chunk<double>(
+                                group, npart_other, ngaspart, "Masses",
+                                HDF5types::DOUBLE);
+                    } else {
+                        vector<float> fmasses =
+                                HDF5tools::read_dataset_scalar_chunk<float>(
+                                        group, npart_other, ngaspart, "Masses",
+                                        HDF5types::FLOAT);
+                        for(unsigned int i = 0; i < fmasses.size(); i++) {
+                            masses[i] = fmasses[i];
+                        }
+                    }
+                } else {
+                    // densities
+                    if(HDF5tools::dataset_has_type(group, "Density",
+                                                   HDF5types::DOUBLE)) {
+                        density = HDF5tools::read_dataset_scalar_chunk<double>(
+                                group, npart_other, ngaspart, "Density",
+                                HDF5types::DOUBLE);
+                    } else {
+                        vector<float> fdensity =
+                                HDF5tools::read_dataset_scalar_chunk<float>(
+                                        group, npart_other, ngaspart, "Density",
+                                        HDF5types::FLOAT);
+                        for(unsigned int i = 0; i < fdensity.size(); i++) {
+                            density[i] = fdensity[i];
+                        }
+                    }
+                }
+
+                // pressure
+                if(HDF5tools::dataset_has_type(group, "InternalEnergy",
                                                HDF5types::DOUBLE)) {
-                    // if density is double, internal energy will be double too
-                    density = HDF5tools::read_dataset_scalar_chunk<double>(
-                            group, npart_other, ngaspart, "Density",
-                            HDF5types::DOUBLE);
                     pressure = HDF5tools::read_dataset_scalar_chunk<double>(
                             group, npart_other, ngaspart, "InternalEnergy",
                             HDF5types::DOUBLE);
                 } else {
-                    vector<float> fdensity =
-                            HDF5tools::read_dataset_scalar_chunk<float>(
-                                    group, npart_other, ngaspart, "Density",
-                                    HDF5types::FLOAT);
                     vector<float> fpressure =
                             HDF5tools::read_dataset_scalar_chunk<float>(
                                     group, npart_other, ngaspart,
                                     "InternalEnergy", HDF5types::FLOAT);
-                    for(unsigned int i = 0; i < fdensity.size(); i++) {
-                        // density and pressure have the same size
-                        density[i] = fdensity[i];
+                    for(unsigned int i = 0; i < fpressure.size(); i++) {
                         pressure[i] = fpressure[i];
                     }
                 }
-                // convert internal energy to pressure (gamma = 5./3.)
-                for(unsigned int i = 0; i < pressure.size(); i++) {
-                    pressure[i] *= 2. * density[i] / 3.;
+                if(!read_mass) {
+                    // convert internal energy to pressure (gamma = 5./3.)
+                    for(unsigned int i = 0; i < pressure.size(); i++) {
+                        pressure[i] *= 2. * density[i] / 3.;
+                    }
                 }
                 // convert units
-                for(unsigned int i = 0; i < density.size(); i++) {
-                    density[i] = density_converter.convert(density[i]);
+                for(unsigned int i = 0; i < pressure.size(); i++) {
+                    if(read_mass) {
+                        masses[i] = mass_converter.convert(masses[i]);
+                    } else {
+                        density[i] = density_converter.convert(density[i]);
+                    }
                     pressure[i] = pressure_converter.convert(pressure[i]);
                 }
 
@@ -332,6 +380,15 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
                             HDF5types::UINT);
                 }
 
+                for(unsigned int i = 0; i < NUM_PAQ; i++) {
+                    if(HDF5tools::exists(group, paq_names[i])) {
+                        paqs[i].resize(ngaspart, 0.);
+                        paqs[i] = HDF5tools::read_dataset_scalar_chunk<double>(
+                                group, npart_other, ngaspart, paq_names[i],
+                                HDF5types::DOUBLE);
+                    }
+                }
+
                 for(unsigned int i = 0; i < ngaspart; i++) {
 #if ndim_ == 3
                     Vec position(coords[3 * i], coords[3 * i + 1],
@@ -344,11 +401,21 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles) {
                     StateVector W(density[i], velocity[3 * i],
                                   velocity[3 * i + 1], pressure[i]);
 #endif
+                    for(unsigned int j = 0; j < NUM_PAQ; j++) {
+                        if(paqs[j].size()) {
+                            W.paq(j) = paqs[j][i];
+                        }
+                    }
                     keep_inside(position, simbox);
                     particles.gas(i) = new GasParticle(position);
                     particles.gas(i)->set_W(W);
                     particles.gas(i)->set_id(ids[i]);
                     particles.gas(i)->set_v(0., 0., 0.);
+                    if(read_mass) {
+                        StateVector Q;
+                        Q.set_m(masses[i]);
+                        particles.gas(i)->set_Q(Q);
+                    }
                 }
 
                 status = H5Gclose(group);

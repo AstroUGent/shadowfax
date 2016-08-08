@@ -25,15 +25,16 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "SpecificICGenerator.hpp"
-#include "DelCont.hpp"                   // for DelCont
-#include "Error.hpp"                     // for my_exit
-#include "MPIGlobal.hpp"                 // for rank, size
-#include "StateVector.hpp"               // for StateVector
-#include "Vec.hpp"                       // for Vec
-#include "VorTessManager.hpp"            // for VorTessManager
-#include "io/Unit.hpp"                   // for Unit
-#include "io/UnitConverter.hpp"          // for UnitConverter
-#include "io/UnitSet.hpp"                // for UnitSet
+#include "DelCont.hpp"           // for DelCont
+#include "Error.hpp"             // for my_exit
+#include "MPIGlobal.hpp"         // for rank, size
+#include "StateVector.hpp"       // for StateVector
+#include "Vec.hpp"               // for Vec
+#include "VorTessManager.hpp"    // for VorTessManager
+#include "io/Unit.hpp"           // for Unit
+#include "io/UnitConverter.hpp"  // for UnitConverter
+#include "io/UnitSet.hpp"        // for UnitSet
+#include "riemann/RiemannSolverFactory.hpp"
 #include "utilities/DMParticle.hpp"      // for DMParticle
 #include "utilities/GasParticle.hpp"     // for GasParticle
 #include "utilities/ParticleVector.hpp"  // for ParticleVector
@@ -162,6 +163,9 @@ ParticleVector SpecificICGenerator::generate(bool conserved_variables) {
             relax_grid(particles);
         }
         apply_profiles(particles);
+        if(conserved_variables) {
+            set_conserved_variables(particles);
+        }
     }
     if(_ndmpart > 0) {
         add_DM(particles);
@@ -566,6 +570,26 @@ void SpecificICGenerator::apply_profile_evrard(ParticleVector& grid) {
          << endl;
     my_exit();
 #endif
+}
+
+/**
+ * @brief Set the conserved variables of the given particles
+ *
+ * @param grid Particles to act upon
+ */
+void SpecificICGenerator::set_conserved_variables(ParticleVector& grid) {
+    RiemannSolver* solver =
+            RiemannSolverFactory::generate("Exact", _gamma, 0., 0.);
+    grid.sort();
+    VorTessManager voronoi(grid, _periodic);
+    for(unsigned int j = grid.gassize(); j--;) {
+        double volume = voronoi.get_volume(j);
+        StateVector Q = solver->get_Q(volume, grid.gas(j)->get_Wvec());
+        grid.gas(j)->set_Q(Q);
+    }
+    cout << "Set conserved variables" << endl;
+
+    delete solver;
 }
 
 /**

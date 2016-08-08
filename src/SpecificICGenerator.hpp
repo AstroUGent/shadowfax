@@ -92,6 +92,8 @@ class SpecificICGenerator : public ICGenerator {
     void apply_profile_kh(ParticleVector& grid);
     void apply_profile_evrard(ParticleVector& grid);
 
+    void set_conserved_variables(ParticleVector& grid);
+
     void add_DM(ParticleVector& grid);
 
     void add_DM_plummer(ParticleVector& grid);

@@ -37,7 +37,7 @@ class ParticleVector;
 class Vec;
 
 /**
-  * \brief Generate initial conditions from a list of geometrical blocks with
+  * @brief Generate initial conditions from a list of geometrical blocks with
   * hydrodynamical properties
   *
   * The simulation domain is composed of geometrical blocks (cubes, sphere...),
@@ -47,21 +47,21 @@ class Vec;
   */
 class BlockICGenerator : public ICGenerator {
   private:
-    /*! \brief DelCont specifying the entire simulation box */
+    /*! @brief DelCont specifying the entire simulation box */
     DelCont* _container;
 
-    /*! \brief Number of gas particles to generate */
+    /*! @brief Number of gas particles to generate */
     unsigned int _ngas;
 
-    /*! \brief NUmber of dark matter particles to generate */
+    /*! @brief NUmber of dark matter particles to generate */
     unsigned int _ndark;
 
-    /*! \brief ICMode specifying if a cartesian or random grid should be set
+    /*! @brief ICMode specifying if a cartesian or random grid should be set
      *  up */
     unsigned int _mode;
 
     /**
-      * \brief Exponents of the geometrical blocks constituting the simulation
+      * @brief Exponents of the geometrical blocks constituting the simulation
       * box
       *
       * The exponent is used to determine the metric for measuring distances in
@@ -75,7 +75,7 @@ class BlockICGenerator : public ICGenerator {
     std::vector<ICRegion*> _regions;
 
     /**
-      * \brief Rejection factors for the geometrical blocks constituting the
+      * @brief Rejection factors for the geometrical blocks constituting the
       * simulation box
       *
       * We try to achieve a constant mass in all grid cells by using more cells
@@ -86,33 +86,34 @@ class BlockICGenerator : public ICGenerator {
       */
     std::vector<double> _rejection_fac;
 
-    /*! \brief Rejection factors for the dark matter */
+    /*! @brief Rejection factors for the dark matter */
     std::vector<double> _rejection_fac_dm;
 
-    /*! \brief The maximal density of the entire simulation, used for adaptive
+    /*! @brief The maximal density of the entire simulation, used for adaptive
      *  sampling */
     double _maxdens;
 
-    /*! \brief Maximal density for the dark matter */
+    /*! @brief Maximal density for the dark matter */
     double _maxdens_dm;
 
-    /*! \brief The desired adiabatic index for the simulation */
+    /*! @brief The desired adiabatic index for the simulation */
     double _gamma;
 
-    /*! \brief Flag indicating if the simulation box is periodic (true) or
+    /*! @brief Flag indicating if the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
 
-    /*! \brief Flag indicating if the initial condition has gas */
+    /*! @brief Flag indicating if the initial condition has gas */
     bool _has_gas;
 
-    /*! \brief Flag indicating if the initial condition has dark matter */
+    /*! @brief Flag indicating if the initial condition has dark matter */
     bool _has_dm;
 
     void make_cartesian_grid(ParticleVector& plist);
     void make_random_grid(ParticleVector& plist);
     void relax_grid(ParticleVector& grid);
     void apply_regions(ParticleVector& grid);
+    void set_conserved_variables(ParticleVector& grid);
     bool regions_accepted(Vec& p);
     bool regions_accepted_dm(Vec& p);
 

@@ -25,13 +25,14 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "BlockICGenerator.hpp"
-#include "DelCont.hpp"                         // for DelCont
-#include "Error.hpp"                           // for my_exit
-#include "ICGenerator.hpp"                     // for ICMode::IC_CART
-#include "ICRegion.hpp"                        // for ICRegion
-#include "MPIGlobal.hpp"                       // for size, rank
-#include "Vec.hpp"                             // for Vec
-#include "VorTessManager.hpp"                  // for VorTessManager
+#include "DelCont.hpp"         // for DelCont
+#include "Error.hpp"           // for my_exit
+#include "ICGenerator.hpp"     // for ICMode::IC_CART
+#include "ICRegion.hpp"        // for ICRegion
+#include "MPIGlobal.hpp"       // for size, rank
+#include "Vec.hpp"             // for Vec
+#include "VorTessManager.hpp"  // for VorTessManager
+#include "riemann/RiemannSolverFactory.hpp"
 #include "utilities/DMParticle.hpp"            // for DMParticle
 #include "utilities/GasParticle.hpp"           // for GasParticle
 #include "utilities/ParticleVector.hpp"        // for ParticleVector
@@ -264,6 +265,26 @@ void BlockICGenerator::apply_regions(ParticleVector& grid) {
 }
 
 /**
+ * @brief Set the conserved variables of the given particles
+ *
+ * @param grid Particles to act upon
+ */
+void BlockICGenerator::set_conserved_variables(ParticleVector& grid) {
+    RiemannSolver* solver =
+            RiemannSolverFactory::generate("Exact", _gamma, 0., 0.);
+    grid.sort();
+    VorTessManager voronoi(grid, _periodic);
+    for(unsigned int j = grid.gassize(); j--;) {
+        double volume = voronoi.get_volume(j);
+        StateVector Q = solver->get_Q(volume, grid.gas(j)->get_Wvec());
+        grid.gas(j)->set_Q(Q);
+    }
+    cout << "Set conserved variables" << endl;
+
+    delete solver;
+}
+
+/**
   * @brief Generate initial conditions
   *
   * We first set up a ParticleVector using the DelCont previously set up. We
@@ -284,6 +305,9 @@ ParticleVector BlockICGenerator::generate(bool conserved_variables) {
             relax_grid(particles);
         }
         apply_regions(particles);
+        if(conserved_variables) {
+            set_conserved_variables(particles);
+        }
     }
     if(_has_dm) {
         add_DM(particles);

@@ -201,7 +201,7 @@ if(DO_ICMAKER)
     VorGen.cpp
     VorTess.cpp
     VorTessManager.cpp
-    
+
     DelCont.hpp
     DelTess.hpp
     ExArith.hpp
@@ -232,6 +232,7 @@ if(DO_ICMAKER)
                           COMPILE_FLAGS "-Dndim_=${NDIM} -DICMAKER")
 
     target_link_libraries(${ICMAKERNAME} ${IONAME})
+    target_link_libraries(${ICMAKERNAME} ${RIEMANNNAME})
     target_link_libraries(${ICMAKERNAME} ${UTILNAME})
     target_link_libraries(${ICMAKERNAME} ${MPI_CXX_LIBRARIES})
     target_link_libraries(${ICMAKERNAME} ${MPI_C_LIBRARIES})

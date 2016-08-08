@@ -268,7 +268,8 @@ set(TESTSPECIFICICGENERATOR_SOURCES
 add_unit_test(NAME testSpecificICGenerator
               SOURCES ${TESTSPECIFICICGENERATOR_SOURCES}
               NDIM 3
-              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d io3d)
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d io3d
+                   riemann3d )
 
 # Legendre test
 set(TESTLEGENDRE_SOURCES

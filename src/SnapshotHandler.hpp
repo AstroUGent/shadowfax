@@ -156,8 +156,10 @@ class SnapshotWriter : public SnapshotHandler {
      *
      * @param t Current time of the simulation
      * @param particles ParticleVector to write out
+     * @param write_mass Should the mass be written to the snapshot?
      */
-    virtual void write_snapshot(double t, ParticleVector& particles) = 0;
+    virtual void write_snapshot(double t, ParticleVector& particles,
+                                bool write_mass = false) = 0;
 
     /**
      * @brief Get the current value of the snapshot counter

@@ -57,7 +57,8 @@ class ShadowfaxSnapshotWriter : public SnapshotWriter {
         return "SHAD";
     }
 
-    void write_snapshot(double currentTime, ParticleVector& particles);
+    void write_snapshot(double currentTime, ParticleVector& particles,
+                        bool write_mass = false);
 
     virtual void dump(RestartFile& rfile);
     ShadowfaxSnapshotWriter(RestartFile& rfile, UnitSet& units,

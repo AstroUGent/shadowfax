@@ -57,7 +57,8 @@ class GadgetSnapshotWriter : public SnapshotWriter {
         return "GADG";
     }
 
-    virtual void write_snapshot(double t, ParticleVector& particles);
+    virtual void write_snapshot(double t, ParticleVector& particles,
+                                bool write_mass = false);
 
     virtual void dump(RestartFile& rfile);
     GadgetSnapshotWriter(RestartFile& rfile, UnitSet& units,

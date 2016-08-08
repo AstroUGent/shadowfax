@@ -76,8 +76,12 @@ GadgetSnapshotWriter::GadgetSnapshotWriter(std::string basename, UnitSet& units,
  * @param t Real simulation time (as opposed to the integer internal timeline)
  * @param particles Reference to the ParticleVector that should be dumped in the
  * snapshot
+ * @param write_mass Should the mass be written to the snapshot?
  */
-void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
+void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles,
+                                          bool write_mass) {
+
+    const static char* paq_names[NUM_PAQ] = PAQ_NAMES;
 
     string snapname;
     // if _lastsnap is negative, we do not add an index to the snapshot name
@@ -287,6 +291,14 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
                 vector<float> velocity(particles.gassize() * 3, 0.);
                 vector<double> internalenergy(particles.gassize(), 0.);
                 vector<unsigned long> ids(particles.gassize(), 0);
+                vector<vector<double> > paqs(NUM_PAQ);
+                for(unsigned int i = 0; i < NUM_PAQ; i++) {
+                    paqs[i].resize(particles.gassize(), 0.);
+                }
+                vector<double> masses;
+                if(write_mass) {
+                    masses.resize(particles.gassize(), 0);
+                }
                 for(unsigned int i = 0; i < particles.gassize(); i++) {
                     coords[3 * i] = length_converter.convert(
                             particles.gas(i)->x() - box[0]);
@@ -303,6 +315,10 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
 #else
                     velocity[3 * i + 2] = 0.;
 #endif
+                    for(unsigned int j = 0; j < NUM_PAQ; j++) {
+                        paqs[j][i] = W.paq(j);
+                    }
+
                     // we assume gamma=5/3
                     if(W.rho()) {
                         internalenergy[i] = 1.5 *
@@ -312,6 +328,9 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
                         internalenergy[i] = 0.;
                     }
                     ids[i] = particles.gas(i)->id();
+                    if(write_mass) {
+                        masses[i] = particles.gas(i)->get_Qvec().m();
+                    }
                 }
                 // write particle data
                 if(!rank) {
@@ -355,6 +374,24 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
                             dataset, HDF5types::ULONG, 0, ids);
                     status = H5Dclose(dataset);
 
+                    for(unsigned int i = 0; i < NUM_PAQ; i++) {
+                        dataset = HDF5tools::create_dataset_scalar(
+                                group, paq_names[i], HDF5types::DOUBLE,
+                                gassizes.back());
+                        HDF5tools::write_dataset_scalar_chunk(
+                                dataset, HDF5types::DOUBLE, 0, paqs[i]);
+                        status = H5Dclose(dataset);
+                    }
+
+                    if(write_mass) {
+                        dataset = HDF5tools::create_dataset_scalar(
+                                group, "Masses", HDF5types::DOUBLE,
+                                gassizes.back());
+                        HDF5tools::write_dataset_scalar_chunk(
+                                dataset, HDF5types::DOUBLE, 0, masses);
+                        status = H5Dclose(dataset);
+                    }
+
                     status = H5Gclose(group);
                 } else {
                     // processes other than 0 open the group and datasets
@@ -389,6 +426,22 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles) {
                     HDF5tools::write_dataset_scalar_chunk(
                             dataset, HDF5types::ULONG, gassizes[rank - 1], ids);
                     status = H5Dclose(dataset);
+
+                    for(unsigned int i = 0; i < NUM_PAQ; i++) {
+                        dataset = H5Dopen(group, paq_names[i]);
+                        HDF5tools::write_dataset_scalar_chunk(
+                                dataset, HDF5types::DOUBLE, gassizes[rank - 1],
+                                paqs[i]);
+                        status = H5Dclose(dataset);
+                    }
+
+                    if(write_mass) {
+                        dataset = H5Dopen(group, "Masses");
+                        HDF5tools::write_dataset_scalar_chunk(
+                                dataset, HDF5types::DOUBLE, gassizes[rank - 1],
+                                masses);
+                        status = H5Dclose(dataset);
+                    }
 
                     status = H5Gclose(group);
                 }

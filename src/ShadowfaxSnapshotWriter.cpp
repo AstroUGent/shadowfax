@@ -82,9 +82,11 @@ ShadowfaxSnapshotWriter::~ShadowfaxSnapshotWriter() {
  * @param currentTime Current time of the simulation, written to the snapshot
  * header
  * @param particles ParticleVector to write out
+ * @param write_mass Should the mass be written to the snapshot?
  */
 void ShadowfaxSnapshotWriter::write_snapshot(double currentTime,
-                                             ParticleVector& particles) {
+                                             ParticleVector& particles,
+                                             bool write_mass) {
     _timer.start();
     string snapname;
     // if _lastsnap is negative, we do not add an index to the snapshot name

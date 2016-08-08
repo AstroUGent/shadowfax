@@ -26,6 +26,7 @@ set(PYTHON_RIEMANNSOURCES
     RiemannModule.cpp
     ../riemann/ApproximateSolver.cpp
     ../riemann/ExactRiemannSolver.cpp
+    ../riemann/RiemannSolver.cpp
     ../MPIGlobal.cpp
     ../ProgramLog.cpp
     ../utilities/HelperFunctions.cpp

@@ -79,6 +79,7 @@ ICMaker::ICMaker(int argc, char** argv) {
     unsigned int seed = 42;
     string output_type = "Gadget";
     string output_name;
+    bool output_mass = false;
 
     static struct option long_options[] = {
             {"ncell", required_argument, NULL, 'n'},
@@ -88,6 +89,7 @@ ICMaker::ICMaker(int argc, char** argv) {
             {"seed", required_argument, NULL, 'r'},
             {"type", required_argument, NULL, 't'},
             {"filename", required_argument, NULL, 'o'},
+            {"output_mass", no_argument, NULL, 'c'},
             {0, 0, 0, 0}};
 
     int c;
@@ -126,6 +128,9 @@ ICMaker::ICMaker(int argc, char** argv) {
                 break;
             case 'o':
                 output_name = optarg;
+                break;
+            case 'c':
+                output_mass = true;
                 break;
             case ':':
                 cerr << "Error! Missing required argument for option " << optopt
@@ -193,7 +198,7 @@ ICMaker::ICMaker(int argc, char** argv) {
         icgen = new BlockICGenerator(ncell, mode, seed);
         ((BlockICGenerator*)icgen)->read_xml(setup);
     }
-    ParticleVector icpart = icgen->generate();
+    ParticleVector icpart = icgen->generate(output_mass);
 
     Header& header = icpart.get_header();
     header.set_time(0);
@@ -202,7 +207,7 @@ ICMaker::ICMaker(int argc, char** argv) {
 
     SnapshotWriter* writer = SnapshotWriterFactory::generate(
             output_type, output_name, SI_units, SI_units, -1);
-    writer->write_snapshot(0, icpart);
+    writer->write_snapshot(0, icpart, output_mass);
     delete writer;
     delete icgen;
 }

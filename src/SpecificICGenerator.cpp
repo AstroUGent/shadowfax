@@ -148,10 +148,11 @@ SpecificICGenerator::~SpecificICGenerator() {
   * the hydrodynamical properties of the cells using the specific profile
   * specified in _type.
   *
+  * @param conserved_variables Generate conserved variables?
   * @return A ParticleVector suitable as initial condition for a hydrodynamical
   * simulation
   */
-ParticleVector SpecificICGenerator::generate() {
+ParticleVector SpecificICGenerator::generate(bool conserved_variables) {
     ParticleVector particles(false, *((RectangularBox*)_container));
     if(_ngaspart) {
         if(_mode == IC_CART) {

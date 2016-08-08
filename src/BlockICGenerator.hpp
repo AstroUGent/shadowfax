@@ -125,7 +125,7 @@ class BlockICGenerator : public ICGenerator {
 
     void read_xml(std::string filename);
 
-    ParticleVector generate();
+    ParticleVector generate(bool conserved_variables = false);
 };
 
 #endif  // BLOCKICGENERATOR_HPP

@@ -105,7 +105,7 @@ class SpecificICGenerator : public ICGenerator {
                         double gamma = 1.66667);
     virtual ~SpecificICGenerator();
 
-    ParticleVector generate();
+    ParticleVector generate(bool conserved_variables = false);
 
     static double gplummer(double q);
 };

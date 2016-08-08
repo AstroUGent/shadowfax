@@ -37,8 +37,11 @@ class ICGenerator {
 
     /**
       * \brief Generate initial conditions and return them as a ParticleVector
+      *
+      * @param conserved_variables Generate conserved variables?
+      * @return ParticleVector containing the generated particles
       */
-    virtual ParticleVector generate() = 0;
+    virtual ParticleVector generate(bool conserved_variables = false) = 0;
 };
 
 /**

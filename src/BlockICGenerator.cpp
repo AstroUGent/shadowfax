@@ -270,10 +270,11 @@ void BlockICGenerator::apply_regions(ParticleVector& grid) {
   * then generate the grid cells and optionally regularize them. We then set up
   * the hydrodynamical properties of the cells using the geometrical blocks.
   *
+  * @param conserved_variables Generate conserved variables?
   * @return A ParticleVector suitable as initial condition for a hydrodynamical
   * simulation
   */
-ParticleVector BlockICGenerator::generate() {
+ParticleVector BlockICGenerator::generate(bool conserved_variables) {
     ParticleVector particles(false, *((RectangularBox*)_container), _periodic);
     if(_has_gas) {
         if(_mode == IC_CART) {

@@ -270,7 +270,7 @@ StateVector TRRSSolver::solve(StateVector& WL, StateVector& WR, Vec& n,
     if(!WL.rho() || !WR.rho()) {
         return solve_vacuum(WL, WR, n, vL, vR, aL, aR);
     }
-    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) < fabs(vL - vR)) {
+    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) <= vR - vL) {
         return solve_vacuum(WL, WR, n, vL, vR, aL, aR);
     }
 

@@ -135,7 +135,7 @@ StateVector ExactRiemannSolver::solve(StateVector& WL, StateVector& WR, Vec& n,
         return solution;
     }
 
-    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) < fabs(vL - vR)) {
+    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) <= vR - vL) {
         solution = solve_vacuum(WL, WR, vL, vR, aL, aR, n);
     } else {
         double p = 0.;

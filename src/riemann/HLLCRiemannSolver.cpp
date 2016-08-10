@@ -283,7 +283,7 @@ StateVector HLLCRiemannSolver::solve_for_flux(StateVector& WL, StateVector& WR,
     if(!WL.rho() || !WR.rho()) {
         return vacuum_flux(WL, WR, n, v, uL, uR, aL, aR);
     }
-    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) < fabs(uL - uR)) {
+    if(2. * aL / (_gamma - 1.) + 2. * aR / (_gamma - 1.) <= uR - uL) {
         return vacuum_flux(WL, WR, n, v, uL, uR, aL, aR);
     }
 

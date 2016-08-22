@@ -28,7 +28,7 @@
 
 #include "StateVector.hpp"  // for StateVector
 #include "Vec.hpp"          // for Vec
-#include <stddef.h>         // for NULL
+#include <cstddef>          // for NULL
 #include <string>           // for string
 #include <vector>           // for vector
 
@@ -52,28 +52,28 @@ class SymbolicFunction;
  */
 class ICRegion {
   private:
-    /*! \brief Exponent \f$e\f$ of the region */
+    /*! @brief Exponent \f$e\f$ of the region */
     double _exponent;
 
-    /*! \brief Origin \f$\vec{o} = (o_x, o_y, o_z)\f$ of the region */
+    /*! @brief Origin \f$\vec{o} = (o_x, o_y, o_z)\f$ of the region */
     Vec _origin;
 
-    /*! \brief Sidelength \f$\vec{l} = (l_x, l_y, l_z)\f$ of the region */
+    /*! @brief Sidelength \f$\vec{l} = (l_x, l_y, l_z)\f$ of the region */
     Vec _sides;
 
-    /*! \brief SymbolicFunctions used for the hydrodynamical quantities */
+    /*! @brief SymbolicFunctions used for the hydrodynamical quantities */
     std::vector<SymbolicFunction*> _hydrofunctions;
 
-    /*! \brief SymbolicFunction used for the dark matter density */
+    /*! @brief SymbolicFunction used for the dark matter density */
     std::vector<SymbolicFunction*> _dmfunction;
 
-    /*! \brief Maximal hydrodynamical density in the region */
+    /*! @brief Maximal hydrodynamical density in the region */
     double _max_value_hydro;
 
-    /*! \brief Maximal dark matter density in the region */
+    /*! @brief Maximal dark matter density in the region */
     double _max_value_dm;
 
-    /*! \brief Volume of the region */
+    /*! @brief Volume of the region */
     double _volume;
 
     double integrate(SymbolicFunction* function, Vec origin, Vec sides,

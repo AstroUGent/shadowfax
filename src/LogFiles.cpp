@@ -180,7 +180,8 @@ void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector*& particles,
     _timefile << timeline->get_time() << "\t"
               << HelperFunctions::human_readable_long(
                          timeline->get_integertime())
-              << "\t" << timeline->get_realtime(timeline->get_timestep())
+              << "\t"
+              << timeline->get_realtime_interval(timeline->get_timestep())
               << endl;
 
     // energy log
@@ -194,7 +195,8 @@ void LogFiles::write_to_logs(TimeLine*& timeline, ParticleVector*& particles,
     _statfile << "Step " << _stat_stepcount << "\n";
     _stat_stepcount++;
     _statfile << "System time: " << timeline->get_time() << ", System step: "
-              << timeline->get_realtime(timeline->get_timestep()) << "\n";
+              << timeline->get_realtime_interval(timeline->get_timestep())
+              << "\n";
     _statfile << HelperFunctions::human_readable_counter(numactive)
               << " active particles\n";
     _statfile << HelperFunctions::human_readable_counter(solvercount)

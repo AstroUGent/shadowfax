@@ -27,7 +27,7 @@
 #define ICMAKER_H
 
 /**
-  * \brief Driving class for initial condition generating part of the code
+  * @brief Driving class for initial condition generating part of the code
   *
   * This class can be thought of as a stand-alone program which generates
   * initial conditions. The initial conditions are generated using a

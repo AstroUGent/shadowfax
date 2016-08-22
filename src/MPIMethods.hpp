@@ -211,6 +211,9 @@ inline void MyMPI_Comm_local_vars(int* rank, int* size, int* noderank,
             owni = i;
         }
     }
+
+    delete[] allnames;
+
     if(!is_single) {
         MPI_Comm real_local_world = MPI_COMM_NULL;
         status = MPI_Comm_split(local_world, owni, (*rank), &real_local_world);
@@ -586,6 +589,34 @@ inline void MyMPI_Allgather(void* sendbuf, int sendcount, MPI_Datatype sendtype,
                                recvtype, comm);
     if(status != MPI_SUCCESS) {
         std::cerr << "Error during MPI_Allgather!" << std::endl;
+        my_exit();
+    }
+    MPIGlobal::commtimer.stop();
+}
+
+/**
+ * @brief Wrapper around MPI_Gather
+ *
+ * We check the error code to detect MPI errors and use the default communicator
+ * MPI_WORLD.
+ *
+ * @param sendbuf Buffer to send
+ * @param sendcount Number of elements in the send buffer
+ * @param sendtype MPI type of elements being sent
+ * @param recvbuf Buffer to receive in
+ * @param recvcount Number of elements to receive
+ * @param recvtype MPI type of elements being received
+ * @param root Root process which will receive contributions from all other
+ * processes
+ */
+inline void MyMPI_Gather(void* sendbuf, int sendcount, MPI_Datatype sendtype,
+                         void* recvbuf, int recvcount, MPI_Datatype recvtype,
+                         int root) {
+    MPIGlobal::commtimer.start();
+    int status = MPI_Gather(sendbuf, sendcount, sendtype, recvbuf, recvcount,
+                            recvtype, root, MPI_COMM_WORLD);
+    if(status != MPI_SUCCESS) {
+        std::cerr << "Error during MPI_Gather!" << std::endl;
         my_exit();
     }
     MPIGlobal::commtimer.stop();

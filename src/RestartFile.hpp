@@ -47,10 +47,10 @@
  */
 class RestartFile {
   private:
-    /*! \brief Output file stream if this RestartFile is used to dump data */
+    /*! @brief Output file stream if this RestartFile is used to dump data */
     std::ofstream _ofile;
 
-    /*! \brief Input file stream if this RestartFile is used to restart */
+    /*! @brief Input file stream if this RestartFile is used to restart */
     std::ifstream _ifile;
 
     std::string get_padded_digit(int digit, int limit);
@@ -63,6 +63,8 @@ class RestartFile {
   public:
     RestartFile(std::string outputdir, double simtime);
     RestartFile(std::string filename);
+
+    RestartFile(bool write);
 
     /**
      * @brief Write a standard datatype value to the stream
@@ -113,6 +115,16 @@ class RestartFile {
     }
 
     /**
+     * @brief RestartFile::write() specialization for std::pair
+     *
+     * @param p std::pair to write to the stream
+     */
+    template <typename T1, typename T2> void write(std::pair<T1, T2>& p) {
+        write(p.first);
+        write(p.second);
+    }
+
+    /**
      * @brief RestartFile::write() specialization for std::vector
      *
      * By using a recursive implementation, things like
@@ -126,6 +138,17 @@ class RestartFile {
         write(vsize);
         for(unsigned int i = 0; i < vsize; i++) {
             write(vec[i]);
+        }
+    }
+
+    /**
+     * @brief RestartFile::write() specialization for std::array
+     *
+     * @param arr std::array to write to the stream
+     */
+    template <typename T, unsigned int S> void write(std::array<T, S>& arr) {
+        for(unsigned int i = 0; i < S; ++i) {
+            write(arr[i]);
         }
     }
 
@@ -212,6 +235,16 @@ class RestartFile {
     }
 
     /**
+     * @brief RestartFile::read() specialization for std::pair
+     *
+     * @param p std::pair to read from the stream
+     */
+    template <typename T1, typename T2> void read(std::pair<T1, T2>& p) {
+        read(p.first);
+        read(p.second);
+    }
+
+    /**
      * @brief RestartFile::read() specialization for std::vector
      *
      * By using a recursive definition, things like
@@ -227,6 +260,17 @@ class RestartFile {
             T element;
             read(element);
             vec[i] = element;
+        }
+    }
+
+    /**
+     * @brief RestartFile::read() specialization for std::array
+     *
+     * @param arr std::array to read from the stream
+     */
+    template <typename T, unsigned int S> void read(std::array<T, S>& arr) {
+        for(unsigned int i = 0; i < S; ++i) {
+            read(arr[i]);
         }
     }
 

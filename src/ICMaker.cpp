@@ -43,7 +43,7 @@
 using namespace std;
 
 /**
-  * \brief Main routine to generate initial condition files
+  * @brief Main routine to generate initial condition files
   *
   * The (optional) arguments to this program are
 \verbatim

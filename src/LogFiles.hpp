@@ -44,28 +44,28 @@ class RiemannSolver;
 class LogFiles {
   private:
     // time log
-    /*! \brief Path of the time log file */
+    /*! @brief Path of the time log file */
     std::string _timename;
-    /*! \brief Stream to write time log information to */
+    /*! @brief Stream to write time log information to */
     std::ofstream _timefile;
 
     // energy log
-    /*! \brief Path of the energy log file */
+    /*! @brief Path of the energy log file */
     std::string _energyname;
-    /*! \brief Stream to write energy log information to */
+    /*! @brief Stream to write energy log information to */
     std::ofstream _energyfile;
 
     // statistics
-    /*! \brief Path of the statistics log file */
+    /*! @brief Path of the statistics log file */
     std::string _statname;
-    /*! \brief Stream to write statistics log information to */
+    /*! @brief Stream to write statistics log information to */
     std::ofstream _statfile;
-    /*! \brief Step counter */
+    /*! @brief Step counter */
     unsigned int _stat_stepcount;
-    /*! \brief Previous number of Riemann solver evaluations */
+    /*! @brief Previous number of Riemann solver evaluations */
     unsigned long _stat_solvercount;
 
-    /*! \brief Timer to quantify time spent writing log files */
+    /*! @brief Timer to quantify time spent writing log files */
     Timer _timer;
 
     void copy_file_single(std::ifstream& ifile, std::ofstream& ofile, long pos);

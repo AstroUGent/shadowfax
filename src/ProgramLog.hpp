@@ -84,11 +84,11 @@
  * @brief Three possible levels of logging
  */
 enum LogLevel {
-    /*! \brief Lowest level of logging, provides most information */
+    /*! @brief Lowest level of logging, provides most information */
     LOGLEVEL_S = 0,
-    /*! \brief Warning level. Invoked to log non-fatal warnings */
+    /*! @brief Warning level. Invoked to log non-fatal warnings */
     LOGLEVEL_W,
-    /*! \brief Error level. Invoked to log fatal program errors */
+    /*! @brief Error level. Invoked to log fatal program errors */
     LOGLEVEL_E
 };
 
@@ -100,7 +100,7 @@ enum LogLevel {
  */
 class ProgramLog {
   private:
-    /*! \brief Output stream to write logs to */
+    /*! @brief Output stream to write logs to */
     std::ofstream _ofile;
 
   public:
@@ -152,7 +152,7 @@ class ProgramLog {
     }
 };
 
-/*! \brief Global ProgramLog instance */
+/*! @brief Global ProgramLog instance */
 extern ProgramLog global_logger;
 
 #endif

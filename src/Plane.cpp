@@ -23,13 +23,13 @@
  *
  * @brief 3D plane: implementation
  */
+#if ndim_ == 3
+
 #include "Plane.hpp"
 #include "Line.hpp"    // for Line
 #include "VorGen.hpp"  // for VorGen
 #include <cmath>       // for fabs, sqrt
 using namespace std;
-
-#if ndim_ == 3
 
 /**
  * @brief Construct a plane through the given point coordinates and with the

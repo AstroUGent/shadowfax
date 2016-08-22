@@ -42,18 +42,18 @@ class Line;
  */
 class Plane {
   private:
-    /*! \brief x-component of the normal vector of the plane */
+    /*! @brief x-component of the normal vector of the plane */
     double _nx;
-    /*! \brief y-component of the normal vector of the plane */
+    /*! @brief y-component of the normal vector of the plane */
     double _ny;
-    /*! \brief z-component of the normal vector of the plane */
+    /*! @brief z-component of the normal vector of the plane */
     double _nz;
 
-    /*! \brief x-coordinate of a reference point on the plane */
+    /*! @brief x-coordinate of a reference point on the plane */
     double _x;
-    /*! \brief y-coordinate of a reference point on the plane */
+    /*! @brief y-coordinate of a reference point on the plane */
     double _y;
-    /*! \brief z-coordinate of a reference point on the plane */
+    /*! @brief z-coordinate of a reference point on the plane */
     double _z;
 
   public:

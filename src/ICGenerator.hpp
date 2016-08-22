@@ -29,14 +29,14 @@
 class ParticleVector;
 
 /**
-  * \brief Interface for initial conditions generators
+  * @brief Interface for initial conditions generators
   */
 class ICGenerator {
   public:
     virtual ~ICGenerator() {}
 
     /**
-      * \brief Generate initial conditions and return them as a ParticleVector
+      * @brief Generate initial conditions and return them as a ParticleVector
       *
       * @param conserved_variables Generate conserved variables?
       * @return ParticleVector containing the generated particles
@@ -45,7 +45,7 @@ class ICGenerator {
 };
 
 /**
-  * \brief Possible modes for initial condition generation
+  * @brief Possible modes for initial condition generation
   */
 enum ICMode {
     /*! Set up a regularized uniform random grid */

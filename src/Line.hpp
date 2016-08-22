@@ -48,27 +48,27 @@ class Plane;
  */
 class Line {
   private:
-    /*! \brief x-coordinate of the first endpoint */
+    /*! @brief x-coordinate of the first endpoint */
     double _x1;
-    /*! \brief x-coordinate of the second endpoint */
+    /*! @brief x-coordinate of the second endpoint */
     double _x2;
 
-    /*! \brief y-coordinate of the first endpoint */
+    /*! @brief y-coordinate of the first endpoint */
     double _y1;
-    /*! \brief y-coordinate of the second endpoint */
+    /*! @brief y-coordinate of the second endpoint */
     double _y2;
 
-    /*! \brief x-component of the direction vector of the line */
+    /*! @brief x-component of the direction vector of the line */
     double _xdir;
-    /*! \brief y-component of the direction vector of the line */
+    /*! @brief y-component of the direction vector of the line */
     double _ydir;
 #if ndim_ == 3
-    /*! \brief z-coordinate of the first endpoint */
+    /*! @brief z-coordinate of the first endpoint */
     double _z1;
-    /*! \brief z-coordinate of the second endpoint */
+    /*! @brief z-coordinate of the second endpoint */
     double _z2;
 
-    /*! \brief z-component of the direction vector of the line */
+    /*! @brief z-component of the direction vector of the line */
     double _zdir;
 #endif
 

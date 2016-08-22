@@ -385,3 +385,17 @@ RestartFile::RestartFile(std::string filename) {
     cout << "Reading " << restartname << endl;
     _ifile.open(restartname.c_str(), ios::in | ios::binary);
 }
+
+/**
+ * @brief Minimal constructor for testing
+ *
+ * @param write Flag indicating if we want a read (false) or write (true)
+ * RestartFile
+ */
+RestartFile::RestartFile(bool write) {
+    if(write) {
+        _ofile.open("restart.test", ios::out | ios::binary);
+    } else {
+        _ifile.open("restart.test", ios::in | ios::binary);
+    }
+}

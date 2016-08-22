@@ -27,7 +27,7 @@
 
 #ifdef DOLOG
 
-/*! \brief Global ProgramLog instance */
+/*! @brief Global ProgramLog instance */
 ProgramLog global_logger;
 
 #endif

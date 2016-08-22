@@ -310,6 +310,22 @@ if(PYTHON_MODULES)
     add_unit_test_python(NAME testShapy3d SCRIPT testShapy3d.py)
 endif(PYTHON_MODULES)
 
+# RestartFile test
+set(TESTRESTART_SOURCES
+    testRestartFile.cpp
+
+    ../src/MPIGlobal.cpp
+    ../src/NDIrregTable.cpp
+    ../src/NDTable.cpp
+    ../src/RestartFile.cpp
+    ../src/CoolingTable.cpp
+)
+
+add_unit_test(NAME testRestartFile
+              SOURCES ${TESTRESTART_SOURCES}
+              NDIM 2
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d io2d)
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

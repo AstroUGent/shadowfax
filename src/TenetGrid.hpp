@@ -29,7 +29,7 @@
 #include "TenetCell.hpp"         // for TenetCell
 #include "Vec.hpp"               // for Vec, operator*, operator+
 #include "utilities/Cuboid.hpp"  // for Cuboid
-#include <stddef.h>              // for NULL
+#include <cstddef>               // for NULL
 #include <vector>                // for vector
 
 /**

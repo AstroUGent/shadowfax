@@ -32,7 +32,7 @@
 #include "TenetSlopeLimiter.hpp"  // for TenetSlopeLimiter
 #include "TenetSystemState.hpp"   // for TenetSystemState
 #include <algorithm>              // for max, min
-#include <math.h>                 // for sqrt
+#include <cmath>                  // for sqrt
 class TenetGrid;
 
 /**

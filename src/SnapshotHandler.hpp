@@ -44,11 +44,11 @@ class UnitSet;
  */
 class SnapshotHandler {
   protected:
-    /*! \brief Name of the snapshot. Can be either a generic name for snapshot
+    /*! @brief Name of the snapshot. Can be either a generic name for snapshot
      *  writers or an actual filename for snapshot readers */
     std::string _name;
 
-    /*! \brief Internal simulation UnitSet */
+    /*! @brief Internal simulation UnitSet */
     UnitSet& _units;
 
     std::string get_snapshot_name(unsigned int nr, int rank = -1, int size = 1);
@@ -72,13 +72,13 @@ class SnapshotHandler {
  */
 class SnapshotWriter : public SnapshotHandler {
   protected:
-    /*! \brief UnitSet to be used in the output file */
+    /*! @brief UnitSet to be used in the output file */
     UnitSet& _output_units;
 
-    /*! \brief Counter in the name of the next snapshot that will be written */
+    /*! @brief Counter in the name of the next snapshot that will be written */
     int _lastsnap;
 
-    /*! \brief Flag indicating if a separate snapshot file should be written for
+    /*! @brief Flag indicating if a separate snapshot file should be written for
      *  different nodes (necessary when e.g. running OpenMPI over SSH) */
     bool _per_node_output;
 

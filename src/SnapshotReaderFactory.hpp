@@ -30,8 +30,8 @@
 #include "Error.hpp"                    // for my_exit
 #include "GadgetSnapshotReader.hpp"     // for GadgetSnapshotReader
 #include "ShadowfaxSnapshotReader.hpp"  // for ShadowfaxSnapshotReader
+#include <cstddef>                      // for NULL
 #include <iostream>                     // for operator<<, basic_ostream, etc
-#include <stddef.h>                     // for NULL
 #include <string>                       // for operator==, basic_string, etc
 
 class SnapshotReader;

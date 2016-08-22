@@ -31,9 +31,9 @@
 #include "NDTable.hpp"       // for FiveDTable
 #include "RestartFile.hpp"
 #include <algorithm>  // for min
+#include <cstddef>    // for NULL
 #include <dirent.h>   // for closedir, opendir, readdir, etc
 #include <iostream>   // for operator<<, basic_ostream, etc
-#include <stddef.h>   // for NULL
 #include <string>     // for string, allocator, etc
 #include <vector>     // for vector
 using namespace std;

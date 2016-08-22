@@ -32,10 +32,10 @@
 #include <algorithm>             // for sort, unique, upper_bound
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
+#include <cmath>     // for pow
 #include <float.h>   // for DBL_MAX
 #include <iostream>  // for ifstream
 #include <iterator>  // for distance
-#include <math.h>    // for pow
 #include <sstream>
 #include <string>  // for basic_string, string
 #include <vector>  // for vector, vector<>::iterator

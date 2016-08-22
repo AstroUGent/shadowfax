@@ -29,9 +29,9 @@
 #include "Particle.hpp"           // for Particle
 #include "ParticleConverter.hpp"  // for ParticleConverter
 #include "RestartFile.hpp"
-#include <sstream>   // for operator<<, basic_ostream, etc
-#include <stddef.h>  // for NULL
-#include <vector>    // for vector
+#include <cstddef>  // for NULL
+#include <sstream>  // for operator<<, basic_ostream, etc
+#include <vector>   // for vector
 using namespace std;
 
 /**

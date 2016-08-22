@@ -28,12 +28,11 @@
 
 #include "StateVector.hpp"  // for StateVector
 #include "Vec.hpp"          // for Vec
+#include <cmath>            // for fabs, fmax, fmin, sqrt
 #include <exception>        // for exception
-#include <math.h>           // for fabs, fmax, fmin, sqrt
 #include <ostream>          // for ostream
 #include <vector>           // for vector
 
-class ParticleVector;
 class RiemannSolver;
 class TimeLine;
 class VorGen;
@@ -48,32 +47,32 @@ class VorGen;
  */
 class VorFace {
   private:
-    /*! \brief Vertices that make up the face */
+    /*! @brief Vertices that make up the face */
     std::vector<VorGen*> _vertices;
 
-    /*! \brief Right generator of the face */
+    /*! @brief Right generator of the face */
     VorGen* _right;
 
-    /*! \brief Left generator of the face */
+    /*! @brief Left generator of the face */
     VorGen* _left;
 
-    /*! \brief Index of the right generator in the DelTess VorGen list */
+    /*! @brief Index of the right generator in the DelTess VorGen list */
     unsigned int _vright;
 
-    /*! \brief Index of the left generator in the DelTess VorGen list */
+    /*! @brief Index of the left generator in the DelTess VorGen list */
     unsigned int _vleft;
 
-    /*! \brief Face neighbours, necessary for evolution algorithm
+    /*! @brief Face neighbours, necessary for evolution algorithm
      *  initialization */
     std::vector<VorGen*> _ngbs;
 
-    /*! \brief Geometrical area of the face */
+    /*! @brief Geometrical area of the face */
     double _area;
 
-    /*! \brief Geometrical centroid of the face */
+    /*! @brief Geometrical centroid of the face */
     Vec _midpoint;
 
-    /*! \brief Velocity of the face */
+    /*! @brief Velocity of the face */
     Vec _v;
 
     /**
@@ -232,7 +231,7 @@ class VorFace {
     void get_normal(double* angles);
 
     Vec& get_v();
-    void set_v(ParticleVector& particles);
+    void set_v();
 
 #ifndef ICMAKER
     void calculate_flux(TimeLine& timeline, RiemannSolver& solver);
@@ -248,16 +247,16 @@ class VorFace {
  */
 class FluxCalculationException : public std::exception {
   private:
-    /*! \brief Left StateVector */
+    /*! @brief Left StateVector */
     StateVector _WL;
 
-    /*! \brief Right StateVector */
+    /*! @brief Right StateVector */
     StateVector _WR;
 
-    /*! \brief Rank of the MPI process */
+    /*! @brief Rank of the MPI process */
     unsigned int _rank;
 
-    /*! \brief Reference to the Solver used to solve the Riemann problem */
+    /*! @brief Reference to the Solver used to solve the Riemann problem */
     RiemannSolver& _solver;
 
   public:

@@ -34,8 +34,8 @@
 #include "utilities/StarParticle.hpp"    // for StarParticle
 #include "utilities/Tree.hpp"            // for Tree
 #include <algorithm>                     // for max, min
+#include <cstddef>                       // for NULL
 #include <sstream>                       // for basic_stringbuf<>::int_type, etc
-#include <stddef.h>                      // for NULL
 using namespace std;
 
 /**

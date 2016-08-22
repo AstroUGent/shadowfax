@@ -31,7 +31,7 @@
 #include "utilities/Particle.hpp"       // for Particle
 #include "utilities/ParticleTypes.hpp"  // for ParticleType, etc
 #include "utilities/TreeWalker.hpp"     // for PeriodicTreeWalker
-#include <stddef.h>                     // for NULL
+#include <cstddef>                      // for NULL
 
 class EwaldTable;
 class Leaf;

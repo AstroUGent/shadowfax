@@ -34,9 +34,9 @@
 #include "io/UnitSet.hpp"             // for UnitSet
 #include "utilities/GasParticle.hpp"
 #include "utilities/ParticleVector.hpp"  // for ParticleVector
+#include <cstddef>                       // for NULL
 #include <getopt.h>                      // for optarg, getopt_long, etc
 #include <iostream>                      // for cerr
-#include <stddef.h>                      // for NULL
 #include <string>                        // for string
 #include <vector>                        // for vector
 using namespace std;

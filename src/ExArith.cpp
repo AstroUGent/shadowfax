@@ -35,8 +35,8 @@
 #include <boost/multiprecision/detail/number_compare.hpp>
 #include <boost/multiprecision/number.hpp>  // for number
 #include <cmath>                            // for fabs
+#include <cstdlib>                          // for srand
 #include <iostream>  // for operator<<, cout, ostream, etc
-#include <stdlib.h>  // for srand
 // if you want to use this, you have to link to the GMP library, which is not
 // done in the basic CMake setup
 //#include <boost/multiprecision/gmp.hpp>

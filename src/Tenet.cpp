@@ -40,9 +40,9 @@
 #include "riemann/RiemannSolverFactory.hpp"  // for RiemannSolverFactory
 #include "utilities/Cuboid.hpp"              // for Cuboid
 #include <algorithm>                         // for min
+#include <cmath>                             // for fabs, sqrt
+#include <cstdlib>                           // for atoi
 #include <iostream>  // for operator<<, basic_ostream, etc
-#include <math.h>    // for fabs, sqrt
-#include <stdlib.h>  // for atoi
 #include <vector>    // for vector
 using namespace std;
 

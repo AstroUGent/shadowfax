@@ -27,9 +27,9 @@
 #define HDF5TOOLS_HPP
 
 #include "Error.hpp"
+#include <cstddef>  // for NULL
 #include <hdf5.h>
 #include <iostream>  // for operator<<, basic_ostream, etc
-#include <stddef.h>  // for NULL
 #include <string>    // for operator<<, char_traits, etc
 #include <vector>    // for vector
 

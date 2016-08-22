@@ -49,23 +49,23 @@ class VorGen;
  */
 class VorCell {
   private:
-    /*! \brief Faces that border the cell */
+    /*! @brief Faces that border the cell */
     std::vector<VorFace*> _faces;
-    /*! \brief Neighbouring points of this cell */
+    /*! @brief Neighbouring points of this cell */
     std::vector<VorGen*> _ngbs;
-    /*! \brief Generator of this cell */
+    /*! @brief Generator of this cell */
     VorGen* _central_point;
 
-    /*! \brief Indices of the faces in the VorTess face list */
+    /*! @brief Indices of the faces in the VorTess face list */
     std::vector<unsigned int> _face_ids;
-    /*! \brief Indices of the neighbours in the DelTess point list */
+    /*! @brief Indices of the neighbours in the DelTess point list */
     std::vector<unsigned int> _ngb_ids;
 
-    /*! \brief Centroid of the cell */
+    /*! @brief Centroid of the cell */
     Vec _centroid;
-    /*! \brief Volume of the cell */
+    /*! @brief Volume of the cell */
     double _volume;
-    /*! \brief Total area of the faces of the cell */
+    /*! @brief Total area of the faces of the cell */
     double _total_area;
 
   public:

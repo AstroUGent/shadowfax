@@ -36,9 +36,9 @@
 #include "utilities/HelperFunctions.hpp"  // for human_readable_bytes
 #include "utilities/ParticleVector.hpp"   // for ParticleVector
 #include <algorithm>                      // for min
+#include <cstdlib>                        // for NULL, atoi
 #include <getopt.h>                       // for optarg, required_argument, etc
 #include <iostream>                       // for operator<<, basic_ostream, etc
-#include <stdlib.h>                       // for NULL, atoi
 #include <string>                         // for string, char_traits, etc
 using namespace std;
 

@@ -26,8 +26,8 @@
 #include "GasParticle.hpp"
 #include "RestartFile.hpp"
 #include "VorGen.hpp"
+#include <cstddef>   // for NULL
 #include <iostream>  // for operator<<, ostream, etc
-#include <stddef.h>  // for NULL
 using namespace std;
 
 /**

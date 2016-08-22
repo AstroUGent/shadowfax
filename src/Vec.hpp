@@ -40,7 +40,7 @@ using namespace std;
 
 #if ndim_ == 3
 /**
-  * \brief A 2D or 3D vector
+  * @brief A 2D or 3D vector
   *
   * Vec is a low-level class for working with three-dimensional vectors: each
   * instance represents a vector with three cartesian components called \em x,
@@ -57,17 +57,17 @@ using namespace std;
   */
 class Vec {
   protected:
-    /*! \brief These data members represent the cartesian vector components.
+    /*! @brief These data members represent the cartesian vector components.
      *  The anonymous union is used to permit indexing the components */
     union {
-        /*! \brief Array storing the actual vector contents */
+        /*! @brief Array storing the actual vector contents */
         double _c[3];
         struct {
-            /*! \brief x-component of the vector */
+            /*! @brief x-component of the vector */
             double _x;
-            /*! \brief y-component of the vector */
+            /*! @brief y-component of the vector */
             double _y;
-            /*! \brief z-component of the vector */
+            /*! @brief z-component of the vector */
             double _z;
         };
     };
@@ -292,7 +292,7 @@ class Vec {
 };
 #else
 /**
-  * \brief A 2D or 3D vector
+  * @brief A 2D or 3D vector
   *
   * Vec is a low-level class for working with three-dimensional vectors: each
   * instance represents a vector with three cartesian components called \em x,
@@ -309,15 +309,15 @@ class Vec {
   */
 class Vec {
   protected:
-    /*! \brief These data members represent the cartesian vector components.
+    /*! @brief These data members represent the cartesian vector components.
      *  The anonymous union is used to permit indexing the components */
     union {
-        /*! \brief Array storing the actual vector contents */
+        /*! @brief Array storing the actual vector contents */
         double _c[2];
         struct {
-            /*! \brief x-component of the vector */
+            /*! @brief x-component of the vector */
             double _x;
-            /*! \brief y-component of the vector */
+            /*! @brief y-component of the vector */
             double _y;
         };
     };

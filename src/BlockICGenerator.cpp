@@ -39,10 +39,10 @@
 #include <algorithm>                           // for max
 #include <boost/algorithm/string/trim.hpp>     // for trim
 #include <boost/property_tree/xml_parser.hpp>  // for read_xml
+#include <cmath>                               // for round
 #include <cstdlib>   // for RAND_MAX, rand, srand, NULL
 #include <fstream>   // for operator<<, basic_ostream, etc
 #include <iostream>  // for cout, cerr
-#include <math.h>    // for round
 #include <sstream>   // for basic_stringbuf<>::int_type, etc
 #include <utility>   // for pair
 using namespace std;

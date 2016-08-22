@@ -33,7 +33,7 @@
 #include <iostream>     // for operator<<, ostream, etc
 #include <vector>       // for vector
 #if ndim_ == 3
-#include <stddef.h>  // for NULL
+#include <cstddef>  // for NULL
 #endif
 
 /**
@@ -47,25 +47,25 @@
  */
 class Simplex {
   private:
-    /*! \brief Indices of the vertices that make up the simplex in the DelTess
+    /*! @brief Indices of the vertices that make up the simplex in the DelTess
      *  VorGen list */
     unsigned int _vorgens[ndim_ + 1];
 
-    /*! \brief Indices of the neighbouring simplices in the DelTess Simplex
+    /*! @brief Indices of the neighbouring simplices in the DelTess Simplex
      *  list */
     unsigned int _ngbs[ndim_ + 1];
 
-    /*! \brief Indices in the neighbouring simplices of this simplex */
+    /*! @brief Indices in the neighbouring simplices of this simplex */
     int _ngbface[ndim_ + 1];
 
-    /*! \brief Midpoint of the circumsphere of this simplex. This will be a
+    /*! @brief Midpoint of the circumsphere of this simplex. This will be a
      *  vertex of the final Voronoi grid, if this Simplex is retained */
     VorGen* _midpoint_circumsphere;
 
-    /*! \brief Linked list for DelTess Simplex queue: next simplex to check */
+    /*! @brief Linked list for DelTess Simplex queue: next simplex to check */
     unsigned int _next_check;
 
-    /*! \brief Linked list for DelTess Simplex queue: previous simplex to
+    /*! @brief Linked list for DelTess Simplex queue: previous simplex to
      *  check */
     unsigned int _previous_check;
 

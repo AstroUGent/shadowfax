@@ -50,36 +50,36 @@ class VorCell;
  */
 class VorGen {
   private:
-    /*! \brief Position of the point */
+    /*! @brief Position of the point */
     Vec _p;
-    /*! \brief Position of the point in the interval [1,2], used for exact
+    /*! @brief Position of the point in the interval [1,2], used for exact
      *  geometrical tests */
     Vec _p12;
-    /*! \brief VorCell of which this point is the generator */
+    /*! @brief VorCell of which this point is the generator */
     VorCell* _cell;
-    /*! \brief GasParticle associated with this generator */
+    /*! @brief GasParticle associated with this generator */
     GasParticle* _particle;
-    /*! \brief Index of the particle in the local ParticleVector */
+    /*! @brief Index of the particle in the local ParticleVector */
     unsigned int _particle_index;
-    /*! \brief Simplices that have this point as one of their vertices */
+    /*! @brief Simplices that have this point as one of their vertices */
     std::list<Simplex*> _tetrahedra;
-    /*! \brief Search radius for Delaunay tesselation completion */
+    /*! @brief Search radius for Delaunay tesselation completion */
     double _sr;
-    /*! \brief Variable that is apparently no longer used... */
+    /*! @brief Variable that is apparently no longer used... */
     VorGen* _mirror;
-    /*! \brief Indices of the simplices that have this point as one of their
+    /*! @brief Indices of the simplices that have this point as one of their
      *  vertices in the DelTess simplex list */
     std::list<unsigned int> _simplices;
-    /*! \brief Integer keeping track of which reflective copies of this point
+    /*! @brief Integer keeping track of which reflective copies of this point
      *  exist */
     unsigned int _mirrored;
-    /*! \brief ID of the GasParticle corresponding to this generator */
+    /*! @brief ID of the GasParticle corresponding to this generator */
     unsigned long _original;
-    /*! \brief Variable holding the process number where this point resides (for
+    /*! @brief Variable holding the process number where this point resides (for
      *  ghost points) */
     unsigned int _process;
 
-    /*! \brief Flag used to flag this VorGen */
+    /*! @brief Flag used to flag this VorGen */
     bool _flag;
 
   public:

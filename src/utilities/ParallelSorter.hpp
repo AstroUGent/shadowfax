@@ -30,7 +30,7 @@
 #include "Hilbert.hpp"  // for sortfunc, Hilbert_Object
 #include "ParticleFactory.hpp"
 #include <algorithm>  // for max, min, sort
-#include <stddef.h>   // for NULL
+#include <cstddef>    // for NULL
 #include <vector>     // for vector
 
 /**

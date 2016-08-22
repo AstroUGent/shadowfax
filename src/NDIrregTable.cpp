@@ -32,9 +32,9 @@
 #include <algorithm>             // for sort, unique, upper_bound
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
+#include <cmath>     // for log10, floor
 #include <iostream>  // for istringstream, etc
 #include <iterator>  // for distance
-#include <math.h>    // for log10, floor
 #include <sstream>
 #include <string>  // for basic_string, string
 #include <vector>  // for vector, vector<>::iterator

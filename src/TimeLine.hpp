@@ -29,9 +29,9 @@
 
 #include "SnapshotHandler.hpp"  // for SnapshotWriter
 #include "utilities/Timer.hpp"  // for Timer
+#include <cmath>                // for exp
+#include <cstddef>              // for NULL
 #include <iostream>             // for operator<<, basic_ostream, etc
-#include <math.h>               // for exp
-#include <stddef.h>             // for NULL
 #include <string>               // for string
 
 class Cosmology;
@@ -51,7 +51,7 @@ class UnitSet;
 #define TIMELINE_DEFAULT_PERNODEOUTPUTFLAG false
 
 /**
-  * \brief Class governing the simulation timeline.
+  * @brief Class governing the simulation timeline.
   *
   * The TimeLine keeps track of the current time of the simulation.
   * The simulation is advanced in time by subsequently calling
@@ -62,51 +62,51 @@ class UnitSet;
   */
 class TimeLine {
   private:
-    /*! \brief End time of the simulation */
+    /*! @brief End time of the simulation */
     double _maxtime;
     /*! @brief Start time of the simulation */
     double _mintime;
     /*! @brief Total simulation interval */
     double _tottime;
-    /*! \brief End time on the integer timeline */
+    /*! @brief End time on the integer timeline */
     unsigned long _integer_maxtime;
-    /*! \brief Current time on the integer timeline */
+    /*! @brief Current time on the integer timeline */
     unsigned long _current_time;
-    /*! \brief Current system timestep on the integer timeline */
+    /*! @brief Current system timestep on the integer timeline */
     unsigned long _timestep;
-    /*! \brief Time interval in between successive snapshots */
+    /*! @brief Time interval in between successive snapshots */
     double _snaptime;
 
-    /*! \brief Reference to the simulation ParticleVector */
+    /*! @brief Reference to the simulation ParticleVector */
     ParticleVector& _particles;
-    /*! \brief SnapshotWriter used to write snapshots */
+    /*! @brief SnapshotWriter used to write snapshots */
     SnapshotWriter* _snapshotwriter;
-    /*! \brief Courant-Friedrich-Levy constant for hydrodynamical timestep
+    /*! @brief Courant-Friedrich-Levy constant for hydrodynamical timestep
      *  calculation */
     double _cfl;
 
-    /*! \brief Flag indicating if gravity is switched on */
+    /*! @brief Flag indicating if gravity is switched on */
     bool _gravity;
-    /*! \brief Flag indicating if the simulation box is periodic (true) or
+    /*! @brief Flag indicating if the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
 
     /*! @brief Cosmology used for comoving integration (if applicable) */
     Cosmology* _cosmology;
 
-    /*! \brief Gravitational timestep constant */
+    /*! @brief Gravitational timestep constant */
     double _grav_eta;
 
-    /*! \brief Maximal allowed timestep on the integer timeline */
+    /*! @brief Maximal allowed timestep on the integer timeline */
     unsigned long _max_timestep;
-    /*! \brief Minimal allowed timestep on the integer timeline */
+    /*! @brief Minimal allowed timestep on the integer timeline */
     unsigned long _min_timestep;
 
-    /*! \brief Flag indicating whether the timestep should be calculated using
+    /*! @brief Flag indicating whether the timestep should be calculated using
      *  the expensive treewalk criterion */
     bool _treetime;
 
-    /*! \brief Timer to quantify time spent in writing snapshot files */
+    /*! @brief Timer to quantify time spent in writing snapshot files */
     Timer* _iotimer;
 
   public:

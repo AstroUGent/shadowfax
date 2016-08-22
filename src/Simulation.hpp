@@ -47,7 +47,7 @@ class UnitSet;
 class VorTessManager;
 
 /**
-  * \brief The main class for actual simulations
+  * @brief The main class for actual simulations
   *
   * A simulation object performs an actual simulation. A parameterfile is
   * extracted from the command line arguments or set to "default.ini" if not
@@ -56,7 +56,7 @@ class VorTessManager;
   */
 class Simulation {
   private:
-    /*! \brief Flag indicating if the simulation box is periodic (true) or
+    /*! @brief Flag indicating if the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
 
@@ -73,31 +73,31 @@ class Simulation {
     /*! @brief Output directory, because it is used in various places */
     std::string _outputdir;
 
-    /*! \brief ParameterFile containing simulation parameters */
+    /*! @brief ParameterFile containing simulation parameters */
     ParameterFile* _parameterfile;
 
-    /*! \brief User-friendly log files */
+    /*! @brief User-friendly log files */
     LogFiles* _logfiles;
 
-    /*! \brief RiemannSolver used to solve the Riemann problem for the
+    /*! @brief RiemannSolver used to solve the Riemann problem for the
      *  hydrodynamics */
     RiemannSolver* _solver;
 
-    /*! \brief Internal simulation UnitSet */
+    /*! @brief Internal simulation UnitSet */
     UnitSet* _simulation_units;
-    /*! \brief Output UnitSet */
+    /*! @brief Output UnitSet */
     UnitSet* _output_units;
 
-    /*! \brief RectangularBox specifying the dimensions of the simulation box */
+    /*! @brief RectangularBox specifying the dimensions of the simulation box */
     RectangularBox* _box;
 
-    /*! \brief ParticleVector containing the particles of the simulation */
+    /*! @brief ParticleVector containing the particles of the simulation */
     ParticleVector* _particles;
 
-    /*! \brief TimeLine governing the timeline of the simulation */
+    /*! @brief TimeLine governing the timeline of the simulation */
     TimeLine* _timeline;
 
-    /*! \brief Physical constants used during the simulation */
+    /*! @brief Physical constants used during the simulation */
     Physics* _physics;
 
     /*! @brief StarFormationParticleConverter used for star formation */
@@ -109,28 +109,28 @@ class Simulation {
     /*! @brief Cosmology used for comoving integration */
     Cosmology* _cosmology;
 
-    /*! \brief VorTessManager used to calculate the Voronoi grid used for the
+    /*! @brief VorTessManager used to calculate the Voronoi grid used for the
      *  hydrodynamical integration */
     VorTessManager* _voronoi;
 
-    /*! \brief Timer used to time the entire simulation */
+    /*! @brief Timer used to time the entire simulation */
     Timer _totaltimer;
-    /*! \brief Timer used to time the initialization of the simulation */
+    /*! @brief Timer used to time the initialization of the simulation */
     Timer* _starttimer;
-    /*! \brief Timer used to quantify the time spent in calculating particle
+    /*! @brief Timer used to quantify the time spent in calculating particle
      *  timesteps */
     Timer* _timesteptimer;
-    /*! \brief Timer used to quantify the time spent in MPI operations */
+    /*! @brief Timer used to quantify the time spent in MPI operations */
     Timer* _mpitimer;
-    /*! \brief Timer used to quantify the time spent in parts of the program
+    /*! @brief Timer used to quantify the time spent in parts of the program
      *  related to the hydrodynamics */
     Timer* _hydrotimer;
 
-    /*! \brief Timer used to quantify the time spent in gravity related
+    /*! @brief Timer used to quantify the time spent in gravity related
      *  operations */
     Timer* _gravitytimer;
 
-    /*! \brief Timer used to determine when it is time to do restart dumps */
+    /*! @brief Timer used to determine when it is time to do restart dumps */
     Timer _restarttimer;
 
     /*! @brief GasCooling object used to calculate cooling rate of gas particles

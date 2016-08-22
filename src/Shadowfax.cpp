@@ -27,9 +27,9 @@
 #include "Plotter.hpp"       // for Plotter
 #include "SidePrograms.hpp"  // for AreaCalculator, etc
 #include "Simulation.hpp"    // for Simulation
+#include <cstddef>           // for NULL
 #include <getopt.h>          // for no_argument, getopt_long, etc
 #include <iostream>          // for operator<<, basic_ostream, etc
-#include <stddef.h>          // for NULL
 using namespace std;
 
 /**
@@ -37,25 +37,25 @@ using namespace std;
  * argument
  */
 enum SideProgramTypes {
-    /*! \brief Plot sideprogram */
+    /*! @brief Plot sideprogram */
     SIDEPROGRAM_PLOT = 0,
-    /*! \brief ICMaker sideprogram (no longer supported and replaced by an
+    /*! @brief ICMaker sideprogram (no longer supported and replaced by an
      *  separate program) */
     SIDEPROGRAM_IC,
-    /*! \brief Make a grid of the given points and return the cell areas (2D
+    /*! @brief Make a grid of the given points and return the cell areas (2D
      *  only) */
     SIDEPROGRAM_AREA,
-    /*! \brief Make a grid of the given points and return the inverse volumes
+    /*! @brief Make a grid of the given points and return the inverse volumes
      *  as a local density measure (3D only) */
     SIDEPROGRAM_DENSITY,
-    /*! \brief Calculate masses for the given snapshot */
+    /*! @brief Calculate masses for the given snapshot */
     SIDEPROGRAM_MASS,
-    /*! \brief Calculate gravitational potential energies for the given
+    /*! @brief Calculate gravitational potential energies for the given
      *  snapshot */
     SIDEPROGRAM_EPOT,
-    /*! \brief Sort the given snapshot in Hilbert space filling order */
+    /*! @brief Sort the given snapshot in Hilbert space filling order */
     SIDEPROGRAM_SORT,
-    /*! \brief Test the Delaunay construction algorithms */
+    /*! @brief Test the Delaunay construction algorithms */
     SIDEPROGRAM_DELTEST
 };
 

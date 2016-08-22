@@ -27,8 +27,8 @@
 #include "Error.hpp"  // for my_exit
 #include <algorithm>  // for min
 #include <cmath>      // for fabs, pow
+#include <cstddef>    // for NULL
 #include <iostream>   // for operator<<, basic_ostream, etc
-#include <stddef.h>   // for NULL
 
 /*
  * The code in this file is mostly copied from the GSL library, which was made

@@ -31,7 +31,7 @@
 class DelCont;
 class ParticleVector;
 
-/*! \brief Type of special initial condition to generate */
+/*! @brief Type of special initial condition to generate */
 enum ICSpecType {
     /*! Gresho vortex (2D only) */
     IC_SPEC_GRESHO = 0,
@@ -56,28 +56,28 @@ enum ICSpecType {
  */
 class SpecificICGenerator : public ICGenerator {
   private:
-    /*! \brief Adiabatic index of the gas in the initial condition */
+    /*! @brief Adiabatic index of the gas in the initial condition */
     double _gamma;
 
-    /*! \brief Number of gas particles to generate */
+    /*! @brief Number of gas particles to generate */
     unsigned int _ngaspart;
 
-    /*! \brief Number of dark matter particles to generate */
+    /*! @brief Number of dark matter particles to generate */
     unsigned int _ndmpart;
 
-    /*! \brief ICMode of grid to use */
+    /*! @brief ICMode of grid to use */
     unsigned int _mode;
 
-    /*! \brief ICSpecType of the initial condition */
+    /*! @brief ICSpecType of the initial condition */
     unsigned int _type;
-    /*! \brief Density contrast at the edge of the Evrard sphere (outside the
+    /*! @brief Density contrast at the edge of the Evrard sphere (outside the
      *  sphere is a homogeneous region) */
     double _evrardfrac;
 
-    /*! \brief DelCont specifying the dimensions of the simulation box */
+    /*! @brief DelCont specifying the dimensions of the simulation box */
     DelCont* _container;
 
-    /*! \brief Flag indicating whether the simulation box is periodic (true) or
+    /*! @brief Flag indicating whether the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
 

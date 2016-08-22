@@ -48,12 +48,12 @@ class VorFace;
  */
 class VorTess {
   private:
-    /*! \brief Delaunay tesselation of the point set */
+    /*! @brief Delaunay tesselation of the point set */
     DelTess* _delaunay;
 
-    /*! \brief Cells of the tesselation */
+    /*! @brief Cells of the tesselation */
     std::vector<VorCell*> _cells;
-    /*! \brief Faces of the tesselation */
+    /*! @brief Faces of the tesselation */
     std::vector<VorFace*> _faces;
 
   public:

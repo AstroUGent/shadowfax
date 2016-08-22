@@ -44,9 +44,9 @@
 #include "utilities/StarParticle.hpp"
 #include "utilities/Tree.hpp"  // for Tree
 #include <algorithm>           // for max, min
+#include <cstdlib>             // for NULL, atof
 #include <getopt.h>            // for optarg, required_argument, etc
 #include <iostream>            // for operator<<, basic_ostream, etc
-#include <stdlib.h>            // for NULL, atof
 #include <vector>              // for vector
 using namespace std;
 

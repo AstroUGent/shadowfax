@@ -43,25 +43,25 @@ class TreeNode;
  */
 class TimeStepWalker : public TreeWalker {
   private:
-    /*! \brief GasParticle for which the timestep is being calculated */
+    /*! @brief GasParticle for which the timestep is being calculated */
     GasParticle* _p;
 
-    /*! \brief Position of the particle */
+    /*! @brief Position of the particle */
     Vec _position;
 
-    /*! \brief Fluid velocity of the particle */
+    /*! @brief Fluid velocity of the particle */
     Vec _v;
 
-    /*! \brief Magnitude of the fluid velocity of the particle */
+    /*! @brief Magnitude of the fluid velocity of the particle */
     double _vi;
 
-    /*! \brief Current value of the timestep */
+    /*! @brief Current value of the timestep */
     double _t;
 
-    /*! \brief Soundspeed of the particle */
+    /*! @brief Soundspeed of the particle */
     double _ci;
 
-    /*! \brief Flag indicating if the calculation is done for a particle that
+    /*! @brief Flag indicating if the calculation is done for a particle that
      *  resides on the local MPI process */
     bool _local;
 
@@ -72,17 +72,17 @@ class TimeStepWalker : public TreeWalker {
      */
     class Export {
       private:
-        /*! \brief GasParticle for which the timestep is being calculated */
+        /*! @brief GasParticle for which the timestep is being calculated */
         GasParticle* _p;
-        /*! \brief Fluid velocity of the particle (exported) */
+        /*! @brief Fluid velocity of the particle (exported) */
         Vec _v;
-        /*! \brief Position of the particle (exported) */
+        /*! @brief Position of the particle (exported) */
         Vec _pos;
-        /*! \brief Magnitude of the fluid velocity of the particle (exported) */
+        /*! @brief Magnitude of the fluid velocity of the particle (exported) */
         double _vi;
-        /*! \brief Soundspeed of the particle (exported) */
+        /*! @brief Soundspeed of the particle (exported) */
         double _ci;
-        /*! \brief Current value of the timestep (exported) */
+        /*! @brief Current value of the timestep (exported) */
         double _t;
 
       public:
@@ -137,15 +137,15 @@ class TimeStepWalker : public TreeWalker {
      */
     class Import {
       private:
-        /*! \brief Fluid velocity of the particle */
+        /*! @brief Fluid velocity of the particle */
         Vec _v;
-        /*! \brief Position of the particle */
+        /*! @brief Position of the particle */
         Vec _pos;
-        /*! \brief Magnitude of the fluid velocity of the particle */
+        /*! @brief Magnitude of the fluid velocity of the particle */
         double _vi;
-        /*! \brief Soundspeed of the particle */
+        /*! @brief Soundspeed of the particle */
         double _ci;
-        /*! \brief Current value of the timestep (exported) */
+        /*! @brief Current value of the timestep (exported) */
         double _t;
 
       public:

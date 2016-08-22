@@ -52,26 +52,26 @@ class VorTess;
  */
 class VorTessManager {
   private:
-    /*! \brief Pointer to a VorTess, only used if this tesselation uses the old
+    /*! @brief Pointer to a VorTess, only used if this tesselation uses the old
      *  algorithm */
     VorTess* _tesselation;
 #ifdef FIXED_GRID
-    /*! \brief Pointer to a FixedGrid, used for the fixed Cartesian grid */
+    /*! @brief Pointer to a FixedGrid, used for the fixed Cartesian grid */
     FixedGrid* _fixedgrid;
 #endif
 
-    /*! \brief ParticleVector for which the tesselation is constructed */
+    /*! @brief ParticleVector for which the tesselation is constructed */
     ParticleVector& _particles;
 
-    /*! \brief Timer to quantify time spent in grid specific operations */
+    /*! @brief Timer to quantify time spent in grid specific operations */
     Timer _gridtimer;
-    /*! \brief Timer to quantify time spent in hydro specific operations */
+    /*! @brief Timer to quantify time spent in hydro specific operations */
     Timer _hydrotimer;
 
-    /*! \brief Flag indicating if the simulation box is periodic (true) or
+    /*! @brief Flag indicating if the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
-    /*! \brief Tolerance value used to distinguish between standard floating
+    /*! @brief Tolerance value used to distinguish between standard floating
      *  point arithmetics and arbitrary precision arithmetics in geometry
      *  tests */
     double _tolerance;

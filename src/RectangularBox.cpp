@@ -30,7 +30,7 @@
 #include "utilities/Hilbert.hpp"   // for get_key
 #include "utilities/Particle.hpp"  // for Particle
 #include <algorithm>               // for max
-#include <math.h>                  // for fabs, sqrt
+#include <cmath>                   // for fabs, sqrt
 using namespace std;
 
 /**

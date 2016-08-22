@@ -39,7 +39,7 @@ class UnitSet;
  */
 class ShadowfaxSnapshotWriter : public SnapshotWriter {
   private:
-    /*! \brief Timer used to quantify time spent writing snapshots */
+    /*! @brief Timer used to quantify time spent writing snapshots */
     Timer _timer;
 
   public:

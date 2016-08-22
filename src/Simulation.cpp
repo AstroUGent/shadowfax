@@ -58,11 +58,11 @@
 #include "utilities/Timer.hpp"               // for Timer
 #include "utilities/Tree.hpp"                // for Tree
 #include <algorithm>                         // for max_element, min
+#include <cmath>                             // for exp, log
+#include <cstddef>                           // for NULL
 #include <getopt.h>                          // for getopt_long, optarg, etc
 #include <iostream>  // for operator<<, basic_ostream, etc
-#include <math.h>    // for exp, log
 #include <sstream>   // for basic_stringbuf<>::int_type, etc
-#include <stddef.h>  // for NULL
 
 //#define VARIABLE_SOFTENING
 //#define ENTROPY
@@ -271,6 +271,7 @@ double Simulation::load(ParticleVector& cells, string ictype, string filename,
     cells.set_container(*_box);
     cells.get_header().set_ngaspart(header.ngaspart());
     cells.get_header().set_ndmpart(header.ndmpart());
+    cells.get_header().set_nstarpart(header.nstarpart());
 
     cout << "Set up ";
     if(_periodic) {

@@ -39,7 +39,7 @@
 class VTKMaker {
   private:
     /**
-     * \brief Flag indicating if the system stores floating point values in big
+     * @brief Flag indicating if the system stores floating point values in big
      *  endian or little endian order
      *
      * Big endian systems store the most significant byte first (lowest memory

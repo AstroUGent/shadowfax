@@ -30,8 +30,8 @@
 #include "utilities/Particle.hpp"       // for Particle
 #include "utilities/ParticleTypes.hpp"  // for ParticleType::PARTTYPE_GAS
 #include "utilities/Tree.hpp"           // for PseudoNode, Leaf, TreeNode
-#include <math.h>                       // for sqrt
-#include <stddef.h>                     // for NULL
+#include <cmath>                        // for sqrt
+#include <cstddef>                      // for NULL
 using namespace std;
 
 /**

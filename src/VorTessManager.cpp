@@ -203,7 +203,7 @@ void VorTessManager::hydro(TimeLine& timeline, RiemannSolver& solver,
     _gridtimer.stop();
     _hydrotimer.start();
     for(unsigned int i = 0; i < faces.size(); i++) {
-        faces[i]->set_v(_particles);
+        faces[i]->set_v();
 #ifndef ICMAKER
         faces[i]->calculate_flux(timeline, solver);
 #endif

@@ -32,8 +32,8 @@
 #include "RestartFile.hpp"              // for RestartFile
 #include "ShadowfaxSnapshotWriter.hpp"  // for ShadowfaxSnapshotWriter
 #include "SnapshotHandler.hpp"          // for SnapshotWriter
+#include <cstddef>                      // for NULL
 #include <iostream>                     // for operator<<, basic_ostream, etc
-#include <stddef.h>                     // for NULL
 #include <string>                       // for operator==, basic_string, etc
 
 class UnitSet;

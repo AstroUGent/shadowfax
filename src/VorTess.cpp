@@ -411,7 +411,7 @@ void VorTess::hydro(TimeLine& timeline, RiemannSolver& solver,
                     ParticleVector& particles) {
     LOGS("Starting flux calculation");
     for(unsigned int i = _faces.size(); i--;) {
-        _faces[i]->set_v(particles);
+        _faces[i]->set_v();
         _faces[i]->calculate_flux(timeline, solver);
     }
     LOGS("Flux calculation done");
@@ -442,10 +442,28 @@ void VorTess::advect(double dt) {
  */
 void VorTess::print_cell_statistics(ostream& stream) {
     double totvol = 0.;
+    double totsize = 0.;
     for(unsigned int i = 0; i < _cells.size(); i++) {
         totvol += _cells[i]->get_volume();
+        totsize += _cells[i]->get_h();
     }
+    double avgvolume = totvol / _cells.size();
+    double avgsize = totsize / _cells.size();
+    double sigmavol = 0.;
+    double sigmasize = 0.;
+    double diff;
+    for(unsigned int i = 0; i < _cells.size(); i++) {
+        diff = _cells[i]->get_volume() - avgvolume;
+        sigmavol += diff * diff;
+        diff = _cells[i]->get_h() - avgsize;
+        sigmasize += diff * diff;
+    }
+    sigmavol = sqrt(sigmavol / _cells.size());
+    sigmasize = sqrt(sigmasize / _cells.size());
     stream << "Total volume: " << totvol << endl;
+    stream << "Average cell volume: " << avgvolume << " +- " << sigmavol
+           << endl;
+    stream << "Average cell size: " << avgsize << " +- " << sigmasize << endl;
 }
 
 /**

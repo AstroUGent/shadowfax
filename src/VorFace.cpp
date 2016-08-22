@@ -582,10 +582,8 @@ Vec& VorFace::get_v() {
 /**
  * @brief Set the velocity of the face based on the velocities of the left and
  * right generator
- *
- * @param particles Obsolete parameter, no idea why it is here
  */
-void VorFace::set_v(ParticleVector& particles) {
+void VorFace::set_v() {
 #ifdef STATIC
 // do nothing
 #else
@@ -683,6 +681,8 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
        _left->get_particle()->get_starttime() != timeline.get_integertime()) {
         return;
     }
+
+    Timer fluxtimer;
 
     // transform the boundaries:
     //   apply a velocity correction for the movement of the face
@@ -909,6 +909,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
         return;
     }
 
+    float time = fluxtimer.stop();
     if(_right->get_particle() != NULL) {
         // if _left is inactive and _right is a ghost => do nothing
         // the flux exchange between _left and _right will happen on another
@@ -921,6 +922,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
            (_right->get_particle()->get_position() - _right->get_position())
                    .norm2()) {
             _left->get_particle()->increase_dQ(dQL);
+            _left->get_particle()->add_comp_cost(time);
             if(timeline.has_gravity()) {
                 _left->get_particle()->increase_delta_E(
                         dQL[0] *
@@ -937,6 +939,7 @@ void VorFace::calculate_flux(TimeLine& timeline, RiemannSolver& solver) {
         // increase _right's dQ, as we only want to account for this face once
         if(_right->get_id() != 1) {
             _right->get_particle()->increase_dQ(dQR);
+            _right->get_particle()->add_comp_cost(time);
             if(timeline.has_gravity()) {
                 _right->get_particle()->increase_delta_E(
                         dQR[0] *

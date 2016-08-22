@@ -40,8 +40,8 @@
 #include "utilities/ParticleVector.hpp"  // for ParticleVector
 #include <algorithm>                     // for max
 #include <cmath>                         // for sqrt, sin, M_PI, cos, log, etc
+#include <cstdlib>                       // for rand, srand, RAND_MAX, NULL
 #include <iostream>                      // for operator<<, basic_ostream, etc
-#include <stdlib.h>                      // for rand, srand, RAND_MAX, NULL
 #include <string>                        // for string
 using namespace std;
 
@@ -142,7 +142,7 @@ SpecificICGenerator::~SpecificICGenerator() {
 }
 
 /**
-  * \brief Generate initial conditions
+  * @brief Generate initial conditions
   *
   * We first set up a ParticleVector using the DelCont previously set up. We
   * then generate the grid cells and optionally regularize them. We then set up
@@ -176,7 +176,7 @@ ParticleVector SpecificICGenerator::generate(bool conserved_variables) {
 }
 
 /**
-  * \brief Set up a cartesian grid of cells
+  * @brief Set up a cartesian grid of cells
   *
   * @param plist Reference to an empty ParticleVector that will be filled
   */
@@ -262,7 +262,7 @@ void SpecificICGenerator::make_cartesian_grid(ParticleVector& plist) {
 }
 
 /**
-  * \brief Set up a uniform random grid using uniform random sampling
+  * @brief Set up a uniform random grid using uniform random sampling
   *
   * @param plist Reference to an empty ParticleVector that will be filled
   */
@@ -316,7 +316,7 @@ void SpecificICGenerator::make_random_grid(ParticleVector& plist) {
 }
 
 /**
-  * \brief Regularize a randomly sampled grid using Lloyd's algorithm
+  * @brief Regularize a randomly sampled grid using Lloyd's algorithm
   *
   * The VorTess for the grid is calculated and the positions of the cell
   * generators are reset to the centroids of their respective VorCell. This
@@ -348,13 +348,14 @@ void SpecificICGenerator::relax_grid(ParticleVector& grid) {
             grid.gas(j)->set_vorgen(NULL);
         }
 
-        voronoi.reset(&grid.get_container(), _periodic);
         // order is important here!
         // since the update_positions depends on the old ordering of the
         // particles, we have to call it before updating the ordering by
         // sorting
         voronoi.update_positions(_periodic);
         grid.sort();
+
+        voronoi.reset(&grid.get_container(), _periodic);
 
         voronoi.update(0);
 

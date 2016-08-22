@@ -92,6 +92,8 @@ class ICRegion {
     double get_max_value_hydro(ICRegion* cut_out_region = NULL);
     double get_max_value_dm(ICRegion* cut_out_region = NULL);
 
+    double get_integral_dm(ICRegion* cut_out_region = NULL);
+
     bool accept_hydro(Vec position);
     bool accept_dm(Vec position);
 };

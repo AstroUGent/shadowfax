@@ -109,6 +109,8 @@ class VorTessManager {
     Vec get_gravitational_correction(unsigned int index);
 
     void dump_connectivity(std::ostream& stream, unsigned long currentTime = 0);
+
+    void print_statistics();
 };
 
 #endif

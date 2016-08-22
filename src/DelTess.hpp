@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 /**
- * \file DelTess.hpp
+ * @file DelTess.hpp
  *
  * @author Bert Vandenbroucke
  *
@@ -47,7 +47,7 @@ class VorGen;
 class VorTess;
 
 /**
- * \brief The Delaunay triangulation
+ * @brief The Delaunay triangulation
  *
  * Base class to construct a Delaunay triangulation, by adding points one by
  * one.
@@ -56,49 +56,49 @@ class VorTess;
  */
 class DelTess {
   private:
-    /*! \brief Tolerance value used to discriminate between exact and inexact
+    /*! @brief Tolerance value used to discriminate between exact and inexact
      *   arithmetics */
     double _tolerance;
 
-    /*! \brief vector containing the points of the tesselation */
+    /*! @brief vector containing the points of the tesselation */
     std::vector<VorGen*> _points;
 
-    /*! \brief vector containg the mirror points of the tesselation */
+    /*! @brief vector containg the mirror points of the tesselation */
     std::vector<VorGen*> _mirrors;
 
-    /*! \brief DelCont specifying the volume that contains the points of the
+    /*! @brief DelCont specifying the volume that contains the points of the
      *  tesselation and the boundaries */
     DelCont* _container;
 
-    /*! \brief VorTess associated with this DelTess */
+    /*! @brief VorTess associated with this DelTess */
     VorTess* _voronoi;
 
-    /*! \brief Stack of Simplex pointers that have to be deleted after
+    /*! @brief Stack of Simplex pointers that have to be deleted after
      *  restoration of Delaunayhood */
     std::vector<Simplex*> _remove_stack;
 
-    /*! \brief Index of the most recently pushed back Simplex. Used as an
+    /*! @brief Index of the most recently pushed back Simplex. Used as an
      *  independent measure of the number of simplices */
     unsigned int _lastindex;
 
-    /*! \brief Index of the latest index that was checked for Delaunayhood. Used
+    /*! @brief Index of the latest index that was checked for Delaunayhood. Used
      *  as a starting point in the simplex search during the next point
      *  insertion */
     unsigned int _lastchecked;
 
-    /*! \brief Index of the last VorGen that was added to the tesselation */
+    /*! @brief Index of the last VorGen that was added to the tesselation */
     unsigned int _lastvorgen;
 
-    /*! \brief A vector containing the simplices that make up the tesselation */
+    /*! @brief A vector containing the simplices that make up the tesselation */
     std::vector<Simplex*> _simplices;
 
-    /*! \brief Cuboid specifying a box that contains all points that could
+    /*! @brief Cuboid specifying a box that contains all points that could
      *  possibly be added to the tesselation, used to rescale point coordinates
      *  to the range [1,2] for exact geometrical tests */
     Cuboid _box12;
 
 #if ndim_ == 3
-    /** \brief An array holding free entries in the simplices vector.
+    /** @brief An array holding free entries in the simplices vector.
      *
      * Used in 3D where not every Simplex that is removed is replaced by a new
      * one, so that empty entries may occur. The maximal number of entries in
@@ -110,28 +110,24 @@ class DelTess {
      */
     unsigned int _free_array[1000];
 
-    /*! \brief The number of valid elements in the _free_array. The latest valid
+    /*! @brief The number of valid elements in the _free_array. The latest valid
      *  element has index _free_size-1. */
     unsigned int _free_size;
 #endif
 
-    /*! \brief A vector of vectors of ghost particles (one vector for every
+    /*! @brief A vector of vectors of ghost particles (one vector for every
      *  process) */
     std::vector<std::vector<GasParticle*> > _ghosts;
 
-    /*! \brief A vector of vectors of exported particles (one vector for every
+    /*! @brief A vector of vectors of exported particles (one vector for every
      *  process) */
     std::vector<std::vector<GasParticle*> > _exports;
 
-    /*! \brief A vector of vectors of exported particle copies (one vector for
+    /*! @brief A vector of vectors of exported particle copies (one vector for
      *  every process) */
     std::vector<std::vector<GasParticle*> > _exportcopies;
 
-    /*! \brief A vector of ghost cells (cells associated with particles on
-     *  another process) */
-    std::vector<VorCell*> _ghostcells;
-
-    /*! \brief Flag indicating whether the simulation box is periodic (true) or
+    /*! @brief Flag indicating whether the simulation box is periodic (true) or
      *  reflective (false) */
     bool _periodic;
 

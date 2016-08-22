@@ -398,6 +398,13 @@ void VorTessManager::dump_connectivity(ostream& stream,
     }
 }
 
+/**
+ * @brief Print cell statistics for the Voronoi mesh
+ */
+void VorTessManager::print_statistics() {
+    _tesselation->print_cell_statistics(cout);
+}
+
 #else  // FIXED_GRID
 
 /**

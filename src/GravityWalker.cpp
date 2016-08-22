@@ -47,7 +47,7 @@ GravityWalker::GravityWalker(Particle* p, bool local) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(_p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
         _eta = 0.;
@@ -72,7 +72,7 @@ GravityWalker::GravityWalker(Import& import) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
         _eta = 0.;
@@ -141,7 +141,6 @@ bool GravityWalker::splitnode(TreeNode* node) {
         }
         if(_local || node->is_local()) {
             _a += r * kernel;
-            _comp_cost++;
         }
         return false;
     } else {
@@ -203,7 +202,6 @@ void GravityWalker::leafaction(Leaf* leaf) {
         kernel = 0.5 * (kernel1 + kernel2);
     }
     _a += r * kernel;
-    _comp_cost++;
 }
 
 /**
@@ -330,7 +328,8 @@ void GravityWalker::periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) {
  */
 void GravityWalker::after_walk() {
     _p->set_gravitational_acceleration(_a);
-    _p->add_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    _p->add_comp_cost(comp_cost);
     if(_p->type() == PARTTYPE_GAS) {
         GasParticle* gas = (GasParticle*)_p;
         gas->set_eta(_eta);
@@ -355,7 +354,8 @@ GravityWalker::Export GravityWalker::get_export() {
  */
 void GravityWalker::after_walk(Import& import) {
     import.set_a(_a);
-    import.set_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    import.set_comp_cost(comp_cost);
 }
 
 // EwaldGravityWalker
@@ -608,7 +608,7 @@ PotentialWalker::PotentialWalker(Particle* p, bool local) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
@@ -634,7 +634,7 @@ PotentialWalker::PotentialWalker(Import& import) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
@@ -699,9 +699,6 @@ bool PotentialWalker::splitnode(TreeNode* node) {
             // force opening of node
             return true;
         }
-        if(_local || node->is_local()) {
-            _comp_cost++;
-        }
         return false;
     } else {
         return true;
@@ -756,7 +753,6 @@ void PotentialWalker::leafaction(Leaf* leaf) {
         kernel = 0.5 * (kernel1 + kernel2);
     }
     _epot += kernel;
-    _comp_cost++;
 }
 
 /**
@@ -885,7 +881,8 @@ void PotentialWalker::periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) {
  */
 void PotentialWalker::after_walk() {
     _p->set_gravitational_potential(_epot);
-    _p->add_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    _p->add_comp_cost(comp_cost);
 }
 
 /**
@@ -906,7 +903,8 @@ PotentialWalker::Export PotentialWalker::get_export() {
  */
 void PotentialWalker::after_walk(Import& import) {
     import.set_epot(_epot);
-    import.set_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    import.set_comp_cost(comp_cost);
 }
 
 // Barnes Hut gravity walk
@@ -925,7 +923,7 @@ BHGravityWalker::BHGravityWalker(Particle* p, bool local) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(_p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
@@ -949,7 +947,7 @@ BHGravityWalker::BHGravityWalker(Import& import) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
@@ -1008,7 +1006,6 @@ bool BHGravityWalker::splitnode(TreeNode* node) {
         }
         if(_local || node->is_local()) {
             _a += r * kernel;
-            _comp_cost++;
         }
         return false;
     } else {
@@ -1071,7 +1068,6 @@ void BHGravityWalker::leafaction(Leaf* leaf) {
         kernel = 0.5 * (kernel1 + kernel2);
     }
     _a += r * kernel;
-    _comp_cost++;
 }
 
 /**
@@ -1182,7 +1178,8 @@ void BHGravityWalker::periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) {
  */
 void BHGravityWalker::after_walk() {
     _p->set_gravitational_acceleration(_a);
-    _p->add_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    _p->add_comp_cost(comp_cost);
 }
 
 /**
@@ -1202,7 +1199,8 @@ BHGravityWalker::Export BHGravityWalker::get_export() {
  */
 void BHGravityWalker::after_walk(Import& import) {
     import.set_a(_a);
-    import.set_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    import.set_comp_cost(comp_cost);
 }
 
 // BHEwaldGravityWalker
@@ -1435,7 +1433,7 @@ BHPotentialWalker::BHPotentialWalker(Particle* p, bool local) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = local;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(_p->type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
@@ -1460,7 +1458,7 @@ BHPotentialWalker::BHPotentialWalker(Import& import) {
     _hsoftinv = 1. / _hsoft;
     _hsoftinv3 = _hsoftinv * _hsoftinv * _hsoftinv;
     _local = false;
-    _comp_cost = 0;
+    _comp_cost.start();
     if(import.get_type() == PARTTYPE_GAS) {
         _kernel = new GasGravityKernel();
     } else {
@@ -1520,7 +1518,6 @@ bool BHPotentialWalker::splitnode(TreeNode* node) {
         }
         if(_local || node->is_local()) {
             _epot += kernel;
-            _comp_cost++;
         }
         return false;
     } else {
@@ -1583,7 +1580,6 @@ void BHPotentialWalker::leafaction(Leaf* leaf) {
         kernel = 0.5 * (kernel1 + kernel2);
     }
     _epot += kernel;
-    _comp_cost++;
 }
 
 /**
@@ -1694,7 +1690,8 @@ void BHPotentialWalker::periodicleafaction(Leaf* leaf,
  */
 void BHPotentialWalker::after_walk() {
     _p->set_gravitational_potential(_epot);
-    _p->add_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    _p->add_comp_cost(comp_cost);
 }
 
 /**
@@ -1715,5 +1712,6 @@ BHPotentialWalker::Export BHPotentialWalker::get_export() {
  */
 void BHPotentialWalker::after_walk(Import& import) {
     import.set_epot(_epot);
-    import.set_comp_cost(_comp_cost);
+    float comp_cost = _comp_cost.stop();
+    import.set_comp_cost(comp_cost);
 }

@@ -187,43 +187,43 @@ class DMGravityKernel : public GravityKernel {
  */
 class GravityWalker : public PeriodicTreeWalker {
   private:
-    /*! \brief Particle for which the acceleration is calculated */
+    /*! @brief Particle for which the acceleration is calculated */
     Particle* _p;
 
-    /*! \brief Position of the Particle for which the acceleration is
+    /*! @brief Position of the Particle for which the acceleration is
      *  calculated */
     Vec _position;
 
-    /*! \brief Current value of the gravitational acceleration */
+    /*! @brief Current value of the gravitational acceleration */
     Vec _a;
 
-    /*! \brief Size of the previous gravitational acceleration, used for the
+    /*! @brief Size of the previous gravitational acceleration, used for the
      *  relative opening criterion */
     double _olda;
 
-    /*! \brief Softening length of the Particle */
+    /*! @brief Softening length of the Particle */
     double _hsoft;
 
-    /*! \brief Inverse softening length of the Particle */
+    /*! @brief Inverse softening length of the Particle */
     double _hsoftinv;
 
-    /*! \brief Inverse softening length cubed */
+    /*! @brief Inverse softening length cubed */
     double _hsoftinv3;
 
-    /*! \brief Flag specifying whether the treewalk is local or is being done
+    /*! @brief Flag specifying whether the treewalk is local or is being done
      *  for a Particle residing on another MPI process */
     bool _local;
 
-    /*! \brief Computational cost of this treewalk */
-    unsigned int _comp_cost;
+    /*! @brief Timer for the computational cost of this treewalk */
+    Timer _comp_cost;
 
-    /*! \brief GravityKernel used to calculate softened accelerations */
+    /*! @brief GravityKernel used to calculate softened accelerations */
     GravityKernel* _kernel;
 
-    /*! \brief \f$\eta\f$-parameter for variable softening lengths */
+    /*! @brief \f$\eta\f$-parameter for variable softening lengths */
     double _eta;
 
-    /*! \brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) */
+    /*! @brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) */
     ParticleType _type;
 
   public:
@@ -233,22 +233,22 @@ class GravityWalker : public PeriodicTreeWalker {
      */
     class Export {
       private:
-        /*! \brief Particle for which the treewalk is performed */
+        /*! @brief Particle for which the treewalk is performed */
         Particle* _p;
 
-        /*! \brief Size of the previous gravitational acceleration, used for the
+        /*! @brief Size of the previous gravitational acceleration, used for the
          *  relative opening criterion (will be exported) */
         double _olda;
 
-        /*! \brief Position of the Particle (will be exported to the other
+        /*! @brief Position of the Particle (will be exported to the other
          *  process) */
         Vec _pos;
 
-        /*! \brief Softening length of the Particle (will be exported to the
+        /*! @brief Softening length of the Particle (will be exported to the
          *  other process) */
         double _hsoft;
 
-        /*! \brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (will be
+        /*! @brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (will be
          *  exported) */
         ParticleType _type;
 
@@ -292,10 +292,9 @@ class GravityWalker : public PeriodicTreeWalker {
          */
         void unpack_data(void* buffer, int bufsize, int* position) {
             Vec a;
-            unsigned int comp_cost;
+            float comp_cost;
             MyMPI_Unpack(buffer, bufsize, position, &a[0], ndim_, MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1,
-                         MPI_UNSIGNED);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_FLOAT);
             _p->set_gravitational_acceleration(
                     _p->get_gravitational_acceleration() + a);
             _p->add_comp_cost(comp_cost);
@@ -314,27 +313,27 @@ class GravityWalker : public PeriodicTreeWalker {
      */
     class Import {
       private:
-        /*! \brief Position for which the treewalk is performed */
+        /*! @brief Position for which the treewalk is performed */
         Vec _pos;
 
-        /*! \brief Old acceleration, used for the relative opening criterion */
+        /*! @brief Old acceleration, used for the relative opening criterion */
         double _olda;
 
-        /*! \brief Local result of the treewalk (is exported) */
+        /*! @brief Local result of the treewalk (is exported) */
         Vec _a;
 
-        /*! \brief Computational cost of the local treewalk (is exported) */
-        unsigned int _comp_cost;
+        /*! @brief Computational cost of the local treewalk (is exported) */
+        float _comp_cost;
 
-        /*! \brief Softening length of the Particle for which the treewalk is
+        /*! @brief Softening length of the Particle for which the treewalk is
          *  performed */
         double _hsoft;
 
-        /*! \brief Type of the Particle for which the treewalk is performed
+        /*! @brief Type of the Particle for which the treewalk is performed
          *  (PARTTYPE_GAS/PARTTYPE_DM) */
         ParticleType _type;
 
-        /*! \brief \f$\eta\f$-parameter for variable softening lengths (is
+        /*! @brief \f$\eta\f$-parameter for variable softening lengths (is
             exported) */
         double _eta;
 
@@ -404,7 +403,7 @@ class GravityWalker : public PeriodicTreeWalker {
          * @brief Set the computational cost
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) {
+        void set_comp_cost(float comp_cost) {
             _comp_cost = comp_cost;
         }
 
@@ -427,7 +426,7 @@ class GravityWalker : public PeriodicTreeWalker {
          */
         void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_a[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
-            MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer, bufsize, position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_FLOAT, buffer, bufsize, position);
             if(_type == PARTTYPE_GAS) {
                 MyMPI_Pack(&_eta, 1, MPI_DOUBLE, buffer, bufsize, position);
             }
@@ -547,11 +546,10 @@ class EwaldGravityWalker : public PeriodicTreeWalker {
          */
         void unpack_data(void* buffer, int bufsize, int* position) {
             Vec acorr;
-            unsigned int comp_cost;
+            float comp_cost;
             MyMPI_Unpack(buffer, bufsize, position, &acorr[0], ndim_,
                          MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1,
-                         MPI_UNSIGNED);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_FLOAT);
             _p->set_gravitational_acceleration(
                     _p->get_gravitational_acceleration() + acorr);
             _p->add_comp_cost(comp_cost);
@@ -574,7 +572,7 @@ class EwaldGravityWalker : public PeriodicTreeWalker {
         Vec _acorr;
 
         /*! @brief Computational cost of the local treewalk (is exported) */
-        unsigned int _comp_cost;
+        float _comp_cost;
 
         /*! @brief Softening length of the external Particle */
         double _hsoft;
@@ -649,7 +647,7 @@ class EwaldGravityWalker : public PeriodicTreeWalker {
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) {
+        void set_comp_cost(float comp_cost) {
             _comp_cost = comp_cost;
         }
 
@@ -664,7 +662,7 @@ class EwaldGravityWalker : public PeriodicTreeWalker {
         void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_acorr[0], ndim_, MPI_DOUBLE, buffer, bufsize,
                        position);
-            MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer, bufsize, position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_FLOAT, buffer, bufsize, position);
         }
     };
 
@@ -702,38 +700,38 @@ class EwaldGravityWalker : public PeriodicTreeWalker {
  */
 class PotentialWalker : public PeriodicTreeWalker {
   private:
-    /*! \brief Particle for which the potential is calculated */
+    /*! @brief Particle for which the potential is calculated */
     Particle* _p;
 
-    /*! \brief Position of the Particle for which the potential is calculated */
+    /*! @brief Position of the Particle for which the potential is calculated */
     Vec _position;
 
-    /*! \brief Current value of the potential */
+    /*! @brief Current value of the potential */
     double _epot;
 
-    /*! \brief Old gravitational acceleration, used for the relative opening
+    /*! @brief Old gravitational acceleration, used for the relative opening
      *  criterion */
     double _olda;
 
-    /*! \brief Softening length of the Particle for which the potential is
+    /*! @brief Softening length of the Particle for which the potential is
      *  calculated */
     double _hsoft;
 
-    /*! \brief Inverse softening length of the Particle for which the potential
+    /*! @brief Inverse softening length of the Particle for which the potential
      *  is calculated */
     double _hsoftinv;
 
-    /*! \brief Inverse softening length cubed */
+    /*! @brief Inverse softening length cubed */
     double _hsoftinv3;
 
-    /*! \brief Flag indicating if the treewalk is performed for a local
+    /*! @brief Flag indicating if the treewalk is performed for a local
      *  Particle */
     bool _local;
 
-    /*! \brief Computational cost of the treewalk */
-    unsigned int _comp_cost;
+    /*! @brief Timer for the computational cost of the treewalk */
+    Timer _comp_cost;
 
-    /*! \brief GravityKernel used for close interaction softening */
+    /*! @brief GravityKernel used for close interaction softening */
     GravityKernel* _kernel;
 
   public:
@@ -743,19 +741,19 @@ class PotentialWalker : public PeriodicTreeWalker {
      */
     class Export {
       private:
-        /*! \brief Particle for which the potential is calculated */
+        /*! @brief Particle for which the potential is calculated */
         Particle* _p;
 
-        /*! \brief Old acceleration of the Particle (is exported) */
+        /*! @brief Old acceleration of the Particle (is exported) */
         double _olda;
 
-        /*! \brief Position of the Particle (is exported) */
+        /*! @brief Position of the Particle (is exported) */
         Vec _pos;
 
-        /*! \brief Softening length of the Particle (is exported) */
+        /*! @brief Softening length of the Particle (is exported) */
         double _hsoft;
 
-        /*! \brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (is
+        /*! @brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (is
          *  exported) */
         ParticleType _type;
 
@@ -799,10 +797,9 @@ class PotentialWalker : public PeriodicTreeWalker {
          */
         void unpack_data(void* buffer, int bufsize, int* position) {
             double epot;
-            unsigned int comp_cost;
+            float comp_cost;
             MyMPI_Unpack(buffer, bufsize, position, &epot, 1, MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1,
-                         MPI_UNSIGNED);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_FLOAT);
             _p->set_gravitational_potential(_p->get_gravitational_potential() +
                                             epot);
             _p->add_comp_cost(comp_cost);
@@ -815,22 +812,22 @@ class PotentialWalker : public PeriodicTreeWalker {
      */
     class Import {
       private:
-        /*! \brief Position for which the potential is calculated */
+        /*! @brief Position for which the potential is calculated */
         Vec _pos;
 
-        /*! \brief Old acceleration, used for the relative opening criterion */
+        /*! @brief Old acceleration, used for the relative opening criterion */
         double _olda;
 
-        /*! \brief Result of the local treewalk (is exported) */
+        /*! @brief Result of the local treewalk (is exported) */
         double _epot;
 
-        /*! \brief Computational cost of the local treewalk (is exported) */
-        unsigned int _comp_cost;
+        /*! @brief Computational cost of the local treewalk (is exported) */
+        float _comp_cost;
 
-        /*! \brief Softening length of the external Particle */
+        /*! @brief Softening length of the external Particle */
         double _hsoft;
 
-        /*! \brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
+        /*! @brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
         ParticleType _type;
 
       public:
@@ -900,7 +897,7 @@ class PotentialWalker : public PeriodicTreeWalker {
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) {
+        void set_comp_cost(float comp_cost) {
             _comp_cost = comp_cost;
         }
 
@@ -914,7 +911,7 @@ class PotentialWalker : public PeriodicTreeWalker {
          */
         void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_epot, 1, MPI_DOUBLE, buffer, bufsize, position);
-            MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer, bufsize, position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_FLOAT, buffer, bufsize, position);
         }
     };
 
@@ -952,34 +949,34 @@ class PotentialWalker : public PeriodicTreeWalker {
  */
 class BHGravityWalker : public PeriodicTreeWalker {
   private:
-    /*! \brief Particle for which the gravitational acceleration is
+    /*! @brief Particle for which the gravitational acceleration is
      *  calculated */
     Particle* _p;
 
-    /*! \brief Position of the Particle for which the gravitational acceleration
+    /*! @brief Position of the Particle for which the gravitational acceleration
      *  is calculated */
     Vec _position;
 
-    /*! \brief Current value of the gravitational acceleration */
+    /*! @brief Current value of the gravitational acceleration */
     Vec _a;
 
-    /*! \brief Softening lenght of the Particle */
+    /*! @brief Softening lenght of the Particle */
     double _hsoft;
 
-    /*! \brief Inverse softening length of the Particle */
+    /*! @brief Inverse softening length of the Particle */
     double _hsoftinv;
 
-    /*! \brief Inverse softening length of the Particle cubed */
+    /*! @brief Inverse softening length of the Particle cubed */
     double _hsoftinv3;
 
-    /*! \brief Flag indicating whether the treewalk is performed for a local
+    /*! @brief Flag indicating whether the treewalk is performed for a local
      *  Particle */
     bool _local;
 
-    /*! \brief Computational cost of the treewalk */
-    unsigned int _comp_cost;
+    /*! @brief Timer for the computational cost of the treewalk */
+    Timer _comp_cost;
 
-    /*! \brief GravityKernel used for close interaction softening */
+    /*! @brief GravityKernel used for close interaction softening */
     GravityKernel* _kernel;
 
   public:
@@ -989,17 +986,17 @@ class BHGravityWalker : public PeriodicTreeWalker {
      */
     class Export {
       private:
-        /*! \brief Particle for which the gravitational acceleration is
+        /*! @brief Particle for which the gravitational acceleration is
          *  calculated */
         Particle* _p;
 
-        /*! \brief Position of the Particle (is exported) */
+        /*! @brief Position of the Particle (is exported) */
         Vec _pos;
 
-        /*! \brief Softening length of the Particle (is exported) */
+        /*! @brief Softening length of the Particle (is exported) */
         double _hsoft;
 
-        /*! \brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (is
+        /*! @brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) (is
          *  exported) */
         ParticleType _type;
 
@@ -1040,9 +1037,9 @@ class BHGravityWalker : public PeriodicTreeWalker {
          */
         void unpack_data(void* buffer, int bufsize, int* position) {
             Vec a;
-            unsigned int comp_cost;
+            float comp_cost;
             MyMPI_Unpack(buffer, bufsize, position, &a[0], ndim_, MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_INT);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_FLOAT);
             _p->set_gravitational_acceleration(
                     _p->get_gravitational_acceleration() + a);
             _p->add_comp_cost(comp_cost);
@@ -1055,19 +1052,19 @@ class BHGravityWalker : public PeriodicTreeWalker {
      */
     class Import {
       private:
-        /*! \brief Position of the external Particle */
+        /*! @brief Position of the external Particle */
         Vec _pos;
 
-        /*! \brief Result of the local treewalk (is exported) */
+        /*! @brief Result of the local treewalk (is exported) */
         Vec _a;
 
-        /*! \brief Computational cost of the local treewalk (is exported) */
-        unsigned int _comp_cost;
+        /*! @brief Computational cost of the local treewalk (is exported) */
+        float _comp_cost;
 
-        /*! \brief Softening length of the external Particle */
+        /*! @brief Softening length of the external Particle */
         double _hsoft;
 
-        /*! \brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
+        /*! @brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
         ParticleType _type;
 
       public:
@@ -1127,7 +1124,7 @@ class BHGravityWalker : public PeriodicTreeWalker {
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) {
+        void set_comp_cost(float comp_cost) {
             _comp_cost = comp_cost;
         }
 
@@ -1141,7 +1138,7 @@ class BHGravityWalker : public PeriodicTreeWalker {
          */
         void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_a[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
-            MyMPI_Pack(&_comp_cost, 1, MPI_INT, buffer, bufsize, position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_FLOAT, buffer, bufsize, position);
         }
     };
 
@@ -1255,11 +1252,10 @@ class BHEwaldGravityWalker : public PeriodicTreeWalker {
          */
         void unpack_data(void* buffer, int bufsize, int* position) {
             Vec acorr;
-            unsigned int comp_cost;
+            float comp_cost;
             MyMPI_Unpack(buffer, bufsize, position, &acorr[0], ndim_,
                          MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1,
-                         MPI_UNSIGNED);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_FLOAT);
             _p->set_gravitational_acceleration(
                     _p->get_gravitational_acceleration() + acorr);
             _p->add_comp_cost(comp_cost);
@@ -1282,7 +1278,7 @@ class BHEwaldGravityWalker : public PeriodicTreeWalker {
         Vec _acorr;
 
         /*! @brief Computational cost of the local treewalk (is exported) */
-        unsigned int _comp_cost;
+        float _comp_cost;
 
         /*! @brief Softening length of the external Particle */
         double _hsoft;
@@ -1357,7 +1353,7 @@ class BHEwaldGravityWalker : public PeriodicTreeWalker {
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) {
+        void set_comp_cost(float comp_cost) {
             _comp_cost = comp_cost;
         }
 
@@ -1372,7 +1368,7 @@ class BHEwaldGravityWalker : public PeriodicTreeWalker {
         void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_acorr[0], ndim_, MPI_DOUBLE, buffer, bufsize,
                        position);
-            MyMPI_Pack(&_comp_cost, 1, MPI_UNSIGNED, buffer, bufsize, position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_FLOAT, buffer, bufsize, position);
         }
     };
 
@@ -1411,31 +1407,31 @@ class BHEwaldGravityWalker : public PeriodicTreeWalker {
  */
 class BHPotentialWalker : public PeriodicTreeWalker {
   private:
-    /*! \brief Particle for which the potential is calculated */
+    /*! @brief Particle for which the potential is calculated */
     Particle* _p;
 
-    /*! \brief Position of the Particle */
+    /*! @brief Position of the Particle */
     Vec _position;
 
-    /*! \brief Current value of the gravitational potential */
+    /*! @brief Current value of the gravitational potential */
     double _epot;
 
-    /*! \brief Softening length of the Particle */
+    /*! @brief Softening length of the Particle */
     double _hsoft;
 
-    /*! \brief Inverse softening length of the Particle */
+    /*! @brief Inverse softening length of the Particle */
     double _hsoftinv;
 
-    /*! \brief Inverse softening length of the Particle cubed */
+    /*! @brief Inverse softening length of the Particle cubed */
     double _hsoftinv3;
 
-    /*! \brief Flag indicating if the treewalk is done for a local Particle */
+    /*! @brief Flag indicating if the treewalk is done for a local Particle */
     bool _local;
 
-    /*! \brief Computational cost of the treewalk */
-    unsigned int _comp_cost;
+    /*! @brief Timer for the computational cost of the treewalk */
+    Timer _comp_cost;
 
-    /*! \brief GravityKernel used for close encounter softening */
+    /*! @brief GravityKernel used for close encounter softening */
     GravityKernel* _kernel;
 
   public:
@@ -1445,17 +1441,17 @@ class BHPotentialWalker : public PeriodicTreeWalker {
      */
     class Export {
       private:
-        /*! \brief Particle for which the gravitational potential is
+        /*! @brief Particle for which the gravitational potential is
          *  calculated */
         Particle* _p;
 
-        /*! \brief Position of the Particle (is exported) */
+        /*! @brief Position of the Particle (is exported) */
         Vec _pos;
 
-        /*! \brief Softening length of the Particle (is exported) */
+        /*! @brief Softening length of the Particle (is exported) */
         double _hsoft;
 
-        /*! \brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) */
+        /*! @brief Type of the Particle (PARTTYPE_GAS/PARTTYPE_DM) */
         ParticleType _type;
 
       public:
@@ -1494,9 +1490,9 @@ class BHPotentialWalker : public PeriodicTreeWalker {
          */
         void unpack_data(void* buffer, int bufsize, int* position) {
             double epot;
-            unsigned int comp_cost;
+            float comp_cost;
             MyMPI_Unpack(buffer, bufsize, position, &epot, 1, MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_INT);
+            MyMPI_Unpack(buffer, bufsize, position, &comp_cost, 1, MPI_FLOAT);
             _p->set_gravitational_potential(_p->get_gravitational_potential() +
                                             epot);
             _p->add_comp_cost(comp_cost);
@@ -1509,19 +1505,19 @@ class BHPotentialWalker : public PeriodicTreeWalker {
      */
     class Import {
       private:
-        /*! \brief Position of the external Particle */
+        /*! @brief Position of the external Particle */
         Vec _pos;
 
-        /*! \brief Local result of the treewalk (is exported) */
+        /*! @brief Local result of the treewalk (is exported) */
         double _epot;
 
-        /*! \brief Computational cost of the local treewalk (is exported) */
-        unsigned int _comp_cost;
+        /*! @brief Computational cost of the local treewalk (is exported) */
+        float _comp_cost;
 
-        /*! \brief Softening length of the external Particle */
+        /*! @brief Softening length of the external Particle */
         double _hsoft;
 
-        /*! \brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
+        /*! @brief Type of the external Particle (PARTTYPE_GAS/PARTTYPE_DM) */
         ParticleType _type;
 
       public:
@@ -1581,7 +1577,7 @@ class BHPotentialWalker : public PeriodicTreeWalker {
          *
          * @param comp_cost Value of the computational cost
          */
-        void set_comp_cost(unsigned int comp_cost) {
+        void set_comp_cost(float comp_cost) {
             _comp_cost = comp_cost;
         }
 
@@ -1595,7 +1591,7 @@ class BHPotentialWalker : public PeriodicTreeWalker {
          */
         void pack_data(void* buffer, int bufsize, int* position) {
             MyMPI_Pack(&_epot, 1, MPI_DOUBLE, buffer, bufsize, position);
-            MyMPI_Pack(&_comp_cost, 1, MPI_INT, buffer, bufsize, position);
+            MyMPI_Pack(&_comp_cost, 1, MPI_FLOAT, buffer, bufsize, position);
         }
     };
 
@@ -1628,7 +1624,7 @@ class BHPotentialWalker : public PeriodicTreeWalker {
 };
 
 /**
- * \brief Dummy TreeWalker for analytical gravitational potentials
+ * @brief Dummy TreeWalker for analytical gravitational potentials
  *
  * The ConstantPotentialGravityWalker does nothing during the treewalk and just
  * sets the acceleration to a value given by the get_gravitational_acceleration
@@ -1641,13 +1637,13 @@ class BHPotentialWalker : public PeriodicTreeWalker {
 template <class T>
 class ConstantPotentialGravityWalker : public PeriodicTreeWalker {
   private:
-    /*! \brief Particle for which the acceleration is calculated */
+    /*! @brief Particle for which the acceleration is calculated */
     Particle* _p;
 
-    /*! \brief Position of the Particle */
+    /*! @brief Position of the Particle */
     Vec _position;
 
-    /*! \brief Current value of the acceleration */
+    /*! @brief Current value of the acceleration */
     Vec _a;
 
   public:

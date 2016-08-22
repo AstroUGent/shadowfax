@@ -134,7 +134,7 @@ DelTess::DelTess(DelCont* container, unsigned int numpart, bool periodic,
 }
 
 /**
- * \brief Destructor. Remove all points, mirrors, existing simplices, ghosts,
+ * @brief Destructor. Remove all points, mirrors, existing simplices, ghosts,
  * ghostscells and exportcopies.
  */
 DelTess::~DelTess() {

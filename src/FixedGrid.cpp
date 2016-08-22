@@ -81,9 +81,12 @@ FixedGrid::FixedGrid(ParticleVector& particles, bool periodic) {
 #if ndim_ == 3
     _cellvolume = cellsize[0] * cellsize[1] * cellsize[2];
     _cellh = cbrt(_cellvolume * 3. / 4. / M_PI);
+    _cellarea = 2. * (cellsize[0] * cellsize[1] + cellsize[0] * cellsize[2] +
+                      cellsize[1] * cellsize[2]);
 #else
     _cellvolume = cellsize[0] * cellsize[1];
     _cellh = sqrt(_cellvolume / M_PI);
+    _cellarea = 2. * (cellsize[0] + cellsize[1]);
 #endif
 
     _vorgens.resize(particles.gassize());
@@ -646,6 +649,18 @@ double FixedGrid::get_h() {
  */
 double FixedGrid::get_volume() {
     return _cellvolume;
+}
+
+/**
+ * @brief Get the total surface area of any cell in the grid
+ *
+ * Since the surface area is constant and the same for all cells, it is
+ * precomputed and then just returned
+ *
+ * @return The total surface area of any cell in the grid
+ */
+double FixedGrid::get_area() {
+    return _cellarea;
 }
 
 /**

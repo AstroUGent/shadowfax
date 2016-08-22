@@ -23,7 +23,6 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "ExArith.hpp"       // for test_predicates
 #include "MPIMethods.hpp"    // for MyMPI_Finalize, MyMPI_Init
 #include "Plotter.hpp"       // for Plotter
 #include "SidePrograms.hpp"  // for AreaCalculator, etc
@@ -57,9 +56,7 @@ enum SideProgramTypes {
     /*! \brief Sort the given snapshot in Hilbert space filling order */
     SIDEPROGRAM_SORT,
     /*! \brief Test the Delaunay construction algorithms */
-    SIDEPROGRAM_DELTEST,
-    /*! \brief Test the exact arithmetics routines */
-    SIDEPROGRAM_EXARITH
+    SIDEPROGRAM_DELTEST
 };
 
 /**
@@ -99,7 +96,6 @@ unsigned int bootstrap(int argc, char** argv) {
             {"mass", no_argument, NULL, SIDEPROGRAM_MASS},
             {"epot", no_argument, NULL, SIDEPROGRAM_EPOT},
             {"sort", no_argument, NULL, SIDEPROGRAM_SORT},
-            {"exact_arithmetics", no_argument, NULL, SIDEPROGRAM_EXARITH},
             {0, 0, 0, 0}};
 
     int c;
@@ -140,10 +136,6 @@ unsigned int bootstrap(int argc, char** argv) {
             }
             case SIDEPROGRAM_SORT: {
                 HilbertSorter hs(argc, argv);
-                return 1;
-            }
-            case SIDEPROGRAM_EXARITH: {
-                ExactArithmetic::test_predicates();
                 return 1;
             }
             case '?':

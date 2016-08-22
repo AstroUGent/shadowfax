@@ -403,6 +403,7 @@ void BlockICGenerator::make_cartesian_grid(ParticleVector& plist) {
         }
     }
 #endif
+    plist.finalize();
 }
 
 /**
@@ -415,7 +416,7 @@ void BlockICGenerator::make_random_grid(ParticleVector& plist) {
     _maxdens = 0.;
     for(unsigned int i = _regions.size(); i--;) {
         ICRegion* next = NULL;
-        if(i < _regions.size() - 2) {
+        if(i + 2 < _regions.size()) {
             next = _regions[i + 1];
         }
         _rejection_fac[i] = _regions[i]->get_max_value_hydro(next);
@@ -448,9 +449,11 @@ void BlockICGenerator::make_random_grid(ParticleVector& plist) {
             }
         }
         plist.add_gas_particle(new GasParticle(x));
-        plist.gasback()->set_id(i);
+        plist.gasback()->set_id(nother + i);
         plist.gasback()->set_starttime(0);
     }
+    // make sure the header is correct
+    plist.finalize();
 }
 
 /**
@@ -537,7 +540,6 @@ void BlockICGenerator::relax_grid(ParticleVector& grid) {
             grid.gas(j)->set_vorgen(NULL);
         }
 
-        voronoi.reset(&grid.get_container(), _periodic);
         // order is important here!
         // since the update_positions depends on the old ordering of the
         // particles, we have to call it before updating the ordering by
@@ -545,10 +547,191 @@ void BlockICGenerator::relax_grid(ParticleVector& grid) {
         voronoi.update_positions(_periodic);
         grid.sort();
 
+        voronoi.reset(&grid.get_container(), _periodic);
+
         voronoi.update(0);
 
         voronoi.set_hs(0);
     }
+
+    voronoi.print_statistics();
+}
+
+/**
+  * @brief Make the given grid more regular by using the method described in
+  * Springel (2010)
+  *
+  * \attention This method is still quite unstable and part of ongoing research
+  *
+  * The VorTess is constructed and a potential is calculated for every VorCell
+  * using its hydrodynamical properties as well as geometric properties. This
+  * potential is then used to calculate a displacement for the mesh generators
+  * which makes the resulting grid more regular. The procedure is repeated for a
+  * fixed number of times until all cells have a fixed mass or volume (or a
+  * combination of both).
+  *
+  * @param plist A refernce to a non-empty ParticleVector containing a randomly
+  * sampled, noisy grid
+  */
+void BlockICGenerator::springel_loop(ParticleVector& plist) {
+    // currently disabled due to conflicts in FancyTree
+    //    boost::mpi::communicator world;
+    //    RiemannSolver solver;
+    //    FancyTree tree(*_container);
+    //    VorTess* voronoi = new VorTess(_container);
+    //    for(unsigned int i = plist.size(); i--;){
+    //        plist[i]->set_key(_container->get_key(plist[i]->get_position()));
+    //        plist[i]->set_vorgen(NULL);
+    //        plist[i]->reset_copies();
+    //        plist[i]->reset_export();
+    //        tree.add_particle(plist[i]);
+    //        voronoi->add_point(plist[i]);
+    //    }
+    //    voronoi->complete(tree);
+    //    voronoi->construct();
+    //    ofstream vorfile("voronoi_mesh.dat");
+    //    voronoi->print_tesselation_gnuplot(vorfile);
+
+    //    apply_regions(plist);
+    //    double totmass = 0.;
+    //    for(unsigned int i = plist.size(); i--;){
+    //        double V = plist[i]->get_cell()->get_volume();
+    //        StateVector Q = solver.get_Q(V, plist[i]->get_Wvec());
+    //        plist[i]->set_Q(Q);
+    //        plist[i]->set_soundspeed(solver.get_soundspeed(plist[i]->get_Wvec()));
+    //        totmass += plist[i]->get_Qvec().m();
+    //    }
+    //    double mdes = totmass*1.01/plist.size();
+    //    double Vdes = 20./plist.size();
+    //    unsigned int numspringelloop = 0;
+    //    for(unsigned int nloop = numspringelloop; nloop--;){
+    //        cout << "Springel loop " << (numspringelloop-nloop) << endl;
+    //        double Kdes = 0.;
+    //        double Vtot = 0.;
+    //        for(unsigned int i = plist.size(); i--;){
+    //            Kdes += 1./(plist[i]->get_Qvec().m()/mdes +
+    //    plist[i]->get_cell()->get_volume()/Vdes);
+    //            Vtot += plist[i]->get_cell()->get_volume();
+    //            plist[i]->get_cell()->set_velocity();
+    //        }
+    //        Kdes = Vtot/Kdes;
+    //        for(unsigned int i = plist.size(); i--;){
+    //            double mass = 1./(plist[i]->get_Wvec().rho()/mdes + 1./Vdes);
+    //            mass = Kdes*mass/4./M_PI;
+    //#if ndim_==2
+    //            // scale factor to convert from the 2D problem to the
+    // equivalent
+    //    //3D problem
+    //            mass *= _container->get_box_width();
+    //#endif
+    //            plist[i]->set_mesh_m(mass);
+    //        }
+    //        tree.update_mesh_m();
+    //        ofstream meshpotfile("potential.dat");
+    //        vector<bool> exportlist(world.size());
+    //        for(unsigned int i = plist.size(); i--;){
+    //            Vec mesh_v;
+    //            Vec rj = plist[i]->get_position();
+    //            mesh_v += tree.calculate_mesh_v(rj, exportlist);
+    //            plist[i]->set_mesh_v(mesh_v);
+    //#if ndim_==3
+    //            meshpotfile << plist[i]->x() << "\t" << plist[i]->y() << "\t"
+    //    << plist[i]->z() << "\t" << mesh_v[0] << "\t" << mesh_v[1] << "\t"
+    //    << mesh_v[2] << "\n";
+    //#else
+    //            meshpotfile << plist[i]->x() << "\t" << plist[i]->y() << "\t"
+    //    << mesh_v[0] << "\t" << mesh_v[1] << "\n";
+    //#endif
+    //        }
+    //        meshpotfile.close();
+    //        double displacement = 0.0001;
+    //        double fac = 0.5;
+
+    //        for(unsigned int i = plist.size(); i--;){
+    //            Vec cur_pos = plist[i]->get_position();
+    //            cur_pos += fac*plist[i]->get_mesh_v();
+    //            fac = std::min(fac, 0.125*
+    //    sqrt(plist[i]->get_cell()->get_volume()/M_PI)/((cur_pos -
+    //    plist[i]->get_position()).norm()));
+    //        }
+    //        if(fac < 1.){
+    //            cout << "fac: " << fac << endl;
+    //        }
+
+    //        for(unsigned int i = plist.size(); i--;){
+    ////            plist[i]->get_position() += fac*plist[i]->get_mesh_v() +
+    ////    displacement*plist[i]->get_velocity();
+    //            plist[i]->get_position() += fac*plist[i]->get_mesh_v();
+    ////            plist[i]->get_position() +=
+    ////    displacement*plist[i]->get_velocity();
+    ////            Vec oldvel = plist[i]->get_velocity();
+    //#if ndim_==3
+    //            plist[i]->set_v(fac*plist[i]->get_mesh_v()[0]/displacement,
+    //    fac*plist[i]->get_mesh_v()[1]/displacement,
+    //    fac*plist[i]->get_mesh_v()[2]/displacement);
+    //#else
+    //            plist[i]->set_v(fac*plist[i]->get_mesh_v()[0]/displacement,
+    //    fac*plist[i]->get_mesh_v()[1]/displacement, 0.);
+    //#endif
+    //            Vec percorr;
+    //            if(plist[i]->x() < 0.){
+    //                percorr[0] = 1.;
+    //            }
+    //            if(plist[i]->x() > 1.){
+    //                percorr[0] = -1.;
+    //            }
+    //            if(plist[i]->y() < 0.){
+    //                percorr[1] = 1.;
+    //            }
+    //            if(plist[i]->y() > 1.){
+    //                percorr[1] = -1.;
+    //            }
+    //#if ndim_==3
+    //            if(plist[i]->z() < 0.){
+    //                percorr[2] = 1.;
+    //            }
+    //            if(plist[i]->z() > 1.){
+    //                percorr[2] = -1.;
+    //            }
+    //#endif
+    //            plist[i]->get_position() += percorr;
+    //            if(plist[i]->x() < 0. || plist[i]->x() > 1. ||
+    //    plist[i]->y() < 0. || plist[i]->y() > 1.){
+    //                cout << plist[i]->x() << "\t" << plist[i]->y() << endl;
+    //                cout << plist[i]->get_mesh_v()[0] << "\t"
+    //    << plist[i]->get_mesh_v()[1] << endl;
+    //                exit(1);
+    //            }
+    //            plist[i]->set_key(_container->get_key(plist[i]->get_position()));
+    //            plist[i]->set_vorgen(NULL);
+    //            plist[i]->reset_copies();
+    //            plist[i]->reset_export();
+    //        }
+    //        voronoi->advect(displacement);
+    ////        sort(plist.begin(), plist.end(), HB::sortfunc);
+    //        plist.sort();
+
+    //        delete voronoi;
+    //        voronoi = new VorTess(_container);
+    //        tree.reset(*_container);
+    //        for(unsigned int j = 0; j < plist.size(); j++){
+    //            voronoi->add_point(plist[j]);
+    //            tree.add_particle(plist[j]);
+    //        }
+    //        voronoi->complete(tree);
+    //        voronoi->construct();
+    //        ofstream vorfile2("voronoi_mesh.dat");
+    //        voronoi->print_tesselation_gnuplot(vorfile2);
+    ////        apply_regions(plist);
+    //        for(unsigned int i = 0; i < plist.size(); i++){
+    ////            plist[i]->update_W(_gamma);
+    //            StateVector W =
+    // solver.get_W(plist[i]->get_cell()->get_volume(),
+    //    plist[i]->get_Qvec());
+    //            plist[i]->set_W(W);
+    //            plist[i]->set_soundspeed(solver.get_soundspeed(W));
+    //        }
+    //    }
 }
 
 /**
@@ -560,14 +743,17 @@ void BlockICGenerator::relax_grid(ParticleVector& grid) {
 void BlockICGenerator::add_DM(ParticleVector& plist) {
     _rejection_fac_dm.resize(_regions.size());
     _maxdens_dm = 0.;
+    double Mtot = 0.;
     for(unsigned int i = _regions.size(); i--;) {
         ICRegion* next = NULL;
-        if(i < _regions.size() - 2) {
+        if(i + 2 < _regions.size()) {
             next = _regions[i + 1];
         }
         _rejection_fac_dm[i] = _regions[i]->get_max_value_dm(next);
         _maxdens_dm = std::max(_maxdens_dm, _rejection_fac_dm[i]);
+        Mtot += _regions[i]->get_integral_dm(next);
     }
+    double mpart = Mtot / _ndark;
     for(unsigned int i = 0; i < _regions.size(); i++) {
         _rejection_fac_dm[i] /= _maxdens_dm;
     }
@@ -598,5 +784,6 @@ void BlockICGenerator::add_DM(ParticleVector& plist) {
         }
         plist.add_DM_particle(new DMParticle(x));
         plist.dmback()->set_id(i);
+        plist.dmback()->set_mass(mpart);
     }
 }

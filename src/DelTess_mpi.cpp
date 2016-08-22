@@ -2053,8 +2053,8 @@ void DelTess::update_dQs() {
                            [si]->get_dQvec();
             Vec dE = _ghosts[(MPIGlobal::rank + 1 + i) % MPIGlobal::size]
                             [si]->get_delta_E();
-            MyMPI_Pack(&dQ[0], ndim_ + 2, MPI_DOUBLE,
-                       &MPIGlobal::sendbuffer[buffers[i]], bufsize, &send_pos);
+            dQ.pack_data(&MPIGlobal::sendbuffer[buffers[i]], bufsize,
+                         &send_pos);
             MyMPI_Pack(&dE[0], ndim_, MPI_DOUBLE,
                        &MPIGlobal::sendbuffer[buffers[i]], bufsize, &send_pos);
         }
@@ -2086,9 +2086,8 @@ void DelTess::update_dQs() {
                         Vec dE = _ghosts[(MPIGlobal::rank + 1 + j) %
                                          MPIGlobal::size]
                                         [si]->get_delta_E();
-                        MyMPI_Pack(&dQ[0], ndim_ + 2, MPI_DOUBLE,
-                                   &MPIGlobal::sendbuffer[buffers[j]], bufsize,
-                                   &send_pos);
+                        dQ.pack_data(&MPIGlobal::sendbuffer[buffers[j]],
+                                     bufsize, &send_pos);
                         MyMPI_Pack(&dE[0], ndim_, MPI_DOUBLE,
                                    &MPIGlobal::sendbuffer[buffers[j]], bufsize,
                                    &send_pos);
@@ -2134,11 +2133,9 @@ void DelTess::update_dQs() {
             recv_pos = 0;
             unsigned int j = numreceived[freebuffer];
             while(recv_pos < nelements - 4) {
-                StateVector dQ;
+                StateVector dQ(&MPIGlobal::recvbuffer[buffers[freebuffer]],
+                               nelements, &recv_pos);
                 Vec dE;
-                MyMPI_Unpack(&MPIGlobal::recvbuffer[buffers[freebuffer]],
-                             nelements, &recv_pos, &dQ[0], ndim_ + 2,
-                             MPI_DOUBLE);
                 MyMPI_Unpack(&MPIGlobal::recvbuffer[buffers[freebuffer]],
                              nelements, &recv_pos, &dE[0], ndim_, MPI_DOUBLE);
                 _exports[index][j]->get_vorgen()->get_particle()->increase_dQ(
@@ -2176,9 +2173,8 @@ void DelTess::update_dQs() {
                         Vec dE = _ghosts[(MPIGlobal::rank + 1 + j) %
                                          MPIGlobal::size]
                                         [si]->get_delta_E();
-                        MyMPI_Pack(&dQ[0], ndim_ + 2, MPI_DOUBLE,
-                                   &MPIGlobal::sendbuffer[buffers[j]], bufsize,
-                                   &send_pos);
+                        dQ.pack_data(&MPIGlobal::sendbuffer[buffers[j]],
+                                     bufsize, &send_pos);
                         MyMPI_Pack(&dE[0], ndim_, MPI_DOUBLE,
                                    &MPIGlobal::sendbuffer[buffers[j]], bufsize,
                                    &send_pos);

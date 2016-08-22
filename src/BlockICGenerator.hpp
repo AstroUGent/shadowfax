@@ -117,6 +117,8 @@ class BlockICGenerator : public ICGenerator {
     bool regions_accepted(Vec& p);
     bool regions_accepted_dm(Vec& p);
 
+    void springel_loop(ParticleVector& plist);
+
     void add_DM(ParticleVector& plist);
 
   public:

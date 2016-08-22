@@ -372,6 +372,83 @@ double ICRegion::get_max_value_dm(ICRegion* cut_out_region) {
 }
 
 /**
+ * @brief Calculate the total dark matter mass in the region
+ *
+ * We divide the region in at most 1,000,000 cells (10,000 in 2D) and calculate
+ * the total mass of all cells with centers that lie inside the region, but not
+ * inside the given cut out region.
+ *
+ * @param cut_out_region ICRegion that (partially) overlaps with this region and
+ * that should not be considered when calculating the maximum
+ * @return The total dark matter mass in the region
+ */
+double ICRegion::get_integral_dm(ICRegion* cut_out_region) {
+    if(!_dmfunction.size()) {
+        return 0;
+    }
+#if ndim_ == 3
+    double mtot_dm = 0.;
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            for(unsigned int z = 0; z < 100; z++) {
+                Vec pos((i + 0.5) * 0.01 * _sides[0] - _origin[0],
+                        (j + 0.5) * 0.01 * _sides[1] - _origin[1],
+                        (z + 0.5) * 0.01 * _sides[2] - _origin[2]);
+                if(!cut_out_region || !cut_out_region->inside(pos)) {
+                    double re = 0.;
+                    for(unsigned int k = 0; k < ndim_; k++) {
+                        double x = 2. * fabs(pos[k]) / _sides[k];
+                        if(_exponent < 10.) {
+                            re += pow(x, _exponent);
+                        } else {
+                            re = std::max(re, x);
+                        }
+                    }
+                    if(_exponent < 10.) {
+                        re = pow(re, 1. / _exponent);
+                    }
+                    if(re <= 1.) {
+                        re = sqrt(pos[0] * pos[0] + pos[1] * pos[1] +
+                                  pos[2] * pos[2]);
+                        mtot_dm += 1.e-6 * (*_dmfunction[0])(re, pos[0], pos[1],
+                                                             pos[2]);
+                    }
+                }
+            }
+        }
+    }
+    return mtot_dm;
+#else
+    double mtot_dm = 0.;
+    for(unsigned int i = 0; i < 100; i++) {
+        for(unsigned int j = 0; j < 100; j++) {
+            Vec pos((i + 0.5) * 0.01 * _sides[0] - _origin[0],
+                    (j + 0.5) * 0.01 * _sides[1] - _origin[1]);
+            if(!cut_out_region || !cut_out_region->inside(pos)) {
+                double re = 0.;
+                for(unsigned int k = 0; k < ndim_; k++) {
+                    double x = 2. * fabs(pos[k]) / _sides[k];
+                    if(_exponent < 10.) {
+                        re += pow(x, _exponent);
+                    } else {
+                        re = std::max(re, x);
+                    }
+                }
+                if(_exponent < 10.) {
+                    re = pow(re, 1. / _exponent);
+                }
+                if(re <= 1.) {
+                    re = sqrt(pos[0] * pos[0] + pos[1] * pos[1]);
+                    mtot_dm += 1.e-4 * (*_dmfunction[0])(re, pos[0], pos[1]);
+                }
+            }
+        }
+    }
+    return mtot_dm;
+#endif
+}
+
+/**
  * @brief Check whether the given position inside this region is acceptable in a
  * Monte Carlo rejection sampling of the density field for the hydro
  *

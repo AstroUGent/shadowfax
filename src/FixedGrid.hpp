@@ -45,28 +45,31 @@ class StateVector;
  */
 class FixedGrid {
   private:
-    /*! \brief Number of grid cells in every dimension */
+    /*! @brief Number of grid cells in every dimension */
     unsigned int _size[ndim_];
 
-    /*! \brief Volume of a single cell of the grid */
+    /*! @brief Volume of a single cell of the grid */
     double _cellvolume;
 
-    /*! \brief Characteristic length of a single cell of the grid */
+    /*! @brief Total surface area of a single cell of the grid */
+    double _cellarea;
+
+    /*! @brief Characteristic length of a single cell of the grid */
     double _cellh;
 
-    /*! \brief Faces of the grid */
+    /*! @brief Faces of the grid */
     std::vector<VorFace*> _faces;
 
-    /*! \brief Generators of the grid cells */
+    /*! @brief Generators of the grid cells */
     std::vector<VorGen*> _vorgens;
 
-    /*! \brief Ghosts at the boundaries of the grid */
+    /*! @brief Ghosts at the boundaries of the grid */
     std::vector<VorGen*> _ghosts;
 
-    /*! \brief Cells of the grid */
+    /*! @brief Cells of the grid */
     std::vector<VorCell*> _cells;
 
-    /*! \brief Indices of the associated gasparticles in the internal grid */
+    /*! @brief Indices of the associated gasparticles in the internal grid */
     std::vector<unsigned int> _idx;
 
   public:
@@ -75,6 +78,7 @@ class FixedGrid {
 
     double get_h();
     double get_volume();
+    double get_area();
 
     void hydro(TimeLine& timeline, RiemannSolver& solver);
     void get_gradients(unsigned int index, StateVector* delta);

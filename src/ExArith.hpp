@@ -37,14 +37,14 @@ class Vec;
  * 64-bit binary representation
  */
 union binaryDouble {
-    /*! \brief Double precision floating point value */
+    /*! @brief Double precision floating point value */
     double dval;
-    /*! \brief 64-bit binary representation */
+    /*! @brief 64-bit binary representation */
     unsigned long bval;
 };
 
 /**
-  * \brief Exact geometric tests
+  * @brief Exact geometric tests
   *
   * A collection of exact geometric tests needed during the Delaunay
   * tesselation.
@@ -122,8 +122,6 @@ inline double orient2d(Vec& a, Vec& b, Vec& c) {
 inline double incircle(Vec& a, Vec& b, Vec& c, Vec& d) {
     return incircle_adaptive(a, b, c, d);
 }
-
-void test_predicates();
 
 /**
  * @brief Get the 53-bit integer mantissa of a given double precision

@@ -24,6 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "Simulation.hpp"
+#include "ContinuousStellarFeedback.hpp"  // for StellarFeedback
 #include "CoolingLocation.hpp"
 #include "Cosmology.hpp"   // for Cosmology
 #include "DelCont.hpp"     // for DelCont
@@ -40,7 +41,6 @@
 #include "SnapshotReaderFactory.hpp"  // for SnapshotReaderFactory
 #include "StarFormationParticleConverter.hpp"
 #include "StateVector.hpp"                   // for StateVector
-#include "ContinuousStellarFeedback.hpp"               // for StellarFeedback
 #include "TimeLine.hpp"                      // for TimeLine
 #include "Vec.hpp"                           // for Vec, operator*
 #include "VorTessManager.hpp"                // for VorTessManager

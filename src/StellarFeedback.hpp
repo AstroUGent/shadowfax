@@ -36,7 +36,7 @@ class StarParticle;
  */
 class StellarFeedback {
   public:
-    virtual ~StellarFeedback() {};
+    virtual ~StellarFeedback(){};
 
     /**
      * @brief Give stellar feedback from the given StarParticle to the gas in
@@ -46,7 +46,8 @@ class StellarFeedback {
      * @param particles ParticleVector containing the gas that receives feedback
      * @param dt Time step over which the feedback is done
      */
-    virtual void do_feedback(StarParticle* star, ParticleVector& particles, double dt) = 0;
+    virtual void do_feedback(StarParticle* star, ParticleVector& particles,
+                             double dt) = 0;
 };
 
 #endif  // STELLARFEEDBACK_HPP

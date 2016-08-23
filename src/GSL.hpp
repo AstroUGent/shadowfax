@@ -29,6 +29,8 @@
 #ifndef GSL_HPP
 #define GSL_HPP
 
+class RestartFile;
+
 namespace GSL {
 // quadrature
 double rescale_error(double err, const double result_abs,
@@ -79,6 +81,10 @@ class GSLInterpolator {
 
     static GSLInterpolator* create(GSLInterpolatorType type, double* x,
                                    double* y, unsigned int size);
+    static GSLInterpolator* create(RestartFile& rfile);
+
+    virtual void dump(RestartFile& rfile);
+    GSLInterpolator(RestartFile& rfile);
 
     /**
      * @brief Evaluate the interpolating function at the given position
@@ -102,6 +108,9 @@ class GSLLinearInterpolator : public GSLInterpolator {
     virtual ~GSLLinearInterpolator();
 
     virtual double eval(double x);
+
+    virtual void dump(RestartFile& rfile);
+    GSLLinearInterpolator(RestartFile& rfile);
 };
 
 /**
@@ -126,6 +135,9 @@ class GSLCubicSplineInterpolator : public GSLInterpolator {
     virtual ~GSLCubicSplineInterpolator();
 
     virtual double eval(double x);
+
+    virtual void dump(RestartFile& rfile);
+    GSLCubicSplineInterpolator(RestartFile& rfile);
 };
 }
 

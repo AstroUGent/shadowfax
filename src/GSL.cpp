@@ -25,6 +25,7 @@
  */
 #include "GSL.hpp"
 #include "Error.hpp"  // for my_exit
+#include "RestartFile.hpp"
 #include <algorithm>  // for min
 #include <cmath>      // for fabs, pow
 #include <cstddef>    // for NULL
@@ -945,6 +946,46 @@ GSL::GSLInterpolator* GSL::GSLInterpolator::create(GSLInterpolatorType type,
 }
 
 /**
+ * @brief Restart constructor
+ *
+ * @param rfile RestartFile to read from
+ * @return Pointer to a new GSLInterpolator implementation instance
+ */
+GSL::GSLInterpolator* GSL::GSLInterpolator::create(RestartFile& rfile) {
+    int tag;
+    rfile.read(tag);
+    if(tag == TypeGSLLinearInterpolator) {
+        return new GSLLinearInterpolator(rfile);
+    }
+    if(tag == TypeGSLCubicSplineInterpolator) {
+        return new GSLCubicSplineInterpolator(rfile);
+    }
+    return NULL;
+}
+
+/**
+ * @brief Dump the GSLInterpolator to the given RestartFile
+ *
+ * @param rfile RestartFile to write to
+ */
+void GSL::GSLInterpolator::dump(RestartFile& rfile) {
+    rfile.write(_size);
+    rfile.write(_x, _size);
+    rfile.write(_y, _size);
+}
+
+/**
+ * @brief Restart constructor
+ *
+ * @param rfile RestartFile to read from
+ */
+GSL::GSLInterpolator::GSLInterpolator(RestartFile& rfile) {
+    rfile.read(_size);
+    rfile.read(_x, _size);
+    rfile.read(_y, _size);
+}
+
+/**
  * @brief Constructor
  *
  * @param x X-values
@@ -993,6 +1034,30 @@ double GSL::GSLLinearInterpolator::eval(double x) {
         // error
         return 0.;
     }
+}
+
+/**
+ * @brief Dump the GSLLinearInterpolator to the given RestartFile
+ *
+ * @param rfile RestartFile to write to
+ */
+void GSL::GSLLinearInterpolator::dump(RestartFile& rfile) {
+    int tag = TypeGSLLinearInterpolator;
+    rfile.write(tag);
+
+    GSLInterpolator::dump(rfile);
+
+    rfile.write(_cache);
+}
+
+/**
+ * @brief Restart constructor
+ *
+ * @param rfile RestartFile to read from
+ */
+GSL::GSLLinearInterpolator::GSLLinearInterpolator(RestartFile& rfile)
+        : GSLInterpolator(rfile) {
+    rfile.read(_cache);
 }
 
 /**
@@ -1095,4 +1160,38 @@ double GSL::GSLCubicSplineInterpolator::eval(double x) {
     } else {
         return 0.;
     }
+}
+
+/**
+ * @brief  Dump the GSLCubicSplineInterpolator to the given RestartFile
+ *
+ * @param rfile RestartFile to write to
+ */
+void GSL::GSLCubicSplineInterpolator::dump(RestartFile& rfile) {
+    int tag = TypeGSLCubicSplineInterpolator;
+    rfile.write(tag);
+
+    GSLInterpolator::dump(rfile);
+
+    rfile.write(_cache);
+
+    rfile.write(_c, _size);
+    rfile.write(_g, _size);
+    rfile.write(_diag, _size);
+    rfile.write(_offdiag, _size);
+}
+
+/**
+ * @brief Restart constructor
+ *
+ * @param rfile RestartFile to read from
+ */
+GSL::GSLCubicSplineInterpolator::GSLCubicSplineInterpolator(RestartFile& rfile)
+        : GSLInterpolator(rfile) {
+    rfile.read(_cache);
+
+    rfile.read(_c, _size);
+    rfile.read(_g, _size);
+    rfile.read(_diag, _size);
+    rfile.read(_offdiag, _size);
 }

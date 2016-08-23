@@ -46,8 +46,9 @@ using namespace std;
  * @param particles Reference to the ParticleVector holding all particles
  * @param dt Timestep over which the feedback is given
  */
-void ContinuousStellarFeedback::do_feedback(StarParticle* star, ParticleVector& particles,
-                                  double dt) {
+void ContinuousStellarFeedback::do_feedback(StarParticle* star,
+                                            ParticleVector& particles,
+                                            double dt) {
     double age = star->get_age();
     // stellar wind period
     double dtsw = std::max(
@@ -113,7 +114,8 @@ void ContinuousStellarFeedback::do_feedback(StarParticle* star, ParticleVector& 
  *
  * @param parameters The parameterfile used
  */
-ContinuousStellarFeedback::ContinuousStellarFeedback(ParameterFile* parameters) {
+ContinuousStellarFeedback::ContinuousStellarFeedback(
+        ParameterFile* parameters) {
     _sw_start = parameters->get_parameter<double>(
             "StellarFeedback.SWStart", STELLARFEEDBACK_DEFAULT_SWSTART);
     _sw_end = parameters->get_parameter<double>("StellarFeedback.SWEnd",

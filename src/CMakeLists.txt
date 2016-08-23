@@ -43,6 +43,7 @@ if(DO_SHADOWFAX)
     CubicBox.cpp
     DelTess.cpp
     DelTess_mpi.cpp
+    DiscreteStellarFeedback.cpp
     ExArith.cpp
     FixedGrid.cpp
     GadgetSnapshotReader.cpp
@@ -88,6 +89,7 @@ if(DO_SHADOWFAX)
     Cosmology.hpp
     DelCont.hpp
     DelTess.hpp
+    DiscreteStellarFeedback.hpp
     Error.hpp
     ExArith.hpp
     FixedGrid.hpp

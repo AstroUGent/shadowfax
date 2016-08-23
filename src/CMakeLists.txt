@@ -37,6 +37,7 @@ if(DO_SHADOWFAX)
     set(SHADOWFAXSOURCES
     CircularBox.cpp
     ColorMap.cpp
+    ContinuousStellarFeedback.cpp
     CoolingTable.cpp
     Cosmology.cpp
     CubicBox.cpp
@@ -72,7 +73,6 @@ if(DO_SHADOWFAX)
     Simulation.cpp
     SnapshotHandler.cpp
     StarFormationParticleConverter.cpp
-    StellarFeedback.cpp
     TimeLine.cpp
     TimeStepWalker.cpp
     VorCell.cpp
@@ -82,6 +82,7 @@ if(DO_SHADOWFAX)
     VorTessManager.cpp
 
     ColorMap.hpp
+    ContinuousStellarFeedback.hpp
     CoolingLocation.hpp
     CoolingTable.hpp
     Cosmology.hpp
@@ -270,7 +271,7 @@ if(DO_VTKMAKER)
     VorGen.cpp
     VorTess.cpp
     VTKMaker.cpp
-    
+
     MPIGlobal.hpp
     MPIMethods.hpp
     ProgramLog.hpp

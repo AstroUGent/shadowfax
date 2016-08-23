@@ -31,6 +31,7 @@
 #include "utilities/Timer.hpp"  // for Timer
 #include <string>               // for string
 
+class ContinuousStellarFeedback;
 class Cosmology;
 class GasCooling;
 class LogFiles;
@@ -41,7 +42,6 @@ class RectangularBox;
 class RestartFile;
 class RiemannSolver;
 class StarFormationParticleConverter;
-class StellarFeedback;
 class TimeLine;
 class UnitSet;
 class VorTessManager;
@@ -104,7 +104,7 @@ class Simulation {
     StarFormationParticleConverter* _starformation_converter;
 
     /*! @brief StarFormationParticleConverter used for star formation */
-    StellarFeedback* _stellar_feedback;
+    ContinuousStellarFeedback* _stellar_feedback;
 
     /*! @brief Cosmology used for comoving integration */
     Cosmology* _cosmology;

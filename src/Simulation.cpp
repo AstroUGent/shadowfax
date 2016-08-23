@@ -40,7 +40,7 @@
 #include "SnapshotReaderFactory.hpp"  // for SnapshotReaderFactory
 #include "StarFormationParticleConverter.hpp"
 #include "StateVector.hpp"                   // for StateVector
-#include "StellarFeedback.hpp"               // for StellarFeedback
+#include "ContinuousStellarFeedback.hpp"               // for StellarFeedback
 #include "TimeLine.hpp"                      // for TimeLine
 #include "Vec.hpp"                           // for Vec, operator*
 #include "VorTessManager.hpp"                // for VorTessManager
@@ -1002,7 +1002,7 @@ void Simulation::restart(string filename) {
     }
 
     if(_parameterfile->check_parameter("Physics.StellarFeedback")) {
-        _stellar_feedback = new StellarFeedback(restartfile);
+        _stellar_feedback = new ContinuousStellarFeedback(restartfile);
     } else {
         _stellar_feedback = NULL;
     }
@@ -1108,7 +1108,7 @@ void Simulation::initialize(string filename, bool read_mass) {
     }
 
     if(_parameterfile->check_parameter("Physics.StellarFeedback")) {
-        _stellar_feedback = new StellarFeedback(_parameterfile);
+        _stellar_feedback = new ContinuousStellarFeedback(_parameterfile);
     } else {
         _stellar_feedback = NULL;
     }

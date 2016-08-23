@@ -18,14 +18,15 @@
  ******************************************************************************/
 
 /**
- * @file StellarFeedback.cpp
+ * @file ContinuousStellarFeedback.cpp
  *
- * @brief ParticleConverter implementation that converts a GasParticle to a
- * StarParticle if star formation criteria are met: implementation
+ * @brief StellarFeedback implementation that spreads out the stellar feedback
+ * uniformly over the lifetime of the various feedback mechanisms:
+ * implementation
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
-#include "StellarFeedback.hpp"
+#include "ContinuousStellarFeedback.hpp"
 #include "NgbSearch.hpp"                 // for ClosestNgbSearch
 #include "ParameterFile.hpp"             // for ParameterFile
 #include "StateVector.hpp"               // for StateVector
@@ -45,7 +46,7 @@ using namespace std;
  * @param particles Reference to the ParticleVector holding all particles
  * @param dt Timestep over which the feedback is given
  */
-void StellarFeedback::do_feedback(StarParticle* star, ParticleVector& particles,
+void ContinuousStellarFeedback::do_feedback(StarParticle* star, ParticleVector& particles,
                                   double dt) {
     double age = star->get_age();
     // stellar wind period
@@ -106,13 +107,13 @@ void StellarFeedback::do_feedback(StarParticle* star, ParticleVector& particles,
 }
 
 /**
- * @brief Constructor for StellarFeedback
+ * @brief Constructor
  *
  * @warning Unit conversion is not yet implemented!!
  *
  * @param parameters The parameterfile used
  */
-StellarFeedback::StellarFeedback(ParameterFile* parameters) {
+ContinuousStellarFeedback::ContinuousStellarFeedback(ParameterFile* parameters) {
     _sw_start = parameters->get_parameter<double>(
             "StellarFeedback.SWStart", STELLARFEEDBACK_DEFAULT_SWSTART);
     _sw_end = parameters->get_parameter<double>("StellarFeedback.SWEnd",
@@ -159,7 +160,7 @@ StellarFeedback::StellarFeedback(ParameterFile* parameters) {
  *
  * @param rad Value for the radius
  */
-void StellarFeedback::set_radius(double rad) {
+void ContinuousStellarFeedback::set_radius(double rad) {
     _sradius = rad;
 }
 
@@ -168,7 +169,7 @@ void StellarFeedback::set_radius(double rad) {
  *
  * @param rfile RestartFile to write to
  */
-void StellarFeedback::dump(RestartFile& rfile) {
+void ContinuousStellarFeedback::dump(RestartFile& rfile) {
     rfile.write(_sw_start);
     rfile.write(_sw_end);
     rfile.write(_sii_start);
@@ -195,7 +196,7 @@ void StellarFeedback::dump(RestartFile& rfile) {
  *
  * @param rfile RestartFile to read from
  */
-StellarFeedback::StellarFeedback(RestartFile& rfile) {
+ContinuousStellarFeedback::ContinuousStellarFeedback(RestartFile& rfile) {
     rfile.read(_sw_start);
     rfile.read(_sw_end);
     rfile.read(_sii_start);

@@ -83,8 +83,6 @@ class VorCell {
     void print_vtk(std::ostream& vstream, unsigned int& numv,
                    std::ostream& pstream, unsigned int& nump,
                    unsigned int& numc, std::ostream& dstream);
-    void print_fastvor(std::ostream& stream, unsigned int& numghost,
-                       bool periodic, bool binary = true);
 
     Vec& get_centroid();
     void set_centroid(double* centroid);

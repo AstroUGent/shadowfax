@@ -100,7 +100,8 @@ inline double width(vector<double>& values, int collapsed, int index) {
  * @param filenames The list of filenames of the cooling tables
  * @param simulation_units The UnitSet used in the simulation
  */
-FiveDTable::FiveDTable(vector<string> filenames, UnitSet* simulation_units) {
+FiveDTable::FiveDTable(std::vector<std::string> filenames,
+                       UnitSet* simulation_units) {
     _Fe_values = vector<double>();
     _Mg_values = vector<double>();
     _redshift_values = vector<double>();

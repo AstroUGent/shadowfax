@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 /**
- * @file ExArith.h
+ * @file ExArith.hpp
  *
  * @brief Arbitrary exact arithmetics functions
  *

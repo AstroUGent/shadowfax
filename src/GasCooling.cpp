@@ -51,7 +51,7 @@ using namespace std;
  * @param parameters ParameterFile containing the parameters of the simulation
  * @param physics Physical constants
  */
-GasCooling::GasCooling(string directory, UnitSet* simulation_units,
+GasCooling::GasCooling(std::string directory, UnitSet* simulation_units,
                        ParameterFile* parameters, Physics* physics) {
     _cooling_table = new CoolingTable(directory, simulation_units);
     UnitSet SI(UNITS_DEFAULT);

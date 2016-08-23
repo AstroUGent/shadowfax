@@ -80,7 +80,7 @@ vector<string> CoolingTable::get_file_list(string directory) {
  * @param directory Folder containing the cooling tables on the system
  * @param simulation_units The UnitSet used in the simulation
  */
-CoolingTable::CoolingTable(string directory, UnitSet* simulation_units) {
+CoolingTable::CoolingTable(std::string directory, UnitSet* simulation_units) {
     vector<string> filenames = get_file_list(directory);
     _coolingtable = new FiveDTable(filenames, simulation_units);
     _ntable = new ThreeDIrregTable(filenames, simulation_units);

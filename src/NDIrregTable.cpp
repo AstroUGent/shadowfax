@@ -236,7 +236,7 @@ int ThreeDIrregTable::find_n_in_table(double value, int a, int b) {
  * @param filenames The list of filenames of the cooling tables
  * @param simulation_units The UnitSet used in the simulation
  */
-ThreeDIrregTable::ThreeDIrregTable(vector<string> filenames,
+ThreeDIrregTable::ThreeDIrregTable(std::vector<std::string> filenames,
                                    UnitSet* simulation_units) {
     _Fe_values = vector<double>();
     _Mg_values = vector<double>();

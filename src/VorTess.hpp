@@ -66,8 +66,6 @@ class VorTess {
     void print_delaunay(std::ostream& stream);
     void print_tesselation_pov(std::ostream& stream);
     void print_tesselation_vtk(std::ostream& stream);
-    void print_tesselation_fastvor(std::ostream& stream, bool periodic,
-                                   bool binary = true);
 #ifndef ICMAKER
     void print_tesselation_leaflet(ColorMap* colormap, StateVector maxW,
                                    StateVector minW);

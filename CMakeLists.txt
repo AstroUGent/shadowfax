@@ -152,6 +152,12 @@ else(LLOYD)
     set(DO_LLOYD False)
 endif(LLOYD)
 
+if(ADAPTIVE_MESH)
+    set(DO_ADAPTIVE_MESH True)
+else(ADAPTIVE_MESH)
+    set(DO_ADAPTIVE_MESH False)
+endif(ADAPTIVE_MESH)
+
 # put executable in the rundirs
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/rundir)
 

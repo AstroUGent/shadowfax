@@ -31,6 +31,11 @@ if(PYTHON_MODULES)
 add_subdirectory(python)
 endif(PYTHON_MODULES)
 
+if(DO_ADAPTIVE_MESH)
+set(ADAPTIVE_MESHNAME adaptive_mesh${NDIM}d)
+add_subdirectory(adaptive_mesh)
+endif(DO_ADAPTIVE_MESH)
+
 if(DO_SHADOWFAX)
     set(SHADOWFAXNAME shadowfax${NDIM}d)
 
@@ -79,7 +84,6 @@ if(DO_SHADOWFAX)
     VorFace.cpp
     VorGen.cpp
     VorTess.cpp
-    VorTessManager.cpp
 
     ColorMap.hpp
     CoolingLocation.hpp
@@ -128,8 +132,18 @@ if(DO_SHADOWFAX)
     VorFace.hpp
     VorGen.hpp
     VorTess.hpp
-    VorTessManager.hpp
     )
+
+    # use a different VorTessManager implementation for the adaptive mesh
+    if(DO_ADAPTIVE_MESH)
+        list(APPEND SHADOWFAXSOURCES
+            adaptive_mesh/VorTessManager.cpp
+            adaptive_mesh/VorTessManager.hpp)
+    else(DO_ADAPTIVE_MESH)
+        list(APPEND SHADOWFAXSOURCES
+            VorTessManager.cpp
+            VorTessManager.hpp)
+    endif(DO_ADAPTIVE_MESH)
 
     #add the location of the cooling tables
     configure_file(${PROJECT_SOURCE_DIR}/src/CoolingLocation.hpp.in
@@ -158,6 +172,9 @@ if(DO_SHADOWFAX)
     target_link_libraries(${SHADOWFAXNAME} ${MPI_C_LIBRARIES})
     target_link_libraries(${SHADOWFAXNAME} ${HDF5_LIBRARIES})
     target_link_libraries(${SHADOWFAXNAME} ${ALL_Boost_LIBRARIES})
+    if(DO_ADAPTIVE_MESH)
+        target_link_libraries(${SHADOWFAXNAME} ${ADAPTIVE_MESHNAME})
+    endif(DO_ADAPTIVE_MESH)
 
     # make sure version_number is called, but only once
     if(${NDIM} EQUAL 2 OR ONLY_3D)

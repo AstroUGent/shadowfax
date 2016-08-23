@@ -93,7 +93,7 @@ class Splitter {
  * Also works in the serial case, in which case it only wraps around std::sort.
  */
 class ParallelSorter {
-  private:
+  protected:
     /**
      * @brief Count the number of objects in the local list with Hilbert key
      * lower than the given value

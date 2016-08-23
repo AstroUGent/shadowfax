@@ -10,7 +10,8 @@ files=( src/*.cpp src/io/*.cpp \
         src/io/*.hpp src/utilities/*.cpp \
         src/utilities/*.hpp src/python/*.cpp \
         test/*.cpp test/*.hpp src/*.hpp
-        src/riemann/*.cpp src/riemann/*.hpp )
+        src/riemann/*.cpp src/riemann/*.hpp \
+        src/adaptive_mesh/*.cpp src/adaptive_mesh/*.hpp )
 
 for f in "${files[@]}"
 do $1 -style=file -i $f

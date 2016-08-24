@@ -134,6 +134,291 @@ class DiscreteStellarFeedbackData : public StellarFeedbackData {
     inline unsigned int get_PopIII_SN_number() {
         return _PopIII_SN_number;
     }
+
+    /**
+     * @brief Set the PopII SW factor
+     *
+     * @param PopII_SW_fac PopII SW factor
+     */
+    inline void set_PopII_SW_fac(double PopII_SW_fac) {
+        _PopII_SW_fac = PopII_SW_fac;
+    }
+
+    /**
+     * @brief Get the PopII SW factor
+     *
+     * @return PopII SW factor
+     */
+    inline double get_PopII_SW_fac() {
+        return _PopII_SW_fac;
+    }
+
+    /**
+     * @brief Set the PopIII SW factor
+     *
+     * @param PopIII SW factor
+     */
+    inline void set_PopIII_SW_fac(double PopIII_SW_fac) {
+        _PopIII_SW_fac = PopIII_SW_fac;
+    }
+
+    /**
+     * @brief Get the PopIII SW factor
+     *
+     * @return PopIII SW factor
+     */
+    inline double get_PopIII_SW_fac() {
+        return _PopIII_SW_fac;
+    }
+
+    /**
+     * @brief Set the number of PopII SNII explosions that has gone off
+     *
+     * @param PopII_SNII_count Number of PopII SNII explosions that has gone off
+     */
+    inline void set_PopII_SNII_count(unsigned int PopII_SNII_count) {
+        _PopII_SNII_count = PopII_SNII_count;
+    }
+
+    /**
+     * @brief Get the number of PopII SNII explosions that has gone off
+     *
+     * @return Number of PopII SNII explosions that has gone off
+     */
+    inline unsigned int get_PopII_SNII_count() {
+        return _PopII_SNII_count;
+    }
+
+    /**
+     * @brief Increase the number of PopII SNII explosions that has gone off
+     */
+    inline void increase_PopII_SNII_count() {
+        _PopII_SNII_count++;
+    }
+
+    /**
+     * @brief Set the number of PopII SNIa explosions that has gone off
+     *
+     * @param PopII_SNIa_count Number of PopII SNIa explosions that has gone off
+     */
+    inline void set_PopII_SNIa_count(unsigned int PopII_SNIa_count) {
+        _PopII_SNIa_count = PopII_SNIa_count;
+    }
+
+    /**
+     * @brief Get the number of PopII SNIa explosions that has gone off
+     *
+     * @return Number of PopII SNIa explosions that has gone off
+     */
+    inline unsigned int get_PopII_SNIa_count() {
+        return _PopII_SNIa_count;
+    }
+
+    /**
+     * @brief Increase the number of PopII SNIa explosions that has gone off
+     */
+    inline void increase_PopII_SNIa_count() {
+        _PopII_SNIa_count++;
+    }
+
+    /**
+     * @brief Set the number of PopIII SN explosions that has gone off
+     *
+     * @param PopIII_SN_count Number of PopIII SN explosions that has gone off
+     */
+    inline void set_PopIII_SN_count(unsigned int PopIII_SN_count) {
+        _PopIII_SN_count = PopIII_SN_count;
+    }
+
+    /**
+     * @brief Get the number of PopIII SN explosions that has gone off
+     *
+     * @return Number of PopIII SN explosions that has gone off
+     */
+    inline unsigned int get_PopIII_SN_count() {
+        return _PopIII_SN_count;
+    }
+
+    /**
+     * @brief Increase the number of PopIII SN explosions that has gone off
+     */
+    inline void increase_PopIII_SN_count() {
+        _PopIII_SN_count++;
+    }
+
+    /**
+     * @brief Set the next time a PopII SNII should go off
+     *
+     * @param PopII_SNII_next_time Next time a PopII SNII should go off
+     */
+    inline void set_PopII_SNII_next_time(double PopII_SNII_next_time) {
+        _PopII_SNII_next_time = PopII_SNII_next_time;
+    }
+
+    /**
+     * @brief Get the next time a PopII SNII should go off
+     *
+     * @return Next time a PopII SNII should go off
+     */
+    inline double get_PopII_SNII_next_time() {
+        return _PopII_SNII_next_time;
+    }
+
+    /**
+     * @brief Set the upper limit for the next mass interval in which a PopII
+     * SNII should go off
+     *
+     * @param PopII_SNII_interval Upper limit for the next mass interval in
+     * which a PopII SNII should go off
+     */
+    inline void set_PopII_SNII_interval(double PopII_SNII_interval) {
+        _PopII_SNII_interval = PopII_SNII_interval;
+    }
+
+    /**
+     * @brief Get the upper limit for the next mass interval in which a PopII
+     * SNII should go off
+     *
+     * @return Upper limit for the next mass interval in which a PopII SNII
+     * should go off
+     */
+    inline double get_PopII_SNII_interval() {
+        return _PopII_SNII_interval;
+    }
+
+    /**
+     * @brief Set the PopII SNII factor
+     *
+     * @param PopII_SNII_fac PopII SNII factor
+     */
+    inline void set_PopII_SNII_fac(double PopII_SNII_fac) {
+        _PopII_SNII_fac = PopII_SNII_fac;
+    }
+
+    /**
+     * @brief Get the PopII SNII factor
+     *
+     * @return PopII SNII factor
+     */
+    inline double get_PopII_SNII_fac() {
+        return _PopII_SNII_fac;
+    }
+
+    /**
+     * @brief Set the next time a PopII SNIa should go off
+     *
+     * @param PopII_SNIa_next_time Next time a PopII SNIa should go off
+     */
+    inline void set_PopII_SNIa_next_time(double PopII_SNIa_next_time) {
+        _PopII_SNIa_next_time = PopII_SNIa_next_time;
+    }
+
+    /**
+     * @brief Get the next time a PopII SNIa should go off
+     *
+     * @return Next time a PopII SNIa should go off
+     */
+    inline double get_PopII_SNIa_next_time() {
+        return _PopII_SNIa_next_time;
+    }
+
+    /**
+     * @brief Set the lower limit for the next time interval in which a PopII
+     * SNIa should go off
+     *
+     * @param PopII_SNIa_interval Upper limit for the next mass interval in
+     * which a PopII SNIa should go off
+     */
+    inline void set_PopII_SNIa_interval(double PopII_SNIa_interval) {
+        _PopII_SNIa_interval = PopII_SNIa_interval;
+    }
+
+    /**
+     * @brief Get the lower limit for the next time interval in which a PopII
+     * SNIa should go off
+     *
+     * @return Upper limit for the next mass interval in which a PopII SNIa
+     * should go off
+     */
+    inline double get_PopII_SNIa_interval() {
+        return _PopII_SNIa_interval;
+    }
+
+    /**
+     * @brief Set the PopII SNIa factor
+     *
+     * @param PopII_SNIa_fac PopII SNIa factor
+     */
+    inline void set_PopII_SNIa_fac(double PopII_SNIa_fac) {
+        _PopII_SNIa_fac = PopII_SNIa_fac;
+    }
+
+    /**
+     * @brief Get the PopII SNIa factor
+     *
+     * @return PopII SNIa factor
+     */
+    inline double get_PopII_SNIa_fac() {
+        return _PopII_SNIa_fac;
+    }
+
+    /**
+     * @brief Set the next time a PopIII SN should go off
+     *
+     * @param PopIII_SN_next_time Next time a PopIII SN should go off
+     */
+    inline void set_PopIII_SN_next_time(double PopIII_SN_next_time) {
+        _PopIII_SN_next_time = PopIII_SN_next_time;
+    }
+
+    /**
+     * @brief Get the next time a PopIII SN should go off
+     *
+     * @return Next time a PopIII SN should go off
+     */
+    inline double get_PopIII_SN_next_time() {
+        return _PopIII_SN_next_time;
+    }
+
+    /**
+     * @brief Set the upper limit for the next mass interval in which a PopIII
+     * SN should go off
+     *
+     * @param PopIII_SN_interval Upper limit for the next mass interval in
+     * which a PopIII SN should go off
+     */
+    inline void set_PopIII_SN_interval(double PopIII_SN_interval) {
+        _PopIII_SN_interval = PopIII_SN_interval;
+    }
+
+    /**
+     * @brief Get the upper limit for the next mass interval in which a PopIII
+     * SN should go off
+     *
+     * @return Upper limit for the next mass interval in which a PopIII SN
+     * should go off
+     */
+    inline double get_PopIII_SN_interval() {
+        return _PopIII_SN_interval;
+    }
+
+    /**
+     * @brief Set the PopIII SN factor
+     *
+     * @param PopIII_SN_fac PopIII SN factor
+     */
+    inline void set_PopIII_SN_fac(double PopIII_SN_fac) {
+        _PopIII_SN_fac = PopIII_SN_fac;
+    }
+
+    /**
+     * @brief Get the PopIII SN factor
+     *
+     * @return PopIII SN factor
+     */
+    inline double get_PopIII_SN_fac() {
+        return _PopIII_SN_fac;
+    }
 };
 
 /**

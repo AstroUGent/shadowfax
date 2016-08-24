@@ -319,6 +319,7 @@ set(TESTRESTART_SOURCES
     ../src/NDTable.cpp
     ../src/RestartFile.cpp
     ../src/CoolingTable.cpp
+    ../src/GSL.cpp
 )
 
 add_unit_test(NAME testRestartFile

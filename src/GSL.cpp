@@ -30,6 +30,7 @@
 #include <cmath>      // for fabs, pow
 #include <cstddef>    // for NULL
 #include <iostream>   // for operator<<, basic_ostream, etc
+#include <typeinfo>
 
 /*
  * The code in this file is mostly copied from the GSL library, which was made
@@ -981,8 +982,54 @@ void GSL::GSLInterpolator::dump(RestartFile& rfile) {
  */
 GSL::GSLInterpolator::GSLInterpolator(RestartFile& rfile) {
     rfile.read(_size);
+    _x = new double[_size];
     rfile.read(_x, _size);
+    _y = new double[_size];
     rfile.read(_y, _size);
+}
+
+/**
+ * @brief Dump the contents of the interpolator to the given stream for
+ * debugging
+ *
+ * @param stream std::ostream to write to
+ */
+void GSL::GSLInterpolator::dump(std::ostream& stream) {
+    stream << "_size: " << _size << "\n";
+    for(unsigned int i = 0; i < _size; ++i) {
+        stream << "_x[" << i << "]: " << _x[i] << "\n";
+    }
+    for(unsigned int i = 0; i < _size; ++i) {
+        stream << "_y[" << i << "]: " << _y[i] << "\n";
+    }
+}
+
+/**
+ * @brief Check if this interpolator matches the given interpolator for
+ * debugging
+ *
+ * @param interpolator GSLInterpolator implementation to compare with
+ * @return true if both interpolators have the same type, size and data values
+ */
+bool GSL::GSLInterpolator::equal(GSLInterpolator* interpolator) {
+    if(typeid(this) != typeid(interpolator)) {
+        return false;
+    }
+
+    if(_size != interpolator->_size) {
+        return false;
+    }
+
+    for(unsigned int i = 0; i < _size; ++i) {
+        if(_x[i] != interpolator->_x[i]) {
+            return false;
+        }
+        if(_y[i] != interpolator->_y[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -1058,6 +1105,44 @@ void GSL::GSLLinearInterpolator::dump(RestartFile& rfile) {
 GSL::GSLLinearInterpolator::GSLLinearInterpolator(RestartFile& rfile)
         : GSLInterpolator(rfile) {
     rfile.read(_cache);
+}
+
+/**
+ * @brief Dump the contents of the interpolator to the given stream for
+ * debugging
+ *
+ * @param stream std::ostream to write to
+ */
+void GSL::GSLLinearInterpolator::dump(std::ostream& stream) {
+    stream << "GSLLinearInterpolator:"
+           << "\n";
+
+    GSL::GSLInterpolator::dump(stream);
+
+    stream << "_cache: " << _cache << "\n";
+}
+
+/**
+ * @brief Check if this interpolator matches the given interpolator for
+ * debugging
+ *
+ * @param interpolator GSLInterpolator to compare with
+ * @return true if both interpolators have the same type, size, data arrays and
+ * cache
+ */
+bool GSL::GSLLinearInterpolator::equal(GSLInterpolator* interpolator) {
+    if(!GSLInterpolator::equal(interpolator)) {
+        return false;
+    }
+
+    GSLLinearInterpolator* linear_interpolator =
+            (GSLLinearInterpolator*)interpolator;
+
+    if(_cache != linear_interpolator->_cache) {
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -1190,8 +1275,78 @@ GSL::GSLCubicSplineInterpolator::GSLCubicSplineInterpolator(RestartFile& rfile)
         : GSLInterpolator(rfile) {
     rfile.read(_cache);
 
+    _c = new double[_size];
     rfile.read(_c, _size);
+    _g = new double[_size];
     rfile.read(_g, _size);
+    _diag = new double[_size];
     rfile.read(_diag, _size);
+    _offdiag = new double[_size];
     rfile.read(_offdiag, _size);
+}
+
+/**
+ * @brief Dump the contents of the interpolator to the given stream for
+ * debugging
+ *
+ * @param stream std::ostream to write to
+ */
+void GSL::GSLCubicSplineInterpolator::dump(std::ostream& stream) {
+    stream << "GSLCubicSplineInterpolator:"
+           << "\n";
+
+    GSL::GSLInterpolator::dump(stream);
+
+    stream << "_cache: " << _cache << "\n";
+
+    for(unsigned int i = 0; i < _size; ++i) {
+        stream << "_c[" << i << "]: " << _c[i] << "\n";
+    }
+    for(unsigned int i = 0; i < _size; ++i) {
+        stream << "_g[" << i << "]: " << _g[i] << "\n";
+    }
+    for(unsigned int i = 0; i < _size; ++i) {
+        stream << "_diag[" << i << "]: " << _diag[i] << "\n";
+    }
+    for(unsigned int i = 0; i < _size; ++i) {
+        stream << "_offdiag[" << i << "]: " << _offdiag[i] << "\n";
+    }
+}
+
+/**
+ * @brief Check if this interpolator matches the given interpolator for
+ * debugging
+ *
+ * @param interpolator GSLInterpolator to compare with
+ * @return true if both interpolators have the same type, size, data arrays and
+ * cubic spline data arrays
+ */
+bool GSL::GSLCubicSplineInterpolator::equal(GSLInterpolator* interpolator) {
+    if(!GSL::GSLInterpolator::equal(interpolator)) {
+        return false;
+    }
+
+    GSLCubicSplineInterpolator* cspline_interpolator =
+            (GSLCubicSplineInterpolator*)interpolator;
+
+    if(_cache != cspline_interpolator->_cache) {
+        return false;
+    }
+
+    for(unsigned int i = 0; i < _size; ++i) {
+        if(_c[i] != cspline_interpolator->_c[i]) {
+            return false;
+        }
+        if(_g[i] != cspline_interpolator->_g[i]) {
+            return false;
+        }
+        if(_diag[i] != cspline_interpolator->_diag[i]) {
+            return false;
+        }
+        if(_offdiag[i] != cspline_interpolator->_offdiag[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }

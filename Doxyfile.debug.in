@@ -762,7 +762,6 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = src \
-                         src/exact_arithmetics \
                          src/io \
                          src/fortune \
                          src/python \

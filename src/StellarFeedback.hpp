@@ -32,11 +32,22 @@ class RestartFile;
 class StarParticle;
 
 /**
+ * @brief General interface for data that needs to be stored in the StarParticle
+ * for the stellar feedback
+ */
+class StellarFeedbackData {
+  public:
+    // we need to provide an empty destructor to make sure this (empty)
+    // interface exists as a well defined entity
+    virtual ~StellarFeedbackData() {}
+};
+
+/**
  * @brief General interface for stellar feedback mechanisms
  */
 class StellarFeedback {
   public:
-    virtual ~StellarFeedback(){};
+    virtual ~StellarFeedback() {}
 
     /**
      * @brief Give stellar feedback from the given StarParticle to the gas in
@@ -48,6 +59,14 @@ class StellarFeedback {
      */
     virtual void do_feedback(StarParticle* star, ParticleVector& particles,
                              double dt) = 0;
+
+    /**
+     * @brief Initialize the StellarFeedbackData for the given StarParticle
+     *
+     * @param star StarParticle for which the StellarFeedbackData is initialized
+     * @return Pointer to a StellarFeedbackData instance for the StarParticle
+     */
+    virtual StellarFeedbackData* initialize_data(StarParticle* star) = 0;
 };
 
 #endif  // STELLARFEEDBACK_HPP

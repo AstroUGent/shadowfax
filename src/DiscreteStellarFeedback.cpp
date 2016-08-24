@@ -370,6 +370,19 @@ DiscreteStellarFeedback::DiscreteStellarFeedback() {
 }
 
 /**
+ * @brief Destructor
+ *
+ * Delete interpolators.
+ */
+DiscreteStellarFeedback::~DiscreteStellarFeedback() {
+    delete _PopII_SNIa_delay_spline;
+    delete _PopIII_IMF_spline;
+    delete _PopII_lifetime_spline;
+    delete _PopIII_lifetime_spline;
+    delete _PopIII_E_SN_spline;
+}
+
+/**
  * @brief Give discrete stellar feedback
  *
  * @param star StarParticle that does feedback
@@ -380,6 +393,18 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star,
                                           ParticleVector& particles,
                                           double dt) {
     // needs to be implemented
+}
+
+/**
+ * @brief Initialize the StellarFeedbackData for discrete stellar feedback for
+ * the given StarParticle
+ *
+ * @param star StarParticle for which the feedback is done
+ * @return Pointer to an initialized DiscreteStellarFeedbackData instance
+ */
+StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
+        StarParticle* star) {
+    return new DiscreteStellarFeedbackData();
 }
 
 /**

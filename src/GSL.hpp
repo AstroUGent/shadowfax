@@ -29,6 +29,8 @@
 #ifndef GSL_HPP
 #define GSL_HPP
 
+#include <ostream>
+
 class RestartFile;
 
 namespace GSL {
@@ -86,6 +88,9 @@ class GSLInterpolator {
     virtual void dump(RestartFile& rfile);
     GSLInterpolator(RestartFile& rfile);
 
+    virtual void dump(std::ostream& stream);
+    virtual bool equal(GSLInterpolator* interpolator);
+
     /**
      * @brief Evaluate the interpolating function at the given position
      *
@@ -111,6 +116,9 @@ class GSLLinearInterpolator : public GSLInterpolator {
 
     virtual void dump(RestartFile& rfile);
     GSLLinearInterpolator(RestartFile& rfile);
+
+    virtual void dump(std::ostream& stream);
+    virtual bool equal(GSLInterpolator* interpolator);
 };
 
 /**
@@ -138,6 +146,9 @@ class GSLCubicSplineInterpolator : public GSLInterpolator {
 
     virtual void dump(RestartFile& rfile);
     GSLCubicSplineInterpolator(RestartFile& rfile);
+
+    virtual void dump(std::ostream& stream);
+    virtual bool equal(GSLInterpolator* interpolator);
 };
 }
 

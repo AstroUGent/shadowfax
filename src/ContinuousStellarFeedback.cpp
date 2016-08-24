@@ -108,6 +108,19 @@ void ContinuousStellarFeedback::do_feedback(StarParticle* star,
 }
 
 /**
+ * @brief Initialize the StellarFeedbackData for continuous stellar feedback for
+ * the given StarParticle
+ *
+ * @param star StarParticle for which feedback is done
+ * @return NULL, since continuous feedback does not need to store any data in
+ * the StarParticle itself
+ */
+StellarFeedbackData* ContinuousStellarFeedback::initialize_data(
+        StarParticle* star) {
+    return NULL;
+}
+
+/**
  * @brief Constructor
  *
  * @warning Unit conversion is not yet implemented!!

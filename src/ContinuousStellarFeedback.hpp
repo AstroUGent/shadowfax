@@ -107,7 +107,9 @@ class ContinuousStellarFeedback : public StellarFeedback {
     ContinuousStellarFeedback(ParameterFile* parameters);
 
     void set_radius(double rad);
-    void do_feedback(StarParticle* star, ParticleVector& particles, double dt);
+    virtual void do_feedback(StarParticle* star, ParticleVector& particles,
+                             double dt);
+    virtual StellarFeedbackData* initialize_data(StarParticle* star);
 
     void dump(RestartFile& rfile);
     ContinuousStellarFeedback(RestartFile& rfile);

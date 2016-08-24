@@ -33,6 +33,110 @@
 #include "StellarFeedback.hpp"
 
 /**
+ * @brief StellarFeedbackData implementation for discrete stellar feedback
+ */
+class DiscreteStellarFeedbackData : public StellarFeedbackData {
+  private:
+    /*! @brief Number of PopII SNII explosions that needs to go off */
+    unsigned int _PopII_SNII_number;
+    /*! @brief Number of PopII SNIa explosions that needs to go off */
+    unsigned int _PopII_SNIa_number;
+    /*! @brief Number of PopIII SN explosions that needs to go off */
+    unsigned int _PopIII_SN_number;
+
+    /*! @brief PopII SW factor */
+    double _PopII_SW_fac;
+    /*! @brief PopIII SW factor */
+    double _PopIII_SW_fac;
+
+    /*! @brief Number of PopII SNII explosions that has gone off */
+    unsigned int _PopII_SNII_count;
+    /*! @brief Number of PopII SNIa explosions that has gone off */
+    unsigned int _PopII_SNIa_count;
+    /*! @brief Number of PopIII SN explosions that has gone off */
+    unsigned int _PopIII_SN_count;
+
+    /*! @brief Next time a PopII SNII needs to go off */
+    double _PopII_SNII_next_time;
+    /*! @brief Upper limit for the next mass interval in which a PopII SNII
+     *  should go off */
+    double _PopII_SNII_interval;
+    /*! @brief PopII SNII factor */
+    double _PopII_SNII_fac;
+
+    /*! @brief Next time a PopII SNIa needs to go off */
+    double _PopII_SNIa_next_time;
+    /*! @brief Lower limit for the next time interval in which a PopII SNIa
+     *  should go off */
+    double _PopII_SNIa_interval;
+    /*! @brief PopII SNIa factor */
+    double _PopII_SNIa_fac;
+
+    /*! @brief Next time a PopIII SN needs to go off */
+    double _PopIII_SN_next_time;
+    /*! @brief Upper limit for the next mass interval in which a PopIII SN
+     *  should go off */
+    double _PopIII_SN_interval;
+    /*! @brief PopIII SN factor */
+    double _PopIII_SN_fac;
+
+  public:
+    /**
+     * @brief Set the total number of PopII SNII that needs to go off
+     *
+     * @param PopII_SNII_number Total number of PopII SNII
+     */
+    inline void set_PopII_SNII_number(unsigned int PopII_SNII_number) {
+        _PopII_SNII_number = PopII_SNII_number;
+    }
+
+    /**
+     * @brief Get the total number of PopII SNII that needs to go off
+     *
+     * @return Total number of PopII SNII
+     */
+    inline unsigned int get_PopII_SNII_number() {
+        return _PopII_SNII_number;
+    }
+
+    /**
+     * @brief Set the total number of PopII SNIa that needs to go off
+     *
+     * @param PopII_SNIa_number Total number of PopII SNIa
+     */
+    inline void set_PopII_SNIa_number(unsigned int PopII_SNIa_number) {
+        _PopII_SNIa_number = PopII_SNIa_number;
+    }
+
+    /**
+     * @brief Get the total number of PopII SNIa that needs to go off
+     *
+     * @return Total number of PopII SNIa
+     */
+    inline unsigned int get_PopII_SNIa_number() {
+        return _PopII_SNIa_number;
+    }
+
+    /**
+     * @brief Set the total number of PopIII SN that needs to go off
+     *
+     * @param PopIII_SN_number Total number of PopIII SN
+     */
+    inline void set_PopIII_SN_number(unsigned int PopIII_SN_number) {
+        _PopIII_SN_number = PopIII_SN_number;
+    }
+
+    /**
+     * @brief Get the total number of PopIII SN that needs to go off
+     *
+     * @return Total number of PopIII SN
+     */
+    inline unsigned int get_PopIII_SN_number() {
+        return _PopIII_SN_number;
+    }
+};
+
+/**
  * @brief StellarFeedback implementation that spreads out the stellar feedback
  * uniformly over the lifetime of the various feedback mechanisms
  */
@@ -266,8 +370,11 @@ class DiscreteStellarFeedback : public StellarFeedback {
 
   public:
     DiscreteStellarFeedback();
+    ~DiscreteStellarFeedback();
 
-    void do_feedback(StarParticle* star, ParticleVector& particles, double dt);
+    virtual void do_feedback(StarParticle* star, ParticleVector& particles,
+                             double dt);
+    virtual StellarFeedbackData* initialize_data(StarParticle* star);
 
     void dump(RestartFile& rfile);
     DiscreteStellarFeedback(RestartFile& rfile);

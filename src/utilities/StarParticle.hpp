@@ -31,6 +31,7 @@
 #include <ostream>            // for ostream
 
 class RestartFile;
+class StellarFeedbackData;
 class Vec;
 
 /**
@@ -46,6 +47,9 @@ class StarParticle : public Particle {
 
     /*! @brief Age of the star particle */
     double _age;
+
+    /*! @brief Extra variables needed for stellar feedback */
+    StellarFeedbackData* _feedback_data;
 
   public:
     StarParticle();
@@ -90,6 +94,9 @@ class StarParticle : public Particle {
     double get_age() {
         return _age;
     }
+
+    void set_feedback_data(StellarFeedbackData* feedback_data);
+    StellarFeedbackData* get_feedback_data();
 
     // NOTE: the "virtual" is really important here
     // it's the thing that makes sure that this particular version of pack_data

@@ -30,6 +30,8 @@
 #define DISCRETESTELLARFEEDBACK_HPP
 
 #include "GSL.hpp"
+#include "MPIMethods.hpp"
+#include "RestartFile.hpp"
 #include "StellarFeedback.hpp"
 
 /**
@@ -81,6 +83,31 @@ class DiscreteStellarFeedbackData : public StellarFeedbackData {
     double _PopIII_SN_fac;
 
   public:
+    DiscreteStellarFeedbackData() {
+        _PopII_SNII_number = 0;
+        _PopII_SNIa_number = 0;
+        _PopIII_SN_number = 0;
+
+        _PopII_SW_fac = 0.;
+        _PopIII_SW_fac = 0.;
+
+        _PopII_SNII_count = 0;
+        _PopII_SNIa_count = 0;
+        _PopIII_SN_count = 0;
+
+        _PopII_SNII_next_time = 0.;
+        _PopII_SNII_interval = 0.;
+        _PopII_SNII_fac = 0.;
+
+        _PopII_SNIa_next_time = 0.;
+        _PopII_SNIa_interval = 0.;
+        _PopII_SNIa_fac = 0.;
+
+        _PopIII_SN_next_time = 0.;
+        _PopIII_SN_interval = 0.;
+        _PopIII_SN_fac = 0.;
+    }
+
     /**
      * @brief Set the total number of PopII SNII that needs to go off
      *
@@ -418,6 +445,157 @@ class DiscreteStellarFeedbackData : public StellarFeedbackData {
      */
     inline double get_PopIII_SN_fac() {
         return _PopIII_SN_fac;
+    }
+
+    /**
+     * @brief Pack the variables to the given MPI buffer for communication
+     *
+     * @param buffer Buffer to write to
+     * @param bufsize Total size of the buffer
+     * @param position Current position inside the buffer (is updated)
+     */
+    void pack(void* buffer, int bufsize, int* position) {
+        MyMPI_Pack(&_PopII_SNII_number, 1, MPI_UNSIGNED, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopII_SNIa_number, 1, MPI_UNSIGNED, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopIII_SN_number, 1, MPI_UNSIGNED, buffer, bufsize,
+                   position);
+
+        MyMPI_Pack(&_PopII_SW_fac, 1, MPI_DOUBLE, buffer, bufsize, position);
+        MyMPI_Pack(&_PopIII_SW_fac, 1, MPI_DOUBLE, buffer, bufsize, position);
+
+        MyMPI_Pack(&_PopII_SNII_count, 1, MPI_UNSIGNED, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopII_SNIa_count, 1, MPI_UNSIGNED, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopIII_SN_count, 1, MPI_UNSIGNED, buffer, bufsize,
+                   position);
+
+        MyMPI_Pack(&_PopII_SNII_next_time, 1, MPI_DOUBLE, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopII_SNII_interval, 1, MPI_DOUBLE, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopII_SNII_fac, 1, MPI_DOUBLE, buffer, bufsize, position);
+
+        MyMPI_Pack(&_PopII_SNIa_next_time, 1, MPI_DOUBLE, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopII_SNIa_interval, 1, MPI_DOUBLE, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopII_SNIa_fac, 1, MPI_DOUBLE, buffer, bufsize, position);
+
+        MyMPI_Pack(&_PopIII_SN_next_time, 1, MPI_DOUBLE, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopIII_SN_interval, 1, MPI_DOUBLE, buffer, bufsize,
+                   position);
+        MyMPI_Pack(&_PopIII_SN_fac, 1, MPI_DOUBLE, buffer, bufsize, position);
+    }
+
+    /**
+     * @brief MPI constructor
+     *
+     * @param buffer Buffer to read from
+     * @param bufsize Total size of the buffer
+     * @param position Current position in the buffer (is updated)
+     */
+    DiscreteStellarFeedbackData(void* buffer, int bufsize, int* position) {
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNII_number, 1,
+                     MPI_UNSIGNED);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNIa_number, 1,
+                     MPI_UNSIGNED);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopIII_SN_number, 1,
+                     MPI_UNSIGNED);
+
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SW_fac, 1, MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopIII_SW_fac, 1, MPI_DOUBLE);
+
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNII_count, 1,
+                     MPI_UNSIGNED);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNIa_count, 1,
+                     MPI_UNSIGNED);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopIII_SN_count, 1,
+                     MPI_UNSIGNED);
+
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNII_next_time, 1,
+                     MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNII_interval, 1,
+                     MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNII_fac, 1,
+                     MPI_DOUBLE);
+
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNIa_next_time, 1,
+                     MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNIa_interval, 1,
+                     MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNIa_fac, 1,
+                     MPI_DOUBLE);
+
+        MyMPI_Unpack(buffer, bufsize, position, &_PopIII_SN_next_time, 1,
+                     MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopIII_SN_interval, 1,
+                     MPI_DOUBLE);
+        MyMPI_Unpack(buffer, bufsize, position, &_PopIII_SN_fac, 1, MPI_DOUBLE);
+    }
+
+    /**
+     * @brief Dump the DiscreteStellarFeedbackData instance to the given
+     * RestartFile
+     *
+     * @param rfile RestartFile to write to
+     */
+    void dump(RestartFile& rfile) {
+        rfile.write(_PopII_SNII_number);
+        rfile.write(_PopII_SNIa_number);
+        rfile.write(_PopIII_SN_number);
+
+        rfile.write(_PopII_SW_fac);
+        rfile.write(_PopIII_SW_fac);
+
+        rfile.write(_PopII_SNII_count);
+        rfile.write(_PopII_SNIa_count);
+        rfile.write(_PopIII_SN_count);
+
+        rfile.write(_PopII_SNII_next_time);
+        rfile.write(_PopII_SNII_interval);
+        rfile.write(_PopII_SNII_fac);
+
+        rfile.write(_PopII_SNIa_next_time);
+        rfile.write(_PopII_SNIa_interval);
+        rfile.write(_PopII_SNIa_fac);
+
+        rfile.write(_PopIII_SN_next_time);
+        rfile.write(_PopIII_SN_interval);
+        rfile.write(_PopIII_SN_fac);
+    }
+
+    /**
+     * @brief Restart constructor
+     *
+     * @param rfile RestartFile to read from
+     */
+    DiscreteStellarFeedbackData(RestartFile& rfile) {
+        rfile.read(_PopII_SNII_number);
+        rfile.read(_PopII_SNIa_number);
+        rfile.read(_PopIII_SN_number);
+
+        rfile.read(_PopII_SW_fac);
+        rfile.read(_PopIII_SW_fac);
+
+        rfile.read(_PopII_SNII_count);
+        rfile.read(_PopII_SNIa_count);
+        rfile.read(_PopIII_SN_count);
+
+        rfile.read(_PopII_SNII_next_time);
+        rfile.read(_PopII_SNII_interval);
+        rfile.read(_PopII_SNII_fac);
+
+        rfile.read(_PopII_SNIa_next_time);
+        rfile.read(_PopII_SNIa_interval);
+        rfile.read(_PopII_SNIa_fac);
+
+        rfile.read(_PopIII_SN_next_time);
+        rfile.read(_PopIII_SN_interval);
+        rfile.read(_PopIII_SN_fac);
     }
 };
 

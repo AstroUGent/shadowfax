@@ -26,6 +26,7 @@
 #include "StarParticle.hpp"
 #include "MPIMethods.hpp"
 #include "RestartFile.hpp"
+#include "StellarFeedbackDataFactory.hpp"
 using namespace std;
 
 /**
@@ -34,6 +35,7 @@ using namespace std;
 StarParticle::StarParticle() : Particle() {
     _mass = 0.;
     _age = 0.;
+    _feedback_data = NULL;
 }
 
 /**
@@ -44,6 +46,7 @@ StarParticle::StarParticle() : Particle() {
 StarParticle::StarParticle(Vec pos) : Particle(pos) {
     _mass = 0.;
     _age = 0.;
+    _feedback_data = NULL;
 }
 
 /**
@@ -53,6 +56,24 @@ StarParticle::StarParticle(Vec pos) : Particle(pos) {
   */
 void StarParticle::set_mass(double mass) {
     _mass = mass;
+}
+
+/**
+ * @brief Set the extra variables needed for stellar feedback
+ *
+ * @param feedback_data Extra variables needed for stellar feedback
+ */
+void StarParticle::set_feedback_data(StellarFeedbackData* feedback_data) {
+    _feedback_data = feedback_data;
+}
+
+/**
+ * @brief Get the extra variables needed for stellar feedback
+ *
+ * @return Extra variables needed for stellar feedback
+ */
+StellarFeedbackData* StarParticle::get_feedback_data() {
+    return _feedback_data;
 }
 
 /**
@@ -68,6 +89,8 @@ StarParticle::StarParticle(void* buffer, int bufsize, int* position)
         : Particle(buffer, bufsize, position) {
     MyMPI_Unpack(buffer, bufsize, position, &_mass, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_age, 1, MPI_DOUBLE);
+    _feedback_data =
+            StellarFeedbackDataFactory::unpack(buffer, bufsize, position);
 }
 
 /**
@@ -83,6 +106,7 @@ void StarParticle::pack_data(void* buffer, int bufsize, int* position) {
     Particle::pack_data(buffer, bufsize, position);
     MyMPI_Pack(&_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_age, 1, MPI_DOUBLE, buffer, bufsize, position);
+    StellarFeedbackDataFactory::pack(_feedback_data, buffer, bufsize, position);
 }
 
 /**
@@ -95,6 +119,7 @@ void StarParticle::dump(RestartFile& rfile) {
 
     rfile.write(_mass);
     rfile.write(_age);
+    StellarFeedbackDataFactory::dump(_feedback_data, rfile);
 }
 
 /**
@@ -106,6 +131,7 @@ void StarParticle::dump(RestartFile& rfile) {
 StarParticle::StarParticle(RestartFile& rfile) : Particle(rfile) {
     rfile.read(_mass);
     rfile.read(_age);
+    _feedback_data = StellarFeedbackDataFactory::restart(rfile);
 }
 
 /**

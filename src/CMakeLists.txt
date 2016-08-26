@@ -124,6 +124,7 @@ if(DO_SHADOWFAX)
     StarFormationParticleConverter.hpp
     StateVector.hpp
     StellarFeedback.hpp
+    StellarFeedbackDataFactory.hpp
     TimeLine.hpp
     TimeStepWalker.hpp
     Vec.hpp

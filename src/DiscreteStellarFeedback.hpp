@@ -156,7 +156,7 @@ class DiscreteStellarFeedbackData : public StellarFeedbackData {
     /**
      * @brief Set the PopIII SW factor
      *
-     * @param PopIII SW factor
+     * @param PopIII_SW_fac PopIII SW factor
      */
     inline void set_PopIII_SW_fac(double PopIII_SW_fac) {
         _PopIII_SW_fac = PopIII_SW_fac;
@@ -545,9 +545,16 @@ class DiscreteStellarFeedback : public StellarFeedback {
     double PopII_IMF(double m);
     double PopII_mIMF(double m);
 
+    double PopII_interval_mass(double pmass, double mupp);
+    double PopII_lifetime(double m);
+
     double PopII_SNIa_delay1(double t);
     double PopII_SNIa_delay2(double t);
     double PopII_SNIa_delay(double t);
+
+    double PopII_SNIa_delay_cumul(double t);
+    double PopII_SNIa_interval_func(double t, double NIa, double vlow);
+    double PopII_SNIa_interval_time(double NIa, double tlow);
 
     /**
      * @brief Static wrapper around PopII_mIMF()
@@ -609,11 +616,45 @@ class DiscreteStellarFeedback : public StellarFeedback {
         return object->PopII_SNIa_delay(t);
     }
 
+    /**
+     * @brief Auxiliary structure used to pass on parameters to
+     * PopII_SNIa_interval_func()
+     */
+    struct PopII_SNIa_interval_func_static_params {
+        /*! @brief Object instance that the static wrapper should call */
+        DiscreteStellarFeedback* object;
+        /*! @brief Number of SNIa */
+        double NIa;
+        /*! @brief Extra parameter that depends on the lower bound of the
+         *  interval */
+        double vlow;
+    };
+
+    /**
+     * @brief Static wrapper around PopII_SNIa_interval_func()
+     *
+     * @param t Time value
+     * @param params PopII_SNIa_interval_func_static_params struct
+     * @return Value of PopII_SNIa_interval_func()
+     */
+    static double PopII_SNIa_interval_func_static(double t, void* params) {
+        struct PopII_SNIa_interval_func_static_params* pars =
+                (PopII_SNIa_interval_func_static_params*)params;
+        DiscreteStellarFeedback* object = pars->object;
+        return object->PopII_SNIa_interval_func(t, pars->NIa, pars->vlow);
+    }
+
     double PopIII_IMF(double m);
     double PopIII_mIMF(double m);
 
     double PopIII_E_SN(double m);
     double PopIII_EIMF(double m);
+
+    double PopIII_IMF_cumul(double m);
+    double PopIII_IMF_interval_func(double m, double pmass, double vlow);
+    double PopIII_interval_mass(double pmass, double mupp);
+
+    double PopIII_lifetime(double m);
 
     /**
      * @brief Static wrapper around PopIII_mIMF()
@@ -649,6 +690,35 @@ class DiscreteStellarFeedback : public StellarFeedback {
     static double PopIII_EIMF_static(double m, void* params) {
         DiscreteStellarFeedback* object = (DiscreteStellarFeedback*)params;
         return object->PopIII_EIMF(m);
+    }
+
+    /**
+     * @brief Extra parameters for the PopIII IMF auxiliary function
+     */
+    struct PopIII_IMF_interval_func_static_params {
+        /*! @brief Object instance that the static wrapper should use */
+        DiscreteStellarFeedback* object;
+        /*! @brief Total (initial) mass of the stellar particle */
+        double pmass;
+        /*! @brief Value of the cumulative PopIII IMF at the upper bound of the
+         * mass
+         *  interval */
+        double vlow;
+    };
+
+    /**
+     * @brief Static wrapper around PopIII_IMF_interval_func()
+     *
+     * @param m Mass value
+     * @param params PopIII_IMF_interval_func_static_params structure holding
+     * extra parameters
+     * @return Value of PopIII_IMF_interval_func()
+     */
+    static double PopIII_IMF_interval_func_static(double m, void* params) {
+        struct PopIII_IMF_interval_func_static_params* pars =
+                (PopIII_IMF_interval_func_static_params*)params;
+        DiscreteStellarFeedback* object = pars->object;
+        return object->PopIII_IMF_interval_func(m, pars->pmass, pars->vlow);
     }
 
     void initialize();

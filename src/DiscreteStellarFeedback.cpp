@@ -28,6 +28,8 @@
  */
 #include "DiscreteStellarFeedback.hpp"
 #include "RestartFile.hpp"
+#include "utilities/HelperFunctions.hpp"
+#include "utilities/StarParticle.hpp"
 #include <cmath>
 using namespace std;
 
@@ -68,6 +70,29 @@ double DiscreteStellarFeedback::PopII_IMF(double m) {
  */
 double DiscreteStellarFeedback::PopII_mIMF(double m) {
     return m * PopII_IMF(m);
+}
+
+/**
+ * @brief Get the lower mass of an interval starting at the given upper mass
+ * that contains exactly one star under a Chabrier IMF
+ *
+ * @param pmass Mass of the stellar population
+ * @param mupp Upper mass of the interval
+ * @return Lower mass (mlow) of the interval, such that the interval [mlow,mupp]
+ * contains exactly one star under a Chabrier IMF
+ */
+double DiscreteStellarFeedback::PopII_interval_mass(double pmass, double mupp) {
+    return pow(1.3 * _PopII_Mint / pmass + pow(mupp, -1.3), -10. / 13.);
+}
+
+/**
+ * @brief Get the lifetime of a star with the given mass
+ *
+ * @param m Mass of a star
+ * @return Lifetime of a star with the given mass
+ */
+double DiscreteStellarFeedback::PopII_lifetime(double m) {
+    return pow(10., _PopII_lifetime_spline->eval(m));
 }
 
 /**
@@ -119,6 +144,52 @@ double DiscreteStellarFeedback::PopII_SNIa_delay2(double t) {
  */
 double DiscreteStellarFeedback::PopII_SNIa_delay(double t) {
     return PopII_SNIa_delay1(t) + PopII_SNIa_delay2(t);
+}
+
+/**
+ * @brief Cumulative SNIa delay time distribution
+ *
+ * The distribution is interpolated using a cubic spline.
+ *
+ * @param t Time value
+ * @return Cumulative SNIa delay time distribution
+ */
+double DiscreteStellarFeedback::PopII_SNIa_delay_cumul(double t) {
+    return _PopII_SNIa_delay_spline->eval(log10(t));
+}
+
+/**
+ * @brief Auxiliary function used to find the upper bound of a time interval
+ * that contains exactly one SNIa
+ *
+ * @param t Time value
+ * @param NIa Number of SNIa
+ * @param vlow Constant that depends on the lower bound of the interval
+ * @return Value that should be as close to zero as possible
+ */
+double DiscreteStellarFeedback::PopII_SNIa_interval_func(double t, double NIa,
+                                                         double vlow) {
+    return 1. - NIa * PopII_SNIa_delay_cumul(t) + vlow;
+}
+
+/**
+ * @brief Get the upper limit of a time interval starting at the given lower
+ * limit that contains exactly one SNIa if the total number of SNIa should be
+ * equal to the given number
+ *
+ * @param NIa Total number of SNIa
+ * @param tlow Lower limit of the time interval
+ * @return Upper limit of the time interval
+ */
+double DiscreteStellarFeedback::PopII_SNIa_interval_time(double NIa,
+                                                         double tlow) {
+    struct PopII_SNIa_interval_func_static_params params;
+    params.object = this;
+    params.NIa = NIa;
+    params.vlow = NIa * PopII_SNIa_delay_cumul(tlow);
+
+    return GSL::brent(&PopII_SNIa_interval_func_static, 0.02, 13.7,
+                      4.4408920985006262e-16, &params);
 }
 
 /**
@@ -176,6 +247,62 @@ double DiscreteStellarFeedback::PopIII_E_SN(double m) {
  */
 double DiscreteStellarFeedback::PopIII_EIMF(double m) {
     return PopIII_E_SN(m) * PopIII_IMF(m);
+}
+
+/**
+ * @brief Cumulative Susa PopIII IMF
+ *
+ * Stored internally as a gsl_spline
+ *
+ * @param m Mass value
+ * @return Value of the cumulative Susa PopIII IMF
+ */
+double DiscreteStellarFeedback::PopIII_IMF_cumul(double m) {
+    return _PopIII_IMF_spline->eval(log10(m));
+}
+
+/**
+ * @brief PopIII IMF auxiliary function, used to find a mass interval containing
+ * exactly one PopIII SN
+ *
+ * @param m Mass value
+ * @param pmass Initial mass of the stellar particle
+ * @param vlow Constant that depends on the upper bound of the interval
+ * @return Value that should be as close to zero as possible
+ */
+double DiscreteStellarFeedback::PopIII_IMF_interval_func(double m, double pmass,
+                                                         double vlow) {
+    return 1. - pmass / _PopIII_Mint * PopIII_IMF_cumul(m) + vlow;
+}
+
+/**
+ * @brief Get the lower mass of an interval starting at the given upper mass
+ * that contains exactly one star under the Susa PopIII IMF
+ *
+ * @param pmass Mass of the stellar population
+ * @param mupp Upper mass of the interval
+ * @return Lower mass (mlow) of the interval, such that the interval [mlow,mupp]
+ * contains exactly one star under the Susa PopIII IMF
+ */
+double DiscreteStellarFeedback::PopIII_interval_mass(double pmass,
+                                                     double mupp) {
+    struct PopIII_IMF_interval_func_static_params pars;
+    pars.object = this;
+    pars.pmass = pmass;
+    pars.vlow = pmass / _PopIII_Mint * PopIII_IMF_cumul(mupp);
+
+    return GSL::brent(&PopIII_IMF_interval_func_static, _PopIII_M_SN_low,
+                      _PopIII_M_upp, 4.4408920985006262e-16, &pars);
+}
+
+/**
+ * @brief Get the lifetime of a star with the given mass
+ *
+ * @param m Mass of a star
+ * @return Lifetime of a star with the given mass
+ */
+double DiscreteStellarFeedback::PopIII_lifetime(double m) {
+    return pow(10., _PopIII_lifetime_spline->eval(m));
 }
 
 /**
@@ -404,7 +531,89 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star,
  */
 StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
         StarParticle* star) {
-    return new DiscreteStellarFeedbackData();
+    DiscreteStellarFeedbackData* data = new DiscreteStellarFeedbackData();
+
+    // get stellar metallicity: TODO
+    double FeH = 0.02;
+    if(FeH <= _PopIII_cutoff) {
+        // only PopIII stars
+        data->set_PopII_SNII_number(0);
+        data->set_PopII_SNIa_number(0);
+        unsigned int PopIII_SN_number =
+                star->get_mass() * _PopIII_Nint / _PopIII_Mint;
+        data->set_PopIII_SN_number(PopIII_SN_number);
+        data->set_PopII_SW_fac(0.);
+        // honestly: no idea why we do this. It probably made sense when I first
+        // wrote this code
+        double PopIII_SW_fac = star->get_mass() * _PopIII_Nint / _PopIII_Mint /
+                               PopIII_SN_number;
+        data->set_PopIII_SW_fac(PopIII_SW_fac);
+    } else {
+        unsigned int PopII_SNII_number =
+                star->get_mass() * _PopII_NIIint / _PopII_Mint;
+        data->set_PopII_SNII_number(PopII_SNII_number);
+        // we cannot simply do 0.15*PopII_SNII_number, since this has less
+        // precision
+        unsigned int PopII_SNIa_number =
+                0.15 * star->get_mass() * _PopII_NIIint / _PopII_Mint;
+        data->set_PopII_SNIa_number(PopII_SNIa_number);
+        data->set_PopIII_SN_number(0);
+        // honestly: no idea why we do this. It probably made sense when I first
+        // wrote this code
+        double PopII_SW_fac = star->get_mass() * _PopII_NIIint / _PopII_Mint /
+                              PopII_SNII_number;
+        data->set_PopII_SW_fac(PopII_SW_fac);
+        data->set_PopIII_SW_fac(0.);
+    }
+    data->set_PopII_SNII_count(0);
+    data->set_PopII_SNIa_count(0);
+    data->set_PopIII_SN_count(0);
+
+    if(data->get_PopII_SNII_number()) {
+        double mupp = _PopII_M_upp;
+        double mlow = PopII_interval_mass(star->get_mass(), mupp);
+        double tlow = PopII_lifetime(mupp);
+        double tupp = PopII_lifetime(mlow);
+        double trand = tlow + (tupp - tlow) * HelperFunctions::rand_double();
+        // UNITS. OFFSET?
+        data->set_PopII_SNII_next_time(trand);
+        data->set_PopII_SNII_interval(mlow);
+        // we have to divide the total SNII energy over a discrete number of SN
+        // the energy per SNII will hence be a small factor larger
+        double PopII_SNII_fac = star->get_mass() * _PopII_NIIint / _PopII_Mint /
+                                data->get_PopII_SNII_number();
+        data->set_PopII_SNII_fac(PopII_SNII_fac);
+    }
+
+    if(data->get_PopII_SNIa_number()) {
+        double tlow = 0.03;
+        double tupp =
+                PopII_SNIa_interval_time(data->get_PopII_SNIa_number(), tlow);
+        double trand = tlow + (tupp - tlow) * HelperFunctions::rand_double();
+        // UNITS. OFFSET?
+        data->set_PopII_SNIa_next_time(trand);
+        data->set_PopII_SNIa_interval(tupp);
+        double PopII_SNIa_fac = star->get_mass() * _PopII_NIaint / _PopII_Mint /
+                                data->get_PopII_SNIa_number();
+        data->set_PopII_SNIa_fac(PopII_SNIa_fac);
+    }
+
+    if(data->get_PopIII_SN_number()) {
+        double mupp = _PopIII_M_upp;
+        double mlow = PopIII_interval_mass(star->get_mass(), mupp);
+        double tlow = PopIII_lifetime(mupp);
+        double tupp = PopIII_lifetime(mlow);
+        double trand = tlow + (tupp - tlow) * HelperFunctions::rand_double();
+        // UNITS. OFFSET?
+        data->set_PopIII_SN_next_time(trand);
+        data->set_PopIII_SN_interval(mlow);
+        double PopIII_SN_fac = star->get_mass() * _PopIII_Nint *
+                               PopIII_E_SN(0.5 * (mlow + mupp)) / _PopIII_Mint /
+                               _PopIII_Eint / data->get_PopIII_SN_number();
+        data->set_PopIII_SN_fac(PopIII_SN_fac);
+    }
+
+    return data;
 }
 
 /**

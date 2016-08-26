@@ -46,9 +46,9 @@ class DiscreteStellarFeedbackData : public StellarFeedbackData {
     /*! @brief Number of PopIII SN explosions that needs to go off */
     unsigned int _PopIII_SN_number;
 
-    /*! @brief PopII SW factor */
+    /*! @brief Total number of PopII SW type stars for the StarParticle */
     double _PopII_SW_fac;
-    /*! @brief PopIII SW factor */
+    /*! @brief Total number of PopIII SW type stars for the StarParticle */
     double _PopIII_SW_fac;
 
     /*! @brief Number of PopII SNII explosions that has gone off */
@@ -83,6 +83,9 @@ class DiscreteStellarFeedbackData : public StellarFeedbackData {
     double _PopIII_SN_fac;
 
   public:
+    /**
+     * @brief Empty constructor
+     */
     DiscreteStellarFeedbackData() {
         _PopII_SNII_number = 0;
         _PopII_SNIa_number = 0;

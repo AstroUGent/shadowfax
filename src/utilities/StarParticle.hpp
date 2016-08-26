@@ -48,6 +48,9 @@ class StarParticle : public Particle {
     /*! @brief Age of the star particle */
     double _age;
 
+    /*! @brief Initial mass of the star particle */
+    double _initial_mass;
+
     /*! @brief Extra variables needed for stellar feedback */
     StellarFeedbackData* _feedback_data;
 
@@ -94,6 +97,9 @@ class StarParticle : public Particle {
     double get_age() {
         return _age;
     }
+
+    void set_initial_mass(double initial_mass);
+    double get_initial_mass();
 
     void set_feedback_data(StellarFeedbackData* feedback_data);
     StellarFeedbackData* get_feedback_data();

@@ -30,8 +30,7 @@
 class ParticleVector;
 class RestartFile;
 class StarParticle;
-
-#include "StellarFeedbackData.hpp"
+class StellarFeedbackData;
 
 /**
  * @brief General interface for stellar feedback mechanisms

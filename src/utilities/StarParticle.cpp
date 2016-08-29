@@ -36,6 +36,8 @@ StarParticle::StarParticle() : Particle() {
     _mass = 0.;
     _age = 0.;
     _initial_mass = 0.;
+    // zero metallicity; [Fe/H] is a logarithmic value
+    _FeH = -99.;
     _feedback_data = NULL;
 }
 
@@ -48,6 +50,7 @@ StarParticle::StarParticle(Vec pos) : Particle(pos) {
     _mass = 0.;
     _age = 0.;
     _initial_mass = 0.;
+    _FeH = -99.;
     _feedback_data = NULL;
 }
 
@@ -76,6 +79,24 @@ void StarParticle::set_initial_mass(double initial_mass) {
  */
 double StarParticle::get_initial_mass() {
     return _initial_mass;
+}
+
+/**
+ * @brief Set the [Fe/H] metallicity of the star
+ *
+ * @param FeH [Fe/H] metallicity of the star
+ */
+void StarParticle::set_FeH(double FeH) {
+    _FeH = FeH;
+}
+
+/**
+ * @brief Get the [Fe/H] metallicity of the star
+ *
+ * @return [Fe/H] metallicity of the star
+ */
+double StarParticle::get_FeH() {
+    return _FeH;
 }
 
 /**
@@ -110,6 +131,7 @@ StarParticle::StarParticle(void* buffer, int bufsize, int* position)
     MyMPI_Unpack(buffer, bufsize, position, &_mass, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_age, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_initial_mass, 1, MPI_DOUBLE);
+    MyMPI_Unpack(buffer, bufsize, position, &_FeH, 1, MPI_DOUBLE);
     _feedback_data =
             StellarFeedbackDataFactory::unpack(buffer, bufsize, position);
 }
@@ -128,6 +150,7 @@ void StarParticle::pack_data(void* buffer, int bufsize, int* position) {
     MyMPI_Pack(&_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_age, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_initial_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
+    MyMPI_Pack(&_FeH, 1, MPI_DOUBLE, buffer, bufsize, position);
     StellarFeedbackDataFactory::pack(_feedback_data, buffer, bufsize, position);
 }
 
@@ -142,6 +165,7 @@ void StarParticle::dump(RestartFile& rfile) {
     rfile.write(_mass);
     rfile.write(_age);
     rfile.write(_initial_mass);
+    rfile.write(_FeH);
     StellarFeedbackDataFactory::dump(_feedback_data, rfile);
 }
 
@@ -155,6 +179,7 @@ StarParticle::StarParticle(RestartFile& rfile) : Particle(rfile) {
     rfile.read(_mass);
     rfile.read(_age);
     rfile.read(_initial_mass);
+    rfile.read(_FeH);
     _feedback_data = StellarFeedbackDataFactory::restart(rfile);
 }
 
@@ -207,4 +232,10 @@ void StarParticle::dump_ascii(ostream& stream) {
 
     stream << "_age:\n";
     stream << _age << "\n";
+
+    stream << "_initial_mass:\n";
+    stream << _initial_mass << "\n";
+
+    stream << "_FeH:\n";
+    stream << _FeH << "\n";
 }

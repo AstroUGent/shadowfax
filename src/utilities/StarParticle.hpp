@@ -51,6 +51,9 @@ class StarParticle : public Particle {
     /*! @brief Initial mass of the star particle */
     double _initial_mass;
 
+    /*! @brief [Fe/H] metallicity */
+    double _FeH;
+
     /*! @brief Extra variables needed for stellar feedback */
     StellarFeedbackData* _feedback_data;
 
@@ -100,6 +103,9 @@ class StarParticle : public Particle {
 
     void set_initial_mass(double initial_mass);
     double get_initial_mass();
+
+    void set_FeH(double FeH);
+    double get_FeH();
 
     void set_feedback_data(StellarFeedbackData* feedback_data);
     StellarFeedbackData* get_feedback_data();

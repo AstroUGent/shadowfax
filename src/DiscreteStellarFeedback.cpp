@@ -544,7 +544,7 @@ StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
     DiscreteStellarFeedbackData* data = new DiscreteStellarFeedbackData();
 
     // get stellar metallicity: TODO
-    double FeH = 0.02;  // [Fe/H]
+    double FeH = star->get_FeH();
     if(FeH <= _PopIII_cutoff) {
         // only PopIII stars
         data->set_PopII_SNII_number(0);

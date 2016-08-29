@@ -497,7 +497,8 @@ class DiscreteStellarFeedbackData : public StellarFeedbackData {
      * @param bufsize Total size of the buffer
      * @param position Current position in the buffer (is updated)
      */
-    inline DiscreteStellarFeedbackData(void* buffer, int bufsize, int* position) {
+    inline DiscreteStellarFeedbackData(void* buffer, int bufsize,
+                                       int* position) {
         MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNII_number, 1,
                      MPI_UNSIGNED);
         MyMPI_Unpack(buffer, bufsize, position, &_PopII_SNIa_number, 1,

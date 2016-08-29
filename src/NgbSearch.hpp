@@ -64,33 +64,4 @@ class NgbSearch : public TreeWalker {
     void pseudonodeaction(PseudoNode* pseudonode);
 };
 
-/**
- * @brief TreeWalker implementation used to find the closest neighbour of a
- * given GasParticle
- */
-class ClosestNgbSearch : public TreeWalker {
-  private:
-    /*! @brief Center of the closest neighbour search */
-    Vec _center;
-
-    /*! @brief Radius squared of the closest neighbour search */
-    double _radius;
-
-    /*! @brief Current closest particle */
-    GasParticle* _closest;
-
-  public:
-    ClosestNgbSearch(Vec center, double radius);
-    void set_position(Vec position);
-    Vec get_position();
-
-    GasParticle* get_closest();
-
-    void increase_radius();
-
-    bool splitnode(TreeNode* node);
-    void leafaction(Leaf* leaf);
-    void pseudonodeaction(PseudoNode* pseudonode);
-};
-
 #endif  // NGBSEARCH_HPP

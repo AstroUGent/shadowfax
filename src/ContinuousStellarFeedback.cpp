@@ -27,7 +27,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ContinuousStellarFeedback.hpp"
-#include "NgbSearch.hpp"                 // for ClosestNgbSearch
+#include "ClosestNgbSearch.hpp"          // for ClosestNgbSearch
 #include "ParameterFile.hpp"             // for ParameterFile
 #include "StateVector.hpp"               // for StateVector
 #include "utilities/GasParticle.hpp"     // for GasParticle
@@ -65,7 +65,7 @@ void ContinuousStellarFeedback::do_feedback(StarParticle* star,
     } else {
         return;
     }
-    ClosestNgbSearch ngbsearch(star->get_position(), _sradius);
+    ClosestNgbSearch ngbsearch(star, star->get_position(), _sradius);
     particles.get_tree().walk_tree(ngbsearch);
     GasParticle* part = ngbsearch.get_closest();
     while(part == NULL) {

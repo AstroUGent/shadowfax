@@ -36,6 +36,7 @@ if(DO_SHADOWFAX)
 
     set(SHADOWFAXSOURCES
     CircularBox.cpp
+    ClosestNgbSearch.cpp
     ColorMap.cpp
     ContinuousStellarFeedback.cpp
     CoolingTable.cpp
@@ -82,6 +83,7 @@ if(DO_SHADOWFAX)
     VorTess.cpp
     VorTessManager.cpp
 
+    ClosestNgbSearch.hpp
     ColorMap.hpp
     ContinuousStellarFeedback.hpp
     CoolingLocation.hpp

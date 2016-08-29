@@ -27,6 +27,7 @@
 #include "MPIMethods.hpp"
 #include "RestartFile.hpp"
 #include "StellarFeedbackDataFactory.hpp"
+#include <cfloat>
 using namespace std;
 
 /**
@@ -38,6 +39,9 @@ StarParticle::StarParticle() : Particle() {
     _initial_mass = 0.;
     // zero metallicity; [Fe/H] is a logarithmic value
     _FeH = -99.;
+    _closest_radius2 = DBL_MAX;
+    _closest_rank = MPIGlobal::rank;
+    _closest_gasparticle = NULL;
     _feedback_data = NULL;
 }
 
@@ -51,6 +55,9 @@ StarParticle::StarParticle(Vec pos) : Particle(pos) {
     _age = 0.;
     _initial_mass = 0.;
     _FeH = -99.;
+    _closest_radius2 = DBL_MAX;
+    _closest_rank = MPIGlobal::rank;
+    _closest_gasparticle = NULL;
     _feedback_data = NULL;
 }
 
@@ -100,6 +107,55 @@ double StarParticle::get_FeH() {
 }
 
 /**
+ * @brief Set the closest GasParticle to this StarParticle
+ *
+ * @param gasparticle Pointer to the GasParticle (might be non-local)
+ * @param radius2 Radius squared to the closest GasParticle
+ * @param rank Rank of the MPI process holding the closest GasParticle, if a
+ * negative value is given, the current MPI rank is used
+ */
+void StarParticle::set_closest_gasparticle(GasParticle* gasparticle,
+                                           double radius2, int rank) {
+    _closest_gasparticle = gasparticle;
+    _closest_radius2 = radius2;
+    if(rank >= 0) {
+        _closest_rank = rank;
+    } else {
+        _closest_rank = MPIGlobal::rank;
+    }
+}
+
+/**
+ * @brief Get the radius squared to the closest GasParticle
+ *
+ * @return Radius squared to the closest GasParticle
+ */
+double StarParticle::get_closest_radius2() {
+    return _closest_radius2;
+}
+
+/**
+ * @brief Get the rank of the MPI process holding the closest GasParticle
+ *
+ * @return MPI rank of the process holding the closest GasParticle
+ */
+int StarParticle::get_closest_rank() {
+    return _closest_rank;
+}
+
+/**
+ * @brief Get a pointer to the closest GasParticle (might be non-local)
+ *
+ * The pointer can only be used on the MPI process with the rank returned by
+ * get_closest_rank()
+ *
+ * @return Pointer to the closest GasParticle
+ */
+GasParticle* StarParticle::get_closest_gasparticle() {
+    return _closest_gasparticle;
+}
+
+/**
  * @brief Set the extra variables needed for stellar feedback
  *
  * @param feedback_data Extra variables needed for stellar feedback
@@ -132,6 +188,10 @@ StarParticle::StarParticle(void* buffer, int bufsize, int* position)
     MyMPI_Unpack(buffer, bufsize, position, &_age, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_initial_mass, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_FeH, 1, MPI_DOUBLE);
+    MyMPI_Unpack(buffer, bufsize, position, &_closest_radius2, 1, MPI_DOUBLE);
+    MyMPI_Unpack(buffer, bufsize, position, &_closest_rank, 1, MPI_INT);
+    MyMPI_Unpack(buffer, bufsize, position, &_closest_gasparticle, 1,
+                 MPI_UNSIGNED_LONG);
     _feedback_data =
             StellarFeedbackDataFactory::unpack(buffer, bufsize, position);
 }
@@ -151,6 +211,10 @@ void StarParticle::pack_data(void* buffer, int bufsize, int* position) {
     MyMPI_Pack(&_age, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_initial_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_FeH, 1, MPI_DOUBLE, buffer, bufsize, position);
+    MyMPI_Pack(&_closest_radius2, 1, MPI_DOUBLE, buffer, bufsize, position);
+    MyMPI_Pack(&_closest_rank, 1, MPI_INT, buffer, bufsize, position);
+    MyMPI_Pack(&_closest_gasparticle, 1, MPI_UNSIGNED_LONG, buffer, bufsize,
+               position);
     StellarFeedbackDataFactory::pack(_feedback_data, buffer, bufsize, position);
 }
 
@@ -166,6 +230,9 @@ void StarParticle::dump(RestartFile& rfile) {
     rfile.write(_age);
     rfile.write(_initial_mass);
     rfile.write(_FeH);
+    rfile.write(_closest_radius2);
+    rfile.write(_closest_rank);
+    // write _closest_gasparticle
     StellarFeedbackDataFactory::dump(_feedback_data, rfile);
 }
 
@@ -180,6 +247,9 @@ StarParticle::StarParticle(RestartFile& rfile) : Particle(rfile) {
     rfile.read(_age);
     rfile.read(_initial_mass);
     rfile.read(_FeH);
+    rfile.read(_closest_radius2);
+    rfile.read(_closest_rank);
+    // read _closest_gasparticle
     _feedback_data = StellarFeedbackDataFactory::restart(rfile);
 }
 

@@ -30,6 +30,7 @@
 #include "ParticleTypes.hpp"  // for ParticleType, etc
 #include <ostream>            // for ostream
 
+class GasParticle;
 class RestartFile;
 class StellarFeedbackData;
 class Vec;
@@ -53,6 +54,15 @@ class StarParticle : public Particle {
 
     /*! @brief [Fe/H] metallicity */
     double _FeH;
+
+    /*! @brief Radius squared to the closest GasParticle */
+    double _closest_radius2;
+
+    /*! @brief MPI rank of the process holding the closest GasParticle */
+    int _closest_rank;
+
+    /*! @brief Pointer to the closest GasParticle */
+    GasParticle* _closest_gasparticle;
 
     /*! @brief Extra variables needed for stellar feedback */
     StellarFeedbackData* _feedback_data;
@@ -106,6 +116,12 @@ class StarParticle : public Particle {
 
     void set_FeH(double FeH);
     double get_FeH();
+
+    void set_closest_gasparticle(GasParticle* gasparticle, double radius2,
+                                 int rank = -1);
+    double get_closest_radius2();
+    int get_closest_rank();
+    GasParticle* get_closest_gasparticle();
 
     void set_feedback_data(StellarFeedbackData* feedback_data);
     StellarFeedbackData* get_feedback_data();

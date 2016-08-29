@@ -90,6 +90,7 @@ if(DO_SHADOWFAX)
     DelCont.hpp
     DelTess.hpp
     DiscreteStellarFeedback.hpp
+    DiscreteStellarFeedbackData.hpp
     Error.hpp
     ExArith.hpp
     FixedGrid.hpp
@@ -124,6 +125,7 @@ if(DO_SHADOWFAX)
     StarFormationParticleConverter.hpp
     StateVector.hpp
     StellarFeedback.hpp
+    StellarFeedbackData.hpp
     StellarFeedbackDataFactory.hpp
     TimeLine.hpp
     TimeStepWalker.hpp

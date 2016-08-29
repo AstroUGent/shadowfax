@@ -27,10 +27,10 @@
 #ifndef STELLARFEEDBACKDATAFACTORY_HPP
 #define STELLARFEEDBACKDATAFACTORY_HPP
 
-#include "DiscreteStellarFeedback.hpp"
+#include "DiscreteStellarFeedbackData.hpp"
 #include "MPIMethods.hpp"
 #include "RestartFile.hpp"
-#include "StellarFeedback.hpp"
+#include "StellarFeedbackData.hpp"
 
 /**
  * @brief Factory class to pack, unpack, dump and reload StellarFeedbackData

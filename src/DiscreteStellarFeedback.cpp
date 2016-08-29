@@ -27,6 +27,7 @@
  * @author Sven De Rijcke (sven.derijcke@ugent.be)
  */
 #include "DiscreteStellarFeedback.hpp"
+#include "DiscreteStellarFeedbackData.hpp"
 #include "RestartFile.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/StarParticle.hpp"

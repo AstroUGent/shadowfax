@@ -81,6 +81,7 @@ endmacro(add_unit_test_python)
 set(TESTRIEMANNSOLVER_SOURCES
     myAssert.hpp
     testRiemannSolver.cpp
+
     ../src/MPIGlobal.cpp
     ../src/ProgramLog.cpp
     )
@@ -94,6 +95,7 @@ add_unit_test(NAME testRiemannSolver
 # ExArith test
 set(TESTEXARITH_SOURCES
     testExArith.cpp
+
     ../src/ExArith.cpp
     ../src/MPIGlobal.cpp
     )
@@ -111,8 +113,10 @@ add_unit_test(NAME testExArith3d
 # DelTess test
 set(TESTDELTESS_SOURCES
     testDelTess.cpp
-    ../src/DelTess.cpp
+
     ../src/CubicBox.cpp
+    ../src/DelTess.cpp
+    ../src/ExArith.cpp
     ../src/Line.cpp
     ../src/MPIGlobal.cpp
     ../src/Plane.cpp
@@ -120,7 +124,6 @@ set(TESTDELTESS_SOURCES
     ../src/RectangularBox.cpp
     ../src/Simplex.cpp
     ../src/VorGen.cpp
-    ../src/ExArith.cpp
     )
 
 add_unit_test(NAME testDelTess2d
@@ -150,8 +153,9 @@ add_unit_test(NAME testUnit
 #NDTable test
 set(TESTNDTABLE_SOURCES
     testNDTable.cpp
-    ../src/NDTable.cpp
+
     ../src/MPIGlobal.cpp
+    ../src/NDTable.cpp
     ../src/io/UnitSet.cpp
     ../src/utilities/Timer.cpp
     )
@@ -171,8 +175,9 @@ add_unit_test_bash(NAME testNDTable
 #NDIrregTable test
 set(TESTNDIRREGTABLE_SOURCES
     testNDIrregTable.cpp
-    ../src/NDIrregTable.cpp
+
     ../src/MPIGlobal.cpp
+    ../src/NDIrregTable.cpp
     ../src/io/UnitSet.cpp
     ../src/utilities/Timer.cpp
     )
@@ -186,19 +191,19 @@ set(TESTNDIRREGTABLE_FILES
 set(TESTGASCOOLING_SOURCES
     testGasCooling.cpp
 
-    ../src/GasCooling.cpp
     ../src/CoolingTable.cpp
+    ../src/GasCooling.cpp
+    ../src/MPIGlobal.cpp
     ../src/NDIrregTable.cpp
     ../src/NDTable.cpp
     ../src/ParameterFile.cpp
-    ../src/utilities/GasParticle.cpp
-    ../src/utilities/Particle.cpp
-    ../src/utilities/Hilbert.cpp
-    ../src/utilities/HelperFunctions.cpp
-    ../src/MPIGlobal.cpp
     ../src/Physics.cpp
     ../src/VorGen.cpp
     ../src/io/UnitSet.cpp
+    ../src/utilities/GasParticle.cpp
+    ../src/utilities/HelperFunctions.cpp
+    ../src/utilities/Hilbert.cpp
+    ../src/utilities/Particle.cpp
     ../src/utilities/Timer.cpp
     )
 
@@ -274,10 +279,10 @@ add_unit_test(NAME testSpecificICGenerator
 # Legendre test
 set(TESTLEGENDRE_SOURCES
     testLegendre.cpp
-    ../src/Legendre.cpp
-    ../src/utilities/Timer.cpp
 
+    ../src/Legendre.cpp
     ../src/Legendre.hpp
+    ../src/utilities/Timer.cpp
 )
 
 add_unit_test(NAME testLegendre
@@ -314,18 +319,32 @@ endif(PYTHON_MODULES)
 set(TESTRESTART_SOURCES
     testRestartFile.cpp
 
+    ../src/CoolingTable.cpp
+    ../src/GSL.cpp
     ../src/MPIGlobal.cpp
     ../src/NDIrregTable.cpp
     ../src/NDTable.cpp
     ../src/RestartFile.cpp
-    ../src/CoolingTable.cpp
-    ../src/GSL.cpp
 )
 
 add_unit_test(NAME testRestartFile
               SOURCES ${TESTRESTART_SOURCES}
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d io2d)
+
+# DiscreteStellarFeedback test
+set(TESTDISCRETESTELLARFEEDBACK_SOURCES
+    testDiscreteStellarFeedback.cpp
+
+    ../src/DiscreteStellarFeedback.cpp
+    ../src/GSL.cpp
+    ../src/MPIGlobal.cpp
+)
+
+add_unit_test(NAME testDiscreteStellarFeedback
+              SOURCES ${TESTDISCRETESTELLARFEEDBACK_SOURCES}
+              NDIM 3
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d)
 
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}

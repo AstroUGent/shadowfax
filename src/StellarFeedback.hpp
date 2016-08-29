@@ -31,16 +31,7 @@ class ParticleVector;
 class RestartFile;
 class StarParticle;
 
-/**
- * @brief General interface for data that needs to be stored in the StarParticle
- * for the stellar feedback
- */
-class StellarFeedbackData {
-  public:
-    // we need to provide an empty destructor to make sure this (empty)
-    // interface exists as a well defined entity
-    virtual ~StellarFeedbackData() {}
-};
+#include "StellarFeedbackData.hpp"
 
 /**
  * @brief General interface for stellar feedback mechanisms

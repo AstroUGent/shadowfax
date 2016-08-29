@@ -49,6 +49,18 @@ ClosestNgbSearch::ClosestNgbSearch(StarParticle* star, Vec center,
 }
 
 /**
+ * @brief Import constructor
+ *
+ * @param import Import containing data communicated from another MPI process
+ */
+ClosestNgbSearch::ClosestNgbSearch(Import& import)
+        : _center(import.get_center()) {
+    _star = NULL;
+    _closest = NULL;
+    _radius = import.get_radius2();
+}
+
+/**
  * @brief Set the position for the closest neighbour search
  *
  * @param position Position for the closest neighbour search
@@ -163,7 +175,7 @@ void ClosestNgbSearch::periodicleafaction(Leaf* leaf, EwaldTable& ewald_table) {
  * @brief Set the closest neighbour of the StarParticle
  */
 void ClosestNgbSearch::after_walk() {
-    // set the closest ngb for the star
+    _star->set_closest_gasparticle(_closest, _radius, MPIGlobal::rank);
 }
 
 /**
@@ -173,5 +185,6 @@ void ClosestNgbSearch::after_walk() {
  * @param import Import to update
  */
 void ClosestNgbSearch::after_walk(Import& import) {
-    // set the closest ngb in the import
+    import.set_closest(_closest);
+    import.set_radius2(_radius);
 }

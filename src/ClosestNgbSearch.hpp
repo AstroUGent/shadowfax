@@ -63,6 +63,10 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
      */
     class Export {
       private:
+        /*! @brief StarParticle for which the closest neighbour search is
+         *  performed */
+        StarParticle* _star;
+
         /*! @brief Center of the closest neighbour search */
         Vec _center;
 
@@ -73,10 +77,13 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
         /**
          * @brief Constructor
          *
+         * @param star StarParticle for which the closest neighbour search is
+         * performed
          * @param center Center of the closest neighbour search
          * @param radius2 Radius squared of the closest neighbour search
          */
-        Export(Vec center, double radius2) {
+        Export(StarParticle* star, Vec center, double radius2) {
+            _star = star;
             _center = center;
             _radius2 = radius2;
         }
@@ -111,6 +118,9 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
             // a pointer should be an unsigned 64-bit integer on 64-bit systems
             MyMPI_Unpack(buffer, bufsize, position, &closest, 1,
                          MPI_UNSIGNED_LONG);
+            if(radius2 < _star->get_closest_radius2()) {
+                _star->set_closest_gasparticle(closest, radius2, rank);
+            }
         }
     };
 
@@ -120,25 +130,14 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
      */
     class Import {
       private:
-        /*! @brief Position for which the treewalk is performed */
-        Vec _pos;
+        /*! @brief Center of the closest neighbour search */
+        Vec _center;
 
-        /*! @brief Old acceleration, used for the relative opening criterion */
-        double _olda;
+        /*! @brief Radius squared of the closest neighbour search */
+        double _radius2;
 
-        /*! @brief Local result of the treewalk (is exported) */
-        Vec _a;
-
-        /*! @brief Computational cost of the local treewalk (is exported) */
-        float _comp_cost;
-
-        /*! @brief Softening length of the Particle for which the treewalk is
-         *  performed */
-        double _hsoft;
-
-        /*! @brief \f$\eta\f$-parameter for variable softening lengths (is
-            exported) */
-        double _eta;
+        /*! @brief Pointer to the closest GasParticle */
+        GasParticle* _closest;
 
       public:
         /**
@@ -150,63 +149,45 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
          * @param position Current position of the buffer (is updated)
          */
         Import(void* buffer, int bufsize, int* position) {
-            MyMPI_Unpack(buffer, bufsize, position, &_pos[0], ndim_,
+            MyMPI_Unpack(buffer, bufsize, position, &_center[0], ndim_,
                          MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &_olda, 1, MPI_DOUBLE);
-            MyMPI_Unpack(buffer, bufsize, position, &_hsoft, 1, MPI_DOUBLE);
+            MyMPI_Unpack(buffer, bufsize, position, &_radius2, 1, MPI_DOUBLE);
         }
 
         /**
-         * @brief Get the position for which the treewalk is performed
+         * @brief Get the center of the closest neighbour search
          *
-         * @return The position of the external Particle
+         * @return Center of the closest neighbour search
          */
-        Vec get_position() {
-            return _pos;
+        Vec get_center() {
+            return _center;
         }
 
         /**
-         * @brief Get the old acceleration of the external Particle
+         * @brief Get the radius squared of the closest neighbour search
          *
-         * @return Old acceleration of the external Particle
+         * @return Radius squared of the closest neighbour search
          */
-        double get_olda() {
-            return _olda;
+        double get_radius2() {
+            return _radius2;
         }
 
         /**
-         * @brief Get the softening length of the external Particle
+         * @brief Set the pointer to the closest GasParticle
          *
-         * @return Softening length of the external Particle
+         * @param closest Pointer to the closest GasParticle
          */
-        double get_hsoft() {
-            return _hsoft;
+        void set_closest(GasParticle* closest) {
+            _closest = closest;
         }
 
         /**
-         * @brief set_a Set the acceleration
+         * @brief Set the most recent value of the search radius squared
          *
-         * @param a Value of the acceleration
+         * @param radius2 Most recent value of search radius squared
          */
-        void set_a(Vec a) {
-            _a = a;
-        }
-
-        /**
-         * @brief Set the computational cost
-         * @param comp_cost Value of the computational cost
-         */
-        void set_comp_cost(float comp_cost) {
-            _comp_cost = comp_cost;
-        }
-
-        /**
-         * @brief Set the \f$\eta\f$-factor for variable softening lengths
-         *
-         * @param eta Value of the \f$\eta\f$-factor
-         */
-        void set_eta(double eta) {
-            _eta = eta;
+        void set_radius2(double radius2) {
+            _radius2 = radius2;
         }
 
         /**
@@ -218,12 +199,16 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
          * @param position Current position of the buffer (is updated)
          */
         void pack_data(void* buffer, int bufsize, int* position) {
-            MyMPI_Pack(&_a[0], ndim_, MPI_DOUBLE, buffer, bufsize, position);
-            MyMPI_Pack(&_comp_cost, 1, MPI_FLOAT, buffer, bufsize, position);
+            int rank = MPIGlobal::rank;
+            MyMPI_Pack(&_radius2, 1, MPI_DOUBLE, buffer, bufsize, position);
+            MyMPI_Pack(&rank, 1, MPI_INT, buffer, bufsize, position);
+            MyMPI_Pack(&_closest, 1, MPI_UNSIGNED_LONG, buffer, bufsize,
+                       position);
         }
     };
 
     ClosestNgbSearch(StarParticle* star, Vec center, double radius);
+    ClosestNgbSearch(Import& import);
     void set_position(Vec position);
     Vec get_position();
 

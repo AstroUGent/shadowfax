@@ -46,9 +46,12 @@ class StellarFeedback {
      * time step
      *
      * @param star StarParticle
+     * @param starttime Physical start time of the next time step
+     * @param endtime Physical end time of the next time step
      * @return True if the StarParticle does feedback
      */
-    virtual bool does_feedback(StarParticle* star) = 0;
+    virtual bool does_feedback(StarParticle* star, double starttime,
+                               double endtime) = 0;
 
     /**
      * @brief Give stellar feedback from the given StarParticle to the gas in
@@ -78,14 +81,25 @@ class StellarFeedbackTreeFilter {
     /*! @brief StellarFeedback implementation used */
     StellarFeedback* _feedback;
 
+    /*! @brief Physical start time of the current time step */
+    double _starttime;
+
+    /*! @brief Physical end time of the current time step */
+    double _endtime;
+
   public:
     /**
      * @brief Constructor
      *
      * @param feedback StellarFeedback implementation used
+     * @param starttime Physical start time of the current time step
+     * @param endtime Physical end time of the current time step
      */
-    inline StellarFeedbackTreeFilter(StellarFeedback* feedback) {
+    inline StellarFeedbackTreeFilter(StellarFeedback* feedback,
+                                     double starttime, double endtime) {
         _feedback = feedback;
+        _starttime = starttime;
+        _endtime = endtime;
     }
 
     /**
@@ -116,7 +130,7 @@ class StellarFeedbackTreeFilter {
      * StarParticle does feedback
      */
     inline bool do_star(StarParticle* star) {
-        return _feedback->does_feedback(star);
+        return _feedback->does_feedback(star, _starttime, _endtime);
     }
 };
 

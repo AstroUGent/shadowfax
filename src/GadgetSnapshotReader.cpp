@@ -659,7 +659,7 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles,
                                              velocity[3 * i + 2]);
                     particles.star(i)->set_id(ids[i]);
                     particles.star(i)->set_mass(masses[i]);
-                    particles.star(i)->set_age(ages[i]);
+                    particles.star(i)->set_birthtime(ages[i]);
                 }
 
                 status = H5Gclose(group);

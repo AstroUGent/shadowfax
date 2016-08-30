@@ -46,8 +46,8 @@ class StarParticle : public Particle {
     /*! @brief Mass of the star particle */
     double _mass;
 
-    /*! @brief Age of the star particle */
-    double _age;
+    /*! @brief Birthtime of the star particle */
+    double _birthtime;
 
     /*! @brief Initial mass of the star particle */
     double _initial_mass;
@@ -71,7 +71,7 @@ class StarParticle : public Particle {
     StarParticle();
     StarParticle(Vec pos);
     StarParticle(void* buffer, int bufsize, int* position);
-    virtual ~StarParticle() {}
+    virtual ~StarParticle();
 
     /**
       * @brief Mark this Particle as a star particle
@@ -94,21 +94,21 @@ class StarParticle : public Particle {
     }
 
     /**
-     * @brief Set the age of the star particle
+     * @brief Set the birthtime of the star particle
      *
-     * @param age Age of the star particle
+     * @param birthtime Birthtime of the star particle
      */
-    void set_age(double age) {
-        _age = age;
+    void set_birthtime(double birthtime) {
+        _birthtime = birthtime;
     }
 
     /**
-     * @brief Get the age of the star particle
+     * @brief Get the birthtime of the star particle
      *
-     * @return Age of the star particle
+     * @return Birthtime of the star particle
      */
-    double get_age() {
-        return _age;
+    double get_birthtime() {
+        return _birthtime;
     }
 
     void set_initial_mass(double initial_mass);

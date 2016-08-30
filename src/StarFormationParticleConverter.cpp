@@ -93,7 +93,7 @@ Particle* StarFormationParticleConverter::convert(Particle* particle) {
         double epot = particle->get_gravitational_potential();
         double hsoft = particle->get_hsoft();
         double mass = particle->get_mass();
-        Particle* part = new StarParticle(pos);
+        StarParticle* part = new StarParticle(pos);
         part->set_velocity(vel);
         part->set_gravitational_acceleration(a);
         part->set_old_acceleration(old_a);
@@ -104,6 +104,9 @@ Particle* StarFormationParticleConverter::convert(Particle* particle) {
         part->set_gravitational_potential(epot);
         part->set_hsoft(hsoft);
         part->set_mass(mass);
+        // flag this StarParticle as new; it's birthtime will be set by the
+        // main simulation loop
+        part->set_birthtime(-1.);
         delete particle;
         return part;
     }

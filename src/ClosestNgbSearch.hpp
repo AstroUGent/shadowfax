@@ -30,7 +30,6 @@
 #include "Vec.hpp"  // for Vec
 #include "utilities/StarParticle.hpp"
 #include "utilities/TreeWalker.hpp"
-#include <cfloat>
 #include <vector>  // for vector
 
 class DMParticle;
@@ -209,7 +208,7 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
         }
     };
 
-    ClosestNgbSearch(StarParticle* star, double radius = DBL_MAX);
+    ClosestNgbSearch(StarParticle* star, double radius = -1.);
 
     /**
      * @brief Empty GasParticle constructor

@@ -523,10 +523,35 @@ DiscreteStellarFeedback::~DiscreteStellarFeedback() {
  * @brief Does the given StarParticle give feedback during the next time step?
  *
  * @param star StarParticle
+ * @param starttime Physical start time of the next time step
+ * @param endtime Physical end time of the next time step
  * @return True if the StarParticle does feedback
  */
-bool DiscreteStellarFeedback::does_feedback(StarParticle* star) {
-    return true;
+bool DiscreteStellarFeedback::does_feedback(StarParticle* star,
+                                            double starttime, double endtime) {
+    DiscreteStellarFeedbackData* data =
+            (DiscreteStellarFeedbackData*)star->get_feedback_data();
+    if(data->get_PopII_SNII_count() < data->get_PopII_SNII_number() &&
+       endtime >= data->get_PopII_SNII_next_time()) {
+        return true;
+    }
+    if(data->get_PopII_SNIa_count() < data->get_PopII_SNIa_number() &&
+       endtime >= data->get_PopII_SNIa_next_time()) {
+        return true;
+    }
+    if(data->get_PopII_SW_fac() &&
+       (starttime - star->get_birthtime()) < _PopII_SW_end_time) {
+        return true;
+    }
+    if(data->get_PopIII_SN_count() < data->get_PopIII_SN_number() &&
+       endtime >= data->get_PopIII_SN_next_time()) {
+        return true;
+    }
+    if(data->get_PopIII_SW_fac() &&
+       (starttime - star->get_birthtime()) < _PopIII_SW_end_time) {
+        return true;
+    }
+    return false;
 }
 
 /**

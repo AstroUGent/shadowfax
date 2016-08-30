@@ -43,9 +43,13 @@ using namespace std;
  * @brief Does the given StarParticle give feedback during the next time step?
  *
  * @param star StarParticle
+ * @param starttime Physical start time of the next time step
+ * @param endtime Physical end time of the next time step
  * @return True if the StarParticle does feedback
  */
-bool ContinuousStellarFeedback::does_feedback(StarParticle* star) {
+bool ContinuousStellarFeedback::does_feedback(StarParticle* star,
+                                              double starttime,
+                                              double endtime) {
     return true;
 }
 
@@ -59,7 +63,7 @@ bool ContinuousStellarFeedback::does_feedback(StarParticle* star) {
 void ContinuousStellarFeedback::do_feedback(StarParticle* star,
                                             ParticleVector& particles,
                                             double dt) {
-    double age = star->get_age();
+    double age = star->get_birthtime();
     // stellar wind period
     double dtsw = std::max(
             0., (std::min(age + dt, _sw_end) - std::max(age, _sw_start)));

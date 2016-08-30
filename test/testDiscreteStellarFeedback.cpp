@@ -26,6 +26,7 @@
 #include "ClosestNgbSearch.hpp"
 #include "DiscreteStellarFeedback.hpp"
 #include "DiscreteStellarFeedbackData.hpp"
+#include "MPIMethods.hpp"
 #include "myAssert.hpp"
 #include "utilities/ParticleVector.hpp"
 #include "utilities/StarParticle.hpp"
@@ -41,16 +42,18 @@ using namespace std;
  * @return 0 on succes. Aborts otherwise
  */
 int main(int argc, char** argv) {
+    MyMPI_Init(&argc, &argv);
 
     DiscreteStellarFeedback feedback;
 
-    StarParticle star;
-    star.set_initial_mass(2500.);  // in solar masses
+    Vec position(0.5, 0.5, 0.5);
+    StarParticle* star = new StarParticle(position);
+    star->set_initial_mass(2500.);  // in solar masses
 
     // normal PopII star
-    star.set_FeH(-2.);
+    star->set_FeH(-2.);
     DiscreteStellarFeedbackData* data =
-            (DiscreteStellarFeedbackData*)feedback.initialize_data(&star);
+            (DiscreteStellarFeedbackData*)feedback.initialize_data(star);
 
     // check numbers:
     my_assert(data->get_PopII_SNII_number() == 28,
@@ -61,8 +64,9 @@ int main(int argc, char** argv) {
               "Wrong number of PopIII SN explosions!");
 
     // PopIII star
-    star.set_FeH(-6.);
-    data = (DiscreteStellarFeedbackData*)feedback.initialize_data(&star);
+    star->set_FeH(-6.);
+    data = (DiscreteStellarFeedbackData*)feedback.initialize_data(star);
+    star->set_feedback_data(data);
 
     // check numbers:
     my_assert(data->get_PopII_SNII_number() == 0,
@@ -75,13 +79,22 @@ int main(int argc, char** argv) {
     Vec center(0.5, 0.5, 0.5);
     Vec sides(1., 1., 1.);
     RectangularBox treebox(center, sides);
-    StellarFeedbackTreeFilter filter(&feedback);
+    StellarFeedbackTreeFilter filter(&feedback, 0., 13.8);
     ParticleVector particles(false, treebox, true);
-    particles.add_star_particle(&star);
+    particles.add_star_particle(star);
+
+    // add a single GasParticle to receive all feedback
+    Vec gasposition(0.6, 0.6, 0.6);
+    particles.add_gas_particle(new GasParticle(gasposition));
     particles.finalize();
     particles.sort();
     particles.get_tree().walk_tree<ClosestNgbSearch>(particles, false, false,
                                                      true, filter);
 
-    return 0;
+    my_assert(star->get_closest_gasparticle() == particles.gasback(),
+              "Wrong closest GasParticle!");
+
+    feedback.do_feedback(star, particles, 0.);
+
+    return MyMPI_Finalize();
 }

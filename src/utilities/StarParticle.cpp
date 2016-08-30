@@ -35,7 +35,7 @@ using namespace std;
   */
 StarParticle::StarParticle() : Particle() {
     _mass = 0.;
-    _age = 0.;
+    _birthtime = 0.;
     _initial_mass = 0.;
     // zero metallicity; [Fe/H] is a logarithmic value
     _FeH = -99.;
@@ -52,13 +52,20 @@ StarParticle::StarParticle() : Particle() {
   */
 StarParticle::StarParticle(Vec pos) : Particle(pos) {
     _mass = 0.;
-    _age = 0.;
+    _birthtime = 0.;
     _initial_mass = 0.;
     _FeH = -99.;
     _closest_radius2 = DBL_MAX;
     _closest_rank = MPIGlobal::rank;
     _closest_gasparticle = NULL;
     _feedback_data = NULL;
+}
+
+/**
+ * @brief Destructor
+ */
+StarParticle::~StarParticle() {
+    delete _feedback_data;
 }
 
 /**
@@ -185,7 +192,7 @@ StellarFeedbackData* StarParticle::get_feedback_data() {
 StarParticle::StarParticle(void* buffer, int bufsize, int* position)
         : Particle(buffer, bufsize, position) {
     MyMPI_Unpack(buffer, bufsize, position, &_mass, 1, MPI_DOUBLE);
-    MyMPI_Unpack(buffer, bufsize, position, &_age, 1, MPI_DOUBLE);
+    MyMPI_Unpack(buffer, bufsize, position, &_birthtime, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_initial_mass, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_FeH, 1, MPI_DOUBLE);
     MyMPI_Unpack(buffer, bufsize, position, &_closest_radius2, 1, MPI_DOUBLE);
@@ -208,7 +215,7 @@ StarParticle::StarParticle(void* buffer, int bufsize, int* position)
 void StarParticle::pack_data(void* buffer, int bufsize, int* position) {
     Particle::pack_data(buffer, bufsize, position);
     MyMPI_Pack(&_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
-    MyMPI_Pack(&_age, 1, MPI_DOUBLE, buffer, bufsize, position);
+    MyMPI_Pack(&_birthtime, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_initial_mass, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_FeH, 1, MPI_DOUBLE, buffer, bufsize, position);
     MyMPI_Pack(&_closest_radius2, 1, MPI_DOUBLE, buffer, bufsize, position);
@@ -227,7 +234,7 @@ void StarParticle::dump(RestartFile& rfile) {
     Particle::dump(rfile);
 
     rfile.write(_mass);
-    rfile.write(_age);
+    rfile.write(_birthtime);
     rfile.write(_initial_mass);
     rfile.write(_FeH);
     rfile.write(_closest_radius2);
@@ -244,7 +251,7 @@ void StarParticle::dump(RestartFile& rfile) {
  */
 StarParticle::StarParticle(RestartFile& rfile) : Particle(rfile) {
     rfile.read(_mass);
-    rfile.read(_age);
+    rfile.read(_birthtime);
     rfile.read(_initial_mass);
     rfile.read(_FeH);
     rfile.read(_closest_radius2);
@@ -301,7 +308,7 @@ void StarParticle::dump_ascii(ostream& stream) {
     stream << _mass << "\n";
 
     stream << "_age:\n";
-    stream << _age << "\n";
+    stream << _birthtime << "\n";
 
     stream << "_initial_mass:\n";
     stream << _initial_mass << "\n";

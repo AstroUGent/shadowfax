@@ -561,7 +561,7 @@ void GadgetSnapshotWriter::write_snapshot(double t, ParticleVector& particles,
                             velocity_converter.convert(particles.star(i)->vz());
                     ids[i] = particles.star(i)->id();
                     ages[i] = time_converter.convert(
-                            particles.star(i)->get_age());
+                            particles.star(i)->get_birthtime());
                 }
                 // write particle data
                 if(!rank) {

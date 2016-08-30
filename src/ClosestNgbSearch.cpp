@@ -29,23 +29,26 @@
 #include "utilities/Particle.hpp"       // for Particle
 #include "utilities/ParticleTypes.hpp"  // for ParticleType::PARTTYPE_GAS
 #include "utilities/Tree.hpp"           // for Leaf, PseudoNode, TreeNode
-#include <cfloat>
-#include <cstddef>  // for NULL
-#include <vector>   // for vector, vector<>::reference
+#include <cfloat>                       // for DBL_MAX
+#include <cstddef>                      // for NULL
+#include <vector>                       // for vector, vector<>::reference
 using namespace std;
 
 /**
  * @brief Constructor
  *
  * @param star StarParticle for which the closest neighbour search is performed
- * @param center Center of the closest neighbour search
  * @param radius Radius of the closest neighbour search
  */
 ClosestNgbSearch::ClosestNgbSearch(StarParticle* star, double radius)
         : _center(star->get_position()) {
     _star = star;
     _closest = NULL;
-    _radius = radius * radius;
+    if(radius < 0.) {
+        _radius = DBL_MAX;
+    } else {
+        _radius = radius * radius;
+    }
 }
 
 /**

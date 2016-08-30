@@ -554,12 +554,6 @@ void Simulation::main_loop() {
         }
         _gravitytimer->stop();
 
-        for(unsigned int i = _particles->starsize(); i--;) {
-            // update star age
-            _particles->star(i)->set_age(_particles->star(i)->get_age() +
-                                         _timeline->get_realtime_interval(dt));
-        }
-
         LOGS("Did second kick");
         currentTime += dt;
         _timeline->set_timestep(dt);
@@ -567,6 +561,13 @@ void Simulation::main_loop() {
         // before we sort, we can convert particles
         if(_starformation_converter) {
             _particles->convert(*_starformation_converter, currentTime);
+            // set the birthtime of the new star particles
+            for(unsigned int i = 0; i < _particles->starsize(); ++i) {
+                if(_particles->star(i)->get_birthtime() < -1.) {
+                    _particles->star(i)->set_birthtime(
+                            _timeline->get_realtime(currentTime));
+                }
+            }
         }
 
         // this does a new domain decomposition and recalculates the tree

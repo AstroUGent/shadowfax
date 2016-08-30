@@ -324,8 +324,9 @@ void Simulation::main_loop() {
     _gravitytimer->start();
     if(_gravity) {
         LOGS("Start calculating gravitational potential");
+        Tree::ActiveParticleTreeFilter filter(0);
         _particles->get_tree().walk_tree<PotentialWalker>(*_particles, true,
-                                                          true, true, 0);
+                                                          true, true, filter);
         // multiply with G
         for(unsigned int i = 0; i < _particles->gassize(); i++) {
             GasParticle* p = _particles->gas(i);
@@ -611,8 +612,9 @@ void Simulation::main_loop() {
         _gravitytimer->start();
         if(_gravity) {
             LOGS("Start calculating gravitational potential");
+            Tree::ActiveParticleTreeFilter filter(currentTime);
             _particles->get_tree().walk_tree<PotentialWalker>(
-                    *_particles, true, true, true, currentTime);
+                    *_particles, true, true, true, filter);
             // multiply with G
             for(unsigned int i = 0; i < _particles->gassize(); i++) {
                 GasParticle* p = _particles->gas(i);
@@ -638,13 +640,14 @@ void Simulation::main_loop() {
         if(_gravity) {
             // calculate the gravitational forces
             LOGS("Start relative treewalk");
-            _particles->get_tree().walk_tree<GravityWalker>(
-                    *_particles, true, true, true, currentTime);
+            Tree::ActiveParticleTreeFilter filter(currentTime);
+            _particles->get_tree().walk_tree<GravityWalker>(*_particles, true,
+                                                            true, true, filter);
             if(_periodic) {
                 _particles->get_tree()
                         .walk_tree<EwaldGravityWalker,
                                    Tree::EwaldWalk<EwaldGravityWalker> >(
-                                *_particles, true, true, true, currentTime);
+                                *_particles, true, true, true, filter);
             }
             // set old acceleration before multiplying with G
             for(unsigned int i = _particles->gassize(); i--;) {
@@ -1273,14 +1276,14 @@ void Simulation::initialize(string filename, bool read_mass) {
 
         // Barnes-Hut
         LOGS("Starting Barnes-Hut gravity walk");
-        _particles->get_tree().walk_tree<BHGravityWalker>(
-                *_particles, true, true, true, _timeline->get_integertime());
+        Tree::ActiveParticleTreeFilter filter(_timeline->get_integertime());
+        _particles->get_tree().walk_tree<BHGravityWalker>(*_particles, true,
+                                                          true, true, filter);
         if(_periodic) {
             _particles->get_tree()
                     .walk_tree<BHEwaldGravityWalker,
                                Tree::EwaldWalk<BHEwaldGravityWalker> >(
-                            *_particles, true, true, true,
-                            _timeline->get_integertime());
+                            *_particles, true, true, true, filter);
         }
 
         // no multiplication by G needed, since it is already included in
@@ -1318,14 +1321,13 @@ void Simulation::initialize(string filename, bool read_mass) {
 
         // relative criterion
         LOGS("Starting relative gravity walk");
-        _particles->get_tree().walk_tree<GravityWalker>(
-                *_particles, true, true, true, _timeline->get_integertime());
+        _particles->get_tree().walk_tree<GravityWalker>(*_particles, true, true,
+                                                        true, filter);
         if(_periodic) {
             _particles->get_tree()
                     .walk_tree<EwaldGravityWalker,
                                Tree::EwaldWalk<EwaldGravityWalker> >(
-                            *_particles, true, true, true,
-                            _timeline->get_integertime());
+                            *_particles, true, true, true, filter);
         }
 
         // set old acceleration before multiplying by G

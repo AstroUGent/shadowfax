@@ -241,8 +241,9 @@ unsigned long TimeLine::calculate_timestep() {
             _particles.get_tree().exchange_pseudonodes();
         }
         // determine hydro timesteps
-        _particles.get_tree().walk_tree<TimeStepWalker>(
-                _particles, true, false, false, _current_time + _timestep);
+        Tree::ActiveParticleTreeFilter filter(_current_time + _timestep);
+        _particles.get_tree().walk_tree<TimeStepWalker>(_particles, true, false,
+                                                        false, filter);
     } else {
         for(unsigned int i = 0; i < _particles.gassize(); i++) {
             if(_particles.gas(i)->get_endtime() == _current_time + _timestep) {

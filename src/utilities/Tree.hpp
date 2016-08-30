@@ -26,14 +26,16 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
-#include "Box.hpp"      // for Box
-#include "Cuboid.hpp"   // for Cuboid
+#include "Box.hpp"     // for Box
+#include "Cuboid.hpp"  // for Cuboid
+#include "DMParticle.hpp"
+#include "GasParticle.hpp"
 #include "Hilbert.hpp"  // for Hilbert_Object
 #include "Particle.hpp"
+#include "StarParticle.hpp"
 #include <fstream>  // for ostream
 
 class EwaldTable;
-class GasParticle;
 class TreeWalker;
 class VorGen;
 
@@ -826,6 +828,55 @@ class Tree {
     };
 
     /**
+     * @brief TreeFilter used to filter out active particles
+     */
+    class ActiveParticleTreeFilter {
+      private:
+        /*! @brief Current simulation time on the integer timeline */
+        unsigned long _current_time;
+
+      public:
+        /**
+         * @brief Constructor
+         *
+         * @param current_time Current simulation time on the integer timeline
+         */
+        inline ActiveParticleTreeFilter(unsigned long current_time) {
+            _current_time = current_time;
+        }
+
+        /**
+         * @brief Is the given GasParticle active?
+         *
+         * @param p GasParticle
+         * @return True if the particle is active
+         */
+        inline bool do_gas(GasParticle* p) {
+            return p->get_endtime() == _current_time;
+        }
+
+        /**
+         * @brief Is the given DMParticle active?
+         *
+         * @param p DMParticle
+         * @return True if the particle is active
+         */
+        inline bool do_dm(DMParticle* p) {
+            return p->get_endtime() == _current_time;
+        }
+
+        /**
+         * @brief Is the given StarParticle active?
+         *
+         * @param p StarParticle
+         * @return True if the particle is active
+         */
+        inline bool do_star(StarParticle* p) {
+            return p->get_endtime() == _current_time;
+        }
+    };
+
+    /**
      * @brief Generic function to walk the tree with a given TreeWalker on a
      * given set of particles
      *
@@ -836,11 +887,10 @@ class Tree {
      * ParticleVector
      * @param stars True if the treewalk should be done for the StarParticles in
      * the ParticleVector
-     * @param current_time unsigned long integer current simulation time
+     * @param filter TreeFilter used to filter out particles
      */
-    template <class T, class WalkMode = NoEwaldWalk<T>, typename P>
-    void walk_tree(P& particles, bool gas, bool dm, bool stars,
-                   unsigned long current_time) {
+    template <class T, class WalkMode = NoEwaldWalk<T>, typename P, typename F>
+    void walk_tree(P& particles, bool gas, bool dm, bool stars, F& filter) {
         // the walker has two associated classes called Import and Export, which
         // are used to communicate relevant information to and from other
         // processes
@@ -849,7 +899,7 @@ class Tree {
         std::vector<std::vector<TExport> > exports(MPIGlobal::size);
         if(gas) {
             for(unsigned int i = 0; i < particles.gassize(); i++) {
-                if(particles.gas(i)->get_endtime() == current_time) {
+                if(filter.do_gas(particles.gas(i))) {
                     WalkMode::walk_local(*this, particles.gas(i), exports);
                 }
             }
@@ -860,7 +910,7 @@ class Tree {
             // of the three that is on another process, an Export is added to
             // the list
             for(unsigned int i = 0; i < particles.dmsize(); i++) {
-                if(particles.dm(i)->get_endtime() == current_time) {
+                if(filter.do_dm(particles.dm(i))) {
                     WalkMode::walk_local(*this, particles.dm(i), exports);
                 }
             }
@@ -871,7 +921,7 @@ class Tree {
             // of the three that is on another process, an Export is added to
             // the list
             for(unsigned int i = 0; i < particles.starsize(); i++) {
-                if(particles.star(i)->get_endtime() == current_time) {
+                if(filter.do_star(particles.star(i))) {
                     WalkMode::walk_local(*this, particles.star(i), exports);
                 }
             }

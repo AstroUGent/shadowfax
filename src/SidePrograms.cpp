@@ -605,8 +605,9 @@ PotentialCalculator::PotentialCalculator(int argc, char** argv) {
     cout << "Performing treewalk to obtain gravitational potentials..." << endl;
 
     // walk the tree to calculate the potentials
+    Tree::ActiveParticleTreeFilter filter(0);
     particles.get_tree().walk_tree<BHPotentialWalker>(particles, true, true,
-                                                      true, 0);
+                                                      true, filter);
     cout << "Done." << endl;
 
     cout << "Writing file " << onlyname << ".epot..." << endl;

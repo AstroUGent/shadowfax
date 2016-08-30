@@ -338,6 +338,7 @@ class DiscreteStellarFeedback : public StellarFeedback {
     DiscreteStellarFeedback();
     ~DiscreteStellarFeedback();
 
+    virtual bool does_feedback(StarParticle* star);
     virtual void do_feedback(StarParticle* star, ParticleVector& particles,
                              double dt);
     virtual StellarFeedbackData* initialize_data(StarParticle* star);

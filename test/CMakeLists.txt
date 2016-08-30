@@ -346,6 +346,25 @@ add_unit_test(NAME testDiscreteStellarFeedback
               NDIM 3
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d)
 
+# ClosestNgbSearch test
+set(TESTCLOSESTNGBSEARCH_SOURCES
+    testClosestNgbSearch.cpp
+
+    ../src/ClosestNgbSearch.cpp
+    ../src/MPIGlobal.cpp
+    ../src/VorGen.cpp
+)
+
+add_unit_test(NAME testClosestNgbSearch2d
+              SOURCES ${TESTCLOSESTNGBSEARCH_SOURCES}
+              NDIM 2
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d)
+
+add_unit_test(NAME testClosestNgbSearch3d
+              SOURCES ${TESTCLOSESTNGBSEARCH_SOURCES}
+              NDIM 3
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d)
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

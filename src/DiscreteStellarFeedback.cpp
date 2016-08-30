@@ -520,6 +520,16 @@ DiscreteStellarFeedback::~DiscreteStellarFeedback() {
 }
 
 /**
+ * @brief Does the given StarParticle give feedback during the next time step?
+ *
+ * @param star StarParticle
+ * @return True if the StarParticle does feedback
+ */
+bool DiscreteStellarFeedback::does_feedback(StarParticle* star) {
+    return true;
+}
+
+/**
  * @brief Give discrete stellar feedback
  *
  * @param star StarParticle that does feedback

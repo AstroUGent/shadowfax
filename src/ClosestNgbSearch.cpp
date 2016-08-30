@@ -29,8 +29,9 @@
 #include "utilities/Particle.hpp"       // for Particle
 #include "utilities/ParticleTypes.hpp"  // for ParticleType::PARTTYPE_GAS
 #include "utilities/Tree.hpp"           // for Leaf, PseudoNode, TreeNode
-#include <cstddef>                      // for NULL
-#include <vector>                       // for vector, vector<>::reference
+#include <cfloat>
+#include <cstddef>  // for NULL
+#include <vector>   // for vector, vector<>::reference
 using namespace std;
 
 /**
@@ -41,7 +42,7 @@ using namespace std;
  * @param radius Radius of the closest neighbour search
  */
 ClosestNgbSearch::ClosestNgbSearch(StarParticle* star, Vec center,
-                                   double radius)
+                                   double radius = DBL_MAX)
         : _center(center) {
     _star = star;
     _closest = NULL;
@@ -103,7 +104,22 @@ void ClosestNgbSearch::increase_radius() {
  * @return True if the node should be opened, false otherwise
  */
 bool ClosestNgbSearch::splitnode(TreeNode* node) {
-    return node->get_distance(_center) < _radius;
+    Vec r = _center - node->get_center();
+    if(_boxsize) {
+        nearest(r);
+    }
+    for(unsigned int i = 0; i < ndim_; ++i) {
+        if(fabs(r[i]) >= 0.5 * node->get_width()) {
+            if(r[i] > 0.) {
+                r[i] -= 0.5 * node->get_width();
+            } else {
+                r[i] += 0.5 * node->get_width();
+            }
+        } else {
+            r[i] = 0.;
+        }
+    }
+    return r.norm2() <= _radius;
 }
 
 /**

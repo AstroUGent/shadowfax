@@ -40,6 +40,16 @@
 using namespace std;
 
 /**
+ * @brief Does the given StarParticle give feedback during the next time step?
+ *
+ * @param star StarParticle
+ * @return True if the StarParticle does feedback
+ */
+bool ContinuousStellarFeedback::does_feedback(StarParticle* star) {
+    return true;
+}
+
+/**
  * @brief Do the feedback for the given StarParticle during the given timestep
  *
  * @param star StarParticle that does feedback

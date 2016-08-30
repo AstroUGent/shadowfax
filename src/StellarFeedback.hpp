@@ -27,6 +27,8 @@
 #ifndef STELLARFEEDBACK_HPP
 #define STELLARFEEDBACK_HPP
 
+class DMParticle;
+class GasParticle;
 class ParticleVector;
 class RestartFile;
 class StarParticle;
@@ -38,6 +40,15 @@ class StellarFeedbackData;
 class StellarFeedback {
   public:
     virtual ~StellarFeedback() {}
+
+    /**
+     * @brief Check if the given StarParticle does feedback during the next
+     * time step
+     *
+     * @param star StarParticle
+     * @return True if the StarParticle does feedback
+     */
+    virtual bool does_feedback(StarParticle* star) = 0;
 
     /**
      * @brief Give stellar feedback from the given StarParticle to the gas in
@@ -57,6 +68,56 @@ class StellarFeedback {
      * @return Pointer to a StellarFeedbackData instance for the StarParticle
      */
     virtual StellarFeedbackData* initialize_data(StarParticle* star) = 0;
+};
+
+/**
+ * @brief TreeFilter used to filter out star particles that give feedback
+ */
+class StellarFeedbackTreeFilter {
+  private:
+    /*! @brief StellarFeedback implementation used */
+    StellarFeedback* _feedback;
+
+  public:
+    /**
+     * @brief Constructor
+     *
+     * @param feedback StellarFeedback implementation used
+     */
+    inline StellarFeedbackTreeFilter(StellarFeedback* feedback) {
+        _feedback = feedback;
+    }
+
+    /**
+     * @brief Do feedback for the given GasParticle
+     *
+     * @param gas GasParticle
+     * @return False, since a GasParticle does not give stellar feedback
+     */
+    inline bool do_gas(GasParticle* gas) {
+        return false;
+    }
+
+    /**
+     * @brief Do feedback for the given DMParticle
+     *
+     * @param dm DMParticle
+     * @return False, since a DMParticle does not give stellar feedback
+     */
+    inline bool do_dm(DMParticle* dm) {
+        return false;
+    }
+
+    /**
+     * @brief Do feedback for the given StarParticle
+     *
+     * @param star StarParticle
+     * @return True if the StellarFeedback implementation signals that this
+     * StarParticle does feedback
+     */
+    inline bool do_star(StarParticle* star) {
+        return _feedback->does_feedback(star);
+    }
 };
 
 #endif  // STELLARFEEDBACK_HPP

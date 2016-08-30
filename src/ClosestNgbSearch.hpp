@@ -30,8 +30,10 @@
 #include "Vec.hpp"  // for Vec
 #include "utilities/StarParticle.hpp"
 #include "utilities/TreeWalker.hpp"
+#include <cfloat>
 #include <vector>  // for vector
 
+class DMParticle;
 class GasParticle;
 class Leaf;
 class PseudoNode;
@@ -207,7 +209,22 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
         }
     };
 
-    ClosestNgbSearch(StarParticle* star, Vec center, double radius);
+    ClosestNgbSearch(StarParticle* star, double radius = DBL_MAX);
+
+    /**
+     * @brief Empty GasParticle constructor
+     *
+     * @param gas GasParticle
+     */
+    ClosestNgbSearch(GasParticle* gas) {}
+
+    /**
+     * @brief Empty DMParticle constructor
+     *
+     * @param gas DMParticle
+     */
+    ClosestNgbSearch(DMParticle* gas) {}
+
     ClosestNgbSearch(Import& import);
     void set_position(Vec position);
     Vec get_position();
@@ -219,6 +236,9 @@ class ClosestNgbSearch : public PeriodicTreeWalker {
     bool splitnode(TreeNode* node);
     void leafaction(Leaf* leaf);
     void pseudonodeaction(PseudoNode* pseudonode);
+    bool export_to_pseudonode(PseudoNode* pseudonode);
+
+    Export get_export();
 
     bool periodicsplitnode(TreeNode* node, EwaldTable& ewald_table);
     void periodicpseudonodeaction(PseudoNode* node, EwaldTable& ewald_table);

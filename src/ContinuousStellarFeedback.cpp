@@ -75,7 +75,7 @@ void ContinuousStellarFeedback::do_feedback(StarParticle* star,
     } else {
         return;
     }
-    ClosestNgbSearch ngbsearch(star, star->get_position(), _sradius);
+    ClosestNgbSearch ngbsearch(star, _sradius);
     particles.get_tree().walk_tree(ngbsearch);
     GasParticle* part = ngbsearch.get_closest();
     while(part == NULL) {

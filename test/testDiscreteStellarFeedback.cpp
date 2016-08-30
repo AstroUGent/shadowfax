@@ -23,10 +23,13 @@
  *
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
+#include "ClosestNgbSearch.hpp"
 #include "DiscreteStellarFeedback.hpp"
 #include "DiscreteStellarFeedbackData.hpp"
 #include "myAssert.hpp"
+#include "utilities/ParticleVector.hpp"
 #include "utilities/StarParticle.hpp"
+#include "utilities/Tree.hpp"
 #include <iostream>
 using namespace std;
 
@@ -68,6 +71,17 @@ int main(int argc, char** argv) {
               "Wrong number of PopII SNIa explosions!");
     my_assert(data->get_PopIII_SN_number() == 45,
               "Wrong number of PopIII SN explosions!");
+
+    Vec center(0.5, 0.5, 0.5);
+    Vec sides(1., 1., 1.);
+    RectangularBox treebox(center, sides);
+    StellarFeedbackTreeFilter filter(&feedback);
+    ParticleVector particles(false, treebox, true);
+    particles.add_star_particle(&star);
+    particles.finalize();
+    particles.sort();
+    particles.get_tree().walk_tree<ClosestNgbSearch>(particles, false, false,
+                                                     true, filter);
 
     return 0;
 }

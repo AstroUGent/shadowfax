@@ -41,9 +41,8 @@ using namespace std;
  * @param center Center of the closest neighbour search
  * @param radius Radius of the closest neighbour search
  */
-ClosestNgbSearch::ClosestNgbSearch(StarParticle* star, Vec center,
-                                   double radius = DBL_MAX)
-        : _center(center) {
+ClosestNgbSearch::ClosestNgbSearch(StarParticle* star, double radius)
+        : _center(star->get_position()) {
     _star = star;
     _closest = NULL;
     _radius = radius * radius;
@@ -135,7 +134,11 @@ bool ClosestNgbSearch::splitnode(TreeNode* node) {
 void ClosestNgbSearch::leafaction(Leaf* leaf) {
     Particle* p = leaf->get_particle();
     if(p->type() == PARTTYPE_GAS) {
-        double r2 = (p->get_position() - _center).norm2();
+        Vec r = p->get_position() - _center;
+        if(_boxsize) {
+            nearest(r);
+        }
+        double r2 = r.norm2();
         if(r2 < _radius) {
             _closest = (GasParticle*)p;
             _radius = r2;
@@ -152,6 +155,42 @@ void ClosestNgbSearch::leafaction(Leaf* leaf) {
  */
 void ClosestNgbSearch::pseudonodeaction(PseudoNode* pseudonode) {
     // do something
+}
+
+/**
+ * @brief Decide if the search should be exported to the process which holds the
+ * actual node represented by the given PseudoNode
+ *
+ * @param pseudonode PseudoNode on which we operate
+ * @return True if the current search radius overlaps with the PseudoNode box
+ */
+bool ClosestNgbSearch::export_to_pseudonode(PseudoNode* pseudonode) {
+    Vec r = _center - pseudonode->get_center();
+    if(_boxsize) {
+        nearest(r);
+    }
+    for(unsigned int i = 0; i < ndim_; ++i) {
+        if(fabs(r[i]) >= 0.5 * pseudonode->get_width()) {
+            if(r[i] > 0.) {
+                r[i] -= 0.5 * pseudonode->get_width();
+            } else {
+                r[i] += 0.5 * pseudonode->get_width();
+            }
+        } else {
+            r[i] = 0.;
+        }
+    }
+    return r.norm2() <= _radius;
+}
+
+/**
+ * @brief Get an Export to export the search to another MPI-process
+ *
+ * @return An Export that can be used to communicate relevant data to another
+ * MPI process
+ */
+ClosestNgbSearch::Export ClosestNgbSearch::get_export() {
+    return Export(_star, _center, _radius);
 }
 
 /**

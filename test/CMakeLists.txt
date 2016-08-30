@@ -336,15 +336,18 @@ add_unit_test(NAME testRestartFile
 set(TESTDISCRETESTELLARFEEDBACK_SOURCES
     testDiscreteStellarFeedback.cpp
 
+    ../src/ClosestNgbSearch.cpp
     ../src/DiscreteStellarFeedback.cpp
     ../src/GSL.cpp
     ../src/MPIGlobal.cpp
+    ../src/RectangularBox.cpp
+    ../src/VorGen.cpp
 )
 
 add_unit_test(NAME testDiscreteStellarFeedback
               SOURCES ${TESTDISCRETESTELLARFEEDBACK_SOURCES}
               NDIM 3
-              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d)
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities3d io3d)
 
 # ClosestNgbSearch test
 set(TESTCLOSESTNGBSEARCH_SOURCES

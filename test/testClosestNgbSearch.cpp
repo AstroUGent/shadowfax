@@ -25,6 +25,7 @@
  */
 #include "ClosestNgbSearch.hpp"
 #include "myAssert.hpp"
+#include "utilities/StarParticle.hpp"
 #include "utilities/Tree.hpp"
 using namespace std;
 
@@ -41,7 +42,8 @@ int main(int argc, char** argv) {
     // No intersection
     {
         Vec center(0.5, 0.5, 0.5);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -52,7 +54,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(-0.5, -0.5, -0.5);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -64,7 +67,8 @@ int main(int argc, char** argv) {
     // Clear intersection
     {
         Vec center(0.25, 0.3, 0.25);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -75,7 +79,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(0.25, -0.05, 0.25);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -87,7 +92,8 @@ int main(int argc, char** argv) {
     // Sphere in box
     {
         Vec center(0.2, 0.2, 0.2);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.01);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.01);
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -99,7 +105,8 @@ int main(int argc, char** argv) {
     // Sphere touches box corner
     {
         Vec center(0.35, 0.35, 0.35);
-        ClosestNgbSearch ngbsearch(NULL, center, sqrt(0.03));
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, sqrt(0.03));
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -111,7 +118,8 @@ int main(int argc, char** argv) {
     // Sphere intersects box side, but no corner
     {
         Vec center(0.125, 0.3, 0.125);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -122,7 +130,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(-0.05, 0.125, 0.125);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125, 0.125);
         Box box(anchor, 0.25);
@@ -134,7 +143,8 @@ int main(int argc, char** argv) {
     // Sphere intersects periodic copy
     {
         Vec center(0.95, 0.95, 0.95);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
         ngbsearch.set_boxsize(1.);
 
         Vec anchor(0.125, 0.125, 0.125);
@@ -146,7 +156,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(0.05, 0.95, 0.95);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
         ngbsearch.set_boxsize(1.);
 
         Vec anchor(0.125, 0.125, 0.125);
@@ -162,7 +173,8 @@ int main(int argc, char** argv) {
     // No intersection
     {
         Vec center(0.5, 0.5);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -173,7 +185,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(-0.5, -0.5);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -185,7 +198,8 @@ int main(int argc, char** argv) {
     // Clear intersection
     {
         Vec center(0.25, 0.3);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -196,7 +210,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(0.25, -0.05);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -208,7 +223,8 @@ int main(int argc, char** argv) {
     // Sphere in box
     {
         Vec center(0.2, 0.2);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.01);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.01);
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -220,7 +236,8 @@ int main(int argc, char** argv) {
     // Sphere touches box corner
     {
         Vec center(0.35, 0.35);
-        ClosestNgbSearch ngbsearch(NULL, center, sqrt(0.02));
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, sqrt(0.02));
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -232,7 +249,8 @@ int main(int argc, char** argv) {
     // Sphere intersects box side, but no corner
     {
         Vec center(0.125, 0.3);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -243,7 +261,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(-0.05, 0.125);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
 
         Vec anchor(0.125, 0.125);
         Box box(anchor, 0.25);
@@ -255,7 +274,8 @@ int main(int argc, char** argv) {
     // Sphere intersects periodic copy
     {
         Vec center(0.95, 0.95);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
         ngbsearch.set_boxsize(1.);
 
         Vec anchor(0.125, 0.125);
@@ -267,7 +287,8 @@ int main(int argc, char** argv) {
     }
     {
         Vec center(0.05, 0.95);
-        ClosestNgbSearch ngbsearch(NULL, center, 0.1);
+        StarParticle star(center);
+        ClosestNgbSearch ngbsearch(&star, 0.1);
         ngbsearch.set_boxsize(1.);
 
         Vec anchor(0.125, 0.125);

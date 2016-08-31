@@ -29,6 +29,7 @@
 #include "DiscreteStellarFeedback.hpp"
 #include "DiscreteStellarFeedbackData.hpp"
 #include "RestartFile.hpp"
+#include "utilities/GasParticle.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/StarParticle.hpp"
 #include <cmath>
@@ -563,7 +564,125 @@ bool DiscreteStellarFeedback::does_feedback(StarParticle* star,
  */
 void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
                                           double endtime) {
-    // needs to be implemented
+    double fb_energy = 0.;
+    double fb_mass = 0.;
+    double fb_metals = 0.;
+    double fb_fe = 0.;
+    double fb_mg = 0.;
+
+    DiscreteStellarFeedbackData* data =
+            (DiscreteStellarFeedbackData*)star->get_feedback_data();
+
+    // PopII SNII feedback
+    while(data->get_PopII_SNII_count() < data->get_PopII_SNII_number() &&
+          endtime >= data->get_PopII_SNII_next_time()) {
+        fb_energy += data->get_PopII_SNII_fac() * _PopII_SNII_energy;
+        fb_mass += data->get_PopII_SNII_fac() * _PopII_SNII_mass *
+                   star->get_initial_mass();
+        fb_metals += data->get_PopII_SNII_fac() * _PopII_SNII_metals *
+                     star->get_initial_mass();
+        fb_fe += data->get_PopII_SNII_fac() * _PopII_SNII_Fe *
+                 star->get_initial_mass();
+        fb_mg += data->get_PopII_SNII_fac() * _PopII_SNII_Mg *
+                 star->get_initial_mass();
+
+        // set next PopII SNII feedback time
+        data->increase_PopII_SNII_count();
+        if(data->get_PopII_SNII_count() < data->get_PopII_SNII_number()) {
+            double mupp = data->get_PopII_SNII_interval();
+            double mlow = PopII_interval_mass(star->get_initial_mass(), mupp);
+            double tlow = PopII_lifetime(mupp);
+            double tupp = PopII_lifetime(mlow);
+            double trand =
+                    tlow + (tupp - tlow) * HelperFunctions::rand_double();
+            data->set_PopII_SNII_next_time(star->get_birthtime() + trand);
+            data->set_PopII_SNII_interval(mlow);
+        }
+    }
+
+    // PopII SNIa feedback
+    while(data->get_PopII_SNIa_count() < data->get_PopII_SNIa_number() &&
+          endtime >= data->get_PopII_SNIa_next_time()) {
+        fb_energy += data->get_PopII_SNIa_fac() * _PopII_SNIa_energy;
+        fb_mass += data->get_PopII_SNIa_fac() * _PopII_SNIa_mass *
+                   star->get_initial_mass();
+        fb_metals += data->get_PopII_SNIa_fac() * _PopII_SNIa_metals *
+                     star->get_initial_mass();
+        fb_fe += data->get_PopII_SNIa_fac() * _PopII_SNIa_Fe *
+                 star->get_initial_mass();
+        fb_mg += data->get_PopII_SNIa_fac() * _PopII_SNIa_Mg *
+                 star->get_initial_mass();
+
+        // set next PopII SNII feedback time
+        data->increase_PopII_SNIa_count();
+        if(data->get_PopII_SNIa_count() < data->get_PopII_SNIa_number()) {
+            double tlow = data->get_PopII_SNIa_interval();
+            double tupp = PopII_SNIa_interval_time(
+                    data->get_PopII_SNIa_number(), tlow);
+            double trand =
+                    tlow + (tupp - tlow) * HelperFunctions::rand_double();
+            data->set_PopII_SNIa_next_time(star->get_birthtime() + trand);
+            data->set_PopII_SNIa_interval(tupp);
+        }
+    }
+
+    // PopII SW feedback
+    if(data->get_PopII_SW_fac() &&
+       (endtime - star->get_birthtime()) <= _PopII_SW_end_time) {
+        double tmin =
+                std::min(endtime, star->get_birthtime() + _PopII_SW_end_time);
+        fb_energy += (tmin - starttime) * data->get_PopII_SW_fac() *
+                     _PopII_SW_energy;
+    }
+
+    // PopIII SN feedback
+    while(data->get_PopIII_SN_count() < data->get_PopIII_SN_number() &&
+          endtime >= data->get_PopIII_SN_next_time()) {
+        fb_energy += data->get_PopIII_SN_fac() * _PopIII_SN_energy;
+        fb_mass += data->get_PopIII_SN_fac() * _PopIII_SN_mass *
+                   star->get_initial_mass();
+        fb_metals += data->get_PopIII_SN_fac() * _PopIII_SN_metals *
+                     star->get_initial_mass();
+        fb_fe += data->get_PopIII_SN_fac() * _PopIII_SN_Fe *
+                 star->get_initial_mass();
+        fb_mg += data->get_PopIII_SN_fac() * _PopIII_SN_Mg *
+                 star->get_initial_mass();
+
+        data->increase_PopIII_SN_count();
+        if(data->get_PopIII_SN_count() < data->get_PopIII_SN_number()) {
+            double mupp = data->get_PopIII_SN_interval();
+            double mlow = PopIII_interval_mass(star->get_initial_mass(), mupp);
+            double tlow = PopIII_lifetime(mupp);
+            double tupp = PopIII_lifetime(mlow);
+            double trand =
+                    tlow + (tupp - tlow) * HelperFunctions::rand_double();
+            data->set_PopIII_SN_next_time(star->get_birthtime() + trand);
+            data->set_PopIII_SN_interval(mlow);
+
+            data->set_PopIII_SN_fac(
+                    star->get_initial_mass() * _PopIII_Nint *
+                    PopIII_E_SN(0.5 * (mlow + mupp)) / _PopIII_Mint /
+                    data->get_PopIII_SN_number() / _PopIII_Eint);
+        }
+    }
+
+    // PopIII SW feedback
+    if(data->get_PopIII_SW_fac() &&
+       (endtime - star->get_birthtime()) <= _PopIII_SW_end_time) {
+        double tmin =
+                std::min(endtime, star->get_birthtime() + _PopIII_SW_end_time);
+        fb_energy += (tmin - starttime) * data->get_PopIII_SW_fac() *
+                     _PopIII_SW_energy;
+    }
+
+    GasParticle* gas = star->get_closest_gasparticle();
+    StateVector dQ;
+    dQ.set_m(-fb_mass);
+    dQ.set_e(-fb_energy);
+    dQ.set_Fe(-fb_fe);
+    dQ.set_Mg(-fb_mg);
+
+    gas->increase_dQ(dQ);
 }
 
 /**

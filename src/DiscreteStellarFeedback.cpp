@@ -558,12 +558,11 @@ bool DiscreteStellarFeedback::does_feedback(StarParticle* star,
  * @brief Give discrete stellar feedback
  *
  * @param star StarParticle that does feedback
- * @param particles ParticleVector containing the gas that receives feedback
- * @param dt Time interval over which the feedback is done
+ * @param starttime Physical start time of the next time step
+ * @param endtime Physical end time of the next time step
  */
-void DiscreteStellarFeedback::do_feedback(StarParticle* star,
-                                          ParticleVector& particles,
-                                          double dt) {
+void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
+                                          double endtime) {
     // needs to be implemented
 }
 

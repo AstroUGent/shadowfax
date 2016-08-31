@@ -461,10 +461,11 @@ void Simulation::main_loop() {
                 for(unsigned int i = 0; i < _particles->starsize(); i++) {
                     if(_particles->star(i)->get_starttime() == currentTime) {
                         _stellar_feedback->do_feedback(
-                                _particles->star(i), *_particles,
-                                _timeline->get_realtime_interval(
-                                        _particles->star(i)->get_endtime() -
-                                        _particles->star(i)->get_starttime()));
+                                _particles->star(i),
+                                _timeline->get_realtime(
+                                        _particles->star(i)->get_starttime()),
+                                _timeline->get_realtime(
+                                        _particles->star(i)->get_endtime()));
                     }
                 }
             }

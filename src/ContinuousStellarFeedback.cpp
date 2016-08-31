@@ -57,12 +57,12 @@ bool ContinuousStellarFeedback::does_feedback(StarParticle* star,
  * @brief Do the feedback for the given StarParticle during the given timestep
  *
  * @param star StarParticle that does feedback
- * @param particles Reference to the ParticleVector holding all particles
- * @param dt Timestep over which the feedback is given
+ * @param starttime Physical start time of the next time step
+ * @param endtime Physical end time of the next time step
  */
 void ContinuousStellarFeedback::do_feedback(StarParticle* star,
-                                            ParticleVector& particles,
-                                            double dt) {
+                                            double starttime, double endtime) {
+    double dt = endtime - starttime;
     double age = star->get_birthtime();
     // stellar wind period
     double dtsw = std::max(
@@ -79,14 +79,15 @@ void ContinuousStellarFeedback::do_feedback(StarParticle* star,
     } else {
         return;
     }
-    ClosestNgbSearch ngbsearch(star, _sradius);
-    particles.get_tree().walk_tree(ngbsearch);
-    GasParticle* part = ngbsearch.get_closest();
-    while(part == NULL) {
-        ngbsearch.increase_radius();
-        particles.get_tree().walk_tree(ngbsearch);
-        part = ngbsearch.get_closest();
-    }
+    //    ClosestNgbSearch ngbsearch(star, _sradius);
+    //    particles.get_tree().walk_tree(ngbsearch);
+    //    GasParticle* part = ngbsearch.get_closest();
+    //    while(part == NULL) {
+    //        ngbsearch.increase_radius();
+    //        particles.get_tree().walk_tree(ngbsearch);
+    //        part = ngbsearch.get_closest();
+    //    }
+    GasParticle* part = star->get_closest_gasparticle();
     StateVector dQ;
     double mass = star->get_mass();
     // stellar wind

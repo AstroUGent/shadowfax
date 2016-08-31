@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
     my_assert(star->get_closest_gasparticle() == particles.gasback(),
               "Wrong closest GasParticle!");
 
-    feedback.do_feedback(star, particles, 0.);
+    feedback.do_feedback(star, 0., 13.8);
 
     return MyMPI_Finalize();
 }

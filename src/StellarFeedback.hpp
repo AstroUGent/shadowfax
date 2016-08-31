@@ -58,11 +58,11 @@ class StellarFeedback {
      * the given ParticleVector
      *
      * @param star StarParticle that does feedback
-     * @param particles ParticleVector containing the gas that receives feedback
-     * @param dt Time step over which the feedback is done
+     * @param starttime Physical start time of the next time step
+     * @param endtime Physical end time of the next time step
      */
-    virtual void do_feedback(StarParticle* star, ParticleVector& particles,
-                             double dt) = 0;
+    virtual void do_feedback(StarParticle* star, double starttime,
+                             double endtime) = 0;
 
     /**
      * @brief Initialize the StellarFeedbackData for the given StarParticle

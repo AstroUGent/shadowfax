@@ -32,12 +32,20 @@
 #include "GSL.hpp"
 #include "StellarFeedback.hpp"
 
+class UnitConverter;
+class UnitSet;
+
 /**
  * @brief StellarFeedback implementation that spreads out the stellar feedback
  * uniformly over the lifetime of the various feedback mechanisms
  */
 class DiscreteStellarFeedback : public StellarFeedback {
   private:
+    /*! @brief UnitConverter from Gyr to internal time units */
+    UnitConverter* _Gyr_to_internal_time;
+    /*! @brief UnitConverter from erg to internal energy units */
+    UnitConverter* _erg_to_internal_energy;
+
     /*! @brief Chabrier IMF: lower limit mass interval */
     double _PopII_M_low;
     /*! @brief Chabrier IMF: upper limit mass interval */
@@ -335,7 +343,7 @@ class DiscreteStellarFeedback : public StellarFeedback {
     void initialize();
 
   public:
-    DiscreteStellarFeedback();
+    DiscreteStellarFeedback(UnitSet& units);
     ~DiscreteStellarFeedback();
 
     virtual bool does_feedback(StarParticle* star, double starttime,

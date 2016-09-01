@@ -29,6 +29,8 @@
 #include "DiscreteStellarFeedback.hpp"
 #include "DiscreteStellarFeedbackData.hpp"
 #include "RestartFile.hpp"
+#include "io/UnitConverter.hpp"
+#include "io/UnitSet.hpp"
 #include "utilities/GasParticle.hpp"
 #include "utilities/HelperFunctions.hpp"
 #include "utilities/StarParticle.hpp"
@@ -312,6 +314,9 @@ double DiscreteStellarFeedback::PopIII_lifetime(double m) {
  */
 void DiscreteStellarFeedback::initialize() {
     // Chabrier IMF: mass interval and normalization factor for low mass part
+    // internally, we store all of these in solar masses
+    // these values are never exposed outside this class, so we do not need to
+    // perform unit conversions
     _PopII_M_low = 0.07;     // in solar masses
     _PopII_M_upp = 100.;     // in solar masses
     _PopII_M_SNII_low = 8.;  // in solar masses
@@ -320,15 +325,18 @@ void DiscreteStellarFeedback::initialize() {
     _PopII_fac_IMF = 1. / PopII_IMF_sub1(1.);
 
     // SNIa delay time distribution
+    // again, no unit conversions are needed as long as we keep these inside
     _PopII_SNIa_delay_mu = 0.05;     // in Gyr
     _PopII_SNIa_delay_sigma = 0.01;  // in Gyr
     _PopII_SNIa_delay_norm1 = 1.;
     _PopII_SNIa_delay_norm2 = 1.;
 
     // Cutoff metallicity for PopIII stars
+    // unit conversion might apply in the future. CHECK THIS!
     _PopIII_cutoff = -5.;  // [Fe/H]
 
     // PopIII IMF: mass interval and factors (come from Sven's Python script)
+    // no unit conversions necessary
     _PopIII_M_low = 0.7;     // in solar masses
     _PopIII_M_upp = 500.;    // in solar masses
     _PopIII_M_SN_low = 10.;  // in solar masses
@@ -461,40 +469,42 @@ void DiscreteStellarFeedback::initialize() {
 
     // Initialize feedback values
     double feedback_efficiency = 0.7;
-    // NEED TO CONVERT TO INTERNAL ENERGY UNIT!!!
-    _PopII_SNII_energy = 1.e51 * feedback_efficiency;  // in erg
+    _PopII_SNII_energy =
+            _erg_to_internal_energy->convert(1.e51 * feedback_efficiency);
     // ratios:
     _PopII_SNII_mass = 0.191445322565;
     _PopII_SNII_metals = 0.0241439721018;
     _PopII_SNII_Fe = 0.000932719658516;
     _PopII_SNII_Mg = 0.00151412640705;
 
-    // NEED TO CONVERT TO INTERNAL ENERGY UNIT!!!
-    _PopII_SNIa_energy = 1.e51 * feedback_efficiency;  // in erg
+    _PopII_SNIa_energy =
+            _erg_to_internal_energy->convert(1.e51 * feedback_efficiency);
     // ratios:
     _PopII_SNIa_mass = 0.00655147325196;
     _PopII_SNIa_metals = 0.00655147325196;
     _PopII_SNIa_Fe = 0.00165100587997;
     _PopII_SNIa_Mg = 0.000257789470044;
 
-    // NEED TO CONVERT TO INTERNAL ENERGY UNIT!!!
-    _PopII_SW_energy = 1.e50 * feedback_efficiency;  // in erg
-    // NEED TO CONVERT TO INTERNAL TIME UNIT!!!
+    _PopII_SW_energy =
+            _erg_to_internal_energy->convert(1.e50 * feedback_efficiency);
     _PopII_SW_end_time = 31.0;  // in Myr
+    _PopII_SW_end_time =
+            _Gyr_to_internal_time->convert(1.e-3 * _PopII_SW_end_time);
     _PopII_SW_energy /= _PopII_SW_end_time;
 
-    // NEED TO CONVERT TO INTERNAL ENERGY UNIT!!!
-    _PopIII_SN_energy = _PopIII_Eint * feedback_efficiency;  // in erg
+    _PopIII_SN_energy = _erg_to_internal_energy->convert(_PopIII_Eint *
+                                                         feedback_efficiency);
     // ratios:
     _PopIII_SN_mass = 0.45;
     _PopIII_SN_metals = 0.026;
     _PopIII_SN_Fe = 0.0000932719658516;
     _PopIII_SN_Mg = 0.000151412640705;
 
-    // NEED TO CONVERT TO INTERNAL ENERGY UNIT!!!
-    _PopIII_SW_energy = 1.e51 * feedback_efficiency;  // in erg
-    // NEED TO CONVERT TO INTERNAL TIME UNIT!!!
+    _PopIII_SW_energy =
+            _erg_to_internal_energy->convert(1.e51 * feedback_efficiency);
     _PopIII_SW_end_time = 16.7;  // in Myr
+    _PopIII_SW_end_time =
+            _Gyr_to_internal_time->convert(1.e-3 * _PopIII_SW_end_time);
     _PopIII_SW_energy /= _PopIII_SW_end_time;
 }
 
@@ -503,16 +513,25 @@ void DiscreteStellarFeedback::initialize() {
  *
  * Calls initialize().
  */
-DiscreteStellarFeedback::DiscreteStellarFeedback() {
+DiscreteStellarFeedback::DiscreteStellarFeedback(UnitSet& units) {
+    // unit conversion factors
+    Unit time_unit("time", "Gyr", 3.154e16);
+    _Gyr_to_internal_time = new UnitConverter(time_unit, units.get_time_unit());
+    Unit energy_unit("length*length*mass/time/time", "erg", 1.e-7);
+    _erg_to_internal_energy =
+            new UnitConverter(energy_unit, units.get_energy_unit());
     initialize();
 }
 
 /**
  * @brief Destructor
  *
- * Delete interpolators.
+ * Delete unit converters and interpolators.
  */
 DiscreteStellarFeedback::~DiscreteStellarFeedback() {
+    delete _Gyr_to_internal_time;
+    delete _erg_to_internal_energy;
+
     delete _PopII_SNIa_delay_spline;
     delete _PopIII_IMF_spline;
     delete _PopII_lifetime_spline;
@@ -593,9 +612,12 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
             double mlow = PopII_interval_mass(star->get_initial_mass(), mupp);
             double tlow = PopII_lifetime(mupp);
             double tupp = PopII_lifetime(mlow);
+            // in yr:
             double trand =
                     tlow + (tupp - tlow) * HelperFunctions::rand_double();
-            data->set_PopII_SNII_next_time(star->get_birthtime() + trand);
+            data->set_PopII_SNII_next_time(
+                    star->get_birthtime() +
+                    _Gyr_to_internal_time->convert(1.e-9 * trand));
             data->set_PopII_SNII_interval(mlow);
         }
     }
@@ -619,9 +641,12 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
             double tlow = data->get_PopII_SNIa_interval();
             double tupp = PopII_SNIa_interval_time(
                     data->get_PopII_SNIa_number(), tlow);
+            // in Gyr:
             double trand =
                     tlow + (tupp - tlow) * HelperFunctions::rand_double();
-            data->set_PopII_SNIa_next_time(star->get_birthtime() + trand);
+            data->set_PopII_SNIa_next_time(
+                    star->get_birthtime() +
+                    _Gyr_to_internal_time->convert(trand));
             data->set_PopII_SNIa_interval(tupp);
         }
     }
@@ -654,9 +679,12 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
             double mlow = PopIII_interval_mass(star->get_initial_mass(), mupp);
             double tlow = PopIII_lifetime(mupp);
             double tupp = PopIII_lifetime(mlow);
+            // in Gyr:
             double trand =
                     tlow + (tupp - tlow) * HelperFunctions::rand_double();
-            data->set_PopIII_SN_next_time(star->get_birthtime() + trand);
+            data->set_PopIII_SN_next_time(
+                    star->get_birthtime() +
+                    _Gyr_to_internal_time->convert(trand));
             data->set_PopIII_SN_interval(mlow);
 
             data->set_PopIII_SN_fac(
@@ -696,7 +724,6 @@ StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
         StarParticle* star) {
     DiscreteStellarFeedbackData* data = new DiscreteStellarFeedbackData();
 
-    // get stellar metallicity: TODO
     double FeH = star->get_FeH();
     if(FeH <= _PopIII_cutoff) {
         // only PopIII stars
@@ -739,7 +766,9 @@ StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
         // in yr:
         double trand = tlow + (tupp - tlow) * HelperFunctions::rand_double();
         // UNITS. OFFSET?
-        data->set_PopII_SNII_next_time(trand);
+        data->set_PopII_SNII_next_time(
+                star->get_birthtime() +
+                _Gyr_to_internal_time->convert(1.e-9 * trand));
         data->set_PopII_SNII_interval(mlow);
         // we have to divide the total SNII energy over a discrete number of SN
         // the energy per SNII will hence be a small factor larger
@@ -756,7 +785,8 @@ StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
         // in Gyr:
         double trand = tlow + (tupp - tlow) * HelperFunctions::rand_double();
         // UNITS. OFFSET?
-        data->set_PopII_SNIa_next_time(trand);
+        data->set_PopII_SNIa_next_time(star->get_birthtime() +
+                                       _Gyr_to_internal_time->convert(trand));
         data->set_PopII_SNIa_interval(tupp);
         double PopII_SNIa_fac = star->get_initial_mass() * _PopII_NIaint /
                                 _PopII_Mint / data->get_PopII_SNIa_number();
@@ -772,7 +802,8 @@ StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
         // in Gyr:
         double trand = tlow + (tupp - tlow) * HelperFunctions::rand_double();
         // UNITS. OFFSET?
-        data->set_PopIII_SN_next_time(trand);
+        data->set_PopIII_SN_next_time(star->get_birthtime() +
+                                      _Gyr_to_internal_time->convert(trand));
         data->set_PopIII_SN_interval(mlow);
         double PopIII_SN_fac = star->get_initial_mass() * _PopIII_Nint *
                                PopIII_E_SN(0.5 * (mlow + mupp)) / _PopIII_Mint /

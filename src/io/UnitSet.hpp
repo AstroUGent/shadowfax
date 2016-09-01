@@ -32,14 +32,6 @@
 class RestartFile;
 
 /**
- * @brief Predefined UnitSet types
- */
-enum UnitType {
-    /*! @brief Default UnitSet: SI-units */
-    UNITS_DEFAULT
-};
-
-/**
   * @brief Collection of units which are mutually consistent
   *
   * In other words: if you divide e.g. the length unit associated with the set
@@ -69,8 +61,11 @@ class UnitSet {
     /*! @brief Acceleration Unit associated with this UnitSet */
     Unit _unit_acceleration;
 
+    /*! @brief Energy Unit associated with this UnitSet */
+    Unit _unit_energy;
+
   public:
-    UnitSet(UnitType type = UNITS_DEFAULT);
+    UnitSet();
     UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time);
 
     ~UnitSet() {}
@@ -82,6 +77,7 @@ class UnitSet {
     Unit get_time_unit();
     Unit get_mass_unit();
     Unit get_acceleration_unit();
+    Unit get_energy_unit();
 
     Unit get_unit(std::string quantity);
 

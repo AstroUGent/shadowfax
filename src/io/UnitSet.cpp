@@ -29,13 +29,9 @@ using namespace std;
 /**
   * @brief Default constructor.
   *
-  * The idea would be to make a few predefined sets to make life easier,
-  * but currently the only predefined set are the default SI units
-  *
-  * @param type UnitType specifying the predefined set, currently only
-  * UNITS_DEFAULT
+  * Initializes a UnitSet with default SI units.
   */
-UnitSet::UnitSet(UnitType type) {
+UnitSet::UnitSet() {
     _unit_position = Unit("length", "m", 1.);
     _unit_velocity = Unit("length/time", "m/s", 1.);
     _unit_density = Unit("mass/length/length/length", "kg/m^3", 1.);
@@ -43,6 +39,7 @@ UnitSet::UnitSet(UnitType type) {
     _unit_time = Unit("time", "s", 1.);
     _unit_mass = Unit("mass", "kg", 1.);
     _unit_acceleration = Unit("length/time/time", "m/s^2", 1.);
+    _unit_energy = Unit("length*length*mass/time/time", "Joule", 1.);
 }
 
 /**
@@ -63,6 +60,8 @@ UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time) {
     _unit_time = unit_time;
     _unit_mass = unit_mass;
     _unit_acceleration = unit_length / unit_time / unit_time;
+    _unit_energy =
+            unit_length * unit_length * unit_mass / unit_time / unit_time;
 }
 
 /**
@@ -129,6 +128,15 @@ Unit UnitSet::get_acceleration_unit() {
 }
 
 /**
+ * @brief Get the energy Unit
+ *
+ * @return The energy Unit
+ */
+Unit UnitSet::get_energy_unit() {
+    return _unit_energy;
+}
+
+/**
   * @brief Get the unit for the given quantity
   *
   * This function only works if the quantity is expressed with the basic
@@ -188,6 +196,7 @@ void UnitSet::dump(RestartFile& rfile) {
     _unit_time.dump(rfile);
     _unit_mass.dump(rfile);
     _unit_acceleration.dump(rfile);
+    _unit_energy.dump(rfile);
 }
 
 /**
@@ -199,4 +208,4 @@ void UnitSet::dump(RestartFile& rfile) {
 UnitSet::UnitSet(RestartFile& rfile)
         : _unit_position(rfile), _unit_density(rfile), _unit_velocity(rfile),
           _unit_pressure(rfile), _unit_time(rfile), _unit_mass(rfile),
-          _unit_acceleration(rfile) {}
+          _unit_acceleration(rfile), _unit_energy(rfile) {}

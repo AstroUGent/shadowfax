@@ -54,7 +54,7 @@ using namespace std;
 GasCooling::GasCooling(std::string directory, UnitSet* simulation_units,
                        ParameterFile* parameters, Physics* physics) {
     _cooling_table = new CoolingTable(directory, simulation_units);
-    UnitSet SI(UNITS_DEFAULT);
+    UnitSet SI;
     // boltzman is in energy per Kelvin but UnitSet doesn't seem to have
     // temperature
     Unit unit_kperm = SI.get_length_unit() * SI.get_length_unit() /

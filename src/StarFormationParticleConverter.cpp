@@ -122,7 +122,7 @@ Particle* StarFormationParticleConverter::convert(Particle* particle) {
 StarFormationParticleConverter::StarFormationParticleConverter(
         ParameterFile* parameters, UnitSet* simulation_units,
         Physics* physics) {
-    UnitSet SI(UNITS_DEFAULT);
+    UnitSet SI;
     _densitylimit = parameters->get_parameter<double>(
             "StarFormation.MinSFDensity",
             STARFORMATIONPARTICLECONVERTER_DEFAULT_MINSFDENSITY);

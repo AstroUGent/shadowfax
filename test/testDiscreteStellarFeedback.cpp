@@ -27,6 +27,8 @@
 #include "DiscreteStellarFeedback.hpp"
 #include "DiscreteStellarFeedbackData.hpp"
 #include "MPIMethods.hpp"
+#include "io/UnitSet.hpp"
+#include "io/UnitSetGenerator.hpp"
 #include "myAssert.hpp"
 #include "utilities/ParticleVector.hpp"
 #include "utilities/StarParticle.hpp"
@@ -42,9 +44,9 @@ using namespace std;
  * @return 0 on succes. Aborts otherwise
  */
 int main(int argc, char** argv) {
-    MyMPI_Init(&argc, &argv);
-
-    DiscreteStellarFeedback feedback;
+    // galactic units: kpc, Msol, Gyr
+    UnitSet* units = UnitSetGenerator::generate("galactic");
+    DiscreteStellarFeedback feedback(*units);
 
     Vec position(0.5, 0.5, 0.5);
     StarParticle* star = new StarParticle(position);
@@ -62,6 +64,8 @@ int main(int argc, char** argv) {
               "Wrong number of PopII SNIa explosions!");
     my_assert(data->get_PopIII_SN_number() == 0,
               "Wrong number of PopIII SN explosions!");
+
+    delete data;
 
     // PopIII star
     star->set_FeH(-6.);
@@ -86,7 +90,6 @@ int main(int argc, char** argv) {
     // add a single GasParticle to receive all feedback
     Vec gasposition(0.6, 0.6, 0.6);
     particles.add_gas_particle(new GasParticle(gasposition));
-    particles.finalize();
     particles.sort();
     particles.get_tree().walk_tree<ClosestNgbSearch>(particles, false, false,
                                                      true, filter);
@@ -96,5 +99,10 @@ int main(int argc, char** argv) {
 
     feedback.do_feedback(star, 0., 13.8);
 
-    return MyMPI_Finalize();
+    StateVector dQ = particles.gas(0)->get_dQvec();
+    cout << "dm: " << dQ.m() << ", dE: " << dQ.e() << endl;
+
+    delete units;
+
+    return 0;
 }

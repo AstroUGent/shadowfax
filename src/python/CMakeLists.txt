@@ -33,12 +33,21 @@ set(PYTHON_RIEMANNSOURCES
     ../utilities/Timer.cpp
     )
 
+set(PYTHON_COMPILE_OPTIONS "-DPYTHON_MODULE -Dndim_=${NDIM}")
+if(SANITIZER)
+    set(PYTHON_COMPILE_OPTIONS
+        "${PYTHON_COMPILE_OPTIONS} -fno-sanitize=address")
+    set(PYTHON_LINK_OPTIONS "-fno-sanitize=address")
+endif(SANITIZER)
+
 add_library(${PYTHON_RIEMANNNAME} SHARED ${PYTHON_RIEMANNSOURCES})
 
 set_target_properties(${PYTHON_RIEMANNNAME} PROPERTIES
-                      COMPILE_FLAGS "-DPYTHON_MODULE -Dndim_=${NDIM}")
+                      COMPILE_FLAGS ${PYTHON_COMPILE_OPTIONS})
 set_target_properties(${PYTHON_RIEMANNNAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
                       ${PROJECT_BINARY_DIR}/${SHAPYNAME})
+set_target_properties(${PYTHON_RIEMANNNAME} PROPERTIES
+                      LINK_FLAGS ${PYTHON_LINK_OPTIONS})
 
 target_link_libraries(${PYTHON_RIEMANNNAME} ${MPI_CXX_LIBRARIES})
 target_link_libraries(${PYTHON_RIEMANNNAME} ${MPI_C_LIBRARIES})
@@ -60,9 +69,11 @@ IOModule.cpp
 
 add_library(${PYTHON_IONAME} SHARED ${PYTHON_IO_SOURCES})
 set_target_properties(${PYTHON_IONAME} PROPERTIES
-                      COMPILE_FLAGS "-DPYTHON_MODULE -Dndim_=${NDIM}")
+                      COMPILE_FLAGS ${PYTHON_COMPILE_OPTIONS})
 set_target_properties(${PYTHON_IONAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
                       ${PROJECT_BINARY_DIR}/${SHAPYNAME})
+set_target_properties(${PYTHON_IONAME} PROPERTIES
+                      LINK_FLAGS ${PYTHON_LINK_OPTIONS})
 
 target_link_libraries(${PYTHON_IONAME} ${MPI_CXX_LIBRARIES})
 target_link_libraries(${PYTHON_IONAME} ${MPI_C_LIBRARIES})
@@ -103,9 +114,11 @@ GridModule.cpp
 
 add_library(${PYTHON_GRIDNAME} SHARED ${PYTHON_GRIDSOURCES})
 set_target_properties(${PYTHON_GRIDNAME} PROPERTIES
-                      COMPILE_FLAGS "-DPYTHON_MODULE -Dndim_=${NDIM}")
+                      COMPILE_FLAGS ${PYTHON_COMPILE_OPTIONS})
 set_target_properties(${PYTHON_GRIDNAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
                       ${PROJECT_BINARY_DIR}/${SHAPYNAME})
+set_target_properties(${PYTHON_GRIDNAME} PROPERTIES
+                      LINK_FLAGS ${PYTHON_LINK_OPTIONS})
 
 target_link_libraries(${PYTHON_GRIDNAME} ${MPI_CXX_LIBRARIES})
 target_link_libraries(${PYTHON_GRIDNAME} ${MPI_C_LIBRARIES})
@@ -155,9 +168,11 @@ LloydModule.cpp
 add_library(${PYTHON_LLOYDNAME} SHARED ${PYTHON_LLOYDSOURCES})
 
 set_target_properties(${PYTHON_LLOYDNAME} PROPERTIES
-                      COMPILE_FLAGS "-DPYTHON_MODULE -Dndim_=${NDIM}")
+                      COMPILE_FLAGS ${PYTHON_COMPILE_OPTIONS})
 set_target_properties(${PYTHON_LLOYDNAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
                       ${PROJECT_BINARY_DIR}/${SHAPYNAME})
+set_target_properties(${PYTHON_LLOYDNAME} PROPERTIES
+                      LINK_FLAGS ${PYTHON_LINK_OPTIONS})
 
 target_link_libraries(${PYTHON_LLOYDNAME} ${MPI_CXX_LIBRARIES})
 target_link_libraries(${PYTHON_LLOYDNAME} ${MPI_C_LIBRARIES})

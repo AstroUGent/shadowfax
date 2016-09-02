@@ -349,6 +349,9 @@ void DiscreteStellarFeedback::initialize() {
     // Calculate number of SNII, SNIa and PopIII SN by integrating the IMFs
     _PopII_Mint = GSL::qag(&PopII_mIMF_static, _PopII_M_low, _PopII_M_upp,
                            1.e-8, this);  // in solar masses
+    // Mint is always used in ratios with star->initial_mass. The latter is in
+    // internal mass units, so we need to convert the former to the same units.
+    _PopII_Mint = _Msol_to_internal_mass->convert(_PopII_Mint);
     _PopII_NIIint = GSL::qag(&PopII_IMF_static, _PopII_M_SNII_low, _PopII_M_upp,
                              1.e-8, this);
     _PopII_NIaint = GSL::qag(&PopII_IMF_static, _PopII_M_SNIa_low,
@@ -356,6 +359,9 @@ void DiscreteStellarFeedback::initialize() {
 
     _PopIII_Mint = GSL::qag(&PopIII_mIMF_static, _PopIII_M_low, _PopIII_M_upp,
                             1.e-8, this);  // in solar masses
+    // Mint is always used in ratios with star->initial_mass. The latter is in
+    // internal mass units, so we need to convert the former to the same units.
+    _PopIII_Mint = _Msol_to_internal_mass->convert(_PopIII_Mint);
     _PopIII_Nint = GSL::qag(&PopIII_IMF_static, _PopIII_M_SN_low, _PopIII_M_upp,
                             1.e-8, this);
 
@@ -512,6 +518,9 @@ void DiscreteStellarFeedback::initialize() {
  * @brief Constructor
  *
  * Calls initialize().
+ *
+ * @param units UnitSet used for all quantities that are not entirely contained
+ * within this class
  */
 DiscreteStellarFeedback::DiscreteStellarFeedback(UnitSet& units) {
     // unit conversion factors
@@ -520,6 +529,9 @@ DiscreteStellarFeedback::DiscreteStellarFeedback(UnitSet& units) {
     Unit energy_unit("length*length*mass/time/time", "erg", 1.e-7);
     _erg_to_internal_energy =
             new UnitConverter(energy_unit, units.get_energy_unit());
+    Unit mass_unit("mass", "Msol", 1.9891e30);
+    _Msol_to_internal_mass =
+            new UnitConverter(mass_unit, units.get_mass_unit());
     initialize();
 }
 
@@ -531,6 +543,7 @@ DiscreteStellarFeedback::DiscreteStellarFeedback(UnitSet& units) {
 DiscreteStellarFeedback::~DiscreteStellarFeedback() {
     delete _Gyr_to_internal_time;
     delete _erg_to_internal_energy;
+    delete _Msol_to_internal_mass;
 
     delete _PopII_SNIa_delay_spline;
     delete _PopIII_IMF_spline;
@@ -596,14 +609,14 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
     while(data->get_PopII_SNII_count() < data->get_PopII_SNII_number() &&
           endtime >= data->get_PopII_SNII_next_time()) {
         fb_energy += data->get_PopII_SNII_fac() * _PopII_SNII_energy;
-        fb_mass += data->get_PopII_SNII_fac() * _PopII_SNII_mass *
-                   star->get_initial_mass();
-        fb_metals += data->get_PopII_SNII_fac() * _PopII_SNII_metals *
-                     star->get_initial_mass();
-        fb_fe += data->get_PopII_SNII_fac() * _PopII_SNII_Fe *
-                 star->get_initial_mass();
-        fb_mg += data->get_PopII_SNII_fac() * _PopII_SNII_Mg *
-                 star->get_initial_mass();
+        fb_mass += _PopII_SNII_mass * star->get_initial_mass() /
+                   data->get_PopII_SNII_number();
+        fb_metals += _PopII_SNII_metals * star->get_initial_mass() /
+                     data->get_PopII_SNII_number();
+        fb_fe += _PopII_SNII_Fe * star->get_initial_mass() /
+                 data->get_PopII_SNII_number();
+        fb_mg += _PopII_SNII_Mg * star->get_initial_mass() /
+                 data->get_PopII_SNII_number();
 
         // set next PopII SNII feedback time
         data->increase_PopII_SNII_count();
@@ -626,14 +639,14 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
     while(data->get_PopII_SNIa_count() < data->get_PopII_SNIa_number() &&
           endtime >= data->get_PopII_SNIa_next_time()) {
         fb_energy += data->get_PopII_SNIa_fac() * _PopII_SNIa_energy;
-        fb_mass += data->get_PopII_SNIa_fac() * _PopII_SNIa_mass *
-                   star->get_initial_mass();
-        fb_metals += data->get_PopII_SNIa_fac() * _PopII_SNIa_metals *
-                     star->get_initial_mass();
-        fb_fe += data->get_PopII_SNIa_fac() * _PopII_SNIa_Fe *
-                 star->get_initial_mass();
-        fb_mg += data->get_PopII_SNIa_fac() * _PopII_SNIa_Mg *
-                 star->get_initial_mass();
+        fb_mass += _PopII_SNIa_mass * star->get_initial_mass() /
+                   data->get_PopII_SNIa_number();
+        fb_metals += _PopII_SNIa_metals * star->get_initial_mass() /
+                     data->get_PopII_SNIa_number();
+        fb_fe += _PopII_SNIa_Fe * star->get_initial_mass() /
+                 data->get_PopII_SNIa_number();
+        fb_mg += _PopII_SNIa_Mg * star->get_initial_mass() /
+                 data->get_PopII_SNIa_number();
 
         // set next PopII SNII feedback time
         data->increase_PopII_SNIa_count();
@@ -653,7 +666,7 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
 
     // PopII SW feedback
     if(data->get_PopII_SW_fac() &&
-       (endtime - star->get_birthtime()) <= _PopII_SW_end_time) {
+       (starttime - star->get_birthtime()) < _PopII_SW_end_time) {
         double tmin =
                 std::min(endtime, star->get_birthtime() + _PopII_SW_end_time);
         fb_energy += (tmin - starttime) * data->get_PopII_SW_fac() *
@@ -664,14 +677,16 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
     while(data->get_PopIII_SN_count() < data->get_PopIII_SN_number() &&
           endtime >= data->get_PopIII_SN_next_time()) {
         fb_energy += data->get_PopIII_SN_fac() * _PopIII_SN_energy;
-        fb_mass += data->get_PopIII_SN_fac() * _PopIII_SN_mass *
-                   star->get_initial_mass();
-        fb_metals += data->get_PopIII_SN_fac() * _PopIII_SN_metals *
-                     star->get_initial_mass();
-        fb_fe += data->get_PopIII_SN_fac() * _PopIII_SN_Fe *
-                 star->get_initial_mass();
-        fb_mg += data->get_PopIII_SN_fac() * _PopIII_SN_Mg *
-                 star->get_initial_mass();
+        // now the mass feedback is spread out uniformly. It would be more
+        // correct to distribute it in the same way as the energy.
+        fb_mass += _PopIII_SN_mass * star->get_initial_mass() /
+                   data->get_PopIII_SN_number();
+        fb_metals += _PopIII_SN_metals * star->get_initial_mass() /
+                     data->get_PopIII_SN_number();
+        fb_fe += _PopIII_SN_Fe * star->get_initial_mass() /
+                 data->get_PopIII_SN_number();
+        fb_mg += _PopIII_SN_Mg * star->get_initial_mass() /
+                 data->get_PopIII_SN_number();
 
         data->increase_PopIII_SN_count();
         if(data->get_PopIII_SN_count() < data->get_PopIII_SN_number()) {
@@ -696,7 +711,7 @@ void DiscreteStellarFeedback::do_feedback(StarParticle* star, double starttime,
 
     // PopIII SW feedback
     if(data->get_PopIII_SW_fac() &&
-       (endtime - star->get_birthtime()) <= _PopIII_SW_end_time) {
+       (starttime - star->get_birthtime()) < _PopIII_SW_end_time) {
         double tmin =
                 std::min(endtime, star->get_birthtime() + _PopIII_SW_end_time);
         fb_energy += (tmin - starttime) * data->get_PopIII_SW_fac() *
@@ -788,8 +803,9 @@ StellarFeedbackData* DiscreteStellarFeedback::initialize_data(
         data->set_PopII_SNIa_next_time(star->get_birthtime() +
                                        _Gyr_to_internal_time->convert(trand));
         data->set_PopII_SNIa_interval(tupp);
-        double PopII_SNIa_fac = star->get_initial_mass() * _PopII_NIaint /
-                                _PopII_Mint / data->get_PopII_SNIa_number();
+        double PopII_SNIa_fac = 0.15 * star->get_initial_mass() *
+                                _PopII_NIIint / _PopII_Mint /
+                                data->get_PopII_SNIa_number();
         data->set_PopII_SNIa_fac(PopII_SNIa_fac);
     }
 

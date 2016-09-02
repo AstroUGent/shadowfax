@@ -45,6 +45,8 @@ class DiscreteStellarFeedback : public StellarFeedback {
     UnitConverter* _Gyr_to_internal_time;
     /*! @brief UnitConverter from erg to internal energy units */
     UnitConverter* _erg_to_internal_energy;
+    /*! @brief UnitConverter from solar mass to internal mass units */
+    UnitConverter* _Msol_to_internal_mass;
 
     /*! @brief Chabrier IMF: lower limit mass interval */
     double _PopII_M_low;

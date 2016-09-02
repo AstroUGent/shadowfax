@@ -546,6 +546,7 @@ double GSL::qk(double (*f)(double, void*), double x0, double x1, void* params,
  * @brief Perform a numerical quadrature using gsl_integration_qag, with the
  * GSL_INTEG_GAUSS41 integration rule
  *
+ * @param f Function to integrate
  * @param x0 Lower limit of the integral
  * @param x1 Upper limit of the integral
  * @param tolerance Relative tolerance for the result
@@ -634,6 +635,7 @@ double GSL::qag(double (*f)(double, void*), double x0, double x1,
  * @brief Find the root of the given function in the given interval using
  * Brent's method
  *
+ * @param f Function to find the root of
  * @param xlow Lower bound of the search interval
  * @param xupp Upper bound of the search interval
  * @param tolerance Desired relative accuracy for the result

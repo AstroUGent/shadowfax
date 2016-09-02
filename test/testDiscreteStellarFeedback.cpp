@@ -51,12 +51,15 @@ using namespace std;
  * @param tend End time of the feedback
  * @param dm_expect Expected change in mass of the surrounding gas
  * @param dE_expect Expected change in energy of the surrounding gas
+ * @param dFe_expect Expected change in [Fe/H] of the surrounding gas
+ * @param dMg_expect Expected change in [Mg/Fe] of the surrounding gas
  */
 void test_feedback(DiscreteStellarFeedback& feedback, double FeH, double mass,
                    unsigned int PopII_SNII_expect,
                    unsigned int PopII_SNIa_expect,
                    unsigned int PopIII_SN_expect, double tstart, double tend,
-                   double dm_expect, double dE_expect) {
+                   double dm_expect, double dE_expect, double dFe_expect,
+                   double dMg_expect) {
 
     Vec position(0.5, 0.5, 0.5);
     StarParticle* star = new StarParticle(position);
@@ -100,6 +103,8 @@ void test_feedback(DiscreteStellarFeedback& feedback, double FeH, double mass,
     StateVector dQ = particles.gas(0)->get_dQvec();
     assert_values_equal(dQ.m(), dm_expect, "Unexpected mass change!");
     assert_values_equal(dQ.e(), dE_expect, "Unexpected energy change!");
+    assert_values_equal(dQ.Fe(), dFe_expect, "Unexpected [Fe/H] change!");
+    assert_values_equal(dQ.Mg(), dMg_expect, "Unexpected [Mg/Fe] change!");
 }
 
 /**
@@ -120,27 +125,37 @@ int main(int argc, char** argv) {
     // PopII star
     double mass_expected = 0.;
     double energy_expected = 0.;
+    double Fe_expected = 0.;
+    double Mg_expected = 0.;
     // SNII
     mass_expected += 0.191445322565 * 2500.;
     energy_expected += 28.7646 * energy_converter.convert(1.e51) * 0.7;
+    Fe_expected += 0.000932719658516 * 2500.;
+    Mg_expected += 0.00151412640705 * 2500.;
     // SNIa
     mass_expected += 0.00655147325196 * 2500.;
     energy_expected += 4.31469 * energy_converter.convert(1.e51) * 0.7;
+    Fe_expected += 0.00165100587997 * 2500.;
+    Mg_expected += 0.000257789470044 * 2500.;
     // SW
     energy_expected += 28.7646 * energy_converter.convert(1.e50) * 0.7;
     test_feedback(feedback, -2., 2500., 28, 4, 0, 0., 13.8, -mass_expected,
-                  -energy_expected);
+                  -energy_expected, -Fe_expected, -Mg_expected);
 
     // PopIII star
     mass_expected = 0.;
     energy_expected = 0.;
+    Fe_expected = 0.;
+    Mg_expected = 0.;
     // SN
     mass_expected += 0.45 * 2500.;
     energy_expected += 5.31551e+09;
+    Fe_expected += 0.0000932719658516 * 2500.;
+    Mg_expected += 0.000151412640705 * 2500.;
     // SW
     energy_expected += 45.4619 * energy_converter.convert(1.e51) * 0.7;
     test_feedback(feedback, -6., 2500., 0, 0, 45, 0., 13.8, -mass_expected,
-                  -energy_expected);
+                  -energy_expected, -Fe_expected, -Mg_expected);
 
     delete units;
 

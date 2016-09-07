@@ -291,18 +291,20 @@ void BlockICGenerator::set_conserved_variables(ParticleVector& grid) {
   * then generate the grid cells and optionally regularize them. We then set up
   * the hydrodynamical properties of the cells using the geometrical blocks.
   *
+  * @param numlloyd Number of Lloyd iterations used to regularize the grid
   * @param conserved_variables Generate conserved variables?
   * @return A ParticleVector suitable as initial condition for a hydrodynamical
   * simulation
   */
-ParticleVector BlockICGenerator::generate(bool conserved_variables) {
+ParticleVector BlockICGenerator::generate(unsigned int numlloyd,
+                                          bool conserved_variables) {
     ParticleVector particles(false, *((RectangularBox*)_container), _periodic);
     if(_has_gas) {
         if(_mode == IC_CART) {
             make_cartesian_grid(particles);
         } else {
             make_random_grid(particles);
-            relax_grid(particles);
+            relax_grid(particles, numlloyd);
         }
         apply_regions(particles);
         if(conserved_variables) {
@@ -520,14 +522,14 @@ bool BlockICGenerator::regions_accepted_dm(Vec& p) {
   *
   * @param grid A reference to a non-empty ParticleVector containing a randomly
   * sampled, noisy grid
+  * @param numlloyd Number of Lloyd iterations
   */
-void BlockICGenerator::relax_grid(ParticleVector& grid) {
+void BlockICGenerator::relax_grid(ParticleVector& grid, unsigned int numlloyd) {
     grid.sort();
     VorTessManager voronoi(grid, _periodic);
     double treebox[ndim_ + ndim_];
     grid.get_container().get_bounding_box(treebox);
 
-    unsigned int numlloyd = 10;
     for(unsigned int i = numlloyd; i--;) {
         cout << "Lloyd iteration " << (numlloyd - i) << endl;
         for(unsigned int j = grid.gassize(); j--;) {

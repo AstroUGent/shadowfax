@@ -62,6 +62,8 @@ using namespace std;
   *     icfile.hdf5)
   *   - type: type of the initial condition file (Shadowfax/Gadget, default:
   *     Gadget)
+  *   - numlloyd: number of Lloyd iterations (for a random sampled grid)
+  *     (default: 10)
   *
   * @param argc Number of command line arguments
   * @param argv Array of command line arguments
@@ -80,6 +82,7 @@ ICMaker::ICMaker(int argc, char** argv) {
     string output_type = "Gadget";
     string output_name;
     bool output_mass = false;
+    unsigned int numlloyd = 10;
 
     static struct option long_options[] = {
             {"ncell", required_argument, NULL, 'n'},
@@ -90,13 +93,14 @@ ICMaker::ICMaker(int argc, char** argv) {
             {"type", required_argument, NULL, 't'},
             {"filename", required_argument, NULL, 'o'},
             {"output_mass", no_argument, NULL, 'c'},
+            {"numlloyd", required_argument, NULL, 'l'},
             {0, 0, 0, 0}};
 
     int c;
     // force rescan of the arguments
     optind = 1;
     opterr = 0;
-    while((c = getopt_long(argc, argv, ":n:m:s:p:r:t:o:c", long_options,
+    while((c = getopt_long(argc, argv, ":n:m:s:p:r:t:o:l:c", long_options,
                            NULL)) != -1) {
         switch(c) {
             case 'n':
@@ -128,6 +132,9 @@ ICMaker::ICMaker(int argc, char** argv) {
                 break;
             case 'o':
                 output_name = optarg;
+                break;
+            case 'l':
+                numlloyd = atoi(optarg);
                 break;
             case 'c':
                 output_mass = true;
@@ -198,7 +205,7 @@ ICMaker::ICMaker(int argc, char** argv) {
         icgen = new BlockICGenerator(ncell, mode, seed);
         ((BlockICGenerator*)icgen)->read_xml(setup);
     }
-    ParticleVector icpart = icgen->generate(output_mass);
+    ParticleVector icpart = icgen->generate(numlloyd, output_mass);
 
     Header& header = icpart.get_header();
     header.set_time(0);

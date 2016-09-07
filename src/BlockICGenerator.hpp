@@ -111,7 +111,7 @@ class BlockICGenerator : public ICGenerator {
 
     void make_cartesian_grid(ParticleVector& plist);
     void make_random_grid(ParticleVector& plist);
-    void relax_grid(ParticleVector& grid);
+    void relax_grid(ParticleVector& grid, unsigned int numlloyd);
     void apply_regions(ParticleVector& grid);
     void set_conserved_variables(ParticleVector& grid);
     bool regions_accepted(Vec& p);
@@ -128,7 +128,8 @@ class BlockICGenerator : public ICGenerator {
 
     void read_xml(std::string filename);
 
-    ParticleVector generate(bool conserved_variables = false);
+    ParticleVector generate(unsigned int numlloyd = 10,
+                            bool conserved_variables = false);
 };
 
 #endif  // BLOCKICGENERATOR_HPP

@@ -149,18 +149,20 @@ SpecificICGenerator::~SpecificICGenerator() {
   * the hydrodynamical properties of the cells using the specific profile
   * specified in _type.
   *
+  * @param numlloyd Number of Lloyd iterations used to relax the grid
   * @param conserved_variables Generate conserved variables?
   * @return A ParticleVector suitable as initial condition for a hydrodynamical
   * simulation
   */
-ParticleVector SpecificICGenerator::generate(bool conserved_variables) {
+ParticleVector SpecificICGenerator::generate(unsigned int numlloyd,
+                                             bool conserved_variables) {
     ParticleVector particles(false, *((RectangularBox*)_container));
     if(_ngaspart) {
         if(_mode == IC_CART) {
             make_cartesian_grid(particles);
         } else {
             make_random_grid(particles);
-            relax_grid(particles);
+            relax_grid(particles, numlloyd);
         }
         apply_profiles(particles);
         if(conserved_variables) {
@@ -328,14 +330,15 @@ void SpecificICGenerator::make_random_grid(ParticleVector& plist) {
   *
   * @param grid A reference to a non-empty ParticleVector containing a randomly
   * sampled, noisy grid
+  * @param numlloyd Number of Lloyd iterations
   */
-void SpecificICGenerator::relax_grid(ParticleVector& grid) {
+void SpecificICGenerator::relax_grid(ParticleVector& grid,
+                                     unsigned int numlloyd) {
     grid.sort();
     VorTessManager voronoi(grid, _periodic);
     double treebox[ndim_ + ndim_];
     grid.get_container().get_bounding_box(treebox);
 
-    unsigned int numlloyd = 10;
     for(unsigned int i = numlloyd; i--;) {
         cout << "Lloyd iteration " << (numlloyd - i) << endl;
         for(unsigned int j = grid.gassize(); j--;) {

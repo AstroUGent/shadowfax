@@ -83,7 +83,7 @@ class SpecificICGenerator : public ICGenerator {
 
     void make_cartesian_grid(ParticleVector& plist);
     void make_random_grid(ParticleVector& plist);
-    void relax_grid(ParticleVector& grid);
+    void relax_grid(ParticleVector& grid, unsigned int numlloyd);
     void apply_profiles(ParticleVector& grid);
 
     void apply_profile_gresho(ParticleVector& grid);
@@ -107,7 +107,8 @@ class SpecificICGenerator : public ICGenerator {
                         double gamma = 1.66667);
     virtual ~SpecificICGenerator();
 
-    ParticleVector generate(bool conserved_variables = false);
+    ParticleVector generate(unsigned int numlloyd = 10,
+                            bool conserved_variables = false);
 
     static double gplummer(double q);
 };

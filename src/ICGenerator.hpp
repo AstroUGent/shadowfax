@@ -38,10 +38,12 @@ class ICGenerator {
     /**
       * @brief Generate initial conditions and return them as a ParticleVector
       *
+      * @param numlloyd Number of Lloyd iterations used to regularize the grid
       * @param conserved_variables Generate conserved variables?
       * @return ParticleVector containing the generated particles
       */
-    virtual ParticleVector generate(bool conserved_variables = false) = 0;
+    virtual ParticleVector generate(unsigned int numlloyd = 10,
+                                    bool conserved_variables = false) = 0;
 };
 
 /**

@@ -768,7 +768,7 @@ class Tree {
          */
         template <typename P>
         static void walk_local(Tree& tree, P* p,
-                               std::vector<std::vector<TExport> > exports) {
+                               std::vector<std::vector<TExport> >& exports) {
             T walker(p);
             tree.walk_tree(walker, exports);
             walker.after_walk();
@@ -806,7 +806,7 @@ class Tree {
          */
         template <typename P>
         static void walk_local(Tree& tree, P* p,
-                               std::vector<std::vector<TExport> > exports) {
+                               std::vector<std::vector<TExport> >& exports) {
             T walker(p, *tree._ewald_table);
             tree.walk_tree(walker, exports);
             walker.after_walk();

@@ -471,6 +471,7 @@ if groups["PartType0"]:
                      dtype = 'L')
 
 if groups["PartType1"]:
+  grp = shadowfax_icfile.create_group("PartType1")
   grp.create_dataset("Coordinates",
                      data = np.array(icfile["/PartType1/Coordinates"]) + \
                             translation,

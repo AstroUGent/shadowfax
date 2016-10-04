@@ -485,7 +485,7 @@ if groups["PartType1"]:
     masses = np.zeros(header["NumPart_ThisFile"][1]) + header["MassTable"][1]
   grp.create_dataset("Masses", data = masses, dtype = 'd')
   grp.create_dataset("ParticleIDs",
-                     data = np.array(icfile["/PartType0/ParticleIDs"]),
+                     data = np.array(icfile["/PartType1/ParticleIDs"]),
                      dtype = 'L')
 
 # print some final instructions

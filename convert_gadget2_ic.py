@@ -113,6 +113,12 @@ for i in range(6):
 # if we have gas, check if all primitive variables are available
 if groups["PartType0"]:
   has_density = ("Density" in icfile["/PartType0"].keys())
+  gas_has_mass = ("Masses" in icfile["/PartType0"].keys())
+  has_smoothing_length = ("SmoothingLength" in icfile["/PartType0"].keys())
+  if not has_smoothing_length:
+    print "No smoothing lengths found in IC file. We will make an educated " \
+          "guess for the initial smoothing length."
+  has_internal_energy = ("InternalEnergy" in icfile["/PartType0"].keys())
 
 # we currently do not support more than one DM particle type
 if groups["PartType2"] or groups["PartType3"] or groups["PartType4"] or \
@@ -124,7 +130,7 @@ if groups["PartType2"] or groups["PartType3"] or groups["PartType4"] or \
 # if we have DM, check if masses are in a dataset
 # if not, we read them from the header
 if groups["PartType1"]:
-  has_mass = ("Masses" in icfile["/PartType1"].keys())
+  dm_has_mass = ("Masses" in icfile["/PartType1"].keys())
 
 # check if we have a box size
 if header["BoxSize"]:
@@ -413,11 +419,27 @@ else:
   xmax = dmax
 if boxsize == 0.:
   boxsize = np.ceil(xmax - xmin)
+if not hasattr(boxsize, "__len__"):
+  boxsize = np.array([boxsize, boxsize, boxsize])
 print "Box size will be", boxsize
 boxcenter = 0.5*(xmin+xmax)
 print "Box center is currently", boxcenter
 translation = 0.5*boxsize - boxcenter
 print "All particles will be translated by", translation
+
+# Find a good guess for the initial smoothing length (if necessary)
+if groups["PartType0"] and not has_smoothing_length:
+  partvolume = boxsize[0]*boxsize[1]*boxsize[2]/header["NumPart_Total"][0]
+  smoothing_length_guess = np.cbrt(0.75*partvolume/np.pi)
+
+boltzmann_constant = 1.38064852e-23 # in SI units
+# Find a good guess for the initial thermal energy (if necessary)
+if groups["PartType0"] and not has_internal_energy:
+  print "No internal energy found in IC. We will make a guess based on " \
+        "InitGasTemp, but this is not guaranteed to be correct."
+  u_guess = boltzmann_constant*float(params["InitGasTemp"])/(adiabatic_index-1.)
+  # unit conversion u_guess was in m^2 kg s^-2
+  u_guess /= (gadget_unit_mass_in_cgs*gadget_unit_velocity_in_cgs)
 
 # write the Shadowfax IC file
 shadowfax_icfile = h5py.File(shadowfax_icname, 'w')
@@ -453,19 +475,25 @@ if groups["PartType0"]:
   grp.create_dataset("Velocities",
                      data = np.array(icfile["/PartType0/Velocities"]),
                      dtype = 'd')
-  grp.create_dataset("Masses",
-                     data = np.array(icfile["/PartType0/Masses"]),
-                     dtype = 'd')
+  if gas_has_mass:
+    masses = np.array(icfile["/PartType0/Masses"])
+  else:
+    masses = np.zeros(header["NumPart_ThisFile"][0]) + header["MassTable"][1]
+  grp.create_dataset("Masses", data = masses, dtype = 'd')
   if has_density:
     grp.create_dataset("Density",
                        data = np.array(icfile["/PartType0/Density"]),
                        dtype = 'd')
-  grp.create_dataset("SmoothingLength",
-                     data = np.array(icfile["/PartType0/SmoothingLength"]),
-                     dtype = 'd')
-  grp.create_dataset("InternalEnergy",
-                     data = np.array(icfile["/PartType0/InternalEnergy"]),
-                     dtype = 'd')
+  if has_smoothing_length:
+    hs = np.array(icfile["/PartType0/SmoothingLength"])
+  else:
+    hs = np.zeros(header["NumPart_ThisFile"][0]) + smoothing_length_guess
+  grp.create_dataset("SmoothingLength", data = hs, dtype = 'd')
+  if has_internal_energy:
+    us = np.array(icfile["/PartType0/InternalEnergy"])
+  else:
+    us = np.zeros(header["NumPart_ThisFile"][0]) + u_guess
+  grp.create_dataset("InternalEnergy", data = us, dtype = 'd')
   grp.create_dataset("ParticleIDs",
                      data = np.array(icfile["/PartType0/ParticleIDs"]),
                      dtype = 'L')
@@ -479,7 +507,7 @@ if groups["PartType1"]:
   grp.create_dataset("Velocities",
                      data = np.array(icfile["/PartType1/Velocities"]),
                      dtype = 'd')
-  if has_mass:
+  if dm_has_mass:
     masses = np.array(icfile["/PartType1/Masses"])
   else:
     masses = np.zeros(header["NumPart_ThisFile"][1]) + header["MassTable"][1]

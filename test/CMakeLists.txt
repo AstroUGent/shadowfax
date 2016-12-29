@@ -326,6 +326,23 @@ add_unit_test(NAME testRestartFile
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d io2d)
 
+# ParameterFile test
+set(TESTPARAMETERFILE_SOURCES
+    testParameterFile.cpp
+
+    ../src/MPIGlobal.cpp
+    ../src/ParameterFile.cpp
+    ../src/ParameterFile.hpp
+)
+add_unit_test(NAME testParameterFile
+              SOURCES ${TESTPARAMETERFILE_SOURCES}
+              NDIM 2
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d)
+
+# Configure test.param
+configure_file(${PROJECT_SOURCE_DIR}/test/test.ini
+               ${PROJECT_BINARY_DIR}/rundir/test/test.ini COPYONLY)
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

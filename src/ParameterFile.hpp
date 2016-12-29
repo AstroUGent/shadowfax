@@ -32,6 +32,7 @@
 #include <string>   // for string, operator<
 
 class RestartFile;
+class YMLFile;
 
 /**
  * @brief Abstraction of the parameter file that contains vital run information
@@ -47,6 +48,9 @@ class ParameterFile {
   private:
     /*! @brief Property tree containing the contents of the .ini file */
     boost::property_tree::ptree _parameters;
+
+    /*! @brief YMLFile containing the contents of the .yml file. */
+    YMLFile* _yml_file;
 
     void print_contents();
 

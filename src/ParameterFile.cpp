@@ -31,7 +31,8 @@
 #include <boost/property_tree/ini_parser.hpp>  // for read_ini
 #include <fstream>   // for operator<<, basic_ostream, etc
 #include <iostream>  // for cout, cerr
-#include <utility>   // for pair
+#include <string>
+#include <utility>  // for pair
 using namespace std;
 
 /**
@@ -60,10 +61,21 @@ void ParameterFile::print_contents() {
  *
  * @param name Filename of the parameter file
  */
-ParameterFile::ParameterFile(std::string name) {
+ParameterFile::ParameterFile(std::string name) : _yml_file(nullptr) {
     ifstream file(name.c_str());
     if(!file) {
         cerr << "Cannot read parameterfile \"" << name << "\"!" << endl;
+        my_exit();
+    }
+
+    // check type
+    std::string extension = name.substr(name.size() - 3, 3);
+    if(extension == "ini") {
+        cout << ".ini parameter file" << endl;
+    } else if(extension == "yml") {
+        cout << ".yml parameter file" << endl;
+    } else {
+        cerr << "Unknown parameter file type: ." << extension << endl;
         my_exit();
     }
 

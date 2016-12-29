@@ -343,6 +343,22 @@ add_unit_test(NAME testParameterFile
 configure_file(${PROJECT_SOURCE_DIR}/test/test.ini
                ${PROJECT_BINARY_DIR}/rundir/test/test.ini COPYONLY)
 
+# YMLFile test
+set(TESTYMLFILE_SOURCES
+    testYMLFile.cpp
+
+    ../src/MPIGlobal.cpp
+    ../src/YMLFile.cpp
+    ../src/YMLFile.hpp
+    ../src/YMLFileUtilities.hpp
+)
+add_unit_test(NAME testYMLFile
+              SOURCES ${TESTYMLFILE_SOURCES}
+              NDIM 2
+              LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d)
+configure_file(${PROJECT_SOURCE_DIR}/test/test.yml
+               ${PROJECT_BINARY_DIR}/rundir/test/test.yml COPYONLY)
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

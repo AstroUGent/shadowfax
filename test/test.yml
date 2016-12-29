@@ -1,0 +1,44 @@
+# Test parameter file. File uses YAML data format.
+
+# General test parameters:
+
+# Integer values
+test_integer1: 42
+test_integer2: 0x2a
+test_integer3: 0x2A
+# Floating point values
+test_float: 3.14
+# Floating point values with units
+test_unit: 1.0 pc
+# Boolean values
+test_bool1: true
+test_bool2: Yes
+test_bool3: ON
+test_bool4: y
+test_bool5: False
+test_bool6: no
+test_bool7: off
+test_bool8: N
+# String value
+test_string: This is a test string.
+# CoordinateVector value
+test_coordinatevector_double: [0.1, 2.e-1, 0.3]
+test_coordinatevector_int: [42, 0x2a, 0x2A]
+test_coordinatevector_bool: [false, true, ON ]
+# CoordinateVector with units
+test_coordinatevector_unit: [1.0 pc, 2.0 m, 2.4e19 m]
+
+# Group test:
+
+test_group:
+  test_group_member: 42
+
+# Inline comments test:
+
+test_comments_group: # test comments
+  test_comments_value: test comments string # actual comments
+
+# group within group test:
+test_group2:
+  test_group_group:
+    test_group_group_member: 42

@@ -42,7 +42,7 @@
  * Reads the contents of a text file in YAML format and stores it in an internal
  * dictionary that can be queried.
  */
-class ParameterFile {
+class YMLFile {
   private:
     /*! @brief Internal dictionary storing the parameters as key-value pairs. */
     std::map<std::string, std::string> _dictionary;
@@ -59,9 +59,9 @@ class ParameterFile {
     /**
      * @brief Empty constructor.
      */
-    ParameterFile() {}
+    YMLFile() {}
 
-    ParameterFile(std::string filename);
+    YMLFile(std::string filename);
 
     /**
      * @brief Add the given value and key to the internal dictionary.
@@ -197,7 +197,7 @@ class ParameterFile {
 };
 
 /**
- * @brief ParameterFile::get_value specialization for std::string.
+ * @brief YMLFile::get_value specialization for std::string.
  *
  * This function is called by all other specializations before converting to the
  * actual template type. It is the only version that checks if the key is in the
@@ -207,8 +207,7 @@ class ParameterFile {
  * @return Value of the parameter, as a std::string.
  */
 template <>
-inline std::string ParameterFile::get_value<std::string>(
-        std::string key) const {
+inline std::string YMLFile::get_value<std::string>(std::string key) const {
     unsigned int count = _dictionary.count(key);
     if(count == 0) {
         std::cerr << "Parameter \"" << key << "\" not found!" << std::endl;
@@ -218,43 +217,41 @@ inline std::string ParameterFile::get_value<std::string>(
 }
 
 /**
- * @brief ParameterFile::get_value specialization for a floating point value.
+ * @brief YMLFile::get_value specialization for a floating point value.
  *
  * @param key Key in the dictionary.
  * @return Floating point value of the parameter.
  */
-template <>
-inline double ParameterFile::get_value<double>(std::string key) const {
+template <> inline double YMLFile::get_value<double>(std::string key) const {
     std::string svalue = get_value<std::string>(key);
     return YMLFileUtilities::convert<double>(svalue);
 }
 
 /**
- * @brief ParameterFile::get_value specialization for an integer value.
+ * @brief YMLFile::get_value specialization for an integer value.
  *
  * @param key Key in the dictionary.
  * @return Integer value of the parameter.
  */
-template <> inline int ParameterFile::get_value<int>(std::string key) const {
+template <> inline int YMLFile::get_value<int>(std::string key) const {
     std::string svalue = get_value<std::string>(key);
     return YMLFileUtilities::convert<int>(svalue);
 }
 
 /**
- * @brief ParameterFile::get_value specialization for an unsigned char value.
+ * @brief YMLFile::get_value specialization for an unsigned char value.
  *
  * @param key Key in the dictionary.
  * @return Unsigned char value of the parameter.
  */
 template <>
-inline unsigned char ParameterFile::get_value<unsigned char>(
-        std::string key) const {
+inline unsigned char YMLFile::get_value<unsigned char>(std::string key) const {
     std::string svalue = get_value<std::string>(key);
     return YMLFileUtilities::convert<unsigned char>(svalue);
 }
 
 /**
- * @brief ParameterFile::get_value specialization for a boolean value.
+ * @brief YMLFile::get_value specialization for a boolean value.
  *
  * The following strings are evaluated as true: "true", "yes", "on", "y".
  * The following strings are evaluated as false: "false", "no", "off", "n".
@@ -265,13 +262,13 @@ inline unsigned char ParameterFile::get_value<unsigned char>(
  * @param key Key in the dictionary.
  * @return Bool value of the parameter.
  */
-template <> inline bool ParameterFile::get_value<bool>(std::string key) const {
+template <> inline bool YMLFile::get_value<bool>(std::string key) const {
     std::string svalue = get_value<std::string>(key);
     return YMLFileUtilities::convert<bool>(svalue);
 }
 
 /**
- * @brief ParameterFile::get_value specialization for std::string.
+ * @brief YMLFile::get_value specialization for std::string.
  *
  * This function is called by all other specializations before converting to the
  * actual template type.
@@ -282,8 +279,8 @@ template <> inline bool ParameterFile::get_value<bool>(std::string key) const {
  * @return Value of the parameter, as a std::string.
  */
 template <>
-inline std::string ParameterFile::get_value<std::string>(
-        std::string key, std::string default_value) {
+inline std::string YMLFile::get_value<std::string>(std::string key,
+                                                   std::string default_value) {
     std::map<std::string, std::string>::iterator it = _dictionary.find(key);
     if(it == _dictionary.end()) {
         // note that this value is overwritten by other type specializations if
@@ -295,7 +292,7 @@ inline std::string ParameterFile::get_value<std::string>(
 }
 
 /**
- * @brief ParameterFile::get_value specialization for a floating point value.
+ * @brief YMLFile::get_value specialization for a floating point value.
  *
  * @param key Key in the dictionary.
  * @param default_value Default value for the parameter, to be used if the
@@ -303,8 +300,8 @@ inline std::string ParameterFile::get_value<std::string>(
  * @return Floating point value of the parameter.
  */
 template <>
-inline double ParameterFile::get_value<double>(std::string key,
-                                               double default_value) {
+inline double YMLFile::get_value<double>(std::string key,
+                                         double default_value) {
     std::string svalue = get_value<std::string>(key, "");
     if(svalue == "") {
         _dictionary[key] = YMLFileUtilities::to_string<double>(default_value);
@@ -314,7 +311,7 @@ inline double ParameterFile::get_value<double>(std::string key,
 }
 
 /**
- * @brief ParameterFile::get_value specialization for an integer value.
+ * @brief YMLFile::get_value specialization for an integer value.
  *
  * @param key Key in the dictionary.
  * @param default_value Default value for the parameter, to be used if the
@@ -322,7 +319,7 @@ inline double ParameterFile::get_value<double>(std::string key,
  * @return Integer value of the parameter.
  */
 template <>
-inline int ParameterFile::get_value<int>(std::string key, int default_value) {
+inline int YMLFile::get_value<int>(std::string key, int default_value) {
     std::string svalue = get_value<std::string>(key, "");
     if(svalue == "") {
         _dictionary[key] = YMLFileUtilities::to_string<int>(default_value);
@@ -332,7 +329,7 @@ inline int ParameterFile::get_value<int>(std::string key, int default_value) {
 }
 
 /**
- * @brief ParameterFile::get_value specialization for an unsigned integer value.
+ * @brief YMLFile::get_value specialization for an unsigned integer value.
  *
  * @param key Key in the dictionary.
  * @param default_value Default value for the parameter, to be used if the
@@ -340,7 +337,7 @@ inline int ParameterFile::get_value<int>(std::string key, int default_value) {
  * @return Unsigned integer value of the parameter.
  */
 template <>
-inline unsigned int ParameterFile::get_value<unsigned int>(
+inline unsigned int YMLFile::get_value<unsigned int>(
         std::string key, unsigned int default_value) {
     std::string svalue = get_value<std::string>(key, "");
     if(svalue == "") {
@@ -352,7 +349,7 @@ inline unsigned int ParameterFile::get_value<unsigned int>(
 }
 
 /**
- * @brief ParameterFile::get_value specialization for an unsigned char value.
+ * @brief YMLFile::get_value specialization for an unsigned char value.
  *
  * @param key Key in the dictionary.
  * @param default_value Default value for the parameter, to be used if the
@@ -360,7 +357,7 @@ inline unsigned int ParameterFile::get_value<unsigned int>(
  * @return Unsigned char value of the parameter.
  */
 template <>
-inline unsigned char ParameterFile::get_value<unsigned char>(
+inline unsigned char YMLFile::get_value<unsigned char>(
         std::string key, unsigned char default_value) {
     std::string svalue = get_value<std::string>(key, "");
     if(svalue == "") {
@@ -372,7 +369,7 @@ inline unsigned char ParameterFile::get_value<unsigned char>(
 }
 
 /**
- * @brief ParameterFile::get_value specialization for a boolean value.
+ * @brief YMLFile::get_value specialization for a boolean value.
  *
  * The following strings are evaluated as true: "true", "yes", "on", "y".
  * The following strings are evaluated as false: "false", "no", "off", "n".
@@ -386,8 +383,7 @@ inline unsigned char ParameterFile::get_value<unsigned char>(
  * @return Bool value of the parameter.
  */
 template <>
-inline bool ParameterFile::get_value<bool>(std::string key,
-                                           bool default_value) {
+inline bool YMLFile::get_value<bool>(std::string key, bool default_value) {
     std::string svalue = get_value<std::string>(key, "");
     if(svalue == "") {
         _dictionary[key] = YMLFileUtilities::to_string<bool>(default_value);

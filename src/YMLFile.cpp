@@ -34,7 +34,7 @@ using namespace std;
  * @param line Line to check.
  * @return True if the line contains only comments.
  */
-bool ParameterFile::is_comment_line(std::string& line) {
+bool YMLFile::is_comment_line(std::string& line) {
     // search for the first non-whitespace character
     // if it is a '#', the line contains only comments
     unsigned int i = 0;
@@ -56,7 +56,7 @@ bool ParameterFile::is_comment_line(std::string& line) {
  * @param line Line to check.
  * @return True if the line is empty.
  */
-bool ParameterFile::is_empty_line(std::string& line) {
+bool YMLFile::is_empty_line(std::string& line) {
     // find the first non-whitespace character
     unsigned int i = 0;
     while(i < line.size() && (line[i] == ' ' || line[i] == '\t')) {
@@ -70,7 +70,7 @@ bool ParameterFile::is_empty_line(std::string& line) {
  *
  * @param line Line to strip.
  */
-void ParameterFile::strip_comments_line(std::string& line) {
+void YMLFile::strip_comments_line(std::string& line) {
     unsigned int hashpos = line.find('#');
     if(hashpos != line.npos) {
         line = line.substr(0, hashpos);
@@ -84,7 +84,7 @@ void ParameterFile::strip_comments_line(std::string& line) {
  * @return 0 if the line is not indented, the number of whitespace characters
  * before the actual contents of the line otherwise.
  */
-unsigned int ParameterFile::is_indented_line(std::string& line) {
+unsigned int YMLFile::is_indented_line(std::string& line) {
     unsigned int i = 0;
     while(i < line.size() && (line[i] == ' ' || line[i] == '\t')) {
         ++i;
@@ -103,7 +103,7 @@ unsigned int ParameterFile::is_indented_line(std::string& line) {
  * @param line Line to parse.
  * @return std::pair of a key and a value std::string.
  */
-std::pair<std::string, std::string> ParameterFile::read_keyvaluepair(
+std::pair<std::string, std::string> YMLFile::read_keyvaluepair(
         std::string& line) {
     unsigned int colonpos = line.find(':');
     if(colonpos == line.npos) {
@@ -122,7 +122,7 @@ std::pair<std::string, std::string> ParameterFile::read_keyvaluepair(
  *
  * @param line Line to strip.
  */
-void ParameterFile::strip_whitespace_line(std::string& line) {
+void YMLFile::strip_whitespace_line(std::string& line) {
     if(is_empty_line(line)) {
         line = "";
         return;
@@ -145,7 +145,7 @@ void ParameterFile::strip_whitespace_line(std::string& line) {
  *
  * @param filename Name of the parameter file.
  */
-ParameterFile::ParameterFile(std::string filename) {
+YMLFile::YMLFile(std::string filename) {
     ifstream file(filename.c_str());
 
     if(!file) {
@@ -244,7 +244,7 @@ ParameterFile::ParameterFile(std::string filename) {
  *
  * @param stream std::ostream to write to.
  */
-void ParameterFile::print_contents(std::ostream& stream) const {
+void YMLFile::print_contents(std::ostream& stream) const {
     stream << "# file written on " << YMLFileUtilities::get_timestamp()
            << ".\n";
 

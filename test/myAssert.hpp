@@ -34,6 +34,8 @@
         abort();                                                         \
     }
 
+#define my_assert_simple(expression) my_assert(expression, "Assertion failed")
+
 #define assert_values_equal(a, b, message)               \
     if(b != 0.) {                                        \
         if(fabs(a - b) / fabs(b) > 1.e-4) {              \

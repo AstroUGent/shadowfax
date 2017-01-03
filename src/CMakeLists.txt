@@ -80,6 +80,7 @@ if(DO_SHADOWFAX)
     VorGen.cpp
     VorTess.cpp
     VorTessManager.cpp
+    YMLFile.cpp
 
     ColorMap.hpp
     CoolingLocation.hpp
@@ -270,7 +271,7 @@ if(DO_VTKMAKER)
     VorGen.cpp
     VorTess.cpp
     VTKMaker.cpp
-    
+
     MPIGlobal.hpp
     MPIMethods.hpp
     ProgramLog.hpp

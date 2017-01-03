@@ -35,19 +35,41 @@
  * @return Exit code: 0 on success.
  */
 int main(int argc, char** argv) {
-    ParameterFile params("test.ini");
+    // .ini parameter file
+    {
+        ParameterFile params("test.ini");
 
-    my_assert(params.get_parameter<double>("Test.test_parameter_float", 0.) ==
-                      42.,
-              "Floating point parameter reading fails!");
-    my_assert(params.get_parameter<int>("Test.test_parameter_int", 0) == 42,
-              "Integer parameter reading fails!");
-    my_assert(params.get_parameter<std::string>("Test.test_parameter_string",
-                                                "None") == "test_string",
-              "String parameter reading fails!");
-    my_assert(params.get_parameter<bool>("Test.test_parameter_bool", true) ==
-                      false,
-              "Boolean parameter reading fails!");
+        my_assert(params.get_parameter<double>("Test.test_parameter_float",
+                                               0.) == 42.,
+                  "Floating point parameter reading fails!");
+        my_assert(params.get_parameter<int>("Test.test_parameter_int", 0) == 42,
+                  "Integer parameter reading fails!");
+        my_assert(
+                params.get_parameter<std::string>("Test.test_parameter_string",
+                                                  "None") == "test_string",
+                "String parameter reading fails!");
+        my_assert(params.get_parameter<bool>("Test.test_parameter_bool",
+                                             true) == false,
+                  "Boolean parameter reading fails!");
+    }
+
+    // .yml parameter file
+    {
+        ParameterFile params("paramtest.yml");
+
+        my_assert(params.get_parameter<double>("Test.test_parameter_float",
+                                               0.) == 42.,
+                  "Floating point parameter reading fails!");
+        my_assert(params.get_parameter<int>("Test.test_parameter_int", 0) == 42,
+                  "Integer parameter reading fails!");
+        my_assert(
+                params.get_parameter<std::string>("Test.test_parameter_string",
+                                                  "None") == "test_string",
+                "String parameter reading fails!");
+        my_assert(params.get_parameter<bool>("Test.test_parameter_bool",
+                                             true) == false,
+                  "Boolean parameter reading fails!");
+    }
 
     return 0;
 }

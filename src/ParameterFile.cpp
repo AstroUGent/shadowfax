@@ -26,8 +26,9 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ParameterFile.hpp"
-#include "Error.hpp"                           // for my_exit
-#include "RestartFile.hpp"                     // for RestartFile
+#include "Error.hpp"        // for my_exit
+#include "RestartFile.hpp"  // for RestartFile
+#include "YMLFile.hpp"
 #include <boost/property_tree/ini_parser.hpp>  // for read_ini
 #include <fstream>   // for operator<<, basic_ostream, etc
 #include <iostream>  // for cout, cerr
@@ -39,12 +40,16 @@ using namespace std;
  * @brief Print the contents of the parameter file to the stdout
  */
 void ParameterFile::print_contents() {
-    for(auto it = _parameters.begin(); it != _parameters.end(); ++it) {
-        cout << "### " << it->first.data() << " ###" << endl;
-        for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-            cout << it2->first.data() << ": " << it2->second.data() << endl;
+    if(_yml_file) {
+        _yml_file->print_contents(cout);
+    } else {
+        for(auto it = _parameters.begin(); it != _parameters.end(); ++it) {
+            cout << "### " << it->first.data() << " ###" << endl;
+            for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+                cout << it2->first.data() << ": " << it2->second.data() << endl;
+            }
+            cout << endl;
         }
-        cout << endl;
     }
 }
 
@@ -72,19 +77,30 @@ ParameterFile::ParameterFile(std::string name) : _yml_file(nullptr) {
     std::string extension = name.substr(name.size() - 3, 3);
     if(extension == "ini") {
         cout << ".ini parameter file" << endl;
+        boost::property_tree::ini_parser::read_ini(name, _parameters);
     } else if(extension == "yml") {
         cout << ".yml parameter file" << endl;
+        _yml_file = new YMLFile(name);
     } else {
         cerr << "Unknown parameter file type: ." << extension << endl;
         my_exit();
     }
 
-    boost::property_tree::ini_parser::read_ini(name, _parameters);
-
     // print out some info
     cout << "Read parameters from " << name << endl;
 
     print_contents();
+}
+
+/**
+ * @brief Destructor.
+ *
+ * Free YMLFile (if necessary).
+ */
+ParameterFile::~ParameterFile() {
+    if(_yml_file) {
+        delete _yml_file;
+    }
 }
 
 #define PARAMETERFILE_RESTART_HEADERFLAG 0
@@ -97,24 +113,36 @@ ParameterFile::ParameterFile(std::string name) : _yml_file(nullptr) {
  * @param rfile RestartFile to write to
  */
 void ParameterFile::dump(RestartFile& rfile) {
-    int headerflag = PARAMETERFILE_RESTART_HEADERFLAG;
     int propertyflag = PARAMETERFILE_RESTART_PROPERTYFLAG;
-    int endflag = PARAMETERFILE_RESTART_ENDFLAG;
-    string header;
-    string property;
-    string value;
-    for(auto it = _parameters.begin(); it != _parameters.end(); ++it) {
-        rfile.write(headerflag);
-        header = it->first.data();
-        rfile.write(header);
-        for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+    if(_yml_file) {
+        std::string tag = "YML";
+        rfile.write(tag);
+        for(auto it = _yml_file->begin(); it != _yml_file->end(); ++it) {
             rfile.write(propertyflag);
-            property = it2->first.data();
-            rfile.write(property);
-            value = it2->second.data();
-            rfile.write(value);
+            rfile.write(it.get_key());
+            rfile.write(it.get_value());
+        }
+    } else {
+        std::string tag = "INI";
+        rfile.write(tag);
+        int headerflag = PARAMETERFILE_RESTART_HEADERFLAG;
+        string header;
+        string property;
+        string value;
+        for(auto it = _parameters.begin(); it != _parameters.end(); ++it) {
+            rfile.write(headerflag);
+            header = it->first.data();
+            rfile.write(header);
+            for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+                rfile.write(propertyflag);
+                property = it2->first.data();
+                rfile.write(property);
+                value = it2->second.data();
+                rfile.write(value);
+            }
         }
     }
+    int endflag = PARAMETERFILE_RESTART_ENDFLAG;
     rfile.write(endflag);
 }
 
@@ -125,21 +153,37 @@ void ParameterFile::dump(RestartFile& rfile) {
  * @param rfile RestartFile to read from
  */
 ParameterFile::ParameterFile(RestartFile& rfile) {
-    int val;
-    rfile.read(val);
-    string header;
-    while(val != PARAMETERFILE_RESTART_ENDFLAG) {
-        if(val == PARAMETERFILE_RESTART_HEADERFLAG) {
-            // new header
-            rfile.read(header);
-        } else {
-            string name;
-            string value;
-            rfile.read(name);
-            rfile.read(value);
-            _parameters.put(header + string(".") + name, value);
-        }
+    std::string tag;
+    rfile.read(tag);
+    if(tag == "YML") {
+        _yml_file = new YMLFile();
+        int val;
         rfile.read(val);
+        while(val != PARAMETERFILE_RESTART_ENDFLAG) {
+            std::string key;
+            std::string value;
+            rfile.read(key);
+            rfile.read(value);
+            _yml_file->add_value(key, value);
+            rfile.read(val);
+        }
+    } else {
+        int val;
+        rfile.read(val);
+        string header;
+        while(val != PARAMETERFILE_RESTART_ENDFLAG) {
+            if(val == PARAMETERFILE_RESTART_HEADERFLAG) {
+                // new header
+                rfile.read(header);
+            } else {
+                string name;
+                string value;
+                rfile.read(name);
+                rfile.read(value);
+                _parameters.put(header + string(".") + name, value);
+            }
+            rfile.read(val);
+        }
     }
 
     print_contents();

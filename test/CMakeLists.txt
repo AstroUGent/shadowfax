@@ -333,15 +333,19 @@ set(TESTPARAMETERFILE_SOURCES
     ../src/MPIGlobal.cpp
     ../src/ParameterFile.cpp
     ../src/ParameterFile.hpp
+    ../src/YMLFile.cpp
+    ../src/YMLFile.hpp
 )
 add_unit_test(NAME testParameterFile
               SOURCES ${TESTPARAMETERFILE_SOURCES}
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d)
 
-# Configure test.param
+# Configure test files
 configure_file(${PROJECT_SOURCE_DIR}/test/test.ini
                ${PROJECT_BINARY_DIR}/rundir/test/test.ini COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/paramtest.yml
+               ${PROJECT_BINARY_DIR}/rundir/test/paramtest.yml COPYONLY)
 
 # YMLFile test
 set(TESTYMLFILE_SOURCES

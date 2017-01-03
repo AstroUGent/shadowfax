@@ -57,6 +57,8 @@ class ParameterFile {
   public:
     ParameterFile(std::string name);
 
+    ~ParameterFile();
+
     /**
      * @brief Get the value of the parameter with the given name
      *

@@ -24,6 +24,8 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "io/Unit.hpp"
+#include "io/UnitDefinitions.hpp"
+#include "myAssert.hpp"
 #include <iostream>
 #include <string>
 
@@ -61,6 +63,12 @@ int main(int argc, char** argv) {
                              unit_length2.get_quantity())
                   << std::endl;
         std::cerr << "Units are not compatible!" << std::endl;
+        exit(1);
+    }
+
+    Unit unit_length3 = UnitDefinitions::get_unit("m");
+    if(unit_length3.get_quantity() != "length") {
+        std::cerr << "Wrong quantity!" << std::endl;
         exit(1);
     }
 

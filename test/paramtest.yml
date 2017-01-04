@@ -1,0 +1,6 @@
+Test:
+  # a comment line that should be ignored
+  test_parameter_float: 42.
+  test_parameter_int: 42
+  test_parameter_string: test_string
+  test_parameter_bool: OFF

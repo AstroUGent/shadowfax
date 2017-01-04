@@ -37,6 +37,7 @@ Output.hpp
 PhysicalConstant.hpp
 Unit.hpp
 UnitConverter.hpp
+UnitDefinitions.hpp
 UnitSet.hpp
 UnitSetGenerator.hpp
 )

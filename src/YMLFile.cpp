@@ -243,10 +243,12 @@ YMLFile::YMLFile(std::string filename) {
  * We have to do some magic to produce yaml group syntax.
  *
  * @param stream std::ostream to write to.
+ * @param add_timestamp Add a time stamp to the output?
  */
-void YMLFile::print_contents(std::ostream& stream) const {
-    stream << "# file written on " << YMLFileUtilities::get_timestamp()
-           << ".\n";
+void YMLFile::print_contents(std::ostream& stream, bool add_timestamp) const {
+    if(add_timestamp) {
+        stream << "# written on " << YMLFileUtilities::get_timestamp() << ".\n";
+    }
 
     // note that we do assume here that all group members are nicely grouped
     // together. This will always be the case, as the map contents is sorted

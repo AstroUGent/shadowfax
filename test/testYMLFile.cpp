@@ -24,6 +24,7 @@
  * @author Bert Vandenbroucke (bv7@st-andrews.ac.uk)
  */
 #include "YMLFile.hpp"
+#include "YMLFileUtilities.hpp"
 #include "myAssert.hpp"
 
 /**
@@ -34,6 +35,12 @@
  * @return Exit code: 0 on success.
  */
 int main(int argc, char** argv) {
+    std::string inistring = "Test.test";
+    YMLFileUtilities::replace_char('.', ':', inistring);
+    my_assert_simple(inistring == "Test:test");
+    YMLFileUtilities::replace_char(':', '.', inistring);
+    my_assert_simple(inistring == "Test.test");
+
     YMLFile file("test.yml");
 
     my_assert_simple(file.get_value<int>("test_integer1") == 42);

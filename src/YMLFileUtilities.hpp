@@ -459,6 +459,22 @@ inline std::string human_readable_bytes(unsigned long bytes) {
     bytestream << bytefloat << " " << byte_unit(sizecount);
     return bytestream.str();
 }
+
+/**
+ * @brief Replace each occurence of the first given character with the second
+ * given character in the given string.
+ *
+ * @param a Character to replace.
+ * @param b Character to replace with.
+ * @param s std::string that is altered.
+ */
+inline void replace_char(const char a, const char b, std::string& s) {
+    for(unsigned int i = 0; i < s.size(); ++i) {
+        if(s[i] == a) {
+            s[i] = b;
+        }
+    }
+}
 }
 
 #endif  // YMLFILEUTILITIES_HPP

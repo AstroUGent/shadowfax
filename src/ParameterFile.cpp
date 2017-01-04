@@ -26,9 +26,8 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ParameterFile.hpp"
-#include "Error.hpp"        // for my_exit
-#include "RestartFile.hpp"  // for RestartFile
-#include "YMLFile.hpp"
+#include "Error.hpp"                           // for my_exit
+#include "RestartFile.hpp"                     // for RestartFile
 #include <boost/property_tree/ini_parser.hpp>  // for read_ini
 #include <fstream>   // for operator<<, basic_ostream, etc
 #include <iostream>  // for cout, cerr
@@ -41,7 +40,7 @@ using namespace std;
  */
 void ParameterFile::print_contents() {
     if(_yml_file) {
-        _yml_file->print_contents(cout);
+        _yml_file->print_contents(cout, false);
     } else {
         for(auto it = _parameters.begin(); it != _parameters.end(); ++it) {
             cout << "### " << it->first.data() << " ###" << endl;

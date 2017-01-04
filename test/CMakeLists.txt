@@ -191,6 +191,7 @@ set(TESTGASCOOLING_SOURCES
     ../src/NDIrregTable.cpp
     ../src/NDTable.cpp
     ../src/ParameterFile.cpp
+    ../src/YMLFile.cpp
     ../src/utilities/GasParticle.cpp
     ../src/utilities/Particle.cpp
     ../src/utilities/Hilbert.cpp
@@ -364,5 +365,5 @@ configure_file(${PROJECT_SOURCE_DIR}/test/test.yml
                ${PROJECT_BINARY_DIR}/rundir/test/test.yml COPYONLY)
 
 # Add custom 'make check' target that builds all tests and executes them
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
-                                                               version_number)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+                        DEPENDS ${TESTNAMES} version_number)

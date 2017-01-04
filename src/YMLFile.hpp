@@ -75,7 +75,7 @@ class YMLFile {
         _dictionary[key] = value;
     }
 
-    void print_contents(std::ostream& stream) const;
+    void print_contents(std::ostream& stream, bool add_timestamp = true) const;
 
     /**
      * @brief Read a value of the given template type from the internal

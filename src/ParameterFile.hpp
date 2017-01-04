@@ -27,12 +27,14 @@
 #ifndef PARAMETERFILE_HPP
 #define PARAMETERFILE_HPP
 
+#include "YMLFile.hpp"
+#include "YMLFileUtilities.hpp"
+
 #include <boost/property_tree/ptree.hpp>  // for basic_ptree
 #include <sstream>  // for basic_stringbuf<>::int_type, etc
 #include <string>   // for string, operator<
 
 class RestartFile;
-class YMLFile;
 
 /**
  * @brief Abstraction of the parameter file that contains vital run information
@@ -67,7 +69,15 @@ class ParameterFile {
      * @return Value of the parameter
      */
     template <typename T> T get_parameter(std::string name, T default_value) {
-        return _parameters.get<T>(name, default_value);
+        if(_yml_file) {
+            // convert all '.' to ':' to comply with the YML syntax
+            YMLFileUtilities::replace_char('.', ':', name);
+            return _yml_file->get_value<T>(name, default_value);
+        } else {
+            // convert all ':' to '.' to comply with the boost::ini syntax
+            YMLFileUtilities::replace_char(':', '.', name);
+            return _parameters.get<T>(name, default_value);
+        }
     }
 
     /**

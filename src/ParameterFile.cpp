@@ -114,6 +114,25 @@ ParameterFile::~ParameterFile() {
 }
 
 /**
+ * @brief Get the physical value of the quantity with the given name, converting
+ * it to internal units for the given quantity.
+ *
+ * If the quantity does not match the units specified in the parameter file, an
+ * error is thrown.
+ *
+ * @param name Name of the parameter.
+ * @param quantity Quantity the parameter represents.
+ * @param default_value Default value of the parameter, with units.
+ * @return Value of the parameter in the given Unit.
+ */
+double ParameterFile::get_quantity(std::string name, std::string quantity,
+                                   std::string default_value) {
+    quantity = UnitDefinitions::get_quantity(quantity);
+    Unit unit = _internal_units->get_unit(quantity);
+    return get_quantity(name, unit, default_value);
+}
+
+/**
  * @brief Get the physical value of the quantity with the given name, in the
  * given Unit.
  *
@@ -122,11 +141,11 @@ ParameterFile::~ParameterFile() {
  * of the given Unit, an error is thrown.
  *
  * @param name Name of the parameter.
- * @param quantity Quantity the parameter represents.
+ * @param unit Unit in which the quantity should be expressed.
  * @param default_value Default value of the parameter, with units.
  * @return Value of the parameter in the given Unit.
  */
-double ParameterFile::get_quantity(std::string name, std::string quantity,
+double ParameterFile::get_quantity(std::string name, Unit unit,
                                    std::string default_value) {
     std::string value = get_parameter<std::string>(name, default_value);
     // split the value in the physical value and the unit
@@ -144,8 +163,6 @@ double ParameterFile::get_quantity(std::string name, std::string quantity,
     }
     std::string unitstr = value.substr(idx);
     Unit parameter_unit = UnitDefinitions::get_unit(unitstr);
-    quantity = UnitDefinitions::get_quantity(quantity);
-    Unit unit = _internal_units->get_unit(quantity);
     UnitConverter converter(parameter_unit, unit);
     return converter.convert(physical_value);
 }

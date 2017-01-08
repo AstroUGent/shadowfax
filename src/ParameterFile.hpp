@@ -102,6 +102,8 @@ class ParameterFile {
     double get_quantity(std::string name, std::string quantity,
                         std::string default_value);
 
+    double get_quantity(std::string name, Unit unit, std::string default_value);
+
     /**
      * @brief Check if the given parameter is true or false/not specified
      *

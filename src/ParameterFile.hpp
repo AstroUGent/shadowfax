@@ -35,6 +35,7 @@
 #include <string>   // for string, operator<
 
 class RestartFile;
+class Unit;
 
 /**
  * @brief Abstraction of the parameter file that contains vital run information
@@ -92,6 +93,8 @@ class ParameterFile {
     template <typename T> T get_parameter(const char* name, T default_value) {
         return get_parameter<T>(std::string(name), default_value);
     }
+
+    double get_quantity(std::string name, Unit unit, std::string default_value);
 
     /**
      * @brief Check if the given parameter is true or false/not specified

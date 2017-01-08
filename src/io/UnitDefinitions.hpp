@@ -43,8 +43,26 @@ class UnitDefinitions {
      * unit.
      */
     inline static Unit get_unit(std::string name) {
-        if(name == "m") {
+        // units are ordered alphabetically, irrespective of their quantity
+        if(name == "cm") {
+            return Unit("length", "cm", 0.01);
+        } else if(name == "g") {
+            return Unit("mass", "g", 0.001);
+        } else if(name == "Gyr") {
+            return Unit("time", "Gyr", 3.154e16);
+        } else if(name == "kg") {
+            return Unit("mass", "kg", 1.);
+        } else if(name == "kpc") {
+            return Unit("length", "kpc", 3.08567758e19);
+        } else if(name == "m") {
             return Unit("length", "m", 1.);
+        } else if(name == "Msol") {
+            return Unit("mass", "Msol", 1.9891e30);
+        } else if(name == "s") {
+            return Unit("time", "s", 1.);
+        } else if(name == "") {
+            // this one is always last
+            return Unit("dimensionless", "", 1.);
         } else {
             std::cerr << "Unknown unit: " << name << std::endl;
             abort();

@@ -26,8 +26,11 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "ParameterFile.hpp"
-#include "Error.hpp"                           // for my_exit
-#include "RestartFile.hpp"                     // for RestartFile
+#include "Error.hpp"        // for my_exit
+#include "RestartFile.hpp"  // for RestartFile
+#include "io/Unit.hpp"
+#include "io/UnitConverter.hpp"
+#include "io/UnitDefinitions.hpp"
 #include <boost/property_tree/ini_parser.hpp>  // for read_ini
 #include <fstream>   // for operator<<, basic_ostream, etc
 #include <iostream>  // for cout, cerr
@@ -100,6 +103,41 @@ ParameterFile::~ParameterFile() {
     if(_yml_file) {
         delete _yml_file;
     }
+}
+
+/**
+ * @brief Get the physical value of the quantity with the given name, in the
+ * given Unit.
+ *
+ * If the specified units do not match the given Unit, an attempt is made to
+ * convert units. If the quantity of the parameter does not match the quantity
+ * of the given Unit, an error is thrown.
+ *
+ * @param name Name of the parameter.
+ * @param unit Unit in which we want the parameter to be.
+ * @param default_value Default value of the parameter, with units.
+ * @return Value of the parameter in the given Unit.
+ */
+double ParameterFile::get_quantity(std::string name, Unit unit,
+                                   std::string default_value) {
+    std::string value = get_parameter<std::string>(name, default_value);
+    // split the value in the physical value and the unit
+    size_t idx;
+    double physical_value;
+    try {
+        physical_value = std::stod(value, &idx);
+    } catch(std::invalid_argument e) {
+        std::cerr << "Error extracting physical value from \"" << value << "\"!"
+                  << std::endl;
+        my_exit();
+    }
+    while(idx < value.size() && value[idx] == ' ') {
+        ++idx;
+    }
+    std::string unitstr = value.substr(idx);
+    Unit parameter_unit = UnitDefinitions::get_unit(unitstr);
+    UnitConverter converter(parameter_unit, unit);
+    return converter.convert(physical_value);
 }
 
 #define PARAMETERFILE_RESTART_HEADERFLAG 0

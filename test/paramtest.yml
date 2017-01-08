@@ -4,3 +4,4 @@ Test:
   test_parameter_int: 42
   test_parameter_string: test_string
   test_parameter_bool: OFF
+  test_physical_value: 1. m

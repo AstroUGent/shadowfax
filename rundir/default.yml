@@ -1,0 +1,171 @@
+Time:
+  # Total simulation time (with time unit, no default value, has to be set)
+  MaxTime: 1. s
+  # Use a global timestep? (default: false)
+  GlobalTimestep: false
+  # Maximum size of the particle time step (with time unit, default: MaxTime)
+  MaxTimeStep: 1. s
+  # Minimum size of the particle time step (with time unit, default:
+  # MaxTime/(2**60))
+  MinTimeStep: 8.67361738e-19 s
+  # Use the expensive tree walk time step criterion? (default: false)
+  TreeTime: false
+
+Snapshot:
+  # Prefix for the snapshot name. The snapshot is named $(BaseName)xxx.hdf5,
+  # where xxx is a sequential 3 digit counter (default: snapshot)
+  BaseName: snapshot
+  # Time between subsequent snapshots (with time unit, default: 10% of MaxTime)
+  SnapTime: 0.1 s
+  # Index number of first snapshot that is written out (default: 0)
+  # This number should be adjusted when restarting from a snapshot!
+  FirstSnap: 0
+  # Directory in which all output will be stored (including log and restart
+  # files). Should not contain trailing '/' (default: .)
+  OutputDir: .
+  # Type of snapshot file (Gadget/Shadowfax, default: Gadget)
+  Type: Gadget
+  # Should every node write a separate snapshot file, or should all nodes try to
+  # write to the same file? (default: false)
+  PerNodeOutput: false
+
+IC:
+  # Name of the initial condition (IC) file (default: $(OutputDir)/icfile.hdf5)
+  Filename: ./icfile.hdf5
+  # Type of the IC file (Gadget/Shadowfax, default: Gadget)
+  Type: Gadget
+
+RiemannSolver:
+  # Type of Riemann solver used to solve the Riemann problem (Exact/TRRS/HLLC,
+  # default: Exact)
+  Type: Exact
+  # Tolerance used for the Newton-Rapshon iteration performed by the exact
+  # Riemann solver (dimensionless, default: 1.e-8)
+  Tolerance: 1.e-8
+  # Cut off value used to distinguish between the Newton-Raphson and the Brent
+  # regime for the root finding step in the exact Riemann solver (default: -5.)
+  CutOff: -5.
+  # Courant Friedrichs Lewy parameter used to limit the hydrodynamical time step
+  # (default: 0.4)
+  CFL: 0.4
+
+Hydro:
+  # Adiabatic index for the polytropic equation of state of the gas (default:
+  # 1.66667)
+  Gamma: 1.66667
+
+Gravity:
+  # Enable gravity? (default: true)
+  Gravity: true
+  # Softening length used for particles with a fixed softening length (with
+  # length unit, default: 0.03 m)
+  Softening: 0.03 m
+  # Eta factor used in gravitational time step criterion (dimensionless,
+  # default: 0.05/2.8)
+  Eta: 0.017857143
+  # Alpha factor used in relative tree opening criterion (default: 0.005)
+  Alpha: 0.005
+
+Voronoi:
+  # Tolerance used in the computation of the Delaunay tesselation to distinguish
+  # between exact and inexact geometric tests (default: 1.e-9)
+  Tolerance: 1.e-9
+
+Tree:
+  # Number of cells in one coordinate direction for the grid on which the Ewald
+  # correction to the gravitational force is precomputed. Warning: the size of
+  # the grid scales as 3*EwaldSize^3 in memory! (default: 64)
+  EwaldSize: 64
+  # Parameter that determines the cut off between short and long rang forces
+  # when using Ewald's method (default: 2.)
+  EwaldAlpha: 2.
+
+Memory:
+  # Maximum size of the MPI buffer in memory (default: 1 GB)
+  MaximumSize: 1 GB
+
+Code:
+  # Computational time interval after which a restart file should be written
+  # (with time unit, default: 1 h)
+  RestartTime: 1. h
+
+Units:
+  # Units used internally during the run (SI/CGS/galactic/Gadget, default: SI)
+  InternalUnits: SI
+  # Units used for the snapshot output (SI/CGS/galactic/Gadget, default: SI)
+  OutputUnits: SI
+
+Physics:
+  # Use physical values for physical constants? (default: true)
+  RealPhysics: true
+  # Enable gas cooling? (default: false)
+  Cooling: false
+  # Mean molecular weight of the gas (with mass unit, default: 1.219512195)
+  MeanMolWeight: 1.219512195 amu
+  # Enable star formation? (default: false)
+  StarFormation: false
+  # Enable stellar feedback? (default: false)
+  StellarFeedback: false
+
+Cooling:
+  # Maximum number of iterations per cooling sub calculation (default: 128)
+  MaxIt: 128
+  # Required precision per cooling step (default: 0.001)
+  ReqPrec: 0.001
+  # Factor that determines when a cooling step is split into multiple steps
+  # (default: 10.)
+  TimeSplitFactor: 10.
+
+StarFormation:
+  # Density criterion (with density unit, default: 2.e-22 kg m^-3)
+  MinSFDensity: 2.e-22 kg m^-3
+  # Temperature criterion (with temperature unit, default: 15000. K)
+  MaxSFTemp: 15000. K
+
+StellarFeedback:
+  # Start time for stellar wind feedback (with time unit, default: 0 yr)
+  SWStart: 0. yr
+  # End time for stellar wind feedback (with time unit, default: 4.3e9 yr)
+  SWEnd: 4.3e9 yr
+  # Start time for SNII feedback (with time unit, default: 3.8e6 yr)
+  SNIIStart: 3.8e6 yr
+  # End time for SNII feedback (with time unit, default: 3.1e7 yr)
+  SNIIEnd: 3.1e7 yr
+  # Start time for SNIa feedback (with time unit, default: 1.543e9 yr)
+  SNIaStart: 1.543e9 yr
+  # End time for SNIa feedback (with time unit, default: 1.87e9 yr)
+  SNIaEnd: 1.87e9 yr
+  # Fe mass fraction of SNII (default: 0.000932719658516)
+  SNII_Fe: 0.000932719658516
+  # Mg mass fraction of SNII (default: 0.00151412640705)
+  SNII_Mg: 0.00151412640705
+  # Fe mass fraction of SNIa (default: 0.00165100587997)
+  SNIa_Fe: 0.00165100587997
+  # Mg mass fraction of SNIa (default: 0.000257789470044)
+  SNIa_Mg: 0.000257789470044
+  # Energy released per SNII (with energy unit, default: 1.e51 erg)
+  SNII_E: 1.e51 erg
+  # Energy released per stellar wind (with energy unit, default: 1.e50 erg)
+  SW_E: 1.e50 erg
+  # Energy released per SNIa (with energy unit, default: 1.e51 erg)
+  SNIa_E: 1.e51 erg
+  # Mass fraction released per SNIa (default: 0.00655147325196)
+  SNIa_m: 0.00655147325196
+  # Mass fraction released per SNII (default: 0.191445322565)
+  SNII_m: 0.191445322565
+  # Number of SNIa per SNII (default: 0.15)
+  nSNIa_per_SNII: 0.15
+  # Number of SNII per mass (with per mass unit, default: 5.93062793e-33 kg^-1)
+  MassFac_SNII: 5.93062793e-33
+
+Cosmology:
+  # Enable comoving integration? (default: false)
+  CosmologicalSimulation: false
+  # Initial redshift of the simulation (default: 99.)
+  InitialRedshift: 99.
+  # Value of the Hubble constant in 100 km/s/Mpc (default: 0.7)
+  Hubble0: 0.7
+  # Value of Omega matter (default: 0.28)
+  OmegaMatter: 0.28
+  # Value of Omega Lambda (default: 0.72)
+  OmegaLambda: 0.72

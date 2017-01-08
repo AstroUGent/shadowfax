@@ -44,14 +44,29 @@ class UnitDefinitions {
      */
     inline static Unit get_unit(std::string name) {
         // units are ordered alphabetically, irrespective of their quantity
-        if(name == "cm") {
+        if(name == "amu") {
+            // check value!
+            return Unit("mass", "amu", 1.67e-27);
+        } else if(name == "cm") {
             return Unit("length", "cm", 0.01);
+        } else if(name == "erg") {
+            return Unit("length*length*mass/time/time", "erg", 1.e7);
         } else if(name == "g") {
             return Unit("mass", "g", 0.001);
         } else if(name == "Gyr") {
             return Unit("time", "Gyr", 3.154e16);
+        } else if(name == "h") {
+            return Unit("time", "h", 3600.);
+        } else if(name == "J") {
+            return Unit("length*length*mass/time/time", "J", 1.);
+        } else if(name == "K") {
+            return Unit("temperature", "K", 1.);
         } else if(name == "kg") {
             return Unit("mass", "kg", 1.);
+        } else if(name == "kg^-1") {
+            return Unit("1/mass", "kg^-1", 1.);
+        } else if(name == "kg m^-3") {
+            return Unit("mass/length/length/length", "kg m^-3", 1.);
         } else if(name == "kpc") {
             return Unit("length", "kpc", 3.08567758e19);
         } else if(name == "m") {
@@ -60,6 +75,8 @@ class UnitDefinitions {
             return Unit("mass", "Msol", 1.9891e30);
         } else if(name == "s") {
             return Unit("time", "s", 1.);
+        } else if(name == "yr") {
+            return Unit("time", "yr", 3.15576e7);
         } else if(name == "") {
             // this one is always last
             return Unit("dimensionless", "", 1.);

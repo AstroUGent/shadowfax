@@ -68,7 +68,7 @@
 //#define ENTROPY
 
 #define SIMULATION_DEFAULT_OUTPUTDIR "."
-#define SIMULATION_DEFAULT_RESTARTTIME 3600.
+#define SIMULATION_DEFAULT_RESTARTTIME "1. h"
 #define SIMULATION_DEFAULT_UNITS "SI"
 #define SIMULATION_DEFAULT_ICTYPE "Gadget"
 #define SIMULATION_DEFAULT_ICNAME "icfile.hdf5"
@@ -1087,8 +1087,9 @@ void Simulation::initialize(string filename, bool read_mass) {
     string outputdir = _parameterfile->get_parameter<string>(
             "Snapshots.OutputDir", SIMULATION_DEFAULT_OUTPUTDIR);
     _outputdir = HelperFunctions::get_absolute_path(outputdir);
-    _restarttime = _parameterfile->get_parameter<double>(
-            "Code.RestartTime", SIMULATION_DEFAULT_RESTARTTIME);
+    _restarttime = _parameterfile->get_quantity("Code.RestartTime",
+                                                Unit("time", "s", 1.),
+                                                SIMULATION_DEFAULT_RESTARTTIME);
 
     // initialize global program log (if logging is enabled)
     LOGINIT(_outputdir);

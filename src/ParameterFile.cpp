@@ -31,6 +31,8 @@
 #include "io/Unit.hpp"
 #include "io/UnitConverter.hpp"
 #include "io/UnitDefinitions.hpp"
+#include "io/UnitSet.hpp"
+#include "io/UnitSetGenerator.hpp"
 #include <boost/property_tree/ini_parser.hpp>  // for read_ini
 #include <fstream>   // for operator<<, basic_ostream, etc
 #include <iostream>  // for cout, cerr
@@ -92,6 +94,11 @@ ParameterFile::ParameterFile(std::string name) : _yml_file(nullptr) {
     cout << "Read parameters from " << name << endl;
 
     print_contents();
+
+    // initialize internal units
+    std::string internal_units =
+            get_parameter<std::string>("Units.InternalUnits", "SI");
+    _internal_units = UnitSetGenerator::generate(internal_units);
 }
 
 /**
@@ -103,6 +110,7 @@ ParameterFile::~ParameterFile() {
     if(_yml_file) {
         delete _yml_file;
     }
+    delete _internal_units;
 }
 
 /**
@@ -114,11 +122,11 @@ ParameterFile::~ParameterFile() {
  * of the given Unit, an error is thrown.
  *
  * @param name Name of the parameter.
- * @param unit Unit in which we want the parameter to be.
+ * @param quantity Quantity the parameter represents.
  * @param default_value Default value of the parameter, with units.
  * @return Value of the parameter in the given Unit.
  */
-double ParameterFile::get_quantity(std::string name, Unit unit,
+double ParameterFile::get_quantity(std::string name, std::string quantity,
                                    std::string default_value) {
     std::string value = get_parameter<std::string>(name, default_value);
     // split the value in the physical value and the unit
@@ -136,6 +144,8 @@ double ParameterFile::get_quantity(std::string name, Unit unit,
     }
     std::string unitstr = value.substr(idx);
     Unit parameter_unit = UnitDefinitions::get_unit(unitstr);
+    quantity = UnitDefinitions::get_quantity(quantity);
+    Unit unit = _internal_units->get_unit(quantity);
     UnitConverter converter(parameter_unit, unit);
     return converter.convert(physical_value);
 }

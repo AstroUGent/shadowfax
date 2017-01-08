@@ -53,10 +53,12 @@ int main(int argc, char** argv) {
                                              true) == false,
                   "Boolean parameter reading fails!");
 
-        Unit unit_length("length", "m", 1.);
-        double value = params.get_quantity("Test.test_physical_value",
-                                           unit_length, "0. m");
-        my_assert(value == 1., "Physical value parameter reading fails!");
+        my_assert(params.get_quantity("Test.test_physical_value", "length",
+                                      "0. m") == 1.,
+                  "Physical value parameter reading fails!");
+        my_assert(params.get_quantity("Test.test_aliased_quantity", "energy",
+                                      "0. J") == 1.,
+                  "Aliased quantity reading fails!");
     }
 
     return 0;

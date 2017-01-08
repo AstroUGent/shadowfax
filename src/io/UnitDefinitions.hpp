@@ -86,6 +86,28 @@ class UnitDefinitions {
             return Unit();
         }
     }
+
+    /**
+     * @brief Get the quantity represented by the given quantity, converting
+     * quantity aliases to their proper basic quantity representations.
+     *
+     * @param quantity Quantity, can be either a basic quantity expression or an
+     * aliased quantity (expressions containing aliased quantities are not
+     * supported).
+     * @return Basic quantity representation of the given quantity. This
+     * representation only contains the five basic SI quantities: length, mass,
+     * time, temperature and current.
+     */
+    inline static std::string get_quantity(std::string quantity) {
+        if(quantity == "energy") {
+            return "length*length*mass/time/time";
+        } else if(quantity == "mass_density") {
+            return "mass/length/length/length";
+        } else {
+            // no alias found, return the input string
+            return quantity;
+        }
+    }
 };
 
 #endif  // UNITDEFINITIONS_HPP

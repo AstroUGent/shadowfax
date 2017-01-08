@@ -336,6 +336,7 @@ set(TESTPARAMETERFILE_SOURCES
     ../src/ParameterFile.hpp
     ../src/YMLFile.cpp
     ../src/YMLFile.hpp
+    ../src/io/UnitSet.cpp
 )
 add_unit_test(NAME testParameterFile
               SOURCES ${TESTPARAMETERFILE_SOURCES}

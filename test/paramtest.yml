@@ -5,3 +5,4 @@ Test:
   test_parameter_string: test_string
   test_parameter_bool: OFF
   test_physical_value: 1. m
+  test_aliased_quantity: 1. J

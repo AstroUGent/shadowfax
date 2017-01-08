@@ -36,6 +36,7 @@
 
 class RestartFile;
 class Unit;
+class UnitSet;
 
 /**
  * @brief Abstraction of the parameter file that contains vital run information
@@ -54,6 +55,10 @@ class ParameterFile {
 
     /*! @brief YMLFile containing the contents of the .yml file. */
     YMLFile* _yml_file;
+
+    /*! @brief UnitSet containing the internal units. Used to convert physical
+     *  quantities to the correct units. */
+    UnitSet* _internal_units;
 
     void print_contents();
 
@@ -94,7 +99,8 @@ class ParameterFile {
         return get_parameter<T>(std::string(name), default_value);
     }
 
-    double get_quantity(std::string name, Unit unit, std::string default_value);
+    double get_quantity(std::string name, std::string quantity,
+                        std::string default_value);
 
     /**
      * @brief Check if the given parameter is true or false/not specified

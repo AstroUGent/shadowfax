@@ -187,6 +187,7 @@ if(DO_ICMAKER)
     Line.cpp
     MPIGlobal.cpp
     NgbSearch.cpp
+    ParameterFile.cpp
     Plane.cpp
     ProgramLog.cpp
     RectangularBox.cpp
@@ -202,6 +203,7 @@ if(DO_ICMAKER)
     VorGen.cpp
     VorTess.cpp
     VorTessManager.cpp
+    YMLFile.cpp
 
     DelCont.hpp
     DelTess.hpp
@@ -257,6 +259,7 @@ if(DO_VTKMAKER)
     Line.cpp
     MPIGlobal.cpp
     NgbSearch.cpp
+    ParameterFile.cpp
     Plane.cpp
     ProgramLog.cpp
     RectangularBox.cpp
@@ -271,6 +274,7 @@ if(DO_VTKMAKER)
     VorGen.cpp
     VorTess.cpp
     VTKMaker.cpp
+    YMLFile.cpp
 
     MPIGlobal.hpp
     MPIMethods.hpp

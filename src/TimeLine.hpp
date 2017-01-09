@@ -45,8 +45,6 @@ class UnitSet;
 #define TIMELINE_DEFAULT_SNAPTYPE "Gadget"
 #define TIMELINE_DEFAULT_BASENAME "snapshot"
 #define TIMELINE_DEFAULT_TREETIMEFLAG false
-#define TIMELINE_DEFAULT_MAXTIMESTEP 0.
-#define TIMELINE_DEFAULT_MINTIMESTEP 0.
 #define TIMELINE_DEFAULT_LASTSNAP 0
 #define TIMELINE_DEFAULT_PERNODEOUTPUTFLAG false
 
@@ -113,12 +111,9 @@ class TimeLine {
     TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
              ParticleVector& particlevector, std::string snaptype,
              std::string snapname, UnitSet& units, UnitSet& output_units,
-             bool gravity, bool periodic, Cosmology* cosmology = NULL,
-             bool treetime = TIMELINE_DEFAULT_TREETIMEFLAG,
-             double max_timestep = TIMELINE_DEFAULT_MAXTIMESTEP,
-             double min_timestep = TIMELINE_DEFAULT_MINTIMESTEP,
-             unsigned int lastsnap = TIMELINE_DEFAULT_LASTSNAP,
-             bool per_node_output = TIMELINE_DEFAULT_PERNODEOUTPUTFLAG);
+             bool gravity, bool periodic, bool treetime, double max_timestep,
+             double min_timestep, unsigned int lastsnap, bool per_node_output,
+             Cosmology* cosmology = NULL);
     TimeLine(ParameterFile* parameters, std::string outputdir,
              ParticleVector& particlevector, UnitSet& units,
              UnitSet& output_units, bool periodic, Cosmology* cosmology = NULL);

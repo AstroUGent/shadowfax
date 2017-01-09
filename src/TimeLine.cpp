@@ -65,7 +65,6 @@ using namespace std;
  * be used
  * @param periodic Bool specifying whether the box containing the
  * ParticleVector is periodic (true) or reflective (false)
- * @param cosmology Cosmology used for comoving integration
  * @param treetime Bool specifying whether the timesteps should be calculated
  * using the expensive treewalk
  * @param max_timestep Maximum particle timestep allowed
@@ -73,17 +72,27 @@ using namespace std;
  * @param lastsnap The starting index of the snapshots (default value: 0)
  * @param per_node_output Flag indicating if each node should write a separate
  * snapshot file or all nodes should write to the same file (if possible)
+ * @param cosmology Cosmology used for comoving integration
  */
 TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
                    ParticleVector& particlevector, std::string snaptype,
                    std::string snapname, UnitSet& units, UnitSet& output_units,
-                   bool gravity, bool periodic, Cosmology* cosmology,
-                   bool treetime, double max_timestep, double min_timestep,
-                   unsigned int lastsnap, bool per_node_output)
+                   bool gravity, bool periodic, bool treetime,
+                   double max_timestep, double min_timestep,
+                   unsigned int lastsnap, bool per_node_output,
+                   Cosmology* cosmology)
         : _particles(particlevector) {
     _snapshotwriter = SnapshotWriterFactory::generate(
             snaptype, snapname, units, output_units, lastsnap, per_node_output);
     _maxtime = maxtime;
+
+    if(_maxtime < 0) {
+        std::cerr << "No maximum simulation time given. This parameter is "
+                     "required!"
+                  << std::endl;
+        my_exit();
+    }
+
     _cosmology = cosmology;
     if(_cosmology) {
         _mintime = log(_cosmology->get_a0());
@@ -97,22 +106,25 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
     _current_time = 0;
     _timestep = 0;
     _snaptime = snaptime;
+    if(_snaptime < 0.) {
+        _snaptime = 0.1 * _maxtime;
+    }
     _cfl = cfl;
     _gravity = gravity;
     _periodic = periodic;
     _treetime = treetime;
     _grav_eta = grav_eta;
     _max_timestep = _integer_maxtime;
-    if(max_timestep) {
+    if(max_timestep > 0.) {
         max_timestep /= maxtime;
         while(_max_timestep > max_timestep * _integer_maxtime) {
             _max_timestep >>= 1;
         }
     }
-    if(min_timestep) {
+    if(min_timestep > 0.) {
         min_timestep /= maxtime;
         _min_timestep = _integer_maxtime;
-        while(_min_timestep > max_timestep * _integer_maxtime) {
+        while(_min_timestep > min_timestep * _integer_maxtime) {
             _min_timestep >>= 1;
         }
     } else {
@@ -140,12 +152,9 @@ TimeLine::TimeLine(double maxtime, double snaptime, double cfl, double grav_eta,
 TimeLine::TimeLine(ParameterFile* parameters, std::string outputdir,
                    ParticleVector& particlevector, UnitSet& units,
                    UnitSet& output_units, bool periodic, Cosmology* cosmology)
-        : TimeLine(parameters->get_parameter<double>("Time.MaxTime", -1000.),
-                   parameters->get_parameter<double>(
-                           "Snapshots.SnapTime",
-                           0.1 *
-                                   parameters->get_parameter<double>(
-                                           "Time.MaxTime", -1000.)),
+        : TimeLine(parameters->get_quantity("Time.MaxTime", "time", "-1000. s"),
+                   parameters->get_quantity("Snapshots.SnapTime", "time",
+                                            "-1. s"),
                    parameters->get_parameter<double>("RiemannSolver.CFL",
                                                      TIMELINE_DEFAULT_CFL),
                    parameters->get_parameter<double>("Gravity.Eta",
@@ -159,14 +168,13 @@ TimeLine::TimeLine(ParameterFile* parameters, std::string outputdir,
                                    TIMELINE_DEFAULT_BASENAME),
                    units, output_units,
                    parameters->check_parameter("Gravity.Gravity"), periodic,
-                   cosmology, parameters->check_parameter("Time.TreeTime"),
-                   parameters->get_parameter<double>(
-                           "Time.MaxTimeStep", TIMELINE_DEFAULT_MAXTIMESTEP),
-                   parameters->get_parameter<double>(
-                           "Time.MinTimeStep", TIMELINE_DEFAULT_MINTIMESTEP),
+                   parameters->check_parameter("Time.TreeTime"),
+                   parameters->get_quantity("Time.MaxTimeStep", "time", "0. s"),
+                   parameters->get_quantity("Time.MinTimeStep", "time", "0. s"),
                    parameters->get_parameter<unsigned int>(
                            "Snapshots.FirstSnap", TIMELINE_DEFAULT_LASTSNAP),
-                   parameters->check_parameter("Snapshots.PerNodeOutput")) {}
+                   parameters->check_parameter("Snapshots.PerNodeOutput"),
+                   cosmology) {}
 
 /**
   * @brief Get the physical current time on the simulation timeline

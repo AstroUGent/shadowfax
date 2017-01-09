@@ -108,10 +108,17 @@ Header GadgetSnapshotReader::read_snapshot(ParticleVector& particles,
                         HDF5tools::read_attribute_scalar<double>(
                                 group, "Unit time in cgs (U_t)",
                                 HDF5types::DOUBLE);
+                double unit_temperature_in_cgs =
+                        HDF5tools::read_attribute_scalar<double>(
+                                group, "Unit temperature in cgs (U_T)",
+                                HDF5types::DOUBLE);
                 Unit unit_length("length", "U_L", 0.01 * unit_length_in_cgs);
                 Unit unit_mass("mass", "U_M", 0.001 * unit_mass_in_cgs);
                 Unit unit_time("time", "U_t", unit_time_in_cgs);
-                input_units = new UnitSet(unit_length, unit_mass, unit_time);
+                Unit unit_temperature("temperature", "U_T",
+                                      unit_temperature_in_cgs);
+                input_units = new UnitSet(unit_length, unit_mass, unit_time,
+                                          unit_temperature);
                 status = H5Gclose(group);
             }
 

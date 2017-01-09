@@ -114,7 +114,8 @@ int main(int argc, char** argv) {
     Unit _unit_mass("mass", "kg", 1.);
     Unit _unit_length("length", "m", 1.);
     Unit _unit_time("time", "s", 1.);
-    UnitSet units(_unit_length, _unit_mass, _unit_time);
+    Unit unit_temperature("temperature", "K", 1.);
+    UnitSet units(_unit_length, _unit_mass, _unit_time, unit_temperature);
     GasCooling gascooling("coolingtables/", &units, NULL, NULL);
     cout << "Starting test" << endl;
     test_GasCooling(gascooling);

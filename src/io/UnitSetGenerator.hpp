@@ -57,26 +57,34 @@ class UnitSetGenerator {
             Unit unit_length("length", "m", 1.);
             Unit unit_mass("mass", "kg", 1.);
             Unit unit_time("time", "s", 1.);
-            return new UnitSet(unit_length, unit_mass, unit_time);
+            Unit unit_temperature("temperature", "K", 1.);
+            return new UnitSet(unit_length, unit_mass, unit_time,
+                               unit_temperature);
         }
         if(name == "CGS") {
             Unit unit_length("length", "cm", 0.01);
             Unit unit_mass("mass", "g", 0.001);
             Unit unit_time("time", "s", 1.);
-            return new UnitSet(unit_length, unit_mass, unit_time);
+            Unit unit_temperature("temperature", "K", 1.);
+            return new UnitSet(unit_length, unit_mass, unit_time,
+                               unit_temperature);
         }
         if(name == "galactic") {
             Unit unit_length("length", "kpc", 3.08567758e19);
             Unit unit_mass("mass", "Msol", 1.9891e30);
             Unit unit_time("time", "Gyr", 3.154e16);
-            return new UnitSet(unit_length, unit_mass, unit_time);
+            Unit unit_temperature("temperature", "K", 1.);
+            return new UnitSet(unit_length, unit_mass, unit_time,
+                               unit_temperature);
         }
         if(name == "Gadget") {
             Unit unit_length("length", "kpc", 3.08568e19);
             Unit unit_mass("mass", "10^10 Msol", 1.989e40);
             Unit unit_velocity("length/time", "10^3 km/s", 1000.);
             Unit unit_time = unit_length / unit_velocity;
-            return new UnitSet(unit_length, unit_mass, unit_time);
+            Unit unit_temperature("temperature", "K", 1.);
+            return new UnitSet(unit_length, unit_mass, unit_time,
+                               unit_temperature);
         }
         std::cerr << "Error! Unknown UnitSet: " << name << "!" << std::endl;
         my_exit();

@@ -488,11 +488,14 @@ void SpecificICGenerator::apply_profile_dwarf(ParticleVector& grid) {
         Unit CGS_length("length", "cm", 0.01);
         Unit CGS_mass("mass", "g", 0.001);
         Unit CGS_time("time", "s", 1.);
-        UnitSet CGS_units(CGS_length, CGS_mass, CGS_time);
+        Unit CGS_temperature("temperature", "K", 1.);
+        UnitSet CGS_units(CGS_length, CGS_mass, CGS_time, CGS_temperature);
         Unit astro_length("length", "kpc", 3.08567785e19);
         Unit astro_mass("mass", "Msol", 1.9891e30);
         Unit astro_time("time", "Gyr", 3.1556926e16);
-        UnitSet astro_units(astro_length, astro_mass, astro_time);
+        Unit astro_temperature("temperature", "K", 1.);
+        UnitSet astro_units(astro_length, astro_mass, astro_time,
+                            astro_temperature);
 
         UnitConverter density_converter(CGS_units.get_density_unit(),
                                         astro_units.get_density_unit());

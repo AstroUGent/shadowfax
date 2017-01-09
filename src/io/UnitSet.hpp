@@ -69,9 +69,13 @@ class UnitSet {
     /*! @brief Acceleration Unit associated with this UnitSet */
     Unit _unit_acceleration;
 
+    /*! @brief Temperature Unit associated with this UnitSet. */
+    Unit _unit_temperature;
+
   public:
     UnitSet(UnitType type = UNITS_DEFAULT);
-    UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time);
+    UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time,
+            Unit unit_temperature);
 
     ~UnitSet() {}
 
@@ -82,6 +86,7 @@ class UnitSet {
     Unit get_time_unit();
     Unit get_mass_unit();
     Unit get_acceleration_unit();
+    Unit get_temperature_unit();
 
     Unit get_unit(std::string quantity);
 

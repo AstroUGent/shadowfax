@@ -120,11 +120,17 @@ StarFormationParticleConverter::StarFormationParticleConverter(
         ParameterFile* parameters, UnitSet* simulation_units,
         Physics* physics) {
     UnitSet SI(UNITS_DEFAULT);
-    _densitylimit = parameters->get_parameter<double>(
-            "StarFormation.MinSFDensity",
+    //    _densitylimit = parameters->get_parameter<double>(
+    //            "StarFormation.MinSFDensity",
+    //            STARFORMATIONPARTICLECONVERTER_DEFAULT_MINSFDENSITY);
+    _densitylimit = parameters->get_quantity(
+            "StarFormation.MinSFDensity", "mass_density",
             STARFORMATIONPARTICLECONVERTER_DEFAULT_MINSFDENSITY);
-    _templimit = parameters->get_parameter<double>(
-            "StarFormation.MaxSFTemp",
+    //    _templimit = parameters->get_parameter<double>(
+    //            "StarFormation.MaxSFTemp",
+    //            STARFORMATIONPARTICLECONVERTER_DEFAULT_MAXSFTEMP);
+    _templimit = parameters->get_quantity(
+            "StarFormation.MaxSFTemp", "temperature",
             STARFORMATIONPARTICLECONVERTER_DEFAULT_MAXSFTEMP);
 
     // boltzman is in energy per Kelvin but UnitSet doesn't seem to have

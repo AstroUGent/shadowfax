@@ -43,6 +43,7 @@ UnitSet::UnitSet(UnitType type) {
     _unit_time = Unit("time", "s", 1.);
     _unit_mass = Unit("mass", "kg", 1.);
     _unit_acceleration = Unit("length/time/time", "m/s^2", 1.);
+    _unit_temperature = Unit("temperature", "K", 1.);
 }
 
 /**
@@ -54,8 +55,10 @@ UnitSet::UnitSet(UnitType type) {
   * @param unit_length Length Unit
   * @param unit_mass Mass Unit
   * @param unit_time Time Unit
+  * @param unit_temperature Temperature Unit.
   */
-UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time) {
+UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time,
+                 Unit unit_temperature) {
     _unit_position = unit_length;
     _unit_velocity = unit_length / unit_time;
     _unit_density = unit_mass / unit_length / unit_length / unit_length;
@@ -63,6 +66,7 @@ UnitSet::UnitSet(Unit unit_length, Unit unit_mass, Unit unit_time) {
     _unit_time = unit_time;
     _unit_mass = unit_mass;
     _unit_acceleration = unit_length / unit_time / unit_time;
+    _unit_temperature = unit_temperature;
 }
 
 /**
@@ -129,6 +133,15 @@ Unit UnitSet::get_acceleration_unit() {
 }
 
 /**
+ * @brief Get the temperature Unit.
+ *
+ * @return The temperature Unit.
+ */
+Unit UnitSet::get_temperature_unit() {
+    return _unit_temperature;
+}
+
+/**
   * @brief Get the unit for the given quantity
   *
   * This function only works if the quantity is expressed with the basic
@@ -142,9 +155,9 @@ Unit UnitSet::get_acceleration_unit() {
   */
 Unit UnitSet::get_unit(string quantity) {
     unsigned int pos = 0;
-    string names[4] = {"1", "length", "mass", "time"};
-    Unit units[4] = {Unit("1", "unity", 1.), _unit_position, _unit_mass,
-                     _unit_time};
+    string names[5] = {"1", "length", "mass", "time", "temperature"};
+    Unit units[5] = {Unit("1", "unity", 1.), _unit_position, _unit_mass,
+                     _unit_time, _unit_temperature};
     Unit unit;
     bool multiply = true;
     while(pos < quantity.length()) {
@@ -188,6 +201,7 @@ void UnitSet::dump(RestartFile& rfile) {
     _unit_time.dump(rfile);
     _unit_mass.dump(rfile);
     _unit_acceleration.dump(rfile);
+    _unit_temperature.dump(rfile);
 }
 
 /**
@@ -199,4 +213,4 @@ void UnitSet::dump(RestartFile& rfile) {
 UnitSet::UnitSet(RestartFile& rfile)
         : _unit_position(rfile), _unit_density(rfile), _unit_velocity(rfile),
           _unit_pressure(rfile), _unit_time(rfile), _unit_mass(rfile),
-          _unit_acceleration(rfile) {}
+          _unit_acceleration(rfile), _unit_temperature(rfile) {}

@@ -73,7 +73,7 @@
 #define SIMULATION_DEFAULT_ICTYPE "Gadget"
 #define SIMULATION_DEFAULT_ICNAME "icfile.hdf5"
 #define SIMULATION_DEFAULT_MAXMEMORY "1 GB"
-#define SIMULATION_DEFAULT_SOFTENING 0.03
+#define SIMULATION_DEFAULT_SOFTENING "0.03 m"
 #define SIMULATION_DEFAULT_VORONOITOLERANCE 1.e-9
 #define SIMULATION_DEFAULT_GRAVALPHA 0.005
 
@@ -1199,8 +1199,10 @@ void Simulation::initialize(string filename, bool read_mass) {
     }
 
     if(_gravity) {
-        double hsoft = _parameterfile->get_parameter<double>(
-                "Gravity.Softening", SIMULATION_DEFAULT_SOFTENING);
+        //        double hsoft = _parameterfile->get_parameter<double>(
+        //                "Gravity.Softening", SIMULATION_DEFAULT_SOFTENING);
+        double hsoft = _parameterfile->get_quantity(
+                "Gravity.Softening", "length", SIMULATION_DEFAULT_SOFTENING);
         for(unsigned int i = _particles->gassize(); i--;) {
             _particles->gas(i)->set_hsoft(hsoft);
         }

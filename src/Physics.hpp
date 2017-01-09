@@ -30,7 +30,7 @@ class ParameterFile;
 class RestartFile;
 class UnitSet;
 
-#define PHYSICS_DEFAULT_MEANMOLWEIGHT 1.219512195
+#define PHYSICS_DEFAULT_MEANMOLWEIGHT "1.219512195 amu"
 
 /**
  * @brief Physical constants used in the simulation
@@ -48,8 +48,7 @@ class Physics {
     double _mean_mol_weight;
 
   public:
-    Physics(UnitSet& units, bool real_units = true,
-            double mean_mol_weight = PHYSICS_DEFAULT_MEANMOLWEIGHT);
+    Physics(UnitSet& units, double mean_mol_weight, bool real_units = true);
     Physics(UnitSet& units, ParameterFile* parameters);
 
     double get_gravitational_constant();

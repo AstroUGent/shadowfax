@@ -46,7 +46,7 @@ class UnitDefinitions {
         // units are ordered alphabetically, irrespective of their quantity
         if(name == "amu") {
             // check value!
-            return Unit("mass", "amu", 1.67e-27);
+            return Unit("mass", "amu", 1.660539040e-27);
         } else if(name == "cm") {
             return Unit("length", "cm", 0.01);
         } else if(name == "erg") {

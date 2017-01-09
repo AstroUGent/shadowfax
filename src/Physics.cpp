@@ -27,7 +27,8 @@
 #include "ParameterFile.hpp"
 #include "io/PhysicalConstant.hpp"  // for PhysicalConstant
 #include "io/Unit.hpp"              // for Unit
-#include <string>                   // for string
+#include "io/UnitDefinitions.hpp"
+#include <string>  // for string
 using namespace std;
 
 /**
@@ -37,11 +38,11 @@ using namespace std;
  * simulation units
  *
  * @param units UnitSet used internally during the simulation
+ * @param mean_mol_weight Mean molecular weight
  * @param real_units Flag indicating whether physical values or idealized values
  * should be used for the physical constants
- * @param mean_mol_weight Mean molecular weight
  */
-Physics::Physics(UnitSet& units, bool real_units, double mean_mol_weight) {
+Physics::Physics(UnitSet& units, double mean_mol_weight, bool real_units) {
     Unit Gunit("length*length*length/mass/time/time", "Gunit", 1.);
     double Gval;
 
@@ -61,7 +62,10 @@ Physics::Physics(UnitSet& units, bool real_units, double mean_mol_weight) {
     PhysicalConstant H(3.24077929e-18, HubbleUnit);
     _H0 = H.get_value(units);
 
-    _mean_mol_weight = mean_mol_weight;
+    // convert to amu
+    Unit amu_unit = UnitDefinitions::get_unit("amu");
+    UnitConverter mmw_converter(units.get_mass_unit(), amu_unit);
+    _mean_mol_weight = mmw_converter.convert(mean_mol_weight);
 }
 
 /**
@@ -72,9 +76,8 @@ Physics::Physics(UnitSet& units, bool real_units, double mean_mol_weight) {
  */
 Physics::Physics(UnitSet& units, ParameterFile* parameters)
         : Physics(units, parameters->check_parameter("Physics.RealPhysics"),
-                  parameters->get_parameter<double>(
-                          "Physics.MeanMolWeight",
-                          PHYSICS_DEFAULT_MEANMOLWEIGHT)) {}
+                  parameters->get_quantity("Physics.MeanMolWeight", "mass",
+                                           PHYSICS_DEFAULT_MEANMOLWEIGHT)) {}
 
 /**
  * @brief Get the value of the gravitational constant in simulation units

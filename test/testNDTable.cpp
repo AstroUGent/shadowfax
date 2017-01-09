@@ -86,7 +86,8 @@ int main(int argc, char** argv) {
     Unit _unit_mass("mass", "g", 0.001);
     Unit _unit_length("length", "cm", 0.01);
     Unit _unit_time("time", "s", 1);
-    UnitSet units(_unit_length, _unit_mass, _unit_time);
+    Unit unit_temperature("temperature", "K", 1.);
+    UnitSet units(_unit_length, _unit_mass, _unit_time, unit_temperature);
     FiveDTable table(result, &units);
     cout << "Starting test" << endl;
     test_NDTable(table);

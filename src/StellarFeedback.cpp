@@ -113,18 +113,18 @@ void StellarFeedback::do_feedback(StarParticle* star, ParticleVector& particles,
  * @param parameters The parameterfile used
  */
 StellarFeedback::StellarFeedback(ParameterFile* parameters) {
-    _sw_start = parameters->get_parameter<double>(
-            "StellarFeedback.SWStart", STELLARFEEDBACK_DEFAULT_SWSTART);
-    _sw_end = parameters->get_parameter<double>("StellarFeedback.SWEnd",
-                                                STELLARFEEDBACK_DEFAULT_SWEND);
-    _sii_start = parameters->get_parameter<double>(
-            "StellarFeedback.SNIIStart", STELLARFEEDBACK_DEFAULT_SNIISTART);
-    _sii_end = parameters->get_parameter<double>(
-            "StellarFeedback.SNIIEnd", STELLARFEEDBACK_DEFAULT_SNIIEND);
-    _sia_start = parameters->get_parameter<double>(
-            "StellarFeedback.SNIaStart", STELLARFEEDBACK_DEFAULT_SNIASTART);
-    _sia_end = parameters->get_parameter<double>(
-            "StellarFeedback.SNIaEnd", STELLARFEEDBACK_DEFAULT_SNIAEND);
+    _sw_start = parameters->get_quantity("StellarFeedback.SWStart", "time",
+                                         STELLARFEEDBACK_DEFAULT_SWSTART);
+    _sw_end = parameters->get_quantity("StellarFeedback.SWEnd", "time",
+                                       STELLARFEEDBACK_DEFAULT_SWEND);
+    _sii_start = parameters->get_quantity("StellarFeedback.SNIIStart", "time",
+                                          STELLARFEEDBACK_DEFAULT_SNIISTART);
+    _sii_end = parameters->get_quantity("StellarFeedback.SNIIEnd", "time",
+                                        STELLARFEEDBACK_DEFAULT_SNIIEND);
+    _sia_start = parameters->get_quantity("StellarFeedback.SNIaStart", "time",
+                                          STELLARFEEDBACK_DEFAULT_SNIASTART);
+    _sia_end = parameters->get_quantity("StellarFeedback.SNIaEnd", "time",
+                                        STELLARFEEDBACK_DEFAULT_SNIAEND);
 
     _sii_Fe = parameters->get_parameter<double>("StellarFeedback.SNII_Fe",
                                                 STELLARFEEDBACK_DEFAULT_SNIIFE);
@@ -134,12 +134,12 @@ StellarFeedback::StellarFeedback(ParameterFile* parameters) {
                                                 STELLARFEEDBACK_DEFAULT_SNIAFE);
     _sia_Mg = parameters->get_parameter<double>("StellarFeedback.SNIa_Mg",
                                                 STELLARFEEDBACK_DEFAULT_SNIAMG);
-    _sii_E = parameters->get_parameter<double>("StellarFeedback.SNII_E",
-                                               STELLARFEEDBACK_DEFAULT_SNIIE);
-    _sw_E = parameters->get_parameter<double>("StellarFeedback.SW_E",
-                                              STELLARFEEDBACK_DEFAULT_SWE);
-    _sia_E = parameters->get_parameter<double>("StellarFeedback.SNIa_E",
-                                               STELLARFEEDBACK_DEFAULT_SNIAE);
+    _sii_E = parameters->get_quantity("StellarFeedback.SNII_E", "energy",
+                                      STELLARFEEDBACK_DEFAULT_SNIIE);
+    _sia_E = parameters->get_quantity("StellarFeedback.SNIa_E", "energy",
+                                      STELLARFEEDBACK_DEFAULT_SNIAE);
+    _sw_E = parameters->get_quantity("StellarFeedback.SW_E", "energy",
+                                     STELLARFEEDBACK_DEFAULT_SWE);
     _sii_m = parameters->get_parameter<double>("StellarFeedback.SNII_m",
                                                STELLARFEEDBACK_DEFAULT_SNIIM);
     _sia_m = parameters->get_parameter<double>("StellarFeedback.SNIa_m",
@@ -147,9 +147,9 @@ StellarFeedback::StellarFeedback(ParameterFile* parameters) {
     _nsnia_per_snii = parameters->get_parameter<double>(
             "StellarFeedback.nSNIa_per_SNII",
             STELLARFEEDBACK_DEFAULT_NSNIAPERSNII);
-    _massfac_snii = parameters->get_parameter<double>(
-            "StellarFeedback.MassFac_SNII",
-            STELLARFEEDBACK_DEFAULT_MASSFACSNII);
+    _massfac_snii =
+            parameters->get_quantity("StellarFeedback.MassFac_SNII", "1/mass",
+                                     STELLARFEEDBACK_DEFAULT_MASSFACSNII);
 
     _sradius = 1.;
 }

@@ -127,7 +127,6 @@ ParameterFile::~ParameterFile() {
  */
 double ParameterFile::get_quantity(std::string name, std::string quantity,
                                    std::string default_value) {
-    quantity = UnitDefinitions::get_quantity(quantity);
     Unit unit = _internal_units->get_unit(quantity);
     return get_quantity(name, unit, default_value);
 }

@@ -54,8 +54,7 @@ class StarFormationParticleConverter : public ParticleConverter {
     double _k_per_mH;
 
   public:
-    StarFormationParticleConverter(ParameterFile* parameters,
-                                   UnitSet* simulation_units, Physics* physics);
+    StarFormationParticleConverter(ParameterFile* parameters, Physics* physics);
     virtual ~StarFormationParticleConverter() {}
 
     virtual bool do_conversion(ParticleType type);

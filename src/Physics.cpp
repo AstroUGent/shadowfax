@@ -62,10 +62,15 @@ Physics::Physics(UnitSet& units, double mean_mol_weight, bool real_units) {
     PhysicalConstant H(3.24077929e-18, HubbleUnit);
     _H0 = H.get_value(units);
 
-    // convert to amu
+    // convert mean_mol_weight to amu
     Unit amu_unit = UnitDefinitions::get_unit("amu");
     UnitConverter mmw_converter(units.get_mass_unit(), amu_unit);
     _mean_mol_weight = mmw_converter.convert(mean_mol_weight);
+
+    double kval = 1.38064852e-23;
+    Unit kunit = Unit("energy", "J", 1.) / Unit("temperature", "K", 1.);
+    PhysicalConstant k(kval, kunit);
+    _boltzmann_k = k.get_value(units);
 }
 
 /**
@@ -108,6 +113,15 @@ double Physics::get_mean_mol_weight() {
 }
 
 /**
+ * @brief Get the Boltzmann constant k.
+ *
+ * @return Boltzmann constant k.
+ */
+double Physics::get_boltzmann_k() {
+    return _boltzmann_k;
+}
+
+/**
  * @brief Dump the object to the given RestartFile
  *
  * @param rfile RestartFile to write to
@@ -116,6 +130,7 @@ void Physics::dump(RestartFile& rfile) {
     rfile.write(_G);
     rfile.write(_H0);
     rfile.write(_mean_mol_weight);
+    rfile.write(_boltzmann_k);
 }
 
 /**
@@ -127,4 +142,5 @@ Physics::Physics(RestartFile& rfile) {
     rfile.read(_G);
     rfile.read(_H0);
     rfile.read(_mean_mol_weight);
+    rfile.read(_boltzmann_k);
 }

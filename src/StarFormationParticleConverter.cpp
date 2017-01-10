@@ -113,38 +113,18 @@ Particle* StarFormationParticleConverter::convert(Particle* particle) {
  * @brief Constructor
  *
  * @param parameters ParameterFile holding the parameters of the simulation
- * @param simulation_units Internal units
  * @param physics Physical constants
  */
 StarFormationParticleConverter::StarFormationParticleConverter(
-        ParameterFile* parameters, UnitSet* simulation_units,
-        Physics* physics) {
-    UnitSet SI(UNITS_DEFAULT);
-    //    _densitylimit = parameters->get_parameter<double>(
-    //            "StarFormation.MinSFDensity",
-    //            STARFORMATIONPARTICLECONVERTER_DEFAULT_MINSFDENSITY);
+        ParameterFile* parameters, Physics* physics) {
     _densitylimit = parameters->get_quantity(
             "StarFormation.MinSFDensity", "mass_density",
             STARFORMATIONPARTICLECONVERTER_DEFAULT_MINSFDENSITY);
-    //    _templimit = parameters->get_parameter<double>(
-    //            "StarFormation.MaxSFTemp",
-    //            STARFORMATIONPARTICLECONVERTER_DEFAULT_MAXSFTEMP);
     _templimit = parameters->get_quantity(
             "StarFormation.MaxSFTemp", "temperature",
             STARFORMATIONPARTICLECONVERTER_DEFAULT_MAXSFTEMP);
 
-    // boltzman is in energy per Kelvin but UnitSet doesn't seem to have
-    // temperature
-    Unit unit_kperm = SI.get_length_unit() * SI.get_length_unit() /
-                      SI.get_time_unit() / SI.get_time_unit();
-    Unit sim_kperm = simulation_units->get_length_unit() *
-                     simulation_units->get_length_unit() /
-                     simulation_units->get_time_unit() /
-                     simulation_units->get_time_unit();
-    UnitConverter _kperm_conv(unit_kperm, sim_kperm);
-    // k/amu = 1.3806488e-23 / 1.67372e-27
-    _k_per_mH =
-            _kperm_conv.convert(8248.98310351 / physics->get_mean_mol_weight());
+    _k_per_mH = physics->get_boltzmann_k() / physics->get_mean_mol_weight();
 }
 
 /**

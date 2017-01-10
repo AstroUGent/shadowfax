@@ -24,6 +24,7 @@
  * @author Bert Vandenbroucke (bert.vandenbroucke@ugent.be)
  */
 #include "UnitSet.hpp"
+#include "UnitDefinitions.hpp"
 using namespace std;
 
 /**
@@ -154,18 +155,22 @@ Unit UnitSet::get_temperature_unit() {
   * this UnitSet
   */
 Unit UnitSet::get_unit(string quantity) {
+    quantity = UnitDefinitions::get_quantity(quantity);
     unsigned int pos = 0;
-    string names[5] = {"1", "length", "mass", "time", "temperature"};
-    Unit units[5] = {Unit("1", "unity", 1.), _unit_position, _unit_mass,
-                     _unit_time, _unit_temperature};
+
+#define NUM_QUANTITY 5
+
+    string names[NUM_QUANTITY] = {"1", "length", "mass", "time", "temperature"};
+    Unit units[NUM_QUANTITY] = {Unit("1", "unity", 1.), _unit_position,
+                                _unit_mass, _unit_time, _unit_temperature};
     Unit unit;
     bool multiply = true;
     while(pos < quantity.length()) {
         unsigned int i = 0;
-        while(i < 4 && quantity.find(names[i], pos) > pos) {
+        while(i < NUM_QUANTITY && quantity.find(names[i], pos) > pos) {
             i++;
         }
-        if(i == 4) {
+        if(i == NUM_QUANTITY) {
             if(quantity.find("*", pos) == pos) {
                 multiply = true;
             } else {
@@ -186,6 +191,8 @@ Unit UnitSet::get_unit(string quantity) {
         }
     }
     return unit;
+
+#undef NUM_QUANTITY
 }
 
 /**

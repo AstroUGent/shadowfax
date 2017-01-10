@@ -46,6 +46,8 @@ class Physics {
     double _H0;
     /*! @brief Mean molecular weight */
     double _mean_mol_weight;
+    /*! @brief Boltzmann constant k. */
+    double _boltzmann_k;
 
   public:
     Physics(UnitSet& units, double mean_mol_weight, bool real_units = true);
@@ -54,6 +56,7 @@ class Physics {
     double get_gravitational_constant();
     double get_Hubble_constant();
     double get_mean_mol_weight();
+    double get_boltzmann_k();
 
     void dump(RestartFile& rfile);
     Physics(RestartFile& rfile);

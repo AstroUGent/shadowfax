@@ -1105,8 +1105,8 @@ void Simulation::initialize(string filename, bool read_mass) {
     _physics = new Physics(*_simulation_units, _parameterfile);
 
     if(_parameterfile->check_parameter("Physics.StarFormation")) {
-        _starformation_converter = new StarFormationParticleConverter(
-                _parameterfile, _simulation_units, _physics);
+        _starformation_converter =
+                new StarFormationParticleConverter(_parameterfile, _physics);
     } else {
         _starformation_converter = NULL;
     }

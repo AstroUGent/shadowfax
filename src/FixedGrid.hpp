@@ -26,6 +26,8 @@
 #ifndef FIXEDGRID_HPP
 #define FIXEDGRID_HPP
 
+#include "Vec.hpp"
+
 #include <vector>
 
 class ParticleVector;
@@ -82,6 +84,7 @@ class FixedGrid {
 
     void hydro(TimeLine& timeline, RiemannSolver& solver);
     void get_gradients(unsigned int index, StateVector* delta);
+    Vec get_laplacian_v(unsigned int index);
 };
 
 #endif  // FIXEDGRID_HPP

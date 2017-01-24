@@ -25,7 +25,6 @@
  */
 #include "FixedGrid.hpp"
 #include "Error.hpp"    // for my_exit
-#include "Vec.hpp"      // for Vec
 #include "VorCell.hpp"  // for VorCell
 #include "VorFace.hpp"  // for VorFace
 #include "VorGen.hpp"   // for VorGen
@@ -689,4 +688,15 @@ void FixedGrid::hydro(TimeLine& timeline, RiemannSolver& solver) {
  */
 void FixedGrid::get_gradients(unsigned int index, StateVector* delta) {
     _cells[_idx[index]]->estimate_gradient(delta);
+}
+
+/**
+ * @brief Get the Laplacian of the fluid velocity for the cell with the given
+ * index.
+ *
+ * @param index Index of a cell.
+ * @return Laplacian of the fluid velocity.
+ */
+Vec FixedGrid::get_laplacian_v(unsigned int index) {
+    return _cells[_idx[index]]->estimate_laplacian_v();
 }

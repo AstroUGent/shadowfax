@@ -124,6 +124,7 @@ GasParticle::GasParticle(GasParticle& p) : Particle(p) {
     _old_v = p._old_v;
     _real_dt = p._real_dt;
     _total_area = p._total_area;
+    _laplacian_v = p._laplacian_v;
 }
 
 /**
@@ -750,6 +751,7 @@ void GasParticle::dump(RestartFile& rfile) {
     rfile.write(_total_area);
 
     rfile.write(_real_dt);
+    rfile.write(_laplacian_v);
 }
 
 /**
@@ -787,6 +789,7 @@ GasParticle::GasParticle(RestartFile& rfile) : Particle(rfile) {
     rfile.read(_total_area);
 
     rfile.read(_real_dt);
+    rfile.read(_laplacian_v);
 }
 
 /**
@@ -1040,6 +1043,24 @@ void GasParticle::set_real_timestep(double real_dt) {
  */
 double GasParticle::get_real_timestep() {
     return _real_dt;
+}
+
+/**
+ * @brief Set the Laplacian of the fluid velocity.
+ *
+ * @param laplacian_v New value for the Laplacian of the fluid velocity.
+ */
+void GasParticle::set_laplacian_v(Vec laplacian_v) {
+    _laplacian_v = laplacian_v;
+}
+
+/**
+ * @brief Get the Laplacian of the fluid velocity.
+ *
+ * @return Laplacian of the fluid velocity.
+ */
+Vec GasParticle::get_laplacian_v() {
+    return _laplacian_v;
 }
 
 /**

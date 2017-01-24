@@ -131,6 +131,9 @@ class GasParticle : public Particle {
      *  particle */
     double _total_area;
 
+    /*! @brief Laplacian of the fluid velocity (used for viscosity). */
+    Vec _laplacian_v;
+
   public:
     GasParticle();
     GasParticle(Vec pos);
@@ -285,6 +288,9 @@ class GasParticle : public Particle {
 
     void set_real_timestep(double real_dt);
     double get_real_timestep();
+
+    void set_laplacian_v(Vec laplacian_v);
+    Vec get_laplacian_v();
 };
 
 /**

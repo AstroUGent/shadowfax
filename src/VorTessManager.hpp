@@ -100,6 +100,7 @@ class VorTessManager {
 
     Vec get_velocity(unsigned int index);
     void estimate_gradients(unsigned int index, StateVector* delta);
+    Vec estimate_laplacian_v(unsigned int index);
     double get_volume(unsigned int index);
     double get_total_area(unsigned int index);
     Vec get_centroid(unsigned int index);

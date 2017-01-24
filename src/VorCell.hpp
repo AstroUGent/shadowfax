@@ -111,6 +111,7 @@ class VorCell {
     std::vector<unsigned int> get_face_ids();
 
     void estimate_gradient(StateVector* delta);
+    Vec estimate_laplacian_v();
     void set_h();
     double get_h();
     Vec get_velocity();

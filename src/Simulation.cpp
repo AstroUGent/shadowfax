@@ -425,6 +425,13 @@ void Simulation::main_loop() {
             _voronoi->update_gradients();
             _mpitimer->stop();
 
+            for(unsigned int i = 0; i < _particles->gassize(); i++) {
+                if(_particles->gas(i)->get_starttime() == currentTime) {
+                    Vec laplacian = _voronoi->estimate_laplacian_v(i);
+                    _particles->gas(i)->set_laplacian_v(laplacian);
+                }
+            }
+
             // exchange timestep information between processes
             _mpitimer->start();
             _voronoi->update_dts(currentTime);
@@ -478,6 +485,16 @@ void Simulation::main_loop() {
             // move the mesh generators
             _particles->gas(i)->drift(_timeline->get_realtime_interval(dt));
 #endif
+            // add the viscous term
+            if(_particles->gas(i)->get_starttime() == currentTime) {
+                double vdt = _timeline->get_realtime_interval(
+                        _particles->gas(i)->get_endtime() -
+                        _particles->gas(i)->get_starttime());
+                StateVector dQ_visc;
+                dQ_visc -= 0.1 * _particles->gas(i)->get_mass() *
+                           _particles->gas(i)->get_laplacian_v() * vdt;
+                _particles->gas(i)->increase_dQ(dQ_visc);
+            }
             // add the calculated flux for this cell to its conserved quantities
             _particles->gas(i)->update_Q();
         }

@@ -296,6 +296,22 @@ void VorTessManager::estimate_gradients(unsigned int index,
 }
 
 /**
+ * @brief Estimate the Laplacian of the fluid velocity for the cell with the
+ * given index.
+ *
+ * @param index Index of a cell.
+ * @return Laplacian of the fluid velocity.
+ */
+Vec VorTessManager::estimate_laplacian_v(unsigned int index) {
+    Vec laplacian_v;
+    _hydrotimer.start();
+    VorCell* cell = _particles.gas(index)->get_cell();
+    laplacian_v = cell->estimate_laplacian_v();
+    _hydrotimer.stop();
+    return laplacian_v;
+}
+
+/**
  * @brief Calculate the volume of the cell corresponding to the particle with
  * the given index
  *
@@ -592,6 +608,17 @@ Vec VorTessManager::get_velocity(unsigned int index) {
 void VorTessManager::estimate_gradients(unsigned int index,
                                         StateVector* delta) {
     _fixedgrid->get_gradients(index, delta);
+}
+
+/**
+ * @brief Estimate the Laplacian of the fluid velocity for the cell with the
+ * given index.
+ *
+ * @param index Index of a cell.
+ * @return Laplacian of the fluid velocity.
+ */
+Vec VorTessManager::estimate_laplacian_v(unsigned int index) {
+    return _fixedgrid->get_laplacian_v(index);
 }
 
 /**

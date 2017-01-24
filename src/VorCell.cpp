@@ -530,6 +530,49 @@ void VorCell::estimate_gradient(StateVector* delta) {
 }
 
 /**
+ * @brief Estimate the Laplacian of the fluid velocity for this cell.
+ *
+ * @return Laplacian of the fluid velocity.
+ */
+Vec VorCell::estimate_laplacian_v() {
+    Vec laplacian;
+    StateVector gradi[3];
+    _central_point->get_particle()->get_gradients(gradi);
+    // laplacian estimation
+    for(unsigned int j = _faces.size(); j--;) {
+        double Aij = _faces[j]->get_area();
+        if(Aij) {
+            Vec& midface = _faces[j]->get_midpoint();
+            Vec c = midface -
+                    0.5 * (_central_point->get_position() +
+                           _ngbs[j]->get_position());
+            Vec rij = _central_point->get_position() - _ngbs[j]->get_position();
+            double rnorm = rij.norm();
+            StateVector gradj[3];
+            // check if we have to mirror this particle
+            // if so, the gradient in that direction will supposedly be zero
+            // (anyway, we do not intend to use it in this case)
+            if(_ngbs[j]->get_particle() != NULL) {
+                _ngbs[j]->get_particle()->get_gradients(gradj);
+            }
+            for(unsigned int l = ndim_; l--;) {
+                for(unsigned int m = 0; m < ndim_; ++m) {
+                    laplacian[l] +=
+                            Aij * ((gradj[m][1 + l] - gradi[m][1 + l]) * c[m] /
+                                           rnorm -
+                                   0.5 * (gradj[m][1 + l] + gradi[m][1 + l]) *
+                                           rij[m] / rnorm);
+                }
+            }
+        }
+    }
+    for(unsigned int l = ndim_; l--;) {
+        laplacian[l] /= get_volume();
+    }
+    return laplacian;
+}
+
+/**
  * @brief Get the face corresponding to the given neighbour
  *
  * If the given point is not a neighbour of this cell, the code will abort.

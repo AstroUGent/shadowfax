@@ -498,7 +498,6 @@ double ExactRiemannSolver::BrentsMethodSolve(double lowerLimit,
     c = a;
     fc = fa;
     bool mflag = true;
-    int i = 0;
 
     while(!(fb == 0) && (fabs(a - b) > errorTol * (a + b) * 0.5)) {
         if((fa != fc) && (fb != fc))
@@ -542,7 +541,6 @@ double ExactRiemannSolver::BrentsMethodSolve(double lowerLimit,
             fa = fb;
             fb = tmp;
         }
-        i++;
     }
     return b;
 }

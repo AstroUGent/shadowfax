@@ -326,6 +326,17 @@ add_unit_test(NAME testRestartFile
               NDIM 2
               LIBS ${MPI_CXX_LIBRARIES} ${MPI_C_LIBRARIES} utilities2d io2d)
 
+# External gravity test
+set(TESTEXTERNALGRAVITY_SOURCES
+    testExternalGravity.cpp
+
+    ../src/ExternalGravity.cpp
+    ../src/ExternalGravity.hpp
+)
+add_unit_test(NAME testExternalGravity
+              SOURCES ${TESTEXTERNALGRAVITY_SOURCES}
+              NDIM 3)
+
 # Add custom 'make check' target that builds all tests and executes them
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTNAMES}
                                                                version_number)

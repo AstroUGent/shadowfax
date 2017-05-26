@@ -78,6 +78,13 @@ class UnitSetGenerator {
             Unit unit_time = unit_length / unit_velocity;
             return new UnitSet(unit_length, unit_mass, unit_time);
         }
+        if(name == "DiscPatch") {
+            Unit unit_length("length", "kpc", 3.08568e16);
+            Unit unit_mass("mass", "10^10 Msol", 1.989e30);
+            Unit unit_velocity("length/time", "10^3 km/s", 1000.);
+            Unit unit_time = unit_length / unit_velocity;
+            return new UnitSet(unit_length, unit_mass, unit_time);
+        }
         std::cerr << "Error! Unknown UnitSet: " << name << "!" << std::endl;
         my_exit();
         return NULL;
